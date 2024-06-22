@@ -1,24 +1,12 @@
 import React from 'react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-	Book,
-	Bot,
-	Code2,
-	Home,
-	Layers,
-	LifeBuoy,
-	LucideIcon,
-	NotebookText,
-	Settings2,
-	SquareTerminal,
-	SquareUser,
-	Triangle,
-} from 'lucide-react';
+import { Home, Layers, LifeBuoy, LucideIcon, NotebookText } from 'lucide-react';
 import UserInfo from './user-info';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import ActivitySwitcher from './activity-switcher';
+import { createClient } from '@/lib/twilio/taskrouter';
 
 type Props = {};
 
@@ -47,28 +35,12 @@ const links: NavLink[] = [
 ];
 
 const SideNav = async (props: Props) => {
-	const myHeaders = new Headers();
-	myHeaders.append(
-		'Authorization',
-		`Basic ${btoa(`${process.env.NEXT_PUBLIC_ACCOUNT_SID}:${process.env.NEXT_PUBLIC_AUTH_TOKEN}`)}`
-	);
-
-	const requestOptions: RequestInit = {
-		method: 'GET',
-		headers: myHeaders,
-		redirect: 'follow',
-	};
-
-	const response = await fetch(
-		`https://taskrouter.twilio.com/v1/Workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_SID}/Activities`,
-		requestOptions
-	);
-	const { activities } = await response.json();
-
+	const client = createClient();
+	const activities = client.activities;
 	return (
 		<aside className='flex h-full flex-col border-r'>
 			<div className='border-b p-2'>
-				<ActivitySwitcher activites={activities} />
+				<ActivitySwitcher activites={[]} />
 			</div>
 
 			<nav className='grid gap-1 p-2'>

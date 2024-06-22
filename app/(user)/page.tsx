@@ -8,7 +8,7 @@ export default async function Home() {
 	const myHeaders = new Headers();
 	myHeaders.append(
 		'Authorization',
-		`Basic ${btoa(`${process.env.NEXT_PUBLIC_ACCOUNT_SID}:${process.env.NEXT_PUBLIC_AUTH_TOKEN}`)}`
+		`Basic ${btoa(`${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}:${process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN}`)}`
 	);
 
 	const requestOptions: RequestInit = {
@@ -17,7 +17,7 @@ export default async function Home() {
 	};
 
 	const inboundResponse = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${process.env.NEXT_PUBLIC_ACCOUNT_SID}/Calls.json?To=client:nblack_40velomethod_2Ecom&PageSize=10`,
+		`https://api.twilio.com/2010-04-01/Accounts/${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}/Calls.json?To=client:nblack_40velomethod_2Ecom&PageSize=10`,
 		requestOptions
 	);
 

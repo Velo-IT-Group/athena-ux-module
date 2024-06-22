@@ -1,18 +1,18 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { cn } from '@/lib/utils';
-import { Activity } from 'twilio-taskrouter';
 import { Circle } from 'lucide-react';
 import { useTwilio } from '@/providers/twilio-provider';
+import { ActivityInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
 
 type Props = {
-	activites: Activity[];
+	activites: ActivityInstance[];
 };
 
 const ActivitySwitcher = ({ activites }: Props) => {
-	const { worker } = useTwilio();
-	const [selectedAccount, setSelectedAccount] = React.useState<string>(worker?.activitySid || activites[0].sid);
+	const { worker, client } = useTwilio();
+	const [selectedAccount, setSelectedAccount] = React.useState<string>(worker?.activitySid || '');
 
 	useEffect(() => {
 		if (!selectedAccount) return;
@@ -21,7 +21,9 @@ const ActivitySwitcher = ({ activites }: Props) => {
 	return (
 		<Select
 			defaultValue={selectedAccount}
-			onValueChange={setSelectedAccount}
+			onValueChange={(e) => {
+				setSelectedAccount(e);
+			}}
 		>
 			<SelectTrigger
 				className={cn(
@@ -40,24 +42,24 @@ const ActivitySwitcher = ({ activites }: Props) => {
 					/>
 					{/* {activites.find((account) => account.name === selectedAccount)?.available ?  :} */}
 					<span className={cn('ml-1.5')}>
-						{activites.find((account) => account.sid === selectedAccount)?.friendly_name}
+						{activites.find((account) => account.sid === selectedAccount)?.friendlyName}
 					</span>
 				</SelectValue>
 			</SelectTrigger>
 			<SelectContent>
-				{activites.map((account) => (
+				{activites.map((activity) => (
 					<SelectItem
-						key={account.sid}
-						value={account.sid}
+						key={activity.sid}
+						value={activity.sid}
 					>
 						<div className='flex items-center gap-3 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 [&_svg]:text-foreground'>
 							<Circle
 								className={cn(
 									'w-3.5 h-3.5',
-									account.available ? 'fill-green-500 stroke-green-500' : 'fill-red-500 stroke-red-500'
+									activity.available ? 'fill-green-500 stroke-green-500' : 'fill-red-500 stroke-red-500'
 								)}
 							/>
-							{account.friendly_name}
+							{activity.friendlyName}
 						</div>
 					</SelectItem>
 				))}

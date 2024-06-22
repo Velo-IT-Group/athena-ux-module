@@ -1,12 +1,4 @@
 /** @type {import('next').NextConfig} */
-const isProd = process.env.NODE_ENV === 'production';
-
-let internalHost = null;
-
-if (!isProd) {
-	const { internalIpV4 } = await import('internal-ip');
-	internalHost = await internalIpV4();
-}
 const nextConfig = {
 	webpack: (config, { isServer }) => {
 		if (!isServer) {
@@ -32,12 +24,6 @@ const nextConfig = {
 
 		return config;
 	},
-	output: 'export',
-	images: {
-		unoptimized: true,
-	},
-	// Configure assetPrefix or else the server won't properly resolve your assets.
-	assetPrefix: isProd ? null : `http://${internalHost}:3000`,
 };
 
 export default nextConfig;

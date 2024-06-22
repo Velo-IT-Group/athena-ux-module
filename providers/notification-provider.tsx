@@ -1,6 +1,5 @@
 'use client';
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
-import { isPermissionGranted, requestPermission } from '@tauri-apps/api/notification';
 const context = React.createContext({});
 const { Provider } = context;
 

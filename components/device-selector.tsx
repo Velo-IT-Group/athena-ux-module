@@ -11,10 +11,13 @@ import {
 import { Button } from './ui/button';
 import { webHidPairing } from '@gnaudio/jabra-js';
 import { Headset } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-type Props = {};
+type Props = {
+	className?: string;
+};
 
-const DeviceSelector = (props: Props) => {
+const DeviceSelector = ({ className }: Props) => {
 	const { callControlDevices, setCurrentCallControl, currentCallControl } = useJabra();
 
 	console.log(callControlDevices, currentCallControl);
@@ -29,7 +32,7 @@ const DeviceSelector = (props: Props) => {
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant='ghost'
-					className=' col-span-3'
+					className={cn('col-span-3', className)}
 				>
 					<Headset className=' h-3.5 mr-1.5' />
 				</Button>

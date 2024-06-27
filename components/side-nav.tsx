@@ -5,7 +5,6 @@ import { Home, Layers, LifeBuoy, LucideIcon, NotebookText } from 'lucide-react';
 import UserInfo from './user-info';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import ActivitySwitcher from './activity-switcher';
 import { createClient } from '@/lib/twilio/taskrouter';
 
 type Props = {};
@@ -38,11 +37,7 @@ const SideNav = async (props: Props) => {
 	const client = createClient();
 	const activities = client.activities;
 	return (
-		<aside className='flex h-full flex-col border-r'>
-			<div className='border-b p-2'>
-				<ActivitySwitcher activites={[]} />
-			</div>
-
+		<aside className='flex flex-col grow border-r'>
 			<nav className='grid gap-1 p-2'>
 				{links.map((link) => (
 					<Tooltip key={link.href}>
@@ -77,6 +72,7 @@ const SideNav = async (props: Props) => {
 							<LifeBuoy className='size-3.5' />
 						</Button>
 					</TooltipTrigger>
+
 					<TooltipContent
 						side='right'
 						sideOffset={5}

@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import type { Task } from 'twilio-taskrouter';
 import { CustomTaskAttributes } from '@/types/twilio';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
 import { useJabra } from '@/providers/jabra-provider';
 import { MuteState } from '@gnaudio/jabra-js';

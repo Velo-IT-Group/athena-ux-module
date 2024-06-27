@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
-import { Button } from './ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import { Grip, Phone, PhoneOutgoing, Settings } from 'lucide-react';
-import { Input } from './ui/input';
-import { Separator } from './ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Call } from '@/app/(user)/history/page';
 
 type Props = {};
@@ -68,6 +68,7 @@ const OutboundDialerContent = async (props: Props) => {
 					<Input
 						placeholder='(555) 555-5555'
 						className='border-none'
+						autoFocus
 					/>
 				</div>
 

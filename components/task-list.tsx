@@ -1,7 +1,7 @@
 import { SettingsIcon } from 'lucide-react';
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Button } from './ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Task } from 'twilio-taskrouter';
 

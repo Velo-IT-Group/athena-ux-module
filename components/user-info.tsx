@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Circle, Headset, LogOut, SquareUser, UserCircle } from 'lucide-react';
@@ -20,6 +20,12 @@ type Props = {};
 
 const UserInfo = (props: Props) => {
 	const { currentCallControl, setCurrentCallControl, callControlDevices } = useJabra();
+
+	useEffect(() => {
+		if (callControlDevices.length !== 1) return;
+
+		setCurrentCallControl(callControlDevices[0]);
+	}, [callControlDevices, setCurrentCallControl]);
 
 	return (
 		<Popover>

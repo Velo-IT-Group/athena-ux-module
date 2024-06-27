@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 
 import IncomingCall from '@/components/incoming-call';
-import { ActiveCall } from '@/components/call-modal';
 import SideNav from '@/components/side-nav';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { JabraProvider } from '@/providers/jabra-provider';
@@ -14,19 +13,21 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
 	return (
-		<JabraProvider>
-			<TwilioProvider>
+		<TwilioProvider>
+			<JabraProvider>
 				<TooltipProvider>
 					<Navbar />
-					<div className='grid grid-cols-[56px_1fr]'>
+
+					<div className='grid grid-cols-[56px_1fr] grow min-h-0'>
 						<SideNav />
+
 						{children}
-						{/* <IncomingCall /> */}
 					</div>
-					{/* <ActiveCall /> */}
+
+					<IncomingCall />
 				</TooltipProvider>
-			</TwilioProvider>
-		</JabraProvider>
+			</JabraProvider>
+		</TwilioProvider>
 	);
 };
 

@@ -11,7 +11,6 @@ type Props = {
 };
 
 export function Overview({ data }: Props) {
-	console.log(data);
 	return (
 		<ResponsiveContainer
 			width='100%'

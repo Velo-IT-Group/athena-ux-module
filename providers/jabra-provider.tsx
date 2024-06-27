@@ -1,35 +1,30 @@
 'use client';
-import React, { ReactNode, useContext, useEffect, useState } from 'react';
-import {
-	init,
-	TransportContext,
-	EasyCallControlFactory,
-	MuteState,
-} from '../node_modules/@gnaudio/jabra-js/browser-esm/index.js';
-import type { ISingleCallControl, IConfig } from '@gnaudio/jabra-js';
+import React, { ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { EasyCallControlFactory, IApi, type ISingleCallControl, type MuteState } from '@gnaudio/jabra-js';
+import { jabraStateAtom } from '@/atoms/jabraAtom';
+import { initalizeJabra } from '@/lib/jabra';
 
 interface JabraProviderProps {
+	jabra: IApi | undefined;
 	callControlDevices: ISingleCallControl[];
+	setCallControlDevices: React.Dispatch<React.SetStateAction<ISingleCallControl[]>>;
 	currentCallControl: ISingleCallControl | undefined;
 	setCurrentCallControl: React.Dispatch<React.SetStateAction<ISingleCallControl | undefined>>;
-	deviceState: DeviceState;
 }
 
 const initialValues: JabraProviderProps = {
+	jabra: undefined,
 	callControlDevices: [],
+	setCallControlDevices: () => undefined,
 	currentCallControl: undefined,
 	setCurrentCallControl: () => undefined,
-	deviceState: {
-		callActive: false,
-		muteState: MuteState.NO_ONGOING_CALLS,
-	},
 };
 
 type WithChildProps = {
 	children: ReactNode;
 };
 
-type DeviceState = {
+export type DeviceState = {
 	callActive: boolean;
 	muteState: MuteState;
 };
@@ -38,76 +33,47 @@ const context = React.createContext(initialValues);
 const { Provider } = context;
 
 export const JabraProvider = ({ children }: WithChildProps) => {
+	const [jabra, setJabra] = useState<IApi>();
 	const [callControlDevices, setCallControlDevices] = useState<ISingleCallControl[]>([]);
 	const [currentCallControl, setCurrentCallControl] = useState<ISingleCallControl>();
-	const [deviceState, setDeviceState] = useState<DeviceState>({
-		callActive: false,
-		muteState: MuteState.NO_ONGOING_CALLS,
-	});
+	const ref = useRef<IApi | undefined>(undefined);
+	const callControlRef = useRef<ISingleCallControl | undefined>(undefined);
+	const callControlList = useRef<ISingleCallControl[]>([]);
+	ref.current = jabra;
+	callControlRef.current = currentCallControl;
+	callControlList.current = callControlDevices;
 
 	useEffect(() => {
-		const config = {
-			partnerKey: '',
-			appId: 'demo-app',
-			appName: 'Demo App',
-			transport: 'web-hid',
-		} as IConfig;
+		initalizeJabra()
+			.then((j) => {
+				setJabra(j);
+				const eccFactory = new EasyCallControlFactory(j);
 
-		init(config)
-			.then((jabra) => {
-				const eccFactory = new EasyCallControlFactory(jabra);
-
-				/**
-				 * Subscribe to device attach events
-				 */
-				jabra.deviceAdded.subscribe(async (d) => {
-					// Skip devices that do not support call control
+				j.deviceAdded.subscribe(async (d) => {
 					if (!eccFactory.supportsEasyCallControl(d)) {
 						return;
 					}
 
+					console.log(d);
+
 					// Convert the ISdkDevice to a ICallControlDevice
 					const ccDevice = await eccFactory.createSingleCallControl(d);
-					setCallControlDevices((defaultValue) => [...defaultValue, ccDevice]);
-				});
-
-				/**
-				 * Subscribe to device detach events
-				 */
-				jabra.deviceRemoved.subscribe((removed) => {
-					setCallControlDevices((prev) => [...prev].filter((x) => x.device.id !== removed.id));
+					setCurrentCallControl(ccDevice);
+					setCallControlDevices((prev) => [...prev, ccDevice]);
 				});
 			})
-			.catch((e) => console.error(e));
+			.catch((e) => console.log(e));
 	}, []);
 
-	useEffect(() => {
-		if (!currentCallControl) return;
-		// setCurrentCallControl(currentCallControl);
-		const muteSubscription = currentCallControl.muteState.subscribe((muteState) => {
-			console.log(muteState);
-			setDeviceState((prevDeviceState) => {
-				return { ...prevDeviceState, muteState };
-			});
-		});
+	const value = {
+		jabra: ref.current || undefined,
+		callControlDevices,
+		setCallControlDevices,
+		currentCallControl: callControlRef.current,
+		setCurrentCallControl,
+	};
 
-		const callSubscription = currentCallControl.callActive.subscribe((callActive) => {
-			setDeviceState((prevDeviceState) => {
-				return { ...prevDeviceState, callActive };
-			});
-		});
-
-		return () => {
-			muteSubscription?.unsubscribe();
-			callSubscription?.unsubscribe();
-		};
-	}, [currentCallControl]);
-
-	return (
-		<Provider value={{ callControlDevices, currentCallControl, setCurrentCallControl, deviceState }}>
-			{children}
-		</Provider>
-	);
+	return <Provider value={value}>{children}</Provider>;
 };
 
 export const useJabra = () => {

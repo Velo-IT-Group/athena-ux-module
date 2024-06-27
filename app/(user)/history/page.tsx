@@ -61,7 +61,7 @@ const Page = async ({}: Props) => {
 	});
 
 	return (
-		<main className='min-h-screen p-3'>
+		<main className='p-3 overflow-y-scroll'>
 			<h1 className='text-2xl font-semibold'>Calls</h1>
 
 			<Table>

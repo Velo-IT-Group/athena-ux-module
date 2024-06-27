@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { Phone, Settings } from 'lucide-react';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import { Sheet, SheetTrigger } from './ui/sheet';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Sheet, SheetTrigger } from '@/components/ui/sheet';
 import OutboundDialerContent from './outbound-dialer-content';
 import Image from 'next/image';
 import ActivitySwitcher from './activity-switcher';
@@ -10,7 +10,7 @@ import DeviceSelector from './device-selector';
 
 const Navbar = () => {
 	return (
-		<nav className='flex items-center justify-between border-b'>
+		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
 			<Image
 				src='/vercel.svg'
 				alt='vercel logo'

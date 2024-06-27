@@ -1,9 +1,12 @@
 'use client';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { type Reservation, Worker } from 'twilio-taskrouter';
+import { type Reservation, Worker, Activity } from 'twilio-taskrouter';
 import { Twilio } from 'twilio';
 import { createAccessToken } from '@/lib/twilio';
 import { useJabra } from './jabra-provider';
+import { useRecoilState } from 'recoil';
+import { reservationAtom } from '@/atoms/reservationAtom';
+import { reject } from 'lodash';
 
 interface TwilioProviderProps {
 	reservations: Reservation[];
@@ -13,6 +16,8 @@ interface TwilioProviderProps {
 	identity: string;
 	client: Twilio | undefined;
 	setIdentity: React.Dispatch<React.SetStateAction<string>>;
+	activities: Activity[];
+	setActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
 }
 
 const initialValues: TwilioProviderProps = {
@@ -23,6 +28,8 @@ const initialValues: TwilioProviderProps = {
 	currentWorkspace: '',
 	setCurrentWorkspace: () => undefined,
 	setIdentity: () => undefined,
+	activities: [],
+	setActivities: () => undefined,
 };
 
 type WithChildProps = {
@@ -39,8 +46,11 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const [worker, setWorker] = useState<Worker>();
 	const [reservations, setReservations] = useState<Reservation[]>([]);
 	const [currentWorkspace, setCurrentWorkspace] = useState<string | undefined>(workspaceSid);
+	const [activities, setActivities] = useState<Activity[]>([]);
 	const [identity, setIdentity] = useState<string>('');
-	const workerRef = useRef<Worker | null>(null);
+
+	const reservationsRef = useRef<Reservation[]>([]);
+	reservationsRef.current = reservations;
 
 	const username = process.env.NEXT_PUBLIC_API_KEY_SID;
 	const password = process.env.NEXT_PUBLIC_API_KEY_SECRET;
@@ -50,8 +60,6 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const { currentCallControl } = useJabra();
 
 	useEffect(() => {
-		if (!currentCallControl) return;
-
 		if (!worker) {
 			createAccessToken(
 				process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID as string,
@@ -60,51 +68,67 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 				process.env.NEXT_PUBLIC_WORKSPACE_SID as string,
 				process.env.NEXT_PUBLIC_WORKER_SID as string
 			).then((token) => {
-				setWorker(new Worker(token, { closeExistingSessions: true }));
+				const w = new Worker(token, { closeExistingSessions: true });
+				setWorker(w);
 			});
 
 			if (!worker) return;
 		}
 
-		worker.on('error', (e) => {
-			console.error(e);
-		});
-
 		worker.on('ready', (w) => {
 			console.log(`Worker ${w.sid} is now ready for work`);
-			// console.log(w.activitySid);
-			console.log(currentCallControl);
-			console.log(currentCallControl.device.id);
-			currentCallControl?.signalIncomingCall();
+			setActivities(Array.from(w.activities.values()));
+			console.log(Array.from(w.reservations.values()));
+			const ress = Array.from(w.reservations.values());
+			setReservations(ress);
+			if (ress.length) {
+				console.log(currentCallControl);
+				currentCallControl?.signalIncomingCall();
+			}
 		});
 
-		// ws.current.
+		worker.on('reservationFailed', (r: Reservation) => {
+			setReservations(reservations.filter((res) => res.sid !== r.sid));
+		});
 
-		worker?.on('reservationCreated', (reservation: Reservation) => {
-			console.log(`Reservation ${reservation.sid} has been created for ${worker?.sid}`);
+		worker?.on('reservationCreated', (r: Reservation) => {
+			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 
 			currentCallControl?.signalIncomingCall();
 
-			reservation.on('accepted', (acceptedReservation) => {
-				console.log(`Reservation ${acceptedReservation.sid} was accepted.`);
+			r.on('accepted', (reservation) => {
+				console.log(`Reservation ${reservation.sid} was accepted.`);
 				currentCallControl?.startCall();
-				setReservations([...reservations.filter((res) => res.sid === acceptedReservation.sid)]);
+				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
+			});
+
+			r.on('rejected', (reservation) => {
+				currentCallControl?.rejectIncomingCall();
+				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
+			});
+
+			r.on('timeout', (reservation) => {
+				currentCallControl?.rejectIncomingCall();
+				currentCallControl;
+				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
 			});
 		});
 
 		return () => {
 			worker?.removeAllListeners();
 		};
-	}, [worker, reservations, currentCallControl]);
+	}, [worker, currentCallControl, reservations]);
 
 	const values = {
-		reservations,
+		reservations: reservationsRef.current,
 		worker,
 		identity,
 		client,
 		currentWorkspace,
 		setCurrentWorkspace,
 		setIdentity,
+		activities,
+		setActivities,
 	};
 
 	return <Provider value={values}>{children}</Provider>;

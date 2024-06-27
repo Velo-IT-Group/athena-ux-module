@@ -5,8 +5,6 @@ import { Home, Layers, LifeBuoy, LucideIcon, NotebookText } from 'lucide-react';
 import UserInfo from './user-info';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { createClient } from '@/lib/twilio/taskrouter';
-
 type Props = {};
 
 type NavLink = {
@@ -33,11 +31,9 @@ const links: NavLink[] = [
 	},
 ];
 
-const SideNav = async (props: Props) => {
-	const client = createClient();
-	const activities = client.activities;
+const SideNav = (props: Props) => {
 	return (
-		<aside className='flex flex-col grow border-r'>
+		<aside className='flex h-full flex-col border-r'>
 			<nav className='grid gap-1 p-2'>
 				{links.map((link) => (
 					<Tooltip key={link.href}>

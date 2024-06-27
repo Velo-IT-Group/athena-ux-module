@@ -22,13 +22,15 @@ export default async function Home() {
 	);
 
 	const { calls: inboundCalls }: { calls: Call[] } = await inboundResponse.json();
+
 	const groupedMonths = groupBy(
 		inboundCalls.sort((a, b) => new Date(a.date_created).getUTCSeconds() - new Date(b.date_created).getUTCSeconds()),
 		({ date_created }) => new Date(date_created).getDay()
 	);
+
 	const data: DataItem[] = Object.entries(groupedMonths).map(([key, value]) => {
 		const date = new Date(value[0].date_created);
-		console.log(value.length);
+		// console.log(value.length);
 
 		return {
 			name: Intl.DateTimeFormat('en-US').format(date),
@@ -37,7 +39,7 @@ export default async function Home() {
 	});
 
 	return (
-		<main className='min-h-screen grid grid-cols-[2fr_1fr] gap-3 p-3'>
+		<main className='grid grid-cols-[2fr_1fr] gap-3 p-3'>
 			<div className='space-y-3'>
 				<div className='grid grid-cols-2'>
 					<Card>

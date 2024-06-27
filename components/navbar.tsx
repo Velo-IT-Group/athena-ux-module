@@ -12,14 +12,14 @@ const Navbar = () => {
 	return (
 		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
 			<Image
-				src='/vercel.svg'
-				alt='vercel logo'
+				src='/velo-logo-black.svg'
+				alt='Velo logo logo'
 				width={50}
 				height={50}
 				className='object-contain'
 			/>
 
-			<div className='flex items-center gap-1.5'>
+			<div className='flex items-center'>
 				<Button
 					variant='ghost'
 					size='icon'
@@ -44,7 +44,7 @@ const Navbar = () => {
 
 				<ActivitySwitcher />
 
-				<Avatar className='w-7 h-7'>
+				<Avatar className='w-7 h-7 ml-1.5'>
 					<AvatarFallback className='text-xs'>NB</AvatarFallback>
 				</Avatar>
 			</div>

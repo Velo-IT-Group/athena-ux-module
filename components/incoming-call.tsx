@@ -66,7 +66,11 @@ const IncomingCall = ({}: Props) => {
 								<Button
 									className='bg-green-600 hover:bg-green-600/90 text-sm'
 									onClick={async () => {
-										await r.accept();
+										const conference = await r.conference({
+											from: attributes.from,
+											to: 'client:nblack_40velomethod_2Ecom',
+										});
+										console.log(conference);
 									}}
 								>
 									Accept

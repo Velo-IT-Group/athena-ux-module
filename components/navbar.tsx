@@ -1,12 +1,15 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Phone, Settings } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetTrigger } from '@/components/ui/sheet';
+
 import OutboundDialerContent from './outbound-dialer-content';
-import Image from 'next/image';
 import ActivitySwitcher from './activity-switcher';
 import DeviceSelector from './device-selector';
+import { Popover, PopoverTrigger } from './ui/popover';
 
 const Navbar = () => {
 	return (
@@ -29,20 +32,20 @@ const Navbar = () => {
 
 				<DeviceSelector />
 
-				<Sheet>
-					<SheetTrigger asChild>
+				<Popover>
+					<PopoverTrigger asChild>
 						<Button
 							variant='ghost'
 							size='icon'
 						>
 							<Phone className='w-3.5 h-3.5' />
 						</Button>
-					</SheetTrigger>
+					</PopoverTrigger>
 
 					<OutboundDialerContent />
-				</Sheet>
+				</Popover>
 
-				<ActivitySwitcher />
+				<ActivitySwitcher className='ml-1.5' />
 
 				<Avatar className='w-7 h-7 ml-1.5'>
 					<AvatarFallback className='text-xs'>NB</AvatarFallback>

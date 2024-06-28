@@ -1,9 +1,14 @@
 import { atom } from 'recoil';
-import { ICallControl, MuteState, type ISingleCallControl } from '@gnaudio/jabra-js';
+import { MuteState, type ISingleCallControl } from '@gnaudio/jabra-js';
 import { DeviceState } from '@/providers/jabra-provider';
 
 export const jabraAtom = atom<ISingleCallControl | null>({
 	key: 'jabraAtom',
+	default: null,
+});
+
+export const callControlAtom = atom<ISingleCallControl | null>({
+	key: 'callControlAtom',
 	default: null,
 });
 

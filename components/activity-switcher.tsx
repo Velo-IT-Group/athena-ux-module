@@ -1,26 +1,23 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { useTwilio } from '@/providers/twilio-provider';
 import { updateWorker } from '@/lib/twilio/update';
 import { Combobox } from './ui/combobox';
 import { Button } from './ui/button';
+import { useJabra } from '@/providers/jabra-provider';
+import { webHidPairing } from '@gnaudio/jabra-js';
 
 type Props = {
-	// activites: ActivityInstance[];
+	className?: string;
 };
 
-const ActivitySwitcher = ({}: Props) => {
+const ActivitySwitcher = ({ className }: Props) => {
 	const { worker, activities } = useTwilio();
+	const { currentCallControl } = useJabra();
 	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.activitySid ?? '');
 	const selectedActivity = activities.find((account) => account.name === selectedAccount);
-
-	useEffect(() => {
-		if (!selectedAccount || !worker) return;
-
-		updateWorker(worker.sid, { activitySid: selectedActivity?.sid });
-	}, [selectedAccount, selectedActivity, worker]);
 
 	return (
 		<Combobox
@@ -29,12 +26,20 @@ const ActivitySwitcher = ({}: Props) => {
 				return { label: a.name, value: a.name };
 			})}
 			value={selectedAccount}
-			setValue={setSelectedAccount}
+			setValue={async (e) => {
+				if (currentCallControl) {
+					setSelectedAccount(e);
+					await updateWorker(worker!.sid, { activitySid: selectedActivity?.sid });
+				} else {
+					await webHidPairing();
+				}
+			}}
+			align='end'
 		>
 			<Button
 				variant='outline'
 				size='sm'
-				className='flex items-center gap-1.5'
+				className={cn('flex items-center gap-1.5', className)}
 			>
 				<CheckCircle2
 					className={cn('inline-block', selectedActivity?.available ? 'stroke-green-500' : 'stroke-red-500')}

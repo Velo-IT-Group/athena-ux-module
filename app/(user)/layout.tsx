@@ -13,8 +13,8 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
 	return (
-		<TwilioProvider>
-			<JabraProvider>
+		<JabraProvider>
+			<TwilioProvider>
 				<TooltipProvider>
 					<Navbar />
 
@@ -26,8 +26,8 @@ const Layout = ({ children }: Props) => {
 
 					<IncomingCall />
 				</TooltipProvider>
-			</JabraProvider>
-		</TwilioProvider>
+			</TwilioProvider>
+		</JabraProvider>
 	);
 };
 

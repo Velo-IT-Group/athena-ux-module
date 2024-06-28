@@ -60,6 +60,8 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const { currentCallControl } = useJabra();
 
 	useEffect(() => {
+		if (!currentCallControl) return;
+
 		if (!worker) {
 			createAccessToken(
 				process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID as string,
@@ -75,7 +77,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			if (!worker) return;
 		}
 
-		worker.on('ready', (w) => {
+		worker.on('ready', async (w) => {
 			console.log(`Worker ${w.sid} is now ready for work`);
 			setActivities(Array.from(w.activities.values()));
 			console.log(Array.from(w.reservations.values()));
@@ -83,7 +85,13 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			setReservations(ress);
 			if (ress.length) {
 				console.log(currentCallControl);
-				currentCallControl?.signalIncomingCall();
+
+				try {
+					const isRinging = await currentCallControl?.signalIncomingCall();
+					console.log(isRinging);
+				} catch (error) {
+					console.log(error);
+				}
 			}
 		});
 
@@ -91,25 +99,51 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			setReservations(reservations.filter((res) => res.sid !== r.sid));
 		});
 
-		worker?.on('reservationCreated', (r: Reservation) => {
+		worker?.on('reservationCreated', async (r: Reservation) => {
 			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 
-			currentCallControl?.signalIncomingCall();
+			try {
+				await currentCallControl?.signalIncomingCall();
+			} catch (error) {
+				console.error(error);
+			}
 
-			r.on('accepted', (reservation) => {
+			setReservations((reservations) => [...reservations, r]);
+
+			r.on('accepted', async (reservation) => {
 				console.log(`Reservation ${reservation.sid} was accepted.`);
+				// await reservation.conference({
+				// 	from: reservation.task.attributes['from'],
+				// });
 				currentCallControl?.startCall();
+
 				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
 			});
 
-			r.on('rejected', (reservation) => {
-				currentCallControl?.rejectIncomingCall();
+			r.on('rejected', async (reservation) => {
+				try {
+					currentCallControl?.rejectIncomingCall();
+				} catch (error) {
+					console.error('No call pending', error);
+				}
 				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
 			});
 
-			r.on('timeout', (reservation) => {
-				currentCallControl?.rejectIncomingCall();
-				currentCallControl;
+			r.on('canceled', async (reservation) => {
+				try {
+					currentCallControl?.rejectIncomingCall();
+				} catch (error) {
+					console.error('No call pending', error);
+				}
+				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
+			});
+
+			r.on('timeout', async (reservation) => {
+				try {
+					currentCallControl?.rejectIncomingCall();
+				} catch (error) {
+					console.error('No call pending', error);
+				}
 				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
 			});
 		});
@@ -117,7 +151,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		return () => {
 			worker?.removeAllListeners();
 		};
-	}, [worker, currentCallControl, reservations]);
+	}, [worker, currentCallControl]);
 
 	const values = {
 		reservations: reservationsRef.current,

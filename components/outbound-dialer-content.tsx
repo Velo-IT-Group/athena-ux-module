@@ -1,11 +1,14 @@
 import React from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Grip, Phone, PhoneOutgoing, Settings } from 'lucide-react';
+import { Grip, History, Phone, PhoneOutgoing, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Call } from '@/app/(user)/history/page';
+import { PopoverContent } from './ui/popover';
+import { Dialpad } from './dialpad';
+import { Combobox } from './ui/combobox';
 
 type Props = {};
 
@@ -36,47 +39,60 @@ const OutboundDialerContent = async (props: Props) => {
 	const calls = [...inboundCalls, ...outboundCalls].sort((a, b) => {
 		return new Date(b.start_time).getTime() - new Date(a.start_time).getTime();
 	});
+
 	return (
-		<SheetContent className='sm:max-w-md'>
-			<SheetHeader>
+		<PopoverContent>
+			{/* <SheetHeader>
 				<SheetTitle>Dial number</SheetTitle>
-			</SheetHeader>
+			</SheetHeader> */}
 
 			<form
 				action=''
 				className='space-y-1.5'
 			>
-				<div className='flex items-center justify-end'>
-					<Button
-						variant='ghost'
-						size='icon'
+				<Dialpad />
+
+				<div className='grid grid-cols-3 gap-1.5 w-full'>
+					<Combobox
+						items={inboundCalls.map((c) => {
+							return {
+								label: `${c.from_formatted} - ${Intl.DateTimeFormat('en-US', {
+									dateStyle: 'short',
+									timeStyle: 'short',
+								}).format(new Date(c.start_time))}`,
+								value: `${c.from_formatted} - ${c.sid}`,
+							};
+						})}
+						placeholder=''
+						value={''}
+						align='end'
+						// setValue={() => {}}
 					>
-						<Grip className='w-3.5 h-3.5' />
-					</Button>
+						<Button
+							variant='ghost'
+							size='lg'
+							className='text-xl'
+						>
+							<History className='font-medium' />
+						</Button>
+					</Combobox>
 
 					<Button
 						variant='ghost'
-						size='icon'
+						size='lg'
+						className='text-xl'
 					>
-						<Settings className='w-3.5 h-3.5' />
+						0
 					</Button>
 				</div>
 
-				<div className='flex items-center border rounded-md'>
-					<div className='bg-secondary h-10 grid place-items-center px-3 text-sm'>+1</div>
-
-					<Input
-						placeholder='(555) 555-5555'
-						className='border-none'
-						autoFocus
-					/>
-				</div>
+				<Separator />
 
 				<Button className='w-full space-x-1.5'>
 					<Phone className='w-3.5 h-3.5' /> <span>Call</span>
 				</Button>
 
-				<Separator />
+				{/* <Separator />
 
 				<h2 className='text-lg font-medium'>Recents</h2>
 
@@ -108,9 +124,9 @@ const OutboundDialerContent = async (props: Props) => {
 							</TableRow>
 						))}
 					</TableBody>
-				</Table>
+				</Table> */}
 			</form>
-		</SheetContent>
+		</PopoverContent>
 	);
 };
 

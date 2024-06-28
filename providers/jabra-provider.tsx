@@ -54,8 +54,6 @@ export const JabraProvider = ({ children }: WithChildProps) => {
 						return;
 					}
 
-					console.log(d);
-
 					// Convert the ISdkDevice to a ICallControlDevice
 					const ccDevice = await eccFactory.createSingleCallControl(d);
 					setCurrentCallControl(ccDevice);

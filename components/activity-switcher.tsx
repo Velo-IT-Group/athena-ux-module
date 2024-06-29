@@ -16,7 +16,7 @@ type Props = {
 const ActivitySwitcher = ({ className }: Props) => {
 	const { worker, activities } = useTwilio();
 	const { currentCallControl } = useJabra();
-	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.activitySid ?? '');
+	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.activity?.name ?? '');
 	const selectedActivity = activities.find((account) => account.name === selectedAccount);
 
 	return (
@@ -29,7 +29,8 @@ const ActivitySwitcher = ({ className }: Props) => {
 			setValue={async (e) => {
 				if (currentCallControl) {
 					setSelectedAccount(e);
-					await updateWorker(worker!.sid, { activitySid: selectedActivity?.sid });
+					const activity = activities.find((account) => account.name === selectedAccount);
+					await updateWorker(worker!.sid, { activitySid: activity?.sid });
 				} else {
 					await webHidPairing();
 				}

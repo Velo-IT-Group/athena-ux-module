@@ -68,7 +68,6 @@ const IncomingCall = ({}: Props) => {
 									onClick={async () => {
 										const conference = await r.conference({
 											from: attributes.from,
-											to: 'client:nblack_40velomethod_2Ecom',
 										});
 										console.log(conference);
 									}}

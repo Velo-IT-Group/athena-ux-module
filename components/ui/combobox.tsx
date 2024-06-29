@@ -18,11 +18,20 @@ type Props = {
 	placeholder: string;
 	children?: React.ReactNode;
 	align?: 'center' | 'end' | 'start';
+	side?: 'top' | 'right' | 'bottom' | 'left';
 	value: string;
 	setValue: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export function Combobox({ items, placeholder, children, align = 'start', value = '', setValue }: Props) {
+export function Combobox({
+	items,
+	placeholder,
+	children,
+	align = 'start',
+	side = 'bottom',
+	value = '',
+	setValue,
+}: Props) {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -48,6 +57,7 @@ export function Combobox({ items, placeholder, children, align = 'start', value 
 			<PopoverContent
 				align={align}
 				className='min-w-52 p-0'
+				side={side}
 			>
 				<Command>
 					<CommandInput placeholder={placeholder} />

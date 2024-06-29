@@ -39,7 +39,7 @@ export const getConference = async (sid: string, callSid: string) => {
 	};
 };
 
-export const call = (CallSid: string, callerId: string, phone: string) => {
+export const call = async (CallSid: string, callerId: string, phone: string) => {
 	let name = 'conf_' + CallSid;
 
 	const response = new twiml.VoiceResponse();

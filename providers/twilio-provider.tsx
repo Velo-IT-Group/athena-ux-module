@@ -80,15 +80,11 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		worker.on('ready', async (w) => {
 			console.log(`Worker ${w.sid} is now ready for work`);
 			setActivities(Array.from(w.activities.values()));
-			console.log(Array.from(w.reservations.values()));
 			const ress = Array.from(w.reservations.values());
 			setReservations(ress);
 			if (ress.length) {
-				console.log(currentCallControl);
-
 				try {
-					const isRinging = await currentCallControl?.signalIncomingCall();
-					console.log(isRinging);
+					await currentCallControl?.signalIncomingCall();
 				} catch (error) {
 					console.log(error);
 				}
@@ -102,19 +98,17 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		worker?.on('reservationCreated', async (r: Reservation) => {
 			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 
-			try {
-				await currentCallControl?.signalIncomingCall();
-			} catch (error) {
-				console.error(error);
-			}
+			// try {
+			// 	await currentCallControl?.signalIncomingCall();
+			// } catch (error) {
+			// 	console.error(error);
+			// }
 
 			setReservations((reservations) => [...reservations, r]);
 
 			r.on('accepted', async (reservation) => {
 				console.log(`Reservation ${reservation.sid} was accepted.`);
-				// await reservation.conference({
-				// 	from: reservation.task.attributes['from'],
-				// });
+
 				currentCallControl?.startCall();
 
 				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
@@ -131,7 +125,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 
 			r.on('canceled', async (reservation) => {
 				try {
-					currentCallControl?.rejectIncomingCall();
+					// currentCallControl?.rejectIncomingCall();
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -140,7 +134,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 
 			r.on('timeout', async (reservation) => {
 				try {
-					currentCallControl?.rejectIncomingCall();
+					// currentCallControl?.rejectIncomingCall();
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -151,7 +145,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		return () => {
 			worker?.removeAllListeners();
 		};
-	}, [worker, currentCallControl]);
+	}, [worker, currentCallControl, reservations]);
 
 	const values = {
 		reservations: reservationsRef.current,

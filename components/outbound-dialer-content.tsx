@@ -1,14 +1,14 @@
 import React from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Grip, History, Phone, PhoneOutgoing, Settings } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { History, Phone } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Call } from '@/app/(user)/history/page';
-import { PopoverContent } from './ui/popover';
+import { PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
-import { Combobox } from './ui/combobox';
+import { Combobox } from '@/components/ui/combobox';
+import { call } from '@/lib/twilio/read';
+import { Select, SelectTrigger, SelectValue } from './ui/select';
+import { Label } from './ui/label';
 
 type Props = {};
 
@@ -23,7 +23,7 @@ const OutboundDialerContent = async (props: Props) => {
 		method: 'GET',
 		headers: myHeaders,
 	};
-	const response = await fetch('https://voice.twilio.com/v1/DialingPermissions/Countries', requestOptions);
+
 	const outBoundResponse = await fetch(
 		`https://api.twilio.com/2010-04-01/Accounts/${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}/Calls.json?From=client:nblack_40velomethod_2Ecom&PageSize=10`,
 		requestOptions
@@ -34,20 +34,17 @@ const OutboundDialerContent = async (props: Props) => {
 		requestOptions
 	);
 
-	const { calls: outboundCalls }: { calls: Call[] } = await outBoundResponse.json();
 	const { calls: inboundCalls }: { calls: Call[] } = await inboundResponse.json();
-	const calls = [...inboundCalls, ...outboundCalls].sort((a, b) => {
-		return new Date(b.start_time).getTime() - new Date(a.start_time).getTime();
-	});
 
 	return (
-		<PopoverContent>
-			{/* <SheetHeader>
-				<SheetTitle>Dial number</SheetTitle>
-			</SheetHeader> */}
-
+		<PopoverContent align='end'>
 			<form
-				action=''
+				action={async (data: FormData) => {
+					'use server';
+					const callerId = data.get('callerId') as string;
+					const phone = data.get('phoneNumber') as string;
+					await call('', callerId, phone);
+				}}
 				className='space-y-1.5'
 			>
 				<Dialpad />
@@ -63,10 +60,10 @@ const OutboundDialerContent = async (props: Props) => {
 								value: `${c.from_formatted} - ${c.sid}`,
 							};
 						})}
-						placeholder=''
+						placeholder='Filter calls...'
 						value={''}
-						align='end'
-						// setValue={() => {}}
+						align='start'
+						side='left'
 					>
 						<Button
 							variant='ghost'
@@ -80,6 +77,7 @@ const OutboundDialerContent = async (props: Props) => {
 					<Button
 						variant='ghost'
 						size='lg'
+						type='button'
 						className='text-xl'
 					>
 						0
@@ -88,43 +86,18 @@ const OutboundDialerContent = async (props: Props) => {
 
 				<Separator />
 
+				<Label>Caller ID</Label>
+				<Select>
+					<SelectTrigger>
+						<SelectValue placeholder='Select caller id...' />
+					</SelectTrigger>
+				</Select>
+
+				<Separator />
+
 				<Button className='w-full space-x-1.5'>
 					<Phone className='w-3.5 h-3.5' /> <span>Call</span>
 				</Button>
-
-				{/* <Separator />
-
-				<h2 className='text-lg font-medium'>Recents</h2>
-
-				<Table className='flex flex-col min-h-0'>
-					<TableBody className='overflow-scroll'>
-						{calls.map((call) => (
-							<TableRow
-								key={call.sid}
-								className='group'
-							>
-								<TableCell>{call.direction === 'outbound-dial' && <PhoneOutgoing className='w-3.5 h-3.5' />}</TableCell>
-								<TableCell className='max-w-16 text-ellipsis overflow-hidden'>{call.from}</TableCell>
-								<TableCell className='text-nowrap text-ellipsis'>Remy Morris</TableCell>
-								<TableCell>
-									<span className='group-hover:hidden'>
-										{Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'short' }).format(
-											new Date(call.date_created)
-										)}
-									</span>
-									<Button
-										variant='ghost'
-										size='sm'
-										className='h-auto hidden group-hover:flex items-center gap-1.5'
-										type='button'
-									>
-										<Phone className='w-3.5 h-3.5' /> Call
-									</Button>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table> */}
 			</form>
 		</PopoverContent>
 	);

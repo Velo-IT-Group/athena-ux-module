@@ -58,6 +58,7 @@ export function Dialpad() {
 				autoFocus
 				ref={textInput}
 				name='phoneNumber'
+				placeholder='(123) 456-7890'
 				className='border-none px-4 py-3 w-full text-center text-xl font-medium text-primary'
 			/>
 
@@ -66,6 +67,7 @@ export function Dialpad() {
 					<Button
 						size='lg'
 						variant='ghost'
+						type='button'
 						key={`${d.name}-${d.value}`}
 						onClick={() => insertMyText(d.value)}
 						className='text-xl'

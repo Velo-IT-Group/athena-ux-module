@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataItem, Overview } from './overview';
 import { Call } from './history/page';
 import { groupBy } from 'lodash';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default async function Home() {
@@ -30,7 +30,6 @@ export default async function Home() {
 
 	const data: DataItem[] = Object.entries(groupedMonths).map(([key, value]) => {
 		const date = new Date(value[0].date_created);
-		// console.log(value.length);
 
 		return {
 			name: Intl.DateTimeFormat('en-US').format(date),

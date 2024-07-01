@@ -3,6 +3,7 @@ import { Call } from './history/page';
 import { groupBy } from 'lodash';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 
 export default async function Home() {
 	const myHeaders = new Headers();
@@ -38,42 +39,60 @@ export default async function Home() {
 	});
 
 	return (
-		<main className='grid grid-cols-[2fr_1fr] gap-3 p-3'>
-			<div className='space-y-3'>
-				<div className='grid grid-cols-2'>
-					<Card>
-						<CardHeader>
-							<CardTitle className='text-xs font-medium'>Horses</CardTitle>
-						</CardHeader>
+		<main className='grid grid-cols-3 gap-3 p-3'>
+			<Card>
+				<CardHeader>
+					<CardTitle className='text-xs font-medium'>Horses</CardTitle>
+				</CardHeader>
 
-						<CardContent>
-							<p className='text-xl'>12</p>
-						</CardContent>
-					</Card>
-				</div>
+				<CardContent>
+					<p className='text-xl'>12</p>
+				</CardContent>
+			</Card>
 
-				<Card className='bg-secondary'>
-					<CardHeader className='justify-between items-center flex-row space-y-0'>
-						<CardTitle>Calls</CardTitle>
+			<div className='bg-yellow-300 rounded-lg'></div>
 
-						<Select defaultValue='lastYear'>
-							<SelectTrigger>
-								<SelectValue placeholder='Select range' />
-							</SelectTrigger>
+			<div className='bg-yellow-300 rounded-lg'></div>
 
-							<SelectContent>
-								<SelectItem value='lastYear'>Last year</SelectItem>
-							</SelectContent>
-						</Select>
-					</CardHeader>
+			<Card className='bg-secondary col-span-2'>
+				<CardHeader className='justify-between items-center flex-row space-y-0'>
+					<CardTitle>Calls</CardTitle>
 
-					<CardContent className='bg-card rounded-lg'>
-						<Overview data={data} />
-					</CardContent>
-				</Card>
-			</div>
+					<Select defaultValue='lastYear'>
+						<SelectTrigger>
+							<SelectValue placeholder='Select range' />
+						</SelectTrigger>
 
-			<div className='bg-yellow-500'></div>
+						<SelectContent>
+							<SelectItem value='lastYear'>Last year</SelectItem>
+						</SelectContent>
+					</Select>
+				</CardHeader>
+
+				<CardContent className='bg-card rounded-lg'>
+					<Overview data={data} />
+				</CardContent>
+			</Card>
+
+			<div className='bg-yellow-300 rounded-lg'></div>
+
+			<Card className='col-span-3'>
+				<CardHeader className='p-3'>
+					<CardTitle className='text-base'>Call History</CardTitle>
+				</CardHeader>
+
+				<CardContent className='px-3'>
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableCell>
+									<span>Hey</span>
+								</TableCell>
+							</TableRow>
+						</TableHeader>
+					</Table>
+				</CardContent>
+			</Card>
 		</main>
 	);
 }

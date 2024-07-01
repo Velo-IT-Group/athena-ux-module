@@ -1,10 +1,40 @@
 'use server';
 import { baseHeaders } from '../utils';
-import { Company, ServiceTicket } from './types';
+import { Company, Contact, ServiceTicket } from './types';
 
 export const getCompany = async (id: number): Promise<Company> => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}`, { headers: baseHeaders });
 	return await response.json();
+};
+
+export const getContact = async (id?: number): Promise<Contact | undefined> => {
+	try {
+		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}`, { headers: baseHeaders });
+
+		if (response.status !== 200) throw Error('Could not find contact...');
+
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const getContacts = async (id?: number): Promise<Contact[]> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/?conditions=company/id = ${id}&pageSize=1000&orderBy=firstName, lastName`,
+			{
+				headers: baseHeaders,
+			}
+		);
+
+		if (response.status !== 200) throw Error('Could not fetch contacts...');
+
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
 };
 
 export const getCompanies = async (): Promise<Company[]> => {

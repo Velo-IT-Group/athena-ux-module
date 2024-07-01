@@ -24,11 +24,14 @@ const Page = async ({ params }: Props) => {
 	);
 	const task = await response.json();
 	const attributes = JSON.parse(task.attributes);
-	console.log(attributes);
 
 	return (
 		<main className='grid sm:grid-cols-[1fr_3fr_1fr] bg-muted grow'>
-			<ConversationContactDetail />
+			<ConversationContactDetail
+				companyId={attributes['companyId']}
+				contactId={attributes.contactId}
+				attributes={attributes}
+			/>
 
 			<ConversationDetails className='p-6' />
 

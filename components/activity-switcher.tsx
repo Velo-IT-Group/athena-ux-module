@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { useTwilio } from '@/providers/twilio-provider';
@@ -19,6 +19,12 @@ const ActivitySwitcher = ({ className }: Props) => {
 	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.activity?.name ?? '');
 	const selectedActivity = activities.find((account) => account.name === selectedAccount);
 
+	useEffect(() => {
+		if (!worker) return;
+		console.log(worker?.activitySid);
+		setSelectedAccount(worker?.activity?.name);
+	}, [worker]);
+
 	return (
 		<Combobox
 			placeholder='Filter activities...'
@@ -29,7 +35,7 @@ const ActivitySwitcher = ({ className }: Props) => {
 			setValue={async (e) => {
 				if (currentCallControl) {
 					setSelectedAccount(e);
-					const activity = activities.find((account) => account.name === selectedAccount);
+					const activity = activities.find((account) => account.name === e);
 					await updateWorker(worker!.sid, { activitySid: activity?.sid });
 				} else {
 					await webHidPairing();

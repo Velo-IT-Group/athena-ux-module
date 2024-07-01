@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
-const VoiceResponse = require('twilio').twiml.VoiceResponse;
+import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
 
 export async function POST(request: Request) {
 	const data = await request.formData();
 	const twiml = new VoiceResponse();
 
+	console.log(data);
+
 	const dial = twiml.dial({ callerId: data.get('Caller') as string });
-	console.log(dial);
-	dial.number('469-344-2265');
-	console.log(data, twiml);
+	dial.client('nblack_40velomethod_2Ecom');
+	// console.log(dial);
+	// console.log(data, twiml);
 
 	// response.
 
@@ -17,7 +19,10 @@ export async function POST(request: Request) {
 	//   instruction: "dequeue",
 	//   post_work_activity_sid: app.get('workspaceInfo').activities.idle
 	// });
-	return NextResponse.json(twiml.toString());
+	let response = new NextResponse(twiml.toString());
+	response.headers.set('Content-Type', 'text/xml');
+
+	return response;
 	// return Response.json({
 	// 	instruction: "dequeue",
 	// 	to: "469-344-2265",

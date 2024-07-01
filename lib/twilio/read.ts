@@ -1,3 +1,4 @@
+'use server';
 import { Twilio, twiml } from 'twilio';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { getConferenceByName, getConferenceParticipants } from './conference/helpers';
@@ -8,7 +9,10 @@ const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_
 
 export const getWorkers = async (): Promise<WorkerInstance[]> => {
 	try {
-		const workers = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers.list();
+		const workers = await client.taskrouter.v1
+			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+			.workers.list({ available: 'true' });
+
 		return workers;
 	} catch (error) {
 		console.error(error);

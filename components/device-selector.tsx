@@ -20,8 +20,6 @@ type Props = {
 const DeviceSelector = ({ className }: Props) => {
 	const { callControlDevices, setCurrentCallControl, currentCallControl } = useJabra();
 
-	console.log(callControlDevices, currentCallControl);
-
 	return (
 		<DropdownMenu
 			onOpenChange={async (e) => {

@@ -175,14 +175,12 @@ export type CatalogComponent = {
 	price: number;
 	cost: number;
 };
-
 export interface SystemMember {
 	id: number;
 	identifier: string;
 	firstName: string;
 	lastName: string;
 }
-
 interface QuoteItem {
 	id: string;
 	id_quote: string;
@@ -742,7 +740,8 @@ export interface Country {
 
 export interface Contact {
 	id: number;
-	name: string;
+	firstName: string;
+	lastName: string;
 }
 
 export interface Type {

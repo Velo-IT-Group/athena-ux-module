@@ -3,32 +3,53 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getContact, getContacts } from '@/lib/manage/read';
 import { Building, Ellipsis, Mail, Phone, Plus } from 'lucide-react';
-import React from 'react';
+import React, { Suspense } from 'react';
+import ContactSelector from '../contact-selector';
 
-type Props = {};
+type Props = {
+	contactId?: string;
+	companyId?: string;
+	attributes: Record<string, any>;
+};
 
-const ConversationContactDetail = async (props: Props) => {
+const ConversationContactDetail = async ({ contactId, companyId, attributes }: Props) => {
+	const [contact, contacts] = await Promise.all([
+		getContact(parseInt(contactId ?? '')),
+		getContacts(parseInt(companyId ?? '')),
+	]);
+
 	return (
 		<aside className='flex flex-col items-center gap-3 p-3 bg-background border-r'>
 			<Avatar className='w-20 h-20'>
-				<AvatarFallback>NB</AvatarFallback>
+				<AvatarFallback>{contactId ? `${contact?.firstName} ${contact?.lastName}` : 'UU'}</AvatarFallback>
 				<AvatarImage src='https://uploads-ssl.webflow.com/61d87d426829a9bac65eeb9e/654d2b113b66e71152acc84c_Nick_Headshot_Fall2023.jpg'></AvatarImage>
 			</Avatar>
 
-			<h2 className='text-2xl font-semibold'>Nick Black</h2>
+			{contactId ? (
+				<h2 className='text-2xl font-semibold'>
+					{contact?.firstName} {contact?.lastName}
+				</h2>
+			) : (
+				<Suspense>
+					<ContactSelector companyId={companyId ?? ''} />
+				</Suspense>
+			)}
 
 			<div className='flex items-center gap-1.5 text-muted-foreground'>
 				<Building />
 
-				<span className='text-sm font-medium'>Velo IT Group</span>
+				<span className='text-sm font-medium'>{attributes.companyName}</span>
 
-				<Badge
-					variant='caution'
-					className='rounded'
-				>
-					VIP
-				</Badge>
+				{attributes.isVip && (
+					<Badge
+						variant='caution'
+						className='rounded'
+					>
+						VIP
+					</Badge>
+				)}
 			</div>
 
 			<div className='flex items-center gap-3'>

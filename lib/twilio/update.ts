@@ -20,7 +20,7 @@ export const updateWorker = async (workerSid: string, options: WorkerContextUpda
 	}
 };
 
-export const conferenceReservation = async (
+export const resToConference = async (
 	taskSid: string,
 	reservationSid: string,
 	params: ReservationContextUpdateOptions = {
@@ -32,4 +32,6 @@ export const conferenceReservation = async (
 		.tasks(taskSid)
 		.reservations(reservationSid)
 		.update(params);
+
+	console.log(reservation);
 };

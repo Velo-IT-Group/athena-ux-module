@@ -11,7 +11,6 @@ type Props = {
 
 const ConversationCompanyDetail = async ({ id }: Props) => {
 	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getTickets(id ?? 250)]);
-	console.log(company);
 
 	return (
 		<aside className='min-h-0 flex flex-col overflow-y-scroll space-y-6 p-3 bg-background border-l'>

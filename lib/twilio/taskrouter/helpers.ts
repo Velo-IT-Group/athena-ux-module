@@ -1,5 +1,5 @@
 import { Twilio, jwt } from 'twilio';
-import { TaskListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { TaskContextUpdateOptions, TaskListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
@@ -16,6 +16,14 @@ export const createTask = async (workflowSid: string, attributes: Object) => {
 	};
 
 	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks.create(payload);
+};
+
+export const getTask = async (taskSid: string) => {
+	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks(taskSid).fetch();
+};
+
+export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
+	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks(taskSid).update(options);
 };
 
 export const findWorker = async (friendlyName: string) => {

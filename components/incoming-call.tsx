@@ -7,13 +7,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 import { Reservation } from 'twilio-taskrouter';
 import { useTwilio } from '@/providers/twilio-provider';
+import { resToConference } from '@/lib/twilio/update';
+import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 
 type Props = {
 	reservations?: Reservation[];
 };
 
 const IncomingCall = ({}: Props) => {
-	const { reservations } = useTwilio();
+	const { reservations, setActiveCall, activeCall } = useTwilio();
 	// const reservations = useRecoilValue(reservationAtom);
 	// console.log(reservations);
 
@@ -66,10 +68,14 @@ const IncomingCall = ({}: Props) => {
 								<Button
 									className='bg-green-600 hover:bg-green-600/90 text-sm'
 									onClick={async () => {
-										const conference = await r.conference({
+										// await r.accept();
+										const reservation = await r.conference({
 											from: attributes.from,
 										});
-										console.log(conference);
+
+										const conference = await getConferenceByName(reservation.task.sid);
+
+										setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 									}}
 								>
 									Accept

@@ -1,5 +1,7 @@
+'use server';
+import { revalidatePath } from 'next/cache';
 import { Twilio, jwt } from 'twilio';
-import { TaskContextUpdateOptions, TaskListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { TaskContextUpdateOptions, TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
@@ -15,27 +17,46 @@ export const createTask = async (workflowSid: string, attributes: Object) => {
 		taskChannel: 'voice',
 	};
 
-	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks.create(payload);
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.create(payload);
 };
 
 export const getTask = async (taskSid: string) => {
-	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks(taskSid).fetch();
+	const taskResponse = await client.taskrouter.v1
+		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+		.tasks(taskSid)
+		.fetch();
+
+	const task: TaskInstance = {
+		...taskResponse,
+	} as TaskInstance;
+
+	// @ts-ignore
+	delete task['_version'];
+
+	return task;
 };
 
 export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
-	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks(taskSid).update(options);
+	const task = await client.taskrouter.v1
+		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+		.tasks(taskSid)
+		.update(options);
+
+	revalidatePath('/conversations');
+	revalidatePath('/conversations/:path*');
+	return task;
 };
 
 export const findWorker = async (friendlyName: string) => {
 	const workers = await client.taskrouter.v1
-		.workspaces(process.env.TWILIO_WORKSPACE_SID!)
+		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
 		.workers.list({ friendlyName });
 
 	return workers[0];
 };
 
 export const getOngoingTasks = (name: string) => {
-	return client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks.list({
+	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.list({
 		assignmentStatus: ['pending', 'assigned', 'reserved'],
 		evaluateTaskAttributes: "name='" + name + "'",
 	});
@@ -43,7 +64,7 @@ export const getOngoingTasks = (name: string) => {
 
 const buildWorkspacePolicy = (options?: { resources: string[]; method?: string }) => {
 	const resources = options?.resources || [];
-	const urlComponents = ['https://taskrouter.twilio.com', 'v1', 'Workspaces', process.env.TWILIO_WORKSPACE_SID];
+	const urlComponents = ['https://taskrouter.twilio.com', 'v1', 'Workspaces', process.env.NEXT_PUBLIC_WORKSPACE_SID];
 
 	return new TaskRouterCapability.Policy({
 		url: urlComponents.concat(resources).join('/'),
@@ -56,7 +77,7 @@ export const createWorkerCapabilityToken = (sid: string) => {
 	const workerCapability = new TaskRouterCapability({
 		accountSid: process.env.TWILIO_ACCOUNT_SID!,
 		authToken: process.env.TWILIO_AUTH_TOKEN!,
-		workspaceSid: process.env.TWILIO_WORKSPACE_SID!,
+		workspaceSid: process.env.NEXT_PUBLIC_WORKSPACE_SID!,
 		channelId: sid,
 		ttl: 3600,
 	});

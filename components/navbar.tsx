@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Image from 'next/image';
 import { Phone, Settings } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Sheet, SheetTrigger } from '@/components/ui/sheet';
 
 import OutboundDialerContent from './outbound-dialer-content';
 import ActivitySwitcher from './activity-switcher';
 import DeviceSelector from './device-selector';
-import { Popover, PopoverTrigger } from './ui/popover';
+import { Popover, PopoverTrigger } from '@/components/ui/popover';
+import HistorySelector from '@/app/(user)/history-selector';
+import { getAllCalls, getInboundCalls } from '@/lib/twilio/read';
 
-const Navbar = () => {
+const Navbar = async () => {
+	const calls = await getAllCalls('client:nblack_40velomethod_2Ecom');
+
 	return (
 		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
 			<Image
@@ -31,6 +34,8 @@ const Navbar = () => {
 				</Button>
 
 				<DeviceSelector />
+
+				<HistorySelector calls={calls} />
 
 				<Popover>
 					<PopoverTrigger asChild>

@@ -26,7 +26,7 @@ export default async function Home() {
 
 	const groupedMonths = groupBy(
 		inboundCalls.sort((a, b) => new Date(a.date_created).getUTCSeconds() - new Date(b.date_created).getUTCSeconds()),
-		({ date_created }) => new Date(date_created).getDay()
+		({ date_created }) => Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(date_created))
 	);
 
 	const data: DataItem[] = Object.entries(groupedMonths).map(([key, value]) => {

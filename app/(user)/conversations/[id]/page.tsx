@@ -3,8 +3,6 @@ import React from 'react';
 import ConversationDetails from './active-conversation';
 import ConversationContactDetail from './conversation-contact-detail';
 import ConversationCompanyDetail from './conversation-company-detail';
-import { getCompanies } from '@/lib/manage/read';
-import { Combobox } from '@/components/ui/combobox';
 
 type Props = {
 	params: { id: string };
@@ -26,16 +24,19 @@ const Page = async ({ params }: Props) => {
 	const attributes = JSON.parse(task.attributes);
 
 	return (
-		<main className='grid sm:grid-cols-[1fr_3fr_1fr] bg-muted grow'>
+		<main className='grid sm:grid-cols-[1fr_3fr_1fr] bg-muted/50 grow'>
 			<ConversationContactDetail
-				companyId={attributes['companyId']}
-				contactId={attributes.contactId}
+				companyId={attributes.companyId}
+				contactId={attributes.userId}
 				attributes={attributes}
 			/>
 
-			<ConversationDetails className='p-6' />
+			<ConversationDetails
+				userId={attributes.userId}
+				className='p-6'
+			/>
 
-			<ConversationCompanyDetail id={attributes['companyId']} />
+			<ConversationCompanyDetail id={attributes.companyId} />
 
 			{/* <Combobox
 				placeholder='Filter companies...'

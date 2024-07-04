@@ -77,3 +77,20 @@ export const addParticipant = async (sid: string, CallSid: string, phone: string
 export const hold = async (conferenceSid: string, callSid: string, hold: boolean) => {
 	return await client.conferences(conferenceSid).participants(callSid).update({ hold });
 };
+
+export const getInboundCalls = async (to?: string, limit: number = 25) => {
+	return await client.calls.list({ to, limit });
+};
+
+export const getOutboundCalls = async (from?: string, limit: number = 25) => {
+	return await client.calls.list({ from, limit });
+};
+
+export const getAllCalls = async (identity?: string, limit: number = 25) => {
+	const [inbound, outbound] = await Promise.all([
+		client.calls.list({ to: identity, limit }),
+		client.calls.list({ from: identity, limit }),
+	]);
+
+	return [...inbound, ...outbound];
+};

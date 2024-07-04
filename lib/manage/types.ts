@@ -124,14 +124,14 @@ export type CatalogItem = {
 	identifier?: string;
 	description?: string;
 	inactiveFlag?: boolean;
-	subcategory?: Subcategory;
-	type?: Type;
+	subcategory?: ReferenceType;
+	type?: ReferenceType;
 	productClass: ProductClass;
 	bundledItems?: CatalogItem[] | undefined;
 	serializedFlag?: boolean;
 	serializedCostFlag?: boolean;
 	phaseProductFlag?: boolean;
-	unitOfMeasure?: UnitOfMeasure;
+	unitOfMeasure?: ReferenceType;
 	price?: number;
 	cost?: number;
 	priceAttribute?: string;
@@ -139,23 +139,23 @@ export type CatalogItem = {
 	dropShipFlag?: boolean;
 	specialOrderFlag?: boolean;
 	customerDescription?: string;
-	manufacturer?: Manufacturer;
+	manufacturer?: ReferenceType;
 	manufacturerPartNumber?: string;
-	vendor?: Vendor;
+	vendor?: ReferenceType;
 	vendorSku?: string;
 	notes?: string;
 	integrationXRef?: string;
-	sla?: Sla;
-	entityType?: EntityType;
+	sla?: ReferenceType;
+	entityType?: ReferenceType;
 	recurringFlag?: boolean;
 	recurringRevenue?: number;
 	recurringCost?: number;
 	recurringOneTimeFlag?: boolean;
-	recurringBillCycle?: RecurringBillCycle;
+	recurringBillCycle?: ReferenceType;
 	recurringCycleType?: string;
 	calculatedPriceFlag?: boolean;
 	calculatedCostFlag?: boolean;
-	category?: Category;
+	category?: ReferenceType;
 	calculatedPrice?: number;
 	calculatedCost?: number;
 	billableOption?: string;
@@ -181,199 +181,41 @@ export interface SystemMember {
 	firstName: string;
 	lastName: string;
 }
-interface QuoteItem {
-	id: string;
-	id_quote: string;
-	approval_content_hash: string;
-	approval_margin_minimum: number;
-	approval_on_change: boolean;
-	approval_price_minimum: number;
-	base_price: number;
-	config_id: string;
-	config_position: number;
-	cost: number;
-	cost_modifier: string;
-	cw_agreement: string;
-	cw_class: string;
-	deferment_periods: number;
-	disable_remaps: boolean;
-	discount: number;
-	discount_amount: number;
-	discount_amount_converted: number;
-	enforce_item_mod_tags: boolean;
-	etilize_product_id: number;
-	etilize_serialized_attributes: string;
-	extended_cost: number;
-	extended_price: number;
-	extended_price_converted: number;
-	extended_suggested_price: number;
-	external_quote_number: string;
-	external_reference: string;
-	factor_item_mfp: string;
-	factor_qty_fixed: number;
-	factor_qty_multiplier: number;
-	federal_gov_price: number;
-	gross_margin: number;
-	grouping_code: string;
-	gsa_price: number;
-	gst: number;
-	gst_converted: number;
-	gst_rate: number;
-	id_quote_tabs: string;
-	id_recurring_revenue: string;
-	is_bundle_component: boolean;
-	is_bundle_header: boolean;
-	is_deferrable: boolean;
-	is_hidden_item: boolean;
-	is_metadata_item: boolean;
-	is_mod_tag_modified: boolean;
-	is_optional: boolean;
-	is_override_qty: boolean;
-	is_phase_item: boolean;
-	is_printed: boolean;
-	is_promotion: boolean;
-	is_protected_item: boolean;
-	is_protected_price: boolean;
-	is_rampable: boolean;
-	is_rebate: boolean;
-	is_recurring_taxable: boolean;
-	is_selected: boolean;
-	is_show_price: boolean;
-	is_sold: boolean;
-	is_taxable: boolean;
-	is_totals_included: boolean;
-	item_cube: number;
-	item_height: number;
-	item_length: number;
-	item_notes_html: string;
-	item_number: string;
-	item_width: number;
-	invoice_grouping_id: number;
-	keywords: string;
-	line_type: string;
-	local_price_formula: string;
-	long_description: string;
-	manufacturer_part_number: string;
-	marketing_information: string;
-	markup: number;
-	modify_date: string;
-	net_cost: number;
-	on_hand: number;
-	on_hand_warehouse1: number;
-	on_hand_warehouse2: number;
-	on_order: number;
-	option_group: string;
-	option_locked: boolean;
-	override_package_details: boolean;
-	override_price: number;
-	override_price_modifier: string;
-	owner: string;
-	package_price: number;
-	package_qty: number;
-	parent_quote_item: string;
-	pdf_attachment: string;
-	period: string;
-	po_number: string;
-	pos_description: string;
-	po_status: string;
-	price_converted: number;
-	price_modifier: string;
-	product_category: string;
-	product_class: string;
-	product_sub_category: string;
-	product_type: string;
-	promotion_comment: string;
-	pst: number;
-	pst_converted: number;
-	pst_rate: number;
-	quantity: number;
-	quosal_description: string;
-	quosal_purchasing_notes: string;
-	quote: string;
-	quote_tab: string;
-	quote_item_price: number;
-	quote_name: string;
-	quote_readable_id: string;
-	ramp_periods: number;
-	rebate_comment: string;
-	recurring_amount: number;
-	recurring_base_price: number;
-	recurring_calculated_price_modifier: string;
-	recurring_cost: number;
-	recurring_cost_modifier: string;
-	recurring_extended_cost: number;
-	recurring_extended_suggested_price: number;
-	recurring_gst: number;
-	recurring_price: number;
-	recurring_price_modifier: string;
-	recurring_pst: number;
-	recurring_suggested_price: number;
-	recurring_tax: number;
-	recurring_total: number;
-	replacement_sku: string;
-	short_description: string;
-	sort_order: number;
-	source: string;
-	source_manufacturer_id: string;
-	source_manufacturer_name: string;
-	source_selection_details: string;
-	source_vendor_id: string;
-	source_vendor_name: string;
-	starting_cost: number;
-	state_gov_price: number;
-	suggested_price: number;
-	svc_spread: number;
-	tax: number;
-	tax_code: string;
-	tax_converted: number;
-	tax_rate: number;
-	total_weight: number;
-	uom: string;
-	uom_factor: number;
-	uom_weight: number;
-	uop: string;
-	uop_factor: number;
-	upc_number: string;
-	user_id: string;
-	vendor_part_number: string;
-	warehouse: string;
-	warehouse_code: string;
-}
 
 export interface ServiceTicket {
 	id: number;
 	summary: string;
 	recordType?: string;
-	board?: Board;
-	status?: Status;
-	workRole?: WorkRole;
-	workType?: WorkType;
-	company?: Company;
-	site?: Site;
+	board?: ReferenceType;
+	status?: ReferenceType;
+	workRole?: ReferenceType;
+	workType?: ReferenceType;
+	company?: ReferenceType;
+	site?: ReferenceType;
 	siteName?: string;
 	addressLine1?: string;
 	addressLine2?: string;
 	city?: string;
 	stateIdentifier?: string;
 	zip?: string;
-	country?: Country;
+	country?: ReferenceType;
 	contact?: Contact;
 	contactName?: string;
 	contactPhoneNumber?: string;
 	contactPhoneExtension?: string;
 	contactEmailAddress?: string;
-	type?: Type;
-	subType?: SubType;
-	item?: Item;
-	team?: Team;
-	owner?: Owner;
-	priority?: Priority;
-	serviceLocation?: ServiceLocation;
-	source?: Source;
+	type?: ReferenceType;
+	subType?: ReferenceType;
+	item?: ReferenceType;
+	team?: ReferenceType;
+	owner?: ReferenceType;
+	priority?: ReferenceType;
+	serviceLocation?: ReferenceType;
+	source?: ReferenceType;
 	requiredDate?: string;
 	budgetHours?: number;
 	opportunity?: ReferenceType;
-	agreement?: Agreement;
+	agreement?: ReferenceType;
 	severity?: string;
 	impact?: string;
 	externalXRef?: string;
@@ -434,13 +276,13 @@ export interface ServiceTicket {
 	estimatedStartDate?: string;
 	duration?: number;
 	location?: Location;
-	department?: Department;
+	department?: ReferenceType;
 	mobileGuid?: string;
-	sla?: Sla;
+	sla?: ReferenceType;
 	slaStatus?: string;
 	requestForChangeFlag?: boolean;
 	currency?: Currency;
-	mergedParentTicket?: MergedParentTicket;
+	mergedParentTicket?: ReferenceType;
 	integratorTags?: string[];
 	escalationStartDateUTC?: string;
 	escalationLevel?: number;
@@ -655,158 +497,106 @@ export interface ReferenceType {
 	name: string;
 }
 
-export interface Subcategory {
-	id: number;
-	name: string;
-}
-
-export interface Type {
-	id: number;
-	name: string;
-}
-
-export interface UnitOfMeasure {
-	id: number;
-	name: string;
-}
-
-export interface Manufacturer {
-	id: number;
-	name: string;
-}
-
-export interface Vendor {
-	id: number;
-	identifier: string;
-	name: string;
-}
-
-export interface Sla {
-	id: number;
-	name: string;
-}
-
-export interface EntityType {
-	id: number;
-	name: string;
-}
-export interface RecurringBillCycle {
-	id: number;
-	name: string;
-}
-
-export interface Category {
-	id: number;
-	name: string;
-}
-
-export interface Board {
-	id: number;
-	name: string;
-}
-
-export interface Status {
-	id: number;
-	name: string;
-	sort: number;
-}
-
-export interface WorkRole {
-	id: number;
-	name: string;
-}
-
-export interface WorkType {
-	id: number;
-	name: string;
-}
-
 export interface Company {
 	id: number;
 	identifier: string;
 	name: string;
 }
-
-export interface Site {
-	id: number;
-	name: string;
-}
-
-export interface Country {
-	id: number;
-	identifier: string;
-	name: string;
-}
-
 export interface Contact {
 	id: number;
 	firstName: string;
 	lastName: string;
+	company: ReferenceType;
+	site: ReferenceType;
+	addressLine1: string;
+	addressLine2: string;
+	city: string;
+	state: string;
+	school?: string;
+	date?: string;
+	zip: string;
+	country: ReferenceType;
+	relationshipOverride: string;
+	inactiveFlag: boolean;
+	managerContact: ReferenceType;
+	title: string;
+	nickName: string;
+	marriedFlag: boolean;
+	childrenFlag: boolean;
+	significantOther: string;
+	portalSecurityLevel: number;
+	disablePortalLoginFlag: boolean;
+	unsubscribeFlag: boolean;
+	gender: string;
+	birthDay: string;
+	anniversary: string;
+	mobileGuid: string;
+	defaultPhoneType: string;
+	defaultPhoneNbr: string;
+	defaultBillingFlag: boolean;
+	defaultFlag: boolean;
+	communicationItems: CommunicationItem[];
+	types: ReferenceType[];
+	ignoreDuplicates: boolean;
 }
-
-export interface Type {
+export interface Configuration {
 	id: number;
 	name: string;
+	type: ReferenceType;
+	status: ReferenceType;
+	company: ReferenceType;
+	contact: ReferenceType;
+	site: ReferenceType;
+	locationId: number;
+	location: Location;
+	businessUnitId: number;
+	department: ReferenceType;
+	deviceIdentifier: string;
+	serialNumber: string;
+	modelNumber: string;
+	tagNumber: string;
+	purchaseDate: string;
+	installationDate: string;
+	warrantyExpirationDate: string;
+	vendorNotes: string;
+	notes: string;
+	macAddress: string;
+	lastLoginName: string;
+	billFlag: boolean;
+	backupSuccesses: number;
+	backupIncomplete: number;
+	backupFailed: number;
+	backupRestores: number;
+	backupServerName: string;
+	backupBillableSpaceGb: number;
+	backupProtectedDeviceList: string;
+	backupYear: number;
+	backupMonth: number;
+	ipAddress: string;
+	defaultGateway: string;
+	osType: string;
+	osInfo: string;
+	cpuSpeed: string;
+	ram: string;
+	localHardDrives: string;
+	manufacturer: ReferenceType;
+	activeFlag: boolean;
+	managementLink: string;
+	remoteLink: string;
+	mobileGuid: string;
+	companyLocationId: number;
+	showRemoteFlag: boolean;
+	showAutomateFlag: boolean;
+	needsRenewalFlag: boolean;
 }
 
-export interface SubType {
+export interface CommunicationItem {
 	id: number;
-	name: string;
-}
-
-export interface Item {
-	id: number;
-	name: string;
-}
-
-export interface Team {
-	id: number;
-	name: string;
-}
-
-export interface Owner {
-	id: number;
-	identifier: string;
-	name: string;
-}
-
-export interface Priority {
-	id: number;
-	name: string;
-	sort: number;
-	level: string;
-}
-
-export interface ServiceLocation {
-	id: number;
-	name: string;
-}
-
-export interface Source {
-	id: number;
-	name: string;
-}
-
-export interface Agreement {
-	id: number;
-	name: string;
-	type: string;
-}
-
-export interface Location {
-	id: number;
-	name: string;
-}
-
-export interface Department {
-	id: number;
-	identifier: string;
-	name: string;
-}
-
-export interface Sla {
-	id: number;
-	name: string;
+	type: ReferenceType;
+	value: string;
+	defaultFlag: boolean;
+	domain?: string;
+	communicationType: string;
 }
 
 export interface Currency {
@@ -822,9 +612,4 @@ export interface Currency {
 	displayIdFlag: boolean;
 	rightAlign: boolean;
 	name: string;
-}
-
-export interface MergedParentTicket {
-	id: number;
-	summary: string;
 }

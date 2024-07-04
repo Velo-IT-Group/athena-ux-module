@@ -24,10 +24,6 @@ const Layout = ({ children }: Props) => {
 
 						{children}
 					</div>
-
-					<IncomingCall />
-
-					<ActiveCall />
 				</TooltipProvider>
 			</TwilioProvider>
 		</JabraProvider>

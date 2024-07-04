@@ -1,5 +1,5 @@
-import { Twilio, jwt } from 'twilio';
-import { WorkerListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+'use server';
+import { Twilio } from 'twilio';
 
 const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_PUBLIC_API_KEY_SECRET, {
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
@@ -22,7 +22,7 @@ export const getConferenceParticipants = async (conferenceSid: string) => {
 	try {
 		const participants = await client.conferences(conferenceSid).participants.list();
 
-		return participants.map((participant) => participant.callSid);
+		return participants;
 	} catch (error) {
 		console.error(error);
 		return [];

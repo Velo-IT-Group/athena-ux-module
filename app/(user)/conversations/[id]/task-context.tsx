@@ -26,8 +26,8 @@ type WithChildProps = {
 const context = createContext(initialValues);
 const { Provider } = context;
 
-export const TwilioTaskContext = ({ children }: WithChildProps) => {
-	const [task, setTask] = useState<TaskInstance>();
+export const TwilioTaskContext = ({ task: aTask, children }: WithChildProps) => {
+	const [task, setTask] = useState<TaskInstance | undefined>(aTask);
 	const [attributes, setAttributes] = useState<TaskAttributes & CustomTaskAttributes>();
 
 	useEffect(() => {

@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { useTwilio } from '@/providers/twilio-provider';
 import { updateWorker } from '@/lib/twilio/update';
-import { Combobox } from './ui/combobox';
-import { Button } from './ui/button';
+import { Combobox } from '@/components/ui/combobox';
+import { Button } from '@/components/ui/button';
 import { useJabra } from '@/providers/jabra-provider';
 import { webHidPairing } from '@gnaudio/jabra-js';
 

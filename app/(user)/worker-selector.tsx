@@ -1,7 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Combobox } from '@/components/ui/combobox';
-import { getWorkers } from '@/lib/twilio/read';
+// import { getWorkers } from '@/lib/twilio/read';
 import { UserPlus } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 
 type Props = {};
@@ -11,12 +11,11 @@ const WorkerSelector = (props: Props) => {
 	const [workers, setWorkers] = useState<WorkerInstance[]>([]);
 
 	useEffect(() => {
-		getWorkers()
-			.then((w) => {
-				// console.log(w);
-				setWorkers(w);
-			})
-			.catch((e) => console.error(e));
+		// getWorkers()
+		// 	.then((w) => {
+		// 		setWorkers(w);
+		// 	})
+		// 	.catch((e) => console.error(e));
 	}, []);
 
 	return (

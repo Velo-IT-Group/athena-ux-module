@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +19,8 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body className={cn(inter.className, 'flex flex-col min-h-screen h-full overflow-hidden')}>{children}</body>
+			<body className={cn(inter.className, 'flex flex-col min-h-screen h-full')}>{children}</body>
+			<Toaster />
 		</html>
 	);
 }

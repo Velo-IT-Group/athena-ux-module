@@ -6,14 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
 import { useJabra } from '@/providers/jabra-provider';
-import WorkerSelector from '@/app/(user)/worker-selector';
-import { Call } from '@twilio/voice-sdk';
 import { useTwilio } from '@/providers/twilio-provider';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
+import { Combobox } from './ui/combobox';
+import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+import WorkerSelector from '@/app/(user)/worker-selector';
 
-type Props = {};
+type Props = {
+	workers: WorkerInstance[];
+};
 
-export function ActiveCall({}: Props) {
+export function ActiveCall({ workers }: Props) {
 	const {} = useJabra();
 	const { activeCall } = useTwilio();
 
@@ -25,10 +28,18 @@ export function ActiveCall({}: Props) {
 						<CardHeader className='flex-row items-center justify-between p-3 gap-12 border-b space-y-0'>
 							<CardTitle className='space-x-1.5 flex items-center'>
 								<Rocket className='h-3.5 w-3.5 inline-block text-yellow-400' />
+
 								<span className='text-sm font-normal'>Customer support</span>
+
 								<span className='text-xs text-muted-foreground tabular-nums'>Test</span>
 							</CardTitle>
 
+							{/* <Combobox
+								items={workers.map((worker) => {
+									return { label: worker.friendlyName, value: `${worker.sid}-${JSON.parse(worker.attributes).email}` };
+								})}
+								placeholder='Filter workers...'
+							/> */}
 							<WorkerSelector />
 
 							{/* <Combobox placeholder='' items={[]}>

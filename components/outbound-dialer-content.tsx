@@ -7,8 +7,8 @@ import { PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
 import { Combobox } from '@/components/ui/combobox';
 import { call } from '@/lib/twilio/read';
-import { Select, SelectTrigger, SelectValue } from './ui/select';
-import { Label } from './ui/label';
+import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 type Props = {};
 

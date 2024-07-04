@@ -6,6 +6,9 @@ import { Device, Call } from '@twilio/voice-sdk';
 import { createAccessToken } from '@/lib/twilio';
 import { useJabra } from './jabra-provider';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
+import { ToastT, toast } from 'sonner';
+import IncomingCall from '@/components/incoming-call';
+import IncomingCallTest from '@/components/incoming-call-test';
 
 interface TwilioProviderProps {
 	reservations: Reservation[];
@@ -58,6 +61,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const [currentWorkspace, setCurrentWorkspace] = useState<string | undefined>(workspaceSid);
 	const [activities, setActivities] = useState<Activity[]>([]);
 	const [identity, setIdentity] = useState<string>('');
+	const toasts = new Map<string, string | number>();
 
 	const activitiesRef = useRef<Activity[]>([]);
 	const reservationsRef = useRef<Reservation[]>([]);
@@ -72,7 +76,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const { currentCallControl } = useJabra();
 
 	useEffect(() => {
-		if (!currentCallControl) return;
+		// if (!currentCallControl) return;
 
 		if (!worker) {
 			createAccessToken(
@@ -84,6 +88,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			).then((token) => {
 				const w = new Worker(token, { closeExistingSessions: true });
 				const d = new Device(token, { disableAudioContextSounds: true, enableImprovedSignalingErrorPrecision: true });
+				console.log(token);
 				d.register();
 				setWorker(w);
 				setDevice(d);
@@ -94,8 +99,6 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		}
 
 		if (!device) return;
-
-		device.audio?.disconnect(false);
 
 		device.on('registered', () => {
 			console.log('Twilio.Device Ready to make and receive calls!');
@@ -126,7 +129,19 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			console.log(`Worker ${w.sid} is now ready for work`);
 			setActivities(Array.from(w.activities.values()));
 			const ress = Array.from(w.reservations.values());
-			setReservations(ress);
+			ress.forEach((res) => {
+				const t = toast.custom(
+					(t) => (
+						<IncomingCall
+							reservation={res}
+							toastId={t}
+						/>
+					),
+					{ important: true, duration: 18000 }
+				);
+				toasts.set(res.sid, t);
+			});
+			// setReservations(ress);
 			if (ress.length) {
 				try {
 					await currentCallControl?.signalIncomingCall();
@@ -138,24 +153,40 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 
 		worker.on('reservationFailed', (r: Reservation) => {
 			setReservations(reservations.filter((res) => res.sid !== r.sid));
+			const t = toasts.get(r.sid);
+			toast.dismiss(t);
+			toasts.delete(r.sid);
 		});
 
 		worker?.on('reservationCreated', async (r: Reservation) => {
 			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 
-			setReservations((reservations) => [...reservations, r]);
+			// setReservations((reservations) => [...reservations, r]);
+			const t = toast.custom(
+				(t) => (
+					<IncomingCallTest
+						r={r}
+						toastId={t}
+					/>
+				),
+				{ important: true, duration: 18000 }
+			);
+			toasts.set(r.sid, t);
 
 			r.on('accepted', async (reservation) => {
 				console.log(`Reservation ${reservation.sid} was accepted.`);
 
 				// currentCallControl?.startCall();
-
+				toast.dismiss(t);
+				toasts.delete(r.sid);
 				setReservations(reservations.filter((res) => res.sid !== reservation.sid));
 			});
 
 			r.on('rejected', async (reservation) => {
 				try {
 					currentCallControl?.rejectIncomingCall();
+					toast.dismiss(t);
+					toasts.delete(r.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -165,6 +196,8 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			r.on('canceled', async (reservation) => {
 				try {
 					// currentCallControl?.rejectIncomingCall();
+					toast.dismiss(t);
+					toasts.delete(r.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -174,6 +207,8 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 			r.on('timeout', async (reservation) => {
 				try {
 					// currentCallControl?.rejectIncomingCall();
+					toast.dismiss(t);
+					toasts.delete(r.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}

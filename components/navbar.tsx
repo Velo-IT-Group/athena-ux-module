@@ -10,10 +10,11 @@ import ActivitySwitcher from './activity-switcher';
 import DeviceSelector from './device-selector';
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import HistorySelector from '@/app/(user)/history-selector';
-import { getAllCalls, getInboundCalls } from '@/lib/twilio/read';
+import { getAllCalls } from '@/lib/twilio/read';
+import { getPhoneNumbers } from '@/lib/twilio/phoneNumbers';
 
 const Navbar = async () => {
-	const calls = await getAllCalls('client:nblack_40velomethod_2Ecom');
+	const [numbers, calls] = await Promise.all([getPhoneNumbers(), getAllCalls('client:nblack_40velomethod_2Ecom')]);
 
 	return (
 		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
@@ -47,7 +48,11 @@ const Navbar = async () => {
 						</Button>
 					</PopoverTrigger>
 
-					<OutboundDialerContent />
+					<OutboundDialerContent
+						numbers={numbers.map(({ phoneNumber, friendlyName }) => {
+							return { phoneNumber, friendlyName };
+						})}
+					/>
 				</Popover>
 
 				<ActivitySwitcher className='ml-1.5' />

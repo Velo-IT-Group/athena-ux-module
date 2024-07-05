@@ -3,11 +3,8 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { useTwilio } from '@/providers/twilio-provider';
-import { updateWorker } from '@/lib/twilio/update';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
-import { useJabra } from '@/providers/jabra-provider';
-import { webHidPairing } from '@gnaudio/jabra-js';
 
 type Props = {
 	className?: string;
@@ -15,30 +12,38 @@ type Props = {
 
 const ActivitySwitcher = ({ className }: Props) => {
 	const { worker, activities } = useTwilio();
-	const { currentCallControl } = useJabra();
 	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.activity?.name ?? '');
-	const selectedActivity = activities.find((account) => account.name === selectedAccount);
+	const selectedActivity = activities.find((account) => account.sid === selectedAccount.split('-')[0]);
 
 	useEffect(() => {
-		if (!worker) return;
-		console.log(worker?.activitySid);
-		setSelectedAccount(worker?.activity?.name);
+		worker?.on('activityUpdated', (a) => {
+			setSelectedAccount(a.activity.name);
+		});
+
+		return () => {
+			worker?.removeListener('activityUpdated', (a) => {
+				setSelectedAccount(a.activity.name);
+			});
+		};
 	}, [worker]);
 
 	return (
 		<Combobox
 			placeholder='Filter activities...'
 			items={activities.map((a) => {
-				return { label: a.name, value: a.name };
+				return { label: a.name, value: `${a.sid}-${a.name}` };
 			})}
 			value={selectedAccount}
 			setValue={async (e) => {
-				if (currentCallControl) {
-					setSelectedAccount(e);
-					const activity = activities.find((account) => account.name === e);
-					await updateWorker(worker!.sid, { activitySid: activity?.sid });
-				} else {
-					await webHidPairing();
+				try {
+					const sid = e.toString().split('-')[0];
+					const act = worker?.activities.get(sid);
+					const activity = await act?.setAsCurrent();
+					if (!activity) throw Error('No activity provided...');
+					setSelectedAccount(activity.sid);
+				} catch (error) {
+					console.error(error);
+					return;
 				}
 			}}
 			align='end'

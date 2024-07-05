@@ -1,78 +1,64 @@
-import React from 'react';
+'use client';
+import React, { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { History, Phone } from 'lucide-react';
+import { ChevronDown, Phone } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { Call } from '@/app/(user)/history/page';
 import { PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
-import { Combobox } from '@/components/ui/combobox';
 import { call } from '@/lib/twilio/read';
-import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import LabeledInput from './ui/labeled-input';
+// import { cookies } from 'next/headers';
+import { useTwilio } from '@/providers/twilio-provider';
+import { toast } from 'sonner';
+import IncomingCall from './incoming-call';
+import { ActiveCall } from './call-modal';
+import { getTask } from '@/lib/twilio/taskrouter/helpers';
+import WorkerSelector from '@/app/(user)/worker-selector';
+import PhoneNumberSelect from './phone-number-select';
+import WorkerSelect from './worker-select';
 
-type Props = {};
+type Props = {
+	numbers: { phoneNumber: string; friendlyName: string }[];
+};
 
-const OutboundDialerContent = async (props: Props) => {
-	const myHeaders = new Headers();
-	myHeaders.append(
-		'Authorization',
-		`Basic ${btoa(`${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}:${process.env.NEXT_PUBLIC_TWILIO_AUTH_TOKEN}`)}`
-	);
-
-	const requestOptions: RequestInit = {
-		method: 'GET',
-		headers: myHeaders,
-	};
-
-	const outBoundResponse = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}/Calls.json?From=client:nblack_40velomethod_2Ecom&PageSize=10`,
-		requestOptions
-	);
-
-	const inboundResponse = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID}/Calls.json?To=client:nblack_40velomethod_2Ecom&PageSize=10`,
-		requestOptions
-	);
-
-	const { calls: inboundCalls }: { calls: Call[] } = await inboundResponse.json();
+const OutboundDialerContent = ({ numbers }: Props) => {
+	const { worker, setActiveCall, activeCall } = useTwilio();
+	// const cookieStore = cookies();
+	// const lastNumber = cookieStore.get('lastUsedNumber');
 
 	return (
 		<PopoverContent align='end'>
 			<form
-				action={async (data: FormData) => {
-					'use server';
-					const callerId = data.get('callerId') as string;
-					const phone = data.get('phoneNumber') as string;
-					await call('', callerId, phone);
+				onSubmit={async (e) => {
+					e.preventDefault();
+					var data = new FormData(e.currentTarget);
+
+					if (!worker) return;
+					const to = data.get('phoneNumber') as string;
+					const from = data.get('from') as string;
+					const workflowSid = data.get('from') as string;
+					const taskQueueSid = data.get('from') as string;
+					console.log(data);
+					await worker.createTask(
+						'+19015988651',
+						'+18449402678',
+						'WW497b90bc1703176f6845c09c8bf4fa8a',
+						'WQee659e96340b3899ad1fad7578fe6515',
+						{
+							attributes: {
+								direction: 'outboundDial',
+							},
+						}
+					);
+					// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
 				}}
-				className='space-y-1.5'
+				className='space-y-3'
 			>
 				<Dialpad />
 
 				<div className='grid grid-cols-3 gap-1.5 w-full'>
-					<Combobox
-						items={inboundCalls.map((c) => {
-							return {
-								label: `${c.from_formatted} - ${Intl.DateTimeFormat('en-US', {
-									dateStyle: 'short',
-									timeStyle: 'short',
-								}).format(new Date(c.start_time))}`,
-								value: `${c.from_formatted} - ${c.sid}`,
-							};
-						})}
-						placeholder='Filter calls...'
-						value={''}
-						align='start'
-						side='left'
-					>
-						<Button
-							variant='ghost'
-							size='lg'
-							className='text-xl'
-						>
-							<History className='font-medium' />
-						</Button>
-					</Combobox>
+					<div></div>
 
 					<Button
 						variant='ghost'
@@ -86,14 +72,31 @@ const OutboundDialerContent = async (props: Props) => {
 
 				<Separator />
 
-				<Label>Caller ID</Label>
-				<Select>
-					<SelectTrigger>
-						<SelectValue placeholder='Select caller id...' />
-					</SelectTrigger>
-				</Select>
+				<LabeledInput
+					label='Caller ID'
+					name='from'
+					id='from'
+				>
+					<Suspense
+						fallback={
+							<Select>
+								<SelectTrigger disabled>
+									<SelectValue placeholder='Select caller id...' />
+								</SelectTrigger>
+							</Select>
+						}
+					>
+						<PhoneNumberSelect />
+					</Suspense>
+				</LabeledInput>
 
 				<Separator />
+
+				<LabeledInput label='Agent'>
+					<Suspense>
+						<WorkerSelect />
+					</Suspense>
+				</LabeledInput>
 
 				<Button className='w-full space-x-1.5'>
 					<Phone className='w-3.5 h-3.5' /> <span>Call</span>

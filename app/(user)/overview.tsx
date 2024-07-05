@@ -14,7 +14,7 @@ export function Overview({ data }: Props) {
 	return (
 		<ResponsiveContainer
 			width='100%'
-			height={350}
+			height={450}
 		>
 			<BarChart data={data}>
 				<XAxis
@@ -24,6 +24,7 @@ export function Overview({ data }: Props) {
 					tickLine={false}
 					axisLine={false}
 				/>
+
 				<YAxis
 					stroke='#888888'
 					fontSize={12}
@@ -31,6 +32,7 @@ export function Overview({ data }: Props) {
 					axisLine={false}
 					tickFormatter={(value) => `${value}`}
 				/>
+
 				<Bar
 					dataKey='value'
 					fill='currentColor'

@@ -1,19 +1,31 @@
 'use server';
 import { Twilio, twiml } from 'twilio';
-import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { getConferenceByName, getConferenceParticipants } from './conference/helpers';
 
 const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_PUBLIC_API_KEY_SECRET, {
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
 });
 
-export const getWorkers = async (): Promise<WorkerInstance[]> => {
+export const getWorkers = async (
+	options: WorkerListInstanceOptions = { available: 'true' }
+): Promise<WorkerInstance[]> => {
 	try {
-		const workers = await client.taskrouter.v1
-			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-			.workers.list({ available: 'true' });
+		console.log(options, process.env.NEXT_PUBLIC_WORKSPACE_SID);
+		const workers = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers.list(options);
 
-		return workers;
+		console.log(workers);
+
+		return workers.map((worker) => {
+			delete worker['_context'];
+			// @ts-ignore
+			delete worker['_proxy'];
+			// @ts-ignore
+			delete worker['_solution'];
+			// @ts-ignore
+			delete worker['_version'];
+			return worker;
+		});
 	} catch (error) {
 		console.error(error);
 		return [];
@@ -27,14 +39,14 @@ export const getConference = async (sid: string, callSid: string) => {
 
 	const participants = await getConferenceParticipants(conference.sid);
 
-	const list = participants.filter((call) => {
-		if (callSid !== call) {
-			return call;
+	const list = participants.filter((participant) => {
+		if (callSid !== participant.callSid) {
+			return participant;
 		}
 	});
 
 	if (list.length !== 0) {
-		callSid = list[0];
+		callSid = list[0].callSid;
 	}
 
 	return {
@@ -79,18 +91,33 @@ export const hold = async (conferenceSid: string, callSid: string, hold: boolean
 };
 
 export const getInboundCalls = async (to?: string, limit: number = 25) => {
-	return await client.calls.list({ to, limit });
+	return (await client.calls.list({ to, limit })).map((call) => {
+		delete call['_context'];
+		// @ts-ignore
+		delete call['_proxy'];
+		// @ts-ignore
+		delete call['_solution'];
+		// @ts-ignore
+		delete call['_version'];
+		return call;
+	});
 };
 
 export const getOutboundCalls = async (from?: string, limit: number = 25) => {
-	return await client.calls.list({ from, limit });
+	return (await client.calls.list({ from, limit })).map((call) => {
+		delete call['_context'];
+		// @ts-ignore
+		delete call['_proxy'];
+		// @ts-ignore
+		delete call['_solution'];
+		// @ts-ignore
+		delete call['_version'];
+		return call;
+	});
 };
 
 export const getAllCalls = async (identity?: string, limit: number = 25) => {
-	const [inbound, outbound] = await Promise.all([
-		client.calls.list({ to: identity, limit }),
-		client.calls.list({ from: identity, limit }),
-	]);
+	const [inbound, outbound] = await Promise.all([getInboundCalls(identity), getOutboundCalls(identity)]);
 
 	return [...inbound, ...outbound];
 };

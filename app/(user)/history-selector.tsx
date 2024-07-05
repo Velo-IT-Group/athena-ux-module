@@ -1,3 +1,4 @@
+'use client';
 import { History, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,14 +12,14 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
-import HistoryListItem from './history-list-item';
+import { groupBy } from 'lodash';
 
 type Props = {
 	calls: CallInstance[];
 };
 
 const HistorySelector = ({ calls }: Props) => {
-	const groupedCalls = Object.groupBy(calls, ({ dateCreated }) =>
+	const groupedCalls = groupBy(calls, ({ dateCreated }) =>
 		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(dateCreated)
 	);
 
@@ -50,6 +51,11 @@ const HistorySelector = ({ calls }: Props) => {
 											<CommandItem
 												key={call.sid}
 												value={call.sid}
+												onSelect={(currentValue) => {
+													// const call =
+													// setValue(value && currentValue === value ? '' : currentValue);
+													// setOpen(false);
+												}}
 											>
 												{call.direction === 'outbound' ? (
 													<PhoneOutgoing className='mr-1.5 text-red-500' />
@@ -57,7 +63,7 @@ const HistorySelector = ({ calls }: Props) => {
 													<PhoneIncoming className='mr-1.5 text-green-500' />
 												)}
 												<span className='text-muted-foreground'>
-													{call.fromFormatted} (
+													{call.direction === 'outbound' ? call.toFormatted : call.fromFormatted} (
 													{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(call.dateCreated))})
 												</span>
 											</CommandItem>

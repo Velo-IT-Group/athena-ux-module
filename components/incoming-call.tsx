@@ -23,7 +23,7 @@ const IncomingCall = ({ toastId, reservation }: Props) => {
 	return (
 		<Card
 			key={reservation.sid}
-			className={cn('absolute bottom-1.5 right-1.5 shadow-sm')}
+			className='shadow-sm'
 		>
 			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
 				<CardTitle>

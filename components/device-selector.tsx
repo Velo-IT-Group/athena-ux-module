@@ -15,12 +15,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from '@/components/ui/labeled-input';
 import { Separator } from '@/components/ui/separator';
+import { Progress } from './ui/progress';
 
 type Props = {
 	className?: string;
 };
 
 const DeviceSelector = ({ className }: Props) => {
+	const [open, setOpen] = useState(false);
+	const [inputLevel, setInputLevel] = useState(0);
 	const { callControlDevices, setCurrentCallControl, currentCallControl, jabra } = useJabra();
 	const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
@@ -42,6 +45,8 @@ const DeviceSelector = ({ className }: Props) => {
 
 			setSelectedDevice(iRemoved.groupId);
 		});
+
+		console.log('getUserMedia is next');
 	}, []);
 
 	useEffect(() => {
@@ -54,9 +59,45 @@ const DeviceSelector = ({ className }: Props) => {
 		});
 	}, [callControlDevices, inputDevices, selectedDevice]);
 
+	useEffect(() => {
+		if (!open) return;
+		navigator.mediaDevices
+			.getUserMedia({
+				audio: true,
+				video: false,
+			})
+			.then(function (stream) {
+				const audioContext = new AudioContext();
+				const analyser = audioContext.createAnalyser();
+				const microphone = audioContext.createMediaStreamSource(stream);
+				const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+
+				analyser.smoothingTimeConstant = 0.8;
+				analyser.fftSize = 1024;
+
+				microphone.connect(analyser);
+				analyser.connect(scriptProcessor);
+				scriptProcessor.connect(audioContext.destination);
+				scriptProcessor.onaudioprocess = function () {
+					const array = new Uint8Array(analyser.frequencyBinCount);
+					analyser.getByteFrequencyData(array);
+					const arraySum = array.reduce((a, value) => a + value, 0);
+					const average = arraySum / array.length;
+					setInputLevel(average);
+					// colorPids(average);
+				};
+			})
+			.catch(function (err) {
+				/* handle the error */
+				console.error(err);
+			});
+	}, [open]);
+
 	return (
 		<Popover
+			open={open}
 			onOpenChange={async (e) => {
+				setOpen(e);
 				if (!e || callControlDevices.length) return;
 				// await webHidPairing();
 			}}
@@ -140,6 +181,8 @@ const DeviceSelector = ({ className }: Props) => {
 							Test Mic
 						</Button>
 					</div>
+
+					<Progress value={inputLevel} />
 				</LabeledInput>
 
 				<Separator />

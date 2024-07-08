@@ -1,31 +1,21 @@
 'use client';
 import React, { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Phone } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from './dialpad';
-import { call } from '@/lib/twilio/read';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from './ui/labeled-input';
-// import { cookies } from 'next/headers';
-import { useTwilio } from '@/providers/twilio-provider';
-import { toast } from 'sonner';
-import IncomingCall from './incoming-call';
-import { ActiveCall } from './call-modal';
-import { getTask } from '@/lib/twilio/taskrouter/helpers';
-import WorkerSelector from '@/app/(user)/worker-selector';
-import PhoneNumberSelect from './phone-number-select';
 import WorkerSelect from './worker-select';
+import { useTwilio } from '@/providers/twilio-provider';
 
 type Props = {
 	numbers: { phoneNumber: string; friendlyName: string }[];
 };
 
 const OutboundDialerContent = ({ numbers }: Props) => {
-	const { worker, setActiveCall, activeCall } = useTwilio();
-	// const cookieStore = cookies();
-	// const lastNumber = cookieStore.get('lastUsedNumber');
+	const { worker } = useTwilio();
 
 	return (
 		<PopoverContent align='end'>
@@ -77,17 +67,25 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 					name='from'
 					id='from'
 				>
-					<Suspense
-						fallback={
-							<Select>
-								<SelectTrigger disabled>
-									<SelectValue placeholder='Select caller id...' />
-								</SelectTrigger>
-							</Select>
-						}
+					<Select
+						name='from'
+						defaultValue={numbers.length ? numbers[0].phoneNumber : undefined}
 					>
-						<PhoneNumberSelect />
-					</Suspense>
+						<SelectTrigger>
+							<SelectValue placeholder='Select caller id...' />
+						</SelectTrigger>
+
+						<SelectContent>
+							{numbers?.map((number) => (
+								<SelectItem
+									key={number.phoneNumber}
+									value={number.phoneNumber}
+								>
+									{number.friendlyName}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</LabeledInput>
 
 				<Separator />

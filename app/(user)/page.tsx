@@ -1,23 +1,21 @@
 import { DataItem, Overview } from './overview';
 import { groupBy } from 'lodash';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { getInboundCalls } from '@/lib/twilio/read';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
 
-export default async function Home() {
-	const inboundCalls = await getInboundCalls('client:nblack_40velomethod_2Ecom');
+export default async function Page({ searchParams }) {
+	console.log(searchParams);
+	const calls = await getInboundCalls('client:nblack_40velomethod_2Ecom', searchParams.from, searchParams.to);
 
-	const groupedMonths = groupBy(
-		inboundCalls.sort((a, b) => new Date(a.dateCreated).getUTCSeconds() - new Date(b.dateCreated).getUTCSeconds()),
-		({ dateCreated }) => Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(dateCreated))
+	const groupedCalls = groupBy(calls, ({ dateCreated }) =>
+		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(dateCreated)
 	);
 
-	const data: DataItem[] = Object.entries(groupedMonths).map(([key, value]) => {
-		const date = new Date(value[0].dateCreated);
-
+	const data: DataItem[] = Object.entries(groupedCalls).map(([name, value]) => {
 		return {
-			name: Intl.DateTimeFormat('en-US').format(date),
+			name,
 			value: value.length,
 		};
 	});
@@ -43,19 +41,11 @@ export default async function Home() {
 					<CardHeader className='justify-between items-center flex-row space-y-0'>
 						<CardTitle>Calls</CardTitle>
 
-						<Select defaultValue='lastYear'>
-							<SelectTrigger>
-								<SelectValue placeholder='Select range' />
-							</SelectTrigger>
-
-							<SelectContent>
-								<SelectItem value='lastYear'>Last year</SelectItem>
-							</SelectContent>
-						</Select>
+						<DateRangePicker className='w-auto' />
 					</CardHeader>
 
 					<CardContent className='bg-card rounded-lg'>
-						<Overview data={data} />
+						<Overview data={data.reverse()} />
 					</CardContent>
 				</Card>
 

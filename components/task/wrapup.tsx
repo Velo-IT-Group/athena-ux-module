@@ -9,10 +9,9 @@ import { Button } from '../ui/button';
 type Props = {
 	taskSid: string;
 	dateUpdated: Date;
-	toastId: number | string;
 };
 
-const TaskWrapup = ({ taskSid, dateUpdated, toastId }: Props) => {
+const TaskWrapup = ({ taskSid, dateUpdated }: Props) => {
 	const [pending, startTransition] = useTransition();
 	const [seconds, setSeconds] = useState(0);
 	const [minutes, setMinutes] = useState(0);
@@ -26,7 +25,7 @@ const TaskWrapup = ({ taskSid, dateUpdated, toastId }: Props) => {
 
 			if (m >= 3) {
 				startTransition(async () => {
-					toast.dismiss(toastId);
+					toast.dismiss(taskSid);
 					await updateTask(taskSid, { assignmentStatus: 'completed', reason: 'Automatically wrapped up' });
 				});
 				return;
@@ -41,7 +40,7 @@ const TaskWrapup = ({ taskSid, dateUpdated, toastId }: Props) => {
 		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [dateUpdated, toastId, taskSid]);
+	}, [dateUpdated, taskSid]);
 
 	return (
 		<Card className='w-[356px]'>
@@ -63,7 +62,7 @@ const TaskWrapup = ({ taskSid, dateUpdated, toastId }: Props) => {
 						onClick={() => {
 							startTransition(async () => {
 								await updateTask(taskSid, { assignmentStatus: 'completed' });
-								toast.dismiss(toastId);
+								toast.dismiss(taskSid);
 							});
 						}}
 					>

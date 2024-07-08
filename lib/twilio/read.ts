@@ -90,8 +90,8 @@ export const hold = async (conferenceSid: string, callSid: string, hold: boolean
 	return await client.conferences(conferenceSid).participants(callSid).update({ hold });
 };
 
-export const getInboundCalls = async (to?: string, limit: number = 25) => {
-	return (await client.calls.list({ to, limit })).map((call) => {
+export const getInboundCalls = async (to?: string, startTime?: string, endTime?: string, limit: number = 25) => {
+	return (await client.calls.list({ to, startTime, endTime, limit })).map((call) => {
 		delete call['_context'];
 		// @ts-ignore
 		delete call['_proxy'];

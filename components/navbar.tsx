@@ -1,6 +1,5 @@
-import React, { Suspense } from 'react';
 import Image from 'next/image';
-import { Phone, Settings } from 'lucide-react';
+import { Phone } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -27,13 +26,6 @@ const Navbar = async () => {
 			/>
 
 			<div className='flex items-center'>
-				<Button
-					variant='ghost'
-					size='icon'
-				>
-					<Settings className='w-3.5 h-3.5' />
-				</Button>
-
 				<DeviceSelector />
 
 				<HistorySelector calls={calls} />
@@ -44,7 +36,7 @@ const Navbar = async () => {
 							variant='ghost'
 							size='icon'
 						>
-							<Phone className='w-3.5 h-3.5' />
+							<Phone />
 						</Button>
 					</PopoverTrigger>
 

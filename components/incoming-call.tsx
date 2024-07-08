@@ -4,18 +4,16 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { Reservation } from 'twilio-taskrouter';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { useTwilio } from '@/providers/twilio-provider';
 import { toast } from 'sonner';
 
 type Props = {
-	toastId: number | string;
 	reservation: Reservation;
 };
 
-const IncomingCall = ({ toastId, reservation }: Props) => {
+const IncomingCall = ({ reservation }: Props) => {
 	const { activeCall, setActiveCall } = useTwilio();
 	const task = reservation.task;
 	const { attributes } = task;
@@ -37,7 +35,7 @@ const IncomingCall = ({ toastId, reservation }: Props) => {
 						variant='ghost'
 						size='icon'
 						className='p-0 w-8 h-8'
-						onClick={() => toast.dismiss(toastId)}
+						onClick={() => toast.dismiss(attributes.call_sid)}
 					>
 						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
 					</Button>
@@ -74,6 +72,8 @@ const IncomingCall = ({ toastId, reservation }: Props) => {
 						});
 
 						const conference = await getConferenceByName(reservation.task.sid);
+
+						console.log(conference);
 
 						setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 					}}

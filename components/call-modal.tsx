@@ -28,6 +28,8 @@ type Props = {
 };
 
 export function ActiveCall({ activeCall }: Props) {
+	console.log(activeCall);
+
 	return (
 		<Popover>
 			<Card className='shadow-sm'>

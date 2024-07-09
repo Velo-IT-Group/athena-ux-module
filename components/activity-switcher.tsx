@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
-import useWorker from '@/hooks/useWorker';
 import { useTwilio } from '@/providers/twilio-provider';
 
 type Props = {
@@ -14,7 +13,7 @@ type Props = {
 const ActivitySwitcher = ({ className }: Props) => {
 	const { worker } = useTwilio();
 	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.workerActivitySid ?? '');
-	const selectedActivity = worker?.activities.get(worker.workerActivitySid);
+	const selectedActivity = worker?.activities.get(selectedAccount);
 
 	useEffect(() => {
 		if (!worker) return;
@@ -26,12 +25,12 @@ const ActivitySwitcher = ({ className }: Props) => {
 
 		return () => {
 			worker?.removeListener('activityUpdated', (a) => {
-				setSelectedAccount(a.activity.name);
+				setSelectedAccount(a.activitySid);
 			});
 		};
 	}, [worker]);
 
-	const activities = Array.from(worker?.activities?.values());
+	const activities = worker?.activities ? Array.from(worker?.activities.values()) : [];
 
 	return (
 		<Combobox

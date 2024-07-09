@@ -90,8 +90,9 @@ export const hold = async (conferenceSid: string, callSid: string, hold: boolean
 	return await client.conferences(conferenceSid).participants(callSid).update({ hold });
 };
 
-export const getInboundCalls = async (to?: string, startTime?: string, endTime?: string, limit: number = 25) => {
-	return (await client.calls.list({ to, startTime, endTime, limit })).map((call) => {
+export const getInboundCalls = async (to?: string, startTime?: Date, endTime?: Date, limit: number = 25) => {
+	return (await client.calls.list({ to, startTime, endTime, limit })).map((c) => {
+		const call = c;
 		delete call['_context'];
 		// @ts-ignore
 		delete call['_proxy'];
@@ -99,12 +100,39 @@ export const getInboundCalls = async (to?: string, startTime?: string, endTime?:
 		delete call['_solution'];
 		// @ts-ignore
 		delete call['_version'];
+		// @ts-ignore
+		delete call['toJSON'];
+		// @ts-ignore
+		delete call['update'];
+		// @ts-ignore
+		delete call['userDefinedMessages'];
+		// @ts-ignore
+		delete call['userDefinedMessageSubscriptions'];
+		// @ts-ignore
+		delete call['events'];
+		// @ts-ignore
+		delete call['fetch'];
+		// @ts-ignore
+		delete call['notifications'];
+		// @ts-ignore
+		delete call['payments'];
+		// @ts-ignore
+		delete call['recordings'];
+		// @ts-ignore
+		delete call['remove'];
+		// @ts-ignore
+		delete call['siprec'];
+		// @ts-ignore
+		delete call['streams'];
+		// @ts-ignore
+		delete call['transcriptions'];
 		return call;
 	});
 };
 
 export const getOutboundCalls = async (from?: string, limit: number = 25) => {
-	return (await client.calls.list({ from, limit })).map((call) => {
+	return (await client.calls.list({ from, limit })).map((c) => {
+		const call = c;
 		delete call['_context'];
 		// @ts-ignore
 		delete call['_proxy'];
@@ -112,6 +140,32 @@ export const getOutboundCalls = async (from?: string, limit: number = 25) => {
 		delete call['_solution'];
 		// @ts-ignore
 		delete call['_version'];
+		// @ts-ignore
+		delete call['toJSON'];
+		// @ts-ignore
+		delete call['update'];
+		// @ts-ignore
+		delete call['userDefinedMessages'];
+		// @ts-ignore
+		delete call['userDefinedMessageSubscriptions'];
+		// @ts-ignore
+		delete call['events'];
+		// @ts-ignore
+		delete call['fetch'];
+		// @ts-ignore
+		delete call['notifications'];
+		// @ts-ignore
+		delete call['payments'];
+		// @ts-ignore
+		delete call['recordings'];
+		// @ts-ignore
+		delete call['remove'];
+		// @ts-ignore
+		delete call['siprec'];
+		// @ts-ignore
+		delete call['streams'];
+		// @ts-ignore
+		delete call['transcriptions'];
 		return call;
 	});
 };

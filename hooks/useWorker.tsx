@@ -1,11 +1,14 @@
 import IncomingCall from '@/components/incoming-call';
 import TaskWrapup from '@/components/task/wrapup';
 import { useJabra } from '@/providers/jabra-provider';
+import { useTwilio } from '@/providers/twilio-provider';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { type Reservation, Worker } from 'twilio-taskrouter';
+import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 
 const useWorker = (token: string) => {
+	const { setActiveCall } = useTwilio();
 	const workerRef = useRef(new Worker(token, { closeExistingSessions: true }));
 	const { currentCallControl } = useJabra();
 
@@ -17,6 +20,7 @@ const useWorker = (token: string) => {
 			console.log(`Worker ${w.sid} is now ready for work`);
 			const ress = Array.from(w.reservations.values());
 			ress.forEach((res) => {
+				console.log(res.task.attributes.call_sid, res.task.attributes.callSid);
 				switch (res.status) {
 					case 'wrapping':
 						toast.custom(
@@ -76,15 +80,16 @@ const useWorker = (token: string) => {
 
 			r.on('accepted', async (reservation) => {
 				console.log(`Reservation ${reservation.sid} was accepted.`);
+				setActiveCall({ task: reservation.task as unknown as TaskInstance });
 
 				// currentCallControl?.startCall();
-				toast.dismiss(reservation.task.attributes.call_sid);
+				// toast.dismiss(reservation.task.attributes.call_sid);
 			});
 
 			r.on('rejected', async (reservation) => {
 				try {
 					currentCallControl?.rejectIncomingCall();
-					toast.dismiss(reservation.sid);
+					toast.dismiss(reservation.task.attributes.call_sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -93,7 +98,7 @@ const useWorker = (token: string) => {
 			r.on('canceled', async (reservation) => {
 				try {
 					currentCallControl?.rejectIncomingCall();
-					toast.dismiss(reservation.sid);
+					toast.dismiss(reservation.task.attributes.call_sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}

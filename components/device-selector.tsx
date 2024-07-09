@@ -45,8 +45,6 @@ const DeviceSelector = ({ className }: Props) => {
 
 			setSelectedDevice(iRemoved.groupId);
 		});
-
-		console.log('getUserMedia is next');
 	}, []);
 
 	useEffect(() => {

@@ -4,13 +4,12 @@ import { Call, Device } from '@twilio/voice-sdk';
 import { ActiveCall } from '@/components/call-modal';
 import { toast } from 'sonner';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
+import { getConferenceParticipants } from '@/lib/twilio/voice/helpers';
 
 const useDevice = (token: string) => {
 	const { activeCall, setActiveCall } = useTwilio();
 
-	const deviceRef = useRef(
-		new Device(token, { disableAudioContextSounds: true, enableImprovedSignalingErrorPrecision: true })
-	);
+	const deviceRef = useRef(new Device(token));
 
 	const [device, setDevice] = useState<Device>();
 
@@ -33,8 +32,10 @@ const useDevice = (token: string) => {
 
 			// await currentCallControl?.signalIncomingCall();
 
-			call.on('accept', (c) => {
-				console.log(call.customParameters, c);
+			call.on('accept', async (c) => {
+				console.log(call.parameters, c);
+
+				// const conference = getConferenceParticipants();
 
 				setActiveCall({ call });
 

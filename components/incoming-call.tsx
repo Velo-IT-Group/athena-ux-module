@@ -67,15 +67,14 @@ const IncomingCall = ({ reservation }: Props) => {
 				<Button
 					className='bg-green-600 hover:bg-green-600/90 text-sm'
 					onClick={async () => {
-						await reservation.conference({
-							from: attributes.from,
-						});
+						await reservation.conference();
 
-						const conference = await getConferenceByName(reservation.task.sid);
+						const conference = await getConferenceByName(task.sid);
+
+						console.log(task.sid, conference);
+						setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 
 						console.log(conference);
-
-						setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 					}}
 				>
 					Accept

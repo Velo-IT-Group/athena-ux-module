@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { JabraProvider } from '@/providers/jabra-provider';
 import { createAccessToken } from '@/lib/twilio';
-import UserLayout from './user-layout';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import Navbar from '@/components/navbar';
 import SideNav from '@/components/side-nav';

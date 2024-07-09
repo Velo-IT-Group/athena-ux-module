@@ -1,7 +1,11 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { Twilio, jwt } from 'twilio';
-import { TaskContextUpdateOptions, TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import {
+	TaskContextUpdateOptions,
+	TaskInstance,
+	TaskListInstanceOptions,
+} from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
@@ -20,18 +24,28 @@ export const createTask = async (workflowSid: string, attributes: Object) => {
 	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.create(payload);
 };
 
-export const getTask = async (taskSid: string) => {
-	const taskResponse = await client.taskrouter.v1
-		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-		.tasks(taskSid)
-		.fetch();
-
-	const task: TaskInstance = {
-		...taskResponse,
-	} as TaskInstance;
+export const getTask = async (taskSid?: string, params?: TaskListInstanceOptions) => {
+	let task: TaskInstance | undefined;
+	if (taskSid) {
+		task = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks(taskSid).fetch();
+	} else if (params) {
+		const taskList = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.list(params);
+		if (taskList.length === 0) return;
+		task = taskList[0];
+	}
 
 	// @ts-ignore
 	delete task['_version'];
+	// @ts-ignore
+	delete task['_proxy'];
+	// @ts-ignore
+	delete task['_solution'];
+	// @ts-ignore
+	delete task['_version'];
+	// @ts-ignore
+	delete task['toJSON'];
+	// @ts-ignore
+	delete task['update'];
 
 	return task;
 };

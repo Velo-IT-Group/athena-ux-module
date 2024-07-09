@@ -6,16 +6,29 @@ const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_
 });
 
 export const getConferenceByName = async (friendlyName: string) => {
-	try {
-		const conferences = await client.conferences.list({ status: 'in-progress', friendlyName });
+	console.log(friendlyName);
 
-		if (conferences.length === 0) return;
+	const conferences = await client.conferences.list({ friendlyName });
 
-		return conferences[0];
-	} catch (error) {
-		console.error(error);
-		return;
-	}
+	console.log(conferences);
+
+	if (conferences.length === 0) return;
+
+	const conference = conferences[0];
+
+	delete conference['_context'];
+	// @ts-ignore
+	delete conference['_proxy'];
+	// @ts-ignore
+	delete conference['_solution'];
+	// @ts-ignore
+	delete conference['_version'];
+	// @ts-ignore
+	delete conference['toJSON'];
+	// @ts-ignore
+	delete conference['update'];
+
+	return conference;
 };
 
 export const getConferenceParticipants = async (conferenceSid: string) => {

@@ -39,39 +39,37 @@ const HistorySelector = ({ calls }: Props) => {
 					<CommandInput placeholder='Filter calls' />
 					<CommandEmpty>No framework found.</CommandEmpty>
 					<CommandList>
-						<CommandGroup>
-							{Object?.entries(groupedCalls).map(([key, calls], index) => (
-								<>
-									{index !== 0 && <CommandSeparator key={`${key}-seperator`} />}
-									<CommandGroup
-										key={key}
-										heading={key}
-									>
-										{calls?.map((call) => (
-											<CommandItem
-												key={call.sid}
-												value={call.sid}
-												onSelect={(currentValue) => {
-													// const call =
-													// setValue(value && currentValue === value ? '' : currentValue);
-													// setOpen(false);
-												}}
-											>
-												{call.direction === 'outbound' ? (
-													<PhoneOutgoing className='mr-1.5 text-red-500' />
-												) : (
-													<PhoneIncoming className='mr-1.5 text-green-500' />
-												)}
-												<span className='text-muted-foreground'>
-													{call.direction === 'outbound' ? call.toFormatted : call.fromFormatted} (
-													{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(call.dateCreated))})
-												</span>
-											</CommandItem>
-										))}
-									</CommandGroup>
-								</>
-							))}
-						</CommandGroup>
+						{Object?.entries(groupedCalls).map(([key, calls], index) => (
+							<div key={`${key}-separator`}>
+								{index !== 0 && <CommandSeparator key={`${key}-seperator`} />}
+								<CommandGroup
+									key={key}
+									heading={key}
+								>
+									{calls?.map((call) => (
+										<CommandItem
+											key={call.sid}
+											value={call.sid}
+											onSelect={(currentValue) => {
+												// const call =
+												// setValue(value && currentValue === value ? '' : currentValue);
+												// setOpen(false);
+											}}
+										>
+											{call.direction === 'outbound' ? (
+												<PhoneOutgoing className='mr-1.5 text-red-500' />
+											) : (
+												<PhoneIncoming className='mr-1.5 text-green-500' />
+											)}
+											<span className='text-muted-foreground'>
+												{call.direction === 'outbound' ? call.toFormatted : call.fromFormatted} (
+												{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(call.dateCreated))})
+											</span>
+										</CommandItem>
+									))}
+								</CommandGroup>
+							</div>
+						))}
 					</CommandList>
 				</Command>
 			</PopoverContent>

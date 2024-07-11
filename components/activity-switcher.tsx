@@ -4,14 +4,14 @@ import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
-import { useTwilio } from '@/providers/twilio-provider';
+import { useWorker } from '@/providers/worker-provider';
 
 type Props = {
 	className?: string;
 };
 
 const ActivitySwitcher = ({ className }: Props) => {
-	const { worker } = useTwilio();
+	const { worker } = useWorker();
 	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.workerActivitySid ?? '');
 	const selectedActivity = worker?.activities.get(selectedAccount);
 

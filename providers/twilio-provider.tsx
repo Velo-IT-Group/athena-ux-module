@@ -1,21 +1,16 @@
 'use client';
 import { useContext, useState, Dispatch, createContext, useRef } from 'react';
-import type { Call, Device } from '@twilio/voice-sdk';
+import type { Call } from '@twilio/voice-sdk';
 
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { ActiveCall as CustomCall } from '@/components/call-modal';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
-import useDevice from '@/hooks/useDevice';
-import useWorker from '@/hooks/useWorker';
-import { Worker } from 'twilio-taskrouter';
 interface TwilioProviderProps {
 	currentWorkspace: string | undefined;
 	setCurrentWorkspace: Dispatch<React.SetStateAction<string | undefined>>;
 	activeCall: CustomCall | undefined;
 	setActiveCall: Dispatch<React.SetStateAction<CustomCall | undefined>>;
 	token: string;
-	worker: Worker | undefined;
-	device: Device | undefined;
 }
 
 const initialValues: TwilioProviderProps = {
@@ -24,8 +19,6 @@ const initialValues: TwilioProviderProps = {
 	activeCall: undefined,
 	setActiveCall: () => undefined,
 	token: '',
-	worker: undefined,
-	device: undefined,
 };
 
 type WithChildProps = {
@@ -48,8 +41,6 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const tokenRef = useRef(authToken);
 	const [activeCall, setActiveCall] = useState<CustomCall>();
 	const [currentWorkspace, setCurrentWorkspace] = useState<string | undefined>(workspaceSid);
-	const { device } = useDevice(authToken);
-	const worker = useWorker(authToken);
 
 	const values = {
 		currentWorkspace,
@@ -57,8 +48,6 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 		activeCall,
 		setActiveCall,
 		token: tokenRef.current,
-		device,
-		worker,
 	};
 
 	return <Provider value={values}>{children}</Provider>;

@@ -36,10 +36,11 @@ const Navbar = async () => {
 
 			<form className='flex items-center'>
 				<DeviceSelector />
+				<ActivitySwitcher className='ml-1.5' />
 
 				{/* <HistorySelector calls={calls} /> */}
 
-				<Popover>
+				{/* <Popover>
 					<PopoverTrigger asChild>
 						<Button
 							variant='ghost'
@@ -49,14 +50,14 @@ const Navbar = async () => {
 						</Button>
 					</PopoverTrigger>
 
-					{/* <OutboundDialerContent
+					<OutboundDialerContent
 						numbers={numbers.map(({ phoneNumber, friendlyName }) => {
 							return { phoneNumber, friendlyName };
 						})}
-					/> */}
+					/>
 				</Popover>
 
-				<ActivitySwitcher className='ml-1.5' />
+				
 
 				<DropdownMenu>
 					<DropdownMenuTrigger>
@@ -72,7 +73,7 @@ const Navbar = async () => {
 					<DropdownMenuContent>
 						<SignOutButton />
 					</DropdownMenuContent>
-				</DropdownMenu>
+				</DropdownMenu> */}
 			</form>
 		</nav>
 	);

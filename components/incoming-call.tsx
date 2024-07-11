@@ -14,6 +14,7 @@ type Props = {
 };
 
 const IncomingCall = ({ reservation }: Props) => {
+	console.log(reservation);
 	const { activeCall, setActiveCall } = useTwilio();
 	const task = reservation.task;
 	const { attributes } = task;
@@ -72,7 +73,7 @@ const IncomingCall = ({ reservation }: Props) => {
 						const conference = await getConferenceByName(task.sid);
 
 						console.log(task.sid, conference);
-						setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
+						// setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 
 						console.log(conference);
 					}}

@@ -28,7 +28,6 @@ const chartData = [
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 export default async function Page({ searchParams }: { searchParams: any }) {
-	console.log(searchParams);
 	const calls = await getInboundCalls('client:nblack_40velomethod_2Ecom', searchParams.from, searchParams.to);
 
 	const groupedCalls = groupBy(calls, ({ dateCreated }) =>

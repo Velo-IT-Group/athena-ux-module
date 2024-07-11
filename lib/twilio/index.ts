@@ -19,7 +19,7 @@ export const createAccessToken = async (
 	signingKeySecret: string,
 	workspaceSid: string,
 	workerSid: string,
-	identity: string = 'nblack_40velomethod_2Ecom'
+	identity: string
 ) => {
 	const taskRouterGrant = new TaskRouterGrant({
 		workerSid,

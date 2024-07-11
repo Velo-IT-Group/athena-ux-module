@@ -24,13 +24,14 @@ type Props = {
 const DeviceSelector = ({ className }: Props) => {
 	const [open, setOpen] = useState(false);
 	const [inputLevel, setInputLevel] = useState(0);
-	const { callControlDevices, setCurrentCallControl, currentCallControl, jabra } = useJabra();
+	const { callControlDevices, setCurrentCallControl, currentCallControl, jabra, deviceState } = useJabra();
 	const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [selectedDevice, setSelectedDevice] = useState<string>();
 
 	useEffect(() => {
 		navigator.mediaDevices.enumerateDevices().then((devices) => {
+			console.log(devices);
 			const iDevices = devices.filter((d) => d.kind === 'audioinput');
 			const oDevices = devices.filter((d) => d.kind === 'audiooutput');
 
@@ -48,12 +49,13 @@ const DeviceSelector = ({ className }: Props) => {
 	}, []);
 
 	useEffect(() => {
+		if (!currentCallControl) return;
 		callControlDevices.forEach(async (d) => {
 			const { device } = d;
 			const de = inputDevices.find((d) => d.groupId === selectedDevice)?.label.includes(device.name);
 			if (!de) return;
-			await webHidPairing();
-			setCurrentCallControl(d);
+			// await webHidPairing();
+			// setCurrentCallControl(d);
 		});
 	}, [callControlDevices, inputDevices, selectedDevice]);
 
@@ -140,6 +142,18 @@ const DeviceSelector = ({ className }: Props) => {
 						<Button
 							variant='outline'
 							className='text-xs'
+							type='button'
+							onClick={async () => {
+								try {
+									if (deviceState?.callActive) {
+										await currentCallControl?.endCall();
+									}
+
+									await currentCallControl?.signalIncomingCall(5000);
+								} catch (error) {
+									console.error(error);
+								}
+							}}
 						>
 							Test Speaker
 						</Button>
@@ -186,22 +200,6 @@ const DeviceSelector = ({ className }: Props) => {
 				<Separator />
 
 				<Button className='w-full'>Make a test call</Button>
-
-				{/* {callControlDevices.map((controlDevice) => {
-					const { device } = controlDevice;
-					return (
-						<DropdownMenuCheckboxItem
-							key={device.id.id}
-							defaultChecked={currentCallControl?.device.id.id === device.id.id}
-							checked={currentCallControl?.device.id.id === device.id.id}
-							onCheckedChange={() => {
-								setCurrentCallControl(controlDevice);
-							}}
-						>
-							{device.name}
-						</DropdownMenuCheckboxItem>
-					);
-				})}  */}
 			</PopoverContent>
 		</Popover>
 	);

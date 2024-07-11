@@ -1,10 +1,17 @@
-import { signIn } from '@/auth';
+'use server';
+import { auth, signIn, signOut } from '@/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import LabeledInput from '@/components/ui/labeled-input';
 import Image from 'next/image';
 
-const Page = () => {
+const Page = async () => {
+	const session = await auth();
+
+	// if (!session?.user) {
+	// 	await signOut();
+	// }
+
 	return (
 		<div className='grid w-screen h-screen place-items-center bg-muted/40'>
 			<form
@@ -29,7 +36,7 @@ const Page = () => {
 						<CardDescription>Enter your email below to login to your account.</CardDescription>
 					</CardHeader>
 
-					<CardContent className='grid gap-4'>
+					<CardContent className='grid gap-3'>
 						{/* <LabeledInput
 							label='Email'
 							type='email'

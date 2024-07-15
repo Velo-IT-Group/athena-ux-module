@@ -39,7 +39,7 @@ const Layout = async ({ children }: Props) => {
 						<TooltipProvider>
 							<Navbar />
 
-							<div className='grid grid-cols-[56px_1fr] grow min-h-0'>
+							<div className='grid grid-cols-[224px_1fr] grow min-h-0'>
 								<SideNav />
 								{children}
 							</div>

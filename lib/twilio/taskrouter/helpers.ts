@@ -69,6 +69,10 @@ export const findWorker = async (friendlyName: string) => {
 	return workers[0];
 };
 
+export const getEvents = async () => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).events.list({ limit: 20 });
+};
+
 export const getOngoingTasks = (name: string) => {
 	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.list({
 		assignmentStatus: ['pending', 'assigned', 'reserved'],
@@ -112,4 +116,8 @@ export const createWorkerCapabilityToken = (sid: string) => {
 	});
 
 	return workerCapability;
+};
+
+export const getWorkflows = async () => {
+	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows.list();
 };

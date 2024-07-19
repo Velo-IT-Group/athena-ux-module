@@ -7,22 +7,20 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Circle, Command, LogOut } from 'lucide-react';
-import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
+import { LogOut } from 'lucide-react';
 import { auth } from '@/auth';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
+import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
+import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
 
 type Props = {};
 
 const UserInfo = async (props: Props) => {
-	const session = await auth();
+	const [session, activities] = await Promise.all([auth(), getActivies()]);
 
 	return (
 		<DropdownMenu>
@@ -30,7 +28,7 @@ const UserInfo = async (props: Props) => {
 				<Button
 					variant='ghost'
 					size='sm'
-					className='w-full justify-start'
+					className='justify-start'
 				>
 					<div className='relative'>
 						<Avatar className='w-7 h-7 mr-1.5'>
@@ -51,7 +49,7 @@ const UserInfo = async (props: Props) => {
 
 					<DropdownMenuSeparator />
 
-					<DeviceDropdownMenuSub />
+					<ActivityDropdownMenuSub activities={activities} />
 
 					<DeviceDropdownMenuSub />
 

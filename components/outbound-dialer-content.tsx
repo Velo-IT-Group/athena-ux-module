@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LabeledInput from './ui/labeled-input';
 import WorkerSelect from './worker-select';
 import { useTwilio } from '@/providers/twilio-provider';
+import { PhoneInput } from './phone-input';
+import { makeOutboundCall } from '@/app/phone-actions';
 
 type Props = {
 	numbers: { phoneNumber: string; friendlyName: string }[];
@@ -20,45 +22,36 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 	return (
 		<PopoverContent align='end'>
 			<form
-				onSubmit={async (e) => {
-					e.preventDefault();
-					var data = new FormData(e.currentTarget);
+				action={makeOutboundCall}
+				// action={async (data: FormData) => {
+				// 	'use server';
+				// 	// e.preventDefault();
+				// 	// var data = new FormData(e.currentTarget);
 
-					if (!worker) return;
-					const to = data.get('phoneNumber') as string;
-					const from = data.get('from') as string;
-					const workflowSid = data.get('from') as string;
-					const taskQueueSid = data.get('from') as string;
-					console.log(data);
-					await worker.createTask(
-						'+19015988651',
-						'+18449402678',
-						'WW497b90bc1703176f6845c09c8bf4fa8a',
-						'WQee659e96340b3899ad1fad7578fe6515',
-						{
-							attributes: {
-								direction: 'outboundDial',
-							},
-						}
-					);
-					// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
-				}}
+				// 	console.log(data);
+
+				// 	if (!worker) return;
+				// const to = data.get('phoneNumber') as string;
+				// const from = data.get('from') as string;
+				// const workflowSid = data.get('from') as string;
+				// const taskQueueSid = data.get('from') as string;
+				// console.log(data);
+				// // await worker.createTask(
+				// // 	'+19015988651',
+				// // 	'+18449402678',
+				// // 	'WW497b90bc1703176f6845c09c8bf4fa8a',
+				// // 	'WQee659e96340b3899ad1fad7578fe6515',
+				// // 	{
+				// // 		attributes: {
+				// // 			direction: 'outboundDial',
+				// // 		},
+				// // 	}
+				// // );
+				// 	// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
+				// }}
 				className='space-y-3'
 			>
-				<Dialpad />
-
-				<div className='grid grid-cols-3 gap-1.5 w-full'>
-					<div></div>
-
-					<Button
-						variant='ghost'
-						size='lg'
-						type='button'
-						className='text-xl'
-					>
-						0
-					</Button>
-				</div>
+				<PhoneInput name='phoneNumber' />
 
 				<Separator />
 

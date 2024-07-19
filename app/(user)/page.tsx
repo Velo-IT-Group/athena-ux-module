@@ -26,9 +26,12 @@ const chartData = [
 	{ month: 'June', desktop: 214, mobile: 140 },
 ];
 import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { getEvents } from '@/lib/twilio/taskrouter/helpers';
 
 export default async function Page({ searchParams }: { searchParams: any }) {
 	const calls = await getInboundCalls('client:nblack_40velomethod_2Ecom', searchParams.from, searchParams.to);
+	const events = await getEvents();
+	console.log(events);
 
 	const groupedCalls = groupBy(calls, ({ dateCreated }) =>
 		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(dateCreated)

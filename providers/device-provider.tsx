@@ -37,9 +37,6 @@ export type CustomCall = {
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	const { activeCall, setActiveCall } = useTwilio();
-	const preflightTest = Device.runPreflight(authToken, { fakeMicInput: true });
-
-	console.log(preflightTest);
 
 	const deviceRef = useRef(
 		new Device(authToken, {
@@ -56,18 +53,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	useEffect(() => {
 		const device = deviceRef.current;
 		if (!device || device.state === Device.State.Unregistered) return;
-
-		preflightTest.on('sample', (report) => {
-			console.log(report);
-		});
-
-		preflightTest.on('completed', (report) => {
-			console.log(report);
-		});
-
-		preflightTest.on('failed', (error) => {
-			console.log('ERROR', error);
-		});
 
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');

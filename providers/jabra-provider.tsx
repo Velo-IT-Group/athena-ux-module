@@ -8,7 +8,7 @@ interface JabraProviderProps {
 	callControlDevices: ISingleCallControl[];
 	setCallControlDevices: React.Dispatch<React.SetStateAction<ISingleCallControl[]>>;
 	currentCallControl: ISingleCallControl | undefined;
-	setCurrentCallControl: React.Dispatch<React.SetStateAction<ISingleCallControl | undefined>>;
+	// setCurrentCallControl: React.Dispatch<React.SetStateAction<ISingleCallControl | undefined>>;
 	deviceState: DeviceState | undefined;
 	setDeviceState: React.Dispatch<React.SetStateAction<DeviceState>>;
 }
@@ -18,7 +18,7 @@ const initialValues: JabraProviderProps = {
 	callControlDevices: [],
 	setCallControlDevices: () => undefined,
 	currentCallControl: undefined,
-	setCurrentCallControl: () => undefined,
+	// setCurrentCallControl: () => undefined,
 	deviceState: undefined,
 	setDeviceState: () => {
 		return {
@@ -43,7 +43,7 @@ const { Provider } = context;
 export const JabraProvider = ({ children }: WithChildProps) => {
 	const [jabra, setJabra] = useState<IApi>();
 	const [callControlDevices, setCallControlDevices] = useState<ISingleCallControl[]>([]);
-	const [currentCallControl, setCurrentCallControl] = useState<ISingleCallControl>();
+	let currentCallControl: ISingleCallControl | undefined;
 	const [deviceState, setDeviceState] = useState<DeviceState>({
 		callActive: false,
 		muteState: MuteState.NO_ONGOING_CALLS,
@@ -69,7 +69,7 @@ export const JabraProvider = ({ children }: WithChildProps) => {
 
 					// Convert the ISdkDevice to a ICallControlDevice
 					const ccDevice = await eccFactory.createSingleCallControl(d);
-					setCurrentCallControl(ccDevice);
+					currentCallControl = ccDevice;
 					setCallControlDevices((prev) => [...prev, ccDevice]);
 				});
 			})
@@ -100,7 +100,7 @@ export const JabraProvider = ({ children }: WithChildProps) => {
 		callControlDevices,
 		setCallControlDevices,
 		currentCallControl: callControlRef.current,
-		setCurrentCallControl,
+		// setCurrentCallControl,
 		deviceState,
 		setDeviceState,
 	};

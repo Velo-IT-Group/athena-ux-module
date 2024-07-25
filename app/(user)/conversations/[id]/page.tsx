@@ -10,6 +10,9 @@ type Props = {
 
 const Page = async ({ params }: Props) => {
 	const task = await getTask(params.id);
+	if (!task) {
+		return <div>Task not found</div>;
+	}
 	const attributes = JSON.parse(task.attributes);
 
 	return (

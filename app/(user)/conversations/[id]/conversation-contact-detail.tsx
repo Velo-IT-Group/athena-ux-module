@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getContact, getContacts } from '@/lib/manage/read';
-import { Building, Ellipsis, Laptop, Mail, Phone, Plus } from 'lucide-react';
+import { Ellipsis, Laptop, Mail, Phone, Plus } from 'lucide-react';
 import React, { Suspense } from 'react';
 import ContactSelector from './contact-selector';
 import { groupBy } from 'lodash';
@@ -15,7 +15,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Contact } from '@/lib/manage/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from '@/components/ui/labeled-input';
 import DatePicker from '@/components/ui/date-picker';

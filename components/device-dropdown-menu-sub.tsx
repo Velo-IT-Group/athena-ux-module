@@ -1,9 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from './ui/dropdown-menu';
-import { Circle, Headset } from 'lucide-react';
+import { Check, Circle, Headset } from 'lucide-react';
 import { useJabra } from '@/providers/jabra-provider';
 import { Command, CommandGroup, CommandItem, CommandList, CommandSeparator } from './ui/command';
+import { cn } from '@/lib/utils';
 
 type Props = {};
 
@@ -78,6 +79,7 @@ const DeviceDropdownMenuSub = (props: Props) => {
 				console.error(err);
 			});
 	}, [open]);
+
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubContent>
@@ -90,6 +92,9 @@ const DeviceDropdownMenuSub = (props: Props) => {
 										key={device.groupId}
 										value={device.groupId}
 									>
+										<Check
+											className={cn('mr-2 h-4 w-4', device?.groupId === selectedDevice ? 'opacity-100' : 'opacity-0')}
+										/>
 										{device.label}
 									</CommandItem>
 								))}
@@ -104,6 +109,9 @@ const DeviceDropdownMenuSub = (props: Props) => {
 									key={device.groupId}
 									value={device.groupId}
 								>
+									<Check
+										className={cn('mr-2 h-4 w-4', device?.groupId === selectedDevice ? 'opacity-100' : 'opacity-0')}
+									/>
 									{device.label}
 								</CommandItem>
 							))}

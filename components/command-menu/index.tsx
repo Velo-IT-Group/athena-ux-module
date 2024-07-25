@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react';
+import { Building, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,11 +15,14 @@ import {
 	CommandSeparator,
 } from '@/components/ui/command';
 import { DialogProps } from '@radix-ui/react-dialog';
+import { Skeleton } from '../ui/skeleton';
+import CommandCompaniesList from './companies';
 
 export function CommandMenu({ ...props }: DialogProps) {
 	const router = useRouter();
 	const [open, setOpen] = React.useState(false);
 	const { setTheme } = useTheme();
+	const blankArray = new Array(6).fill(null);
 
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -63,6 +66,7 @@ export function CommandMenu({ ...props }: DialogProps) {
 					<span className='text-xs'>⌘</span>K
 				</kbd>
 			</Button>
+
 			<CommandDialog
 				open={open}
 				onOpenChange={setOpen}
@@ -70,43 +74,30 @@ export function CommandMenu({ ...props }: DialogProps) {
 				<CommandInput placeholder='Type a command or search...' />
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
-					<CommandGroup heading='Links'>
-						{/* {docsConfig.mainNav
-							.filter((navitem) => !navitem.external)
-							.map((navItem) => (
-								<CommandItem
-									key={navItem.href}
-									value={navItem.title}
-									onSelect={() => {
-										runCommand(() => router.push(navItem.href as string));
-									}}
-								>
-									<FileIcon className='mr-2 h-4 w-4' />
-									{navItem.title}
-								</CommandItem>
-							))} */}
-					</CommandGroup>
-					{/* {docsConfig.sidebarNav.map((group) => (
-						<CommandGroup
-							key={group.title}
-							heading={group.title}
-						>
-							{group.items.map((navItem) => (
-								<CommandItem
-									key={navItem.href}
-									value={navItem.title}
-									onSelect={() => {
-										runCommand(() => router.push(navItem.href as string));
-									}}
-								>
-									<div className='mr-2 flex h-4 w-4 items-center justify-center'>
-										<CircleIcon className='h-3 w-3' />
-									</div>
-									{navItem.title}
-								</CommandItem>
-							))}
+					<React.Suspense
+						fallback={
+							<CommandGroup
+								heading='Companies'
+								className='flex flex-col'
+							>
+								{blankArray.map((_, index) => (
+									<CommandItem
+										key={index}
+										value={''}
+									>
+										loading...
+										{/* <Building className='mr-1.5' />
+										<Skeleton className='w-full h-9 rounded-xl' /> */}
+									</CommandItem>
+								))}
+							</CommandGroup>
+						}
+					>
+						<CommandGroup heading='Companies'>
+							<CommandCompaniesList />
 						</CommandGroup>
-					))} */}
+					</React.Suspense>
+
 					<CommandSeparator />
 					<CommandGroup heading='Theme'>
 						<CommandItem onSelect={() => runCommand(() => setTheme('light'))}>

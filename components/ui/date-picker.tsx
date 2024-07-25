@@ -21,10 +21,11 @@ const DatePicker = ({ date, setDate, name }: Props) => {
 			<Popover>
 				<PopoverTrigger asChild>
 					<Button
-						variant={'outline'}
-						className={cn('justify-start text-left font-normal', !date && 'text-muted-foreground')}
+						variant={'ghost'}
+						size={'sm'}
+						className={cn('justify-start text-left font-normal text-xs', !date && 'text-muted-foreground')}
 					>
-						<CalendarIcon className='mr-2 h-4 w-4' />
+						<CalendarIcon className='mr-1.5' />
 						{date ? format(date, 'PPP') : <span>Pick a date</span>}
 					</Button>
 				</PopoverTrigger>

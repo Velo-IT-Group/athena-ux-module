@@ -60,6 +60,7 @@ export const config: NextAuthConfig = {
 			},
 		}),
 	],
+	trustHost: true,
 	pages: {
 		signIn: '/login',
 	},

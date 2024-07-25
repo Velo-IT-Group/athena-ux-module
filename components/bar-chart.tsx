@@ -23,7 +23,7 @@ const BarChart = <T extends ChartConfig>({ config, dataKey, data }: Props<T>) =>
 				{dataKey.map((key) => (
 					<RBar
 						key={key.toString()}
-						dataKey={key}
+						dataKey={key as string}
 						fill='var(--color-desktop)'
 						radius={4}
 					/>

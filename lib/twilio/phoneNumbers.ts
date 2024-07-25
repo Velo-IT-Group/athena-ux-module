@@ -6,8 +6,9 @@ const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_
 });
 
 export const getPhoneNumbers = async () => {
+	// client.outgoingCallerIds.list({ limit: 100 });
 	const phoneNumbers = await client.incomingPhoneNumbers.list({
-		limit: 25,
+		limit: 100,
 	});
 
 	return phoneNumbers.map((number) => {

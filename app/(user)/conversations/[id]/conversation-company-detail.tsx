@@ -2,7 +2,7 @@ import { Building } from 'lucide-react';
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCompany, getTickets } from '@/lib/manage/read';
+import { getCompany, getTickets, getUserTickets } from '@/lib/manage/read';
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
@@ -10,7 +10,9 @@ type Props = {
 };
 
 const ConversationCompanyDetail = async ({ id }: Props) => {
-	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getTickets(id ?? 250)]);
+	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getUserTickets(10)]);
+
+	console.log(tickets);
 
 	return (
 		<aside className='min-h-0 flex flex-col overflow-y-scroll space-y-6 p-3 bg-background border-l'>
@@ -54,7 +56,7 @@ const ConversationCompanyDetail = async ({ id }: Props) => {
 						</AccordionTrigger>
 
 						<AccordionContent className='space-y-3'>
-							{tickets.map((ticket) => (
+							{tickets?.map((ticket) => (
 								<Card key={ticket.id}>
 									<CardHeader className='p-3'>
 										<CardTitle className='text-sm'>{ticket.summary}</CardTitle>

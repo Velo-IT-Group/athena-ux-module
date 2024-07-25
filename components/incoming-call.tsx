@@ -4,7 +4,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Reservation } from 'twilio-taskrouter';
+import { ConferenceOptions, Reservation } from 'twilio-taskrouter';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { useTwilio } from '@/providers/twilio-provider';
 import { toast } from 'sonner';
@@ -13,8 +13,7 @@ type Props = {
 	reservation: Reservation;
 };
 
-const IncomingCall = ({ reservation }: Props) => {
-	console.log(reservation);
+const IncomingTask = ({ reservation }: Props) => {
 	const { activeCall, setActiveCall } = useTwilio();
 	const task = reservation.task;
 	const { attributes } = task;
@@ -22,7 +21,7 @@ const IncomingCall = ({ reservation }: Props) => {
 	return (
 		<Card
 			key={reservation.sid}
-			className='shadow-sm'
+			className='shadow-none border-none'
 		>
 			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
 				<CardTitle>
@@ -32,14 +31,14 @@ const IncomingCall = ({ reservation }: Props) => {
 
 				<CardDescription>
 					Incoming call
-					<Button
+					{/* <Button
 						variant='ghost'
 						size='icon'
 						className='p-0 w-8 h-8'
 						onClick={() => toast.dismiss(attributes.call_sid)}
 					>
 						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
-					</Button>
+					</Button> */}
 				</CardDescription>
 			</CardHeader>
 
@@ -70,12 +69,12 @@ const IncomingCall = ({ reservation }: Props) => {
 					onClick={async () => {
 						await reservation.conference();
 
-						const conference = await getConferenceByName(task.sid);
+						// const conference = await getConferenceByName(task.sid);
 
-						console.log(task.sid, conference);
+						// console.log(task.sid, conference);
 						// setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 
-						console.log(conference);
+						// console.log(conference);
 					}}
 				>
 					Accept
@@ -85,4 +84,4 @@ const IncomingCall = ({ reservation }: Props) => {
 	);
 };
 
-export default IncomingCall;
+export default IncomingTask;

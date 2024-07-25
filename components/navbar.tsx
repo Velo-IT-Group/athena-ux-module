@@ -10,6 +10,7 @@ import { Button } from './ui/button';
 import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
 import HistorySelector from '@/app/(user)/history-selector';
+import { Suspense } from 'react';
 
 const Navbar = async () => {
 	const [numbers, calls, session] = await Promise.all([
@@ -30,7 +31,9 @@ const Navbar = async () => {
 				className='object-contain'
 			/>
 
-			<CommandMenu />
+			<Suspense>
+				<CommandMenu />
+			</Suspense>
 
 			<div className='flex items-center'>
 				<HistorySelector calls={calls} />

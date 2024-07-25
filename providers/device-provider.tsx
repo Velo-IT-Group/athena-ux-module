@@ -38,20 +38,15 @@ export type CustomCall = {
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	const { activeCall, setActiveCall } = useTwilio();
 
-	const deviceRef = useRef(
-		new Device(authToken, {
-			disableAudioContextSounds: true,
-			sounds: {
-				incoming: undefined,
-			},
-			enableImprovedSignalingErrorPrecision: true,
-		})
-	);
-
-	const [device, setDevice] = useState<Device>();
+	const device = new Device(authToken, {
+		disableAudioContextSounds: true,
+		sounds: {
+			incoming: undefined,
+		},
+		enableImprovedSignalingErrorPrecision: true,
+	});
 
 	useEffect(() => {
-		const device = deviceRef.current;
 		if (!device || device.state === Device.State.Unregistered) return;
 
 		device.on('registered', async (d) => {
@@ -61,6 +56,10 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			// } catch (error) {
 			// 	console.error(error);
 			// }
+		});
+
+		device.on('error', (error) => {
+			console.error(error);
 		});
 
 		device.on('incoming', async (call: Call) => {
@@ -80,13 +79,13 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 				// await currentCallControl?.startCall();
 				// const conference = getConferenceParticipants();
 
-				setActiveCall({ call });
+				// setActiveCall({ call });
 
-				toast.custom(() => <ActiveCall activeCall={activeCall!} />, {
-					duration: Infinity,
-					dismissible: false,
-					id: call.parameters.CallSid,
-				});
+				// toast.custom(() => <ActiveCall activeCall={activeCall!} />, {
+				// 	duration: Infinity,
+				// 	dismissible: false,
+				// 	id: call.parameters.CallSid,
+				// });
 			});
 		});
 
@@ -99,7 +98,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	}, []);
 
 	useEffect(() => {
-		const device = deviceRef.current;
 		if (!device) return;
 		window.addEventListener('click', () => {
 			if (device?.state === Device.State.Unregistered) {
@@ -108,11 +106,12 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 				// currentCallControl?.endCall();
 			}
 		});
-		if (!device) return;
 	}, [device]);
 
 	return (
-		<Provider value={{ device, setDevice, hasExternalFunctionality: device?.identity === '' }}>{children}</Provider>
+		<Provider value={{ device, setDevice: () => undefined, hasExternalFunctionality: device?.identity === '' }}>
+			{children}
+		</Provider>
 	);
 };
 

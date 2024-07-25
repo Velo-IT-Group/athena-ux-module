@@ -6,6 +6,7 @@ import { useWorker } from '@/providers/worker-provider';
 import { ActivityInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
 import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type Props = {
 	activities: ActivityInstance[];
@@ -33,8 +34,9 @@ const ActivityDropdownMenuSub = ({ activities }: Props) => {
 												const activity = await act?.setAsCurrent();
 												if (!activity) throw Error('No activity provided...');
 												setSelectedAccount(activity.sid);
-											} catch (error) {
+											} catch (error: any) {
 												console.error(error);
+												toast.error('Failed to set activity', { description: error.message });
 												return;
 											}
 										}}

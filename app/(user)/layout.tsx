@@ -8,7 +8,6 @@ import { TwilioProvider } from '@/providers/twilio-provider';
 import { WorkerProvider } from '@/providers/worker-provider';
 import { DeviceProvider } from '@/providers/device-provider';
 import { auth } from '@/auth';
-import { getSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
 type Props = {
@@ -39,8 +38,9 @@ const Layout = async ({ children }: Props) => {
 						<TooltipProvider>
 							<Navbar />
 
-							<div className='grid grid-cols-[224px_1fr] grow min-h-0'>
+							<div className='grid grid-cols-[18rem_1fr] grow min-h-0'>
 								<SideNav />
+
 								{children}
 							</div>
 						</TooltipProvider>

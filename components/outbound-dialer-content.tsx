@@ -11,44 +11,44 @@ import WorkerSelect from './worker-select';
 import { useTwilio } from '@/providers/twilio-provider';
 import { PhoneInput } from './phone-input';
 import { makeOutboundCall } from '@/app/phone-actions';
+import { useWorker } from '@/providers/worker-provider';
 
 type Props = {
 	numbers: { phoneNumber: string; friendlyName: string }[];
 };
 
 const OutboundDialerContent = ({ numbers }: Props) => {
-	const { worker } = useTwilio();
+	const { worker } = useWorker();
 
 	return (
 		<PopoverContent align='end'>
 			<form
-				action={makeOutboundCall}
-				// action={async (data: FormData) => {
-				// 	'use server';
-				// 	// e.preventDefault();
-				// 	// var data = new FormData(e.currentTarget);
+				// action={makeOutboundCall}
+				onSubmit={async (e) => {
+					e.preventDefault();
+					var data = new FormData(e.currentTarget);
 
-				// 	console.log(data);
+					console.log(data);
 
-				// 	if (!worker) return;
-				// const to = data.get('phoneNumber') as string;
-				// const from = data.get('from') as string;
-				// const workflowSid = data.get('from') as string;
-				// const taskQueueSid = data.get('from') as string;
-				// console.log(data);
-				// // await worker.createTask(
-				// // 	'+19015988651',
-				// // 	'+18449402678',
-				// // 	'WW497b90bc1703176f6845c09c8bf4fa8a',
-				// // 	'WQee659e96340b3899ad1fad7578fe6515',
-				// // 	{
-				// // 		attributes: {
-				// // 			direction: 'outboundDial',
-				// // 		},
-				// // 	}
-				// // );
-				// 	// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
-				// }}
+					if (!worker) return;
+					const to = data.get('phoneNumber') as string;
+					const from = data.get('from') as string;
+					const workflowSid = data.get('from') as string;
+					const taskQueueSid = data.get('from') as string;
+					console.log(data);
+					await worker.createTask(
+						'+19015988651',
+						'+18449402678',
+						'WW497b90bc1703176f6845c09c8bf4fa8a',
+						'WQee659e96340b3899ad1fad7578fe6515',
+						{
+							attributes: {
+								direction: 'outboundDial',
+							},
+						}
+					);
+					// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
+				}}
 				className='space-y-3'
 			>
 				<PhoneInput name='phoneNumber' />

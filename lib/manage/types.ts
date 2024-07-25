@@ -182,6 +182,14 @@ export interface SystemMember {
 	lastName: string;
 }
 
+export interface Priority {
+	id: number;
+	name: string;
+	color: string;
+	sortOrder: number;
+	defaultFlag: boolean;
+}
+
 export interface ServiceTicket {
 	id: number;
 	summary: string;
@@ -199,7 +207,7 @@ export interface ServiceTicket {
 	stateIdentifier?: string;
 	zip?: string;
 	country?: ReferenceType;
-	contact?: Contact;
+	contact?: ReferenceType;
 	contactName?: string;
 	contactPhoneNumber?: string;
 	contactPhoneExtension?: string;
@@ -502,6 +510,27 @@ export interface Company {
 	identifier: string;
 	name: string;
 }
+
+export interface Note {
+	id: number;
+	ticketId: number;
+	text: string;
+	detailDescriptionFlag: boolean;
+	internalAnalysisFlag: boolean;
+	resolutionFlag: boolean;
+	issueFlag: boolean;
+	member: {
+		id: number;
+		identifier: string;
+		name: string;
+		dailyCapacity: number;
+	};
+	contact: ReferenceType;
+	customerUpdatedFlag: boolean;
+	processNotifications: boolean;
+	internalFlag: boolean;
+	externalFlag: boolean;
+}
 export interface Contact {
 	id: number;
 	firstName: string;
@@ -612,4 +641,56 @@ export interface Currency {
 	displayIdFlag: boolean;
 	rightAlign: boolean;
 	name: string;
+}
+
+type AuditType =
+	| 'Attachment'
+	| 'Combined Tickets'
+	| 'Company'
+	| 'Configuration'
+	| 'Contact'
+	| 'Control'
+	| 'Custom Field'
+	| 'Date'
+	| 'Email'
+	| 'Finance'
+	| 'Knowledge Base'
+	| 'Meeting'
+	| 'Notes'
+	| 'Product'
+	| 'Record'
+	| 'Resource'
+	| 'SLA'
+	| 'Task'
+	| 'Template'
+	| 'Tickets'
+	| 'Ticket Template'
+	| 'Time Entry'
+	| 'Workflow';
+
+export interface AuditTrailEntry {
+	text: string;
+	enteredDate: string;
+	enteredBy: string;
+	auditType: AuditType;
+	auditSubType: string;
+	auditSource: string;
+}
+
+export interface Document {
+	id: number;
+	title: string;
+	fileName: string;
+	serverFileName: string;
+	owner: string;
+	linkFlag: boolean;
+	imageFlag: boolean;
+	publicFlag: boolean;
+	htmlTemplateFlag: boolean;
+	readOnlyFlag: boolean;
+	size: number;
+	urlFlag: boolean;
+	createdOnDate: string;
+	documentType: ReferenceType;
+	guid: string;
 }

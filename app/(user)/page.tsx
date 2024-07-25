@@ -27,77 +27,152 @@ const chartData = [
 ];
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { getEvents } from '@/lib/twilio/taskrouter/helpers';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { auth } from '@/auth';
+import { cn } from '@/lib/utils';
+import { PhoneIncoming, Smile } from 'lucide-react';
+import Metric from './metric';
+import { ServiceLevel } from './service-level';
+import { CallVolume } from './call-volume';
 
 export default async function Page({ searchParams }: { searchParams: any }) {
-	const calls = await getInboundCalls('client:nblack_40velomethod_2Ecom', searchParams.from, searchParams.to);
-	const events = await getEvents();
-	console.log(events);
-
-	const groupedCalls = groupBy(calls, ({ dateCreated }) =>
-		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(dateCreated)
-	);
-
-	const data: DataItem[] = Object.entries(groupedCalls).map(([name, value]) => {
-		return {
-			name,
-			value: value.length,
-		};
-	});
+	const session = await auth();
 
 	return (
-		<div>
-			<main className='grid grid-cols-3 gap-3 p-3'>
+		<main className='grid gap-3 p-3'>
+			<Card>
+				<CardHeader className='bg-muted/50 grid grid-cols-5 items-start gap-6 pb-0 space-y-0'>
+					<Metric
+						icon={<PhoneIncoming className='w-6 h-6' />}
+						title='Incoming Calls'
+						subtitle='Last 7 days'
+						value='526'
+						prevValue='497'
+						timeline='prev. 7 days'
+					/>
+
+					<Metric
+						icon={<PhoneIncoming className='w-6 h-6' />}
+						title='Answered Calls'
+						subtitle='Last 7 days'
+						value='554'
+						prevValue='548'
+						timeline='prev. 7 days'
+					/>
+
+					<Metric
+						icon={<PhoneIncoming className='w-6 h-6' />}
+						title='Abandoned Calls'
+						subtitle='Last 7 days'
+						value='25'
+						prevValue='22'
+						timeline='prev. 7 days'
+					/>
+
+					<div className='border-l pl-6 col-span-2 flex items-center'>
+						<ServiceLevel />
+
+						<Metric
+							icon={<Smile className='w-6 h-6' />}
+							title='Average CSAT'
+							subtitle='All time'
+							value='4.7 of 5'
+							prevValue='497'
+							timeline='All time'
+						/>
+					</div>
+				</CardHeader>
+
+				<CardContent>
+					<CallVolume />
+				</CardContent>
+			</Card>
+
+			<div className='grid grid-cols-[2fr_1fr] gap-3'>
 				<Card>
 					<CardHeader>
-						<CardTitle className='text-xs font-medium'>Horses</CardTitle>
+						<CardTitle>Best Agents This Week</CardTitle>
 					</CardHeader>
-
-					<CardContent>
-						<p className='text-xl'>12</p>
-					</CardContent>
 				</Card>
 
-				<div className='bg-yellow-300 rounded-lg'></div>
-
-				<div className='bg-yellow-300 rounded-lg'></div>
-
-				<Card className='bg-secondary col-span-2'>
-					<CardHeader className='justify-between items-center flex-row space-y-0'>
-						<CardTitle>Calls</CardTitle>
-
-						<DateRangePicker className='w-auto' />
+				<Card>
+					<CardHeader>
+						<CardTitle>Reason For Calls</CardTitle>
 					</CardHeader>
-
-					<CardContent className='bg-card rounded-lg'>
-						{/* <Overview data={data} /> */}
-						<BarChart
-							config={chartConfig}
-							data={chartData}
-							dataKey={['desktop', 'mobile']}
-						/>
-					</CardContent>
 				</Card>
+			</div>
+		</main>
+		// <div className='grid grid-cols-[1fr_6rem] items-start gap-3'>
 
-				<div className='bg-yellow-300 rounded-lg'></div>
+		// 	<aside className='grid place-items-center gap-3 pr-4 h-full'>
+		// 		<div className='space-y-1.5'>
+		// 			<div className='bg-blue-500 rounded-full h-[4rem] w-[4rem] grid place-items-center text-primary-foreground text-xl'>
+		// 				25
+		// 			</div>
 
-				<Card className='col-span-3'>
-					<CardHeader className='p-3'>
-						<CardTitle className='text-base'>Call History</CardTitle>
-					</CardHeader>
+		// 			<p className='font-semibold text-sm text-center'>
+		// 				Calls
+		// 				<br />
+		// 				active
+		// 			</p>
+		// 		</div>
 
-					<CardContent className='px-3'>
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableCell>
-										<span>Hey</span>
-									</TableCell>
-								</TableRow>
-							</TableHeader>
-						</Table>
-					</CardContent>
-				</Card>
-			</main>
-		</div>
+		// 		<div className='space-y-1.5'>
+		// 			<div className='bg-orange-400 rounded-full h-[4rem] w-[4rem] grid place-items-center text-primary-foreground text-xl'>
+		// 				7
+		// 			</div>
+		// 			<p className='font-semibold text-sm text-center'>
+		// 				Calls
+		// 				<br />
+		// 				waiting
+		// 			</p>
+		// 		</div>
+
+		// 		<div className='space-y-1.5'>
+		// 			<div className='bg-gray-300 rounded-full h-[4rem] w-[4rem] grid place-items-center text-primary-foreground text-xl'>
+		// 				4
+		// 			</div>
+		// 			<p className='font-semibold text-sm text-center'>
+		// 				Calls
+		// 				<br />
+		// 				on hold
+		// 			</p>
+		// 		</div>
+
+		// 		<div className='space-y-1.5'>
+		// 			<div className='relative h-[4rem] w-[4rem]'>
+		// 				{new Array(3).fill(null).map((_, index) => (
+		// 					<Avatar
+		// 						key={index}
+		// 						className={cn(
+		// 							'absolute border-2 border-white w-9 h-9',
+		// 							index === 0
+		// 								? 'bottom-0 left-0 z-0'
+		// 								: index === 1
+		// 								? 'top-0 left-[14px] right-[14px] bottom-auto z-10'
+		// 								: 'bottom-0 right-0 z-20'
+		// 						)}
+		// 					>
+		// 						{index === 2 && (
+		// 							<div className='absolute inset-0 bg-black/50 z-10 text-white text-xs grid place-items-center'>
+		// 								+25
+		// 							</div>
+		// 						)}
+		// 						<AvatarImage
+		// 							className={'relative'}
+		// 							src={session?.user?.image ?? undefined}
+		// 						/>
+		// 						<AvatarFallback className={cn(index === 2 && '')}>NB</AvatarFallback>
+		// 					</Avatar>
+		// 				))}
+		// 			</div>
+		// 			<p className='font-semibold text-sm text-center'>
+		// 				Agents
+		// 				<br />
+		// 				online
+		// 			</p>
+		// 		</div>
+		// 	</aside>
+		// </div>
 	);
 }

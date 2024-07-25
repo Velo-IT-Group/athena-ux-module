@@ -47,7 +47,6 @@ const Page = async (props: Props) => {
 								{contacts.map((contact) => {
 									const number = contact.defaultPhoneNbr ? parsePhoneNumber(contact.defaultPhoneNbr, 'US') : null;
 									const comms = contact?.communicationItems?.filter((item) => item.communicationType === 'Email');
-									console.log(comms);
 
 									return (
 										<TableRow key={contact.id}>

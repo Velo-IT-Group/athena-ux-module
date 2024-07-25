@@ -60,10 +60,10 @@ export const config: NextAuthConfig = {
 			},
 		}),
 	],
-	trustHost: true,
-	pages: {
-		signIn: '/login',
-	},
+	// trustHost: true,
+	// pages: {
+	// 	signIn: '/login',
+	// },
 	// callbacks: {
 	// 	async session({ session, token, user }) {
 	// 		// console.log(session.user, user);

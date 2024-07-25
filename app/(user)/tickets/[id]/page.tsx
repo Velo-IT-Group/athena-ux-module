@@ -19,7 +19,7 @@ export default async function Page({ params }: Props) {
 
 	return (
 		<main className='grid grid-cols-[1fr_280px] items-start gap-3 h-full bg-muted/15'>
-			<ScrollArea className='h-screen'>
+			<ScrollArea className='grid min-h-0'>
 				<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
 					<form action=''>
 						<Textarea

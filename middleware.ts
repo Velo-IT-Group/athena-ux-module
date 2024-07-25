@@ -4,19 +4,19 @@ import NextAuth from 'next-auth';
 
 // Use only one of the two middleware options below
 // 1. Use middleware directly
-// export const { auth: middleware } = NextAuth(authConfig)
+export const { auth: middleware } = NextAuth(config);
 
-// 2. Wrapped middleware option
-const { auth } = NextAuth(config);
-export default auth(async function middleware(request: NextRequest) {
-	// Store current request url in a custom header, which you can read later
-	const requestHeaders = new Headers(request.headers);
-	requestHeaders.set('x-url', request.url);
+// // 2. Wrapped middleware option
+// const { auth } = NextAuth(config);
+// export default auth(async function middleware(request: NextRequest) {
+// 	// Store current request url in a custom header, which you can read later
+// 	const requestHeaders = new Headers(request.headers);
+// 	requestHeaders.set('x-url', request.url);
 
-	return NextResponse.next({
-		request: {
-			// Apply new request headers
-			headers: requestHeaders,
-		},
-	});
-});
+// 	return NextResponse.next({
+// 		request: {
+// 			// Apply new request headers
+// 			headers: requestHeaders,
+// 		},
+// 	});
+// });

@@ -10,7 +10,7 @@ type Props = {
 };
 
 const ConversationCompanyDetail = async ({ id }: Props) => {
-	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getUserTickets(10)]);
+	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getUserTickets(id ?? 250)]);
 
 	console.log(tickets);
 

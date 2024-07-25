@@ -49,6 +49,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
     "react-phone-number-input": "^3.4.3",
+    "react-resizable-panels": "^2.0.22",
     "react-textarea-autosize": "^8.5.3",
     "recharts": "^2.12.7",
     "recoil": "^0.7.7",

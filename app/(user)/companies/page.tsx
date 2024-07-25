@@ -22,62 +22,68 @@ const Page = async (props: Props) => {
 	const companies = await getCompanies();
 
 	return (
-		<div className='p-3 space-y-3'>
-			<h1 className='text-2xl font-bold'>Companies</h1>
+		<main className='p-3 space-y-3'>
+			<header>
+				<h1 className='text-lg font-semibold'>Companies</h1>
+			</header>
 
-			<Table>
-				<TableCaption>A list of your recent invoices.</TableCaption>
-				<TableHeader>
-					<TableRow>
-						<TableHead className='w-[100px]'>ID</TableHead>
-						<TableHead>Name</TableHead>
-						<TableHead>Phone Number</TableHead>
-						<TableHead>Territory</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{companies.map((company) => {
-						const number = parsePhoneNumber(company.phoneNumber, 'US');
+			<section>
+				<Table>
+					<TableCaption>A list of your recent invoices.</TableCaption>
+					<TableHeader>
+						<TableRow>
+							<TableHead className='w-[100px]'>ID</TableHead>
+							<TableHead>Name</TableHead>
+							<TableHead>Phone Number</TableHead>
+							<TableHead>Territory</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{companies.map((company) => {
+							const number = parsePhoneNumber(company.phoneNumber, 'US');
 
-						return (
-							<TableRow key={company.id}>
-								<TableCell className='font-medium'>{company.identifier}</TableCell>
+							return (
+								<TableRow key={company.id}>
+									<TableCell className='font-medium'>{company.identifier}</TableCell>
 
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<TableCell>
-											<Link
-												href={`/companies/${company.id}`}
-												className='font-medium'
-											>
-												{company.name}
-											</Link>
-										</TableCell>
-									</TooltipTrigger>
+									<TableCell>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<Link
+													href={`/companies/${company.id}`}
+													className='font-medium'
+												>
+													{company.name}
+												</Link>
+											</TooltipTrigger>
 
-									<CompanyTooltipDetail
-										name={company.name}
-										phoneNumber={company.phoneNumber}
-									/>
-								</Tooltip>
+											<CompanyTooltipDetail
+												name={company.name}
+												phoneNumber={company.phoneNumber}
+											/>
+										</Tooltip>
+									</TableCell>
 
-								<TableCell>
-									<span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{number?.format('NATIONAL')}</span>
-								</TableCell>
+									<TableCell>
+										<span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>
+											{number?.format('NATIONAL')}
+										</span>
+									</TableCell>
 
-								<TableCell>{company?.territory?.name}</TableCell>
-							</TableRow>
-						);
-					})}
-				</TableBody>
-				<TableFooter>
-					<TableRow>
-						<TableCell colSpan={3}>Total</TableCell>
-						<TableCell className='text-right'>$2,500.00</TableCell>
-					</TableRow>
-				</TableFooter>
-			</Table>
-		</div>
+									<TableCell>{company?.territory?.name}</TableCell>
+								</TableRow>
+							);
+						})}
+					</TableBody>
+					<TableFooter>
+						<TableRow>
+							<TableCell colSpan={3}>Total</TableCell>
+							<TableCell className='text-right'>$2,500.00</TableCell>
+						</TableRow>
+					</TableFooter>
+				</Table>
+			</section>
+		</main>
 	);
 };
 

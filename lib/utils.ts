@@ -6,6 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const baseHeaders = new Headers();
-baseHeaders.set('clientId', process.env.CW_CLIENT_ID!);
-baseHeaders.set('Authorization', 'Basic ' + btoa(process.env.CW_USERNAME! + ':' + process.env.CW_PASSWORD!));
+baseHeaders.set('clientId', process.env.CONNECT_WISE_CLIENT_ID!);
+baseHeaders.set(
+	'Authorization',
+	'Basic ' + btoa(process.env.CONNECT_WISE_USERNAME! + ':' + process.env.CONNECT_WISE_PASSWORD!)
+);
 baseHeaders.set('Content-Type', 'application/json');

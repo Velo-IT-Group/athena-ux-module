@@ -47,7 +47,11 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	});
 
 	useEffect(() => {
-		if (!device || device.state === Device.State.Unregistered) return;
+		if (!device) return;
+
+		if (device.state === Device.State.Unregistered) {
+			device?.register();
+		}
 
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');
@@ -95,18 +99,18 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 				device.unregister();
 			}
 		};
-	}, []);
-
-	useEffect(() => {
-		if (!device) return;
-		window.addEventListener('click', () => {
-			if (device?.state === Device.State.Unregistered) {
-				console.log('registering device');
-				device?.register();
-				// currentCallControl?.endCall();
-			}
-		});
 	}, [device]);
+
+	// useEffect(() => {
+	// 	if (!device) return;
+	// 	window.addEventListener('click', () => {
+	// 		if (device?.state === Device.State.Unregistered) {
+	// 			console.log('registering device');
+	// 			device?.register();
+	// 			// currentCallControl?.endCall();
+	// 		}
+	// 	});
+	// }, [device]);
 
 	return (
 		<Provider value={{ device, setDevice: () => undefined, hasExternalFunctionality: device?.identity === '' }}>

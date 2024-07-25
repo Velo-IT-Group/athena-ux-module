@@ -505,12 +505,6 @@ export interface ReferenceType {
 	name: string;
 }
 
-export interface Company {
-	id: number;
-	identifier: string;
-	name: string;
-}
-
 export interface Note {
 	id: number;
 	ticketId: number;
@@ -694,3 +688,121 @@ export interface Document {
 	documentType: ReferenceType;
 	guid: string;
 }
+
+export interface Company {
+	id: number;
+	identifier: string;
+	name: string;
+	status: ReferenceType;
+	addressLine1: string;
+	addressLine2: string;
+	city: string;
+	state: string;
+	zip: string;
+	country: ReferenceType;
+	phoneNumber: string;
+	faxNumber: string;
+	website: string;
+	territory: ReferenceType;
+	market: ReferenceType;
+	accountNumber: string;
+	defaultContact: ReferenceType;
+	dateAcquired: string;
+	sicCode: ReferenceType;
+	parentCompany: ReferenceType;
+	annualRevenue: number;
+	numberOfEmployees: number;
+	yearEstablished: number;
+	revenueYear: number;
+	ownershipType: ReferenceType;
+	timeZoneSetup: ReferenceType;
+	leadSource: string;
+	leadFlag: boolean;
+	unsubscribeFlag: boolean;
+	calendar: ReferenceType;
+	userDefinedField1: string;
+	userDefinedField2: string;
+	userDefinedField3: string;
+	userDefinedField4: string;
+	userDefinedField5: string;
+	userDefinedField6: string;
+	userDefinedField7: string;
+	userDefinedField8: string;
+	userDefinedField9: string;
+	userDefinedField10: string;
+	vendorIdentifier: string;
+	taxIdentifier: string;
+	taxCode: ReferenceType;
+	billingTerms: ReferenceType;
+	invoiceTemplate: ReferenceType;
+	pricingSchedule: ReferenceType;
+	companyEntityType: ReferenceType;
+	billToCompany: ReferenceType;
+	billingSite: ReferenceType;
+	billingContact: ReferenceType;
+	invoiceDeliveryMethod: ReferenceType;
+	invoiceToEmailAddress: string;
+	invoiceCCEmailAddress: string;
+	deletedFlag: boolean;
+	dateDeleted: string;
+	deletedBy: string;
+	mobileGuid: string;
+	facebookUrl: string;
+	twitterUrl: string;
+	linkedInUrl: string;
+	currency: Currency;
+	territoryManager: ReferenceType;
+	resellerIdentifier: string;
+	isVendorFlag: boolean;
+	types: ReferenceType[];
+	site: ReferenceType;
+	integratorTags: string[];
+	customFields: ReferenceType[];
+}
+
+export type RecordType =
+	| 'Activity'
+	| 'Agreement'
+	| 'Company'
+	| 'Config'
+	| 'Configuration'
+	| 'Contact'
+	| 'CustomImage'
+	| 'Document'
+	| 'Expense'
+	| 'HTMLTemplate'
+	| 'Invoice'
+	| 'Opportunity'
+	| 'Project'
+	| 'ProjectActivity'
+	| 'PurchaseOrder'
+	| 'Rma'
+	| 'SalesOrder'
+	| 'Service'
+	| 'Ticket'
+	| 'ProjectTicket'
+	| 'ServiceTemplate'
+	| 'StandardServiceTemplate'
+	| 'SrDetail'
+	| 'TimeEntry'
+	| 'JobHeader'
+	| 'MarketingManagerAudit'
+	| 'KnowledgeBase'
+	| 'ToolbarIcon'
+	| 'Meeting'
+	| 'MeetingNote'
+	| 'ProductSetup'
+	| 'ProjectTemplateTicket'
+	| 'BillingSetup'
+	| 'ServiceBoard'
+	| 'WordTemplate'
+	| 'Member'
+	| 'PortalImagePortalLogo'
+	| 'PortalImageReportLogo'
+	| 'TopNavigationLogo'
+	| 'PhaseStatus'
+	| 'ProjectStatus'
+	| 'TicketStatus'
+	| 'Schedule'
+	| 'Priority'
+	| 'Unassigned';

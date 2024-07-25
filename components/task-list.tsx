@@ -28,32 +28,28 @@ const TaskList = ({ className }: Props) => {
 
 			ress.forEach((res) => {
 				setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);
-				// switch (res.status) {
-				// 	case 'wrapping':
-				// 		toast.custom(
-				// 			() => (
-				// 				<TaskWrapup
-				// 					taskSid={res.task.sid}
-				// 					dateUpdated={res.dateUpdated}
-				// 				/>
-				// 			),
-				// 			{
-				// 				important: true,
-				// 				duration: res.timeout * 1000,
-				// 				id: res.task.attributes.call_sid,
-				// 			}
-				// 		);
-				// 		break;
-				// 	case 'pending':
-				// 		toast.custom(() => <IncomingCall reservation={res} />, {
-				// 			important: true,
-				// 			duration: res.timeout * 1000,
-				// 			id: res.task.attributes.call_sid,
-				// 		});
-				// 		currentCallControl?.signalIncomingCall(res.timeout * 1000);
-				// 	default:
-				// 		break;
-				// }
+				switch (res.status) {
+					case 'wrapping':
+						// toast.custom(
+						// 	() => (
+						// 		<TaskWrapup
+						// 			taskSid={res.task.sid}
+						// 			dateUpdated={res.dateUpdated}
+						// 		/>
+						// 	),
+						// 	{
+						// 		important: true,
+						// 		duration: res.timeout * 1000,
+						// 		id: res.task.attributes.call_sid,
+						// 	}
+						// );
+						break;
+					case 'pending':
+						setTasks((prev) => [...prev, res.task]);
+						break;
+					default:
+						break;
+				}
 			});
 		});
 
@@ -61,13 +57,14 @@ const TaskList = ({ className }: Props) => {
 			console.error('failed res', r);
 		});
 
-		worker.on('reservationCreated', (r: Reservation) => {
+		worker.on('reservationCreated', async (r: Reservation) => {
 			setReservations((prev) => [...prev, r]);
-			console.log('res made', r);
 			try {
 				console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
-				console.log(r.timeout * 1000);
 
+				if (r.task.attributes.direction === 'outboundDial') {
+					await r.conference();
+				}
 				// toast.custom(() => <IncomingCall reservation={r} />, {
 				// 	important: true,
 				// 	duration: r.task.timeout,

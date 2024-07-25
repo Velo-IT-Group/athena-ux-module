@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,15 +13,22 @@ import {
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { LogOut } from 'lucide-react';
-import { auth } from '@/auth';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
-import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
+import type { Session } from 'next-auth';
+import type { ActivityInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
+import { useWorker } from '@/providers/worker-provider';
+import { cn } from '@/lib/utils';
 
-type Props = {};
+type Props = {
+	session: Session | null;
+	activities: ActivityInstance[];
+};
 
-const UserInfo = async (props: Props) => {
-	const [session, activities] = await Promise.all([auth(), getActivies()]);
+const UserInfo = ({ session, activities }: Props) => {
+	const { worker } = useWorker();
+	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.workerActivitySid ?? '');
+	const selectedActivity = worker?.activities.get(selectedAccount);
 
 	return (
 		<DropdownMenu>
@@ -36,7 +44,12 @@ const UserInfo = async (props: Props) => {
 							<AvatarImage src={session?.user?.image ?? undefined} />
 						</Avatar>
 
-						<div className='w-2 h-2 rounded-full bg-green-500 absolute bottom-0 border border-white right-1.5' />
+						<div
+							className={cn(
+								'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5',
+								selectedActivity?.available ? 'bg-green-500' : 'bg-red-500'
+							)}
+						/>
 					</div>
 
 					<span>{session?.user.name}</span>
@@ -49,7 +62,12 @@ const UserInfo = async (props: Props) => {
 
 					<DropdownMenuSeparator />
 
-					<ActivityDropdownMenuSub activities={activities} />
+					<ActivityDropdownMenuSub
+						activities={activities}
+						selectedAccount={selectedAccount}
+						setSelectedAccount={setSelectedAccount}
+						selectedActivity={selectedActivity}
+					/>
 
 					<DeviceDropdownMenuSub />
 

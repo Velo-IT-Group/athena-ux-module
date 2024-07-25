@@ -1,10 +1,23 @@
 'use server';
-import { error } from 'console';
 import { baseHeaders } from '../utils';
-import { AuditTrailEntry, Company, Contact, Document, Note, ServiceTicket, SystemMember } from './types';
+import { AuditTrailEntry, Company, Contact, Document, Note, RecordType, ServiceTicket, SystemMember } from './types';
 
 export const getCompany = async (id: number): Promise<Company> => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}`, { headers: baseHeaders });
+	return await response.json();
+};
+
+export const getCompanySites = async (id: number): Promise<Company> => {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/sites`, {
+		headers: baseHeaders,
+	});
+	return await response.json();
+};
+
+export const getCompanyNotes = async (id: number): Promise<Company> => {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes`, {
+		headers: baseHeaders,
+	});
 	return await response.json();
 };
 
@@ -21,15 +34,19 @@ export const getContact = async (id?: number): Promise<Contact | undefined> => {
 };
 
 export const getContacts = async (id: number): Promise<Contact[]> => {
+	console.log(id);
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/?conditions=company/id = ${id}&pageSize=1000&orderBy=firstName, lastName`,
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/?conditions=company/id = ${id}&pageSize=1000&orderBy=firstName,lastName`,
 			{
 				headers: baseHeaders,
 			}
 		);
 
-		if (response.status !== 200) throw Error('Could not fetch contacts...');
+		if (response.status !== 200) {
+			console.error(response.statusText);
+			throw Error('Could not fetch contacts...');
+		}
 
 		return await response.json();
 	} catch (error) {
@@ -39,12 +56,26 @@ export const getContacts = async (id: number): Promise<Contact[]> => {
 };
 
 export const getConfigurations = async (id?: number): Promise<Contact[]> => {
-	const headers: HeadersInit = baseHeaders;
-	headers.set('Authorization', 'Basic ' + btoa('velo+cyTkw7WgbwL55BE1:LkQxsnjZ3fEnyNEr'));
-
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations?conditions=contact/id=10&orderBy=name,site/id`,
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations?fields=id,name,questions,type,notes&conditions=company/id=${id} and status/id=2 and type/id in (211, 212, 219, )&orderBy=name`,
+			{
+				headers: baseHeaders,
+			}
+		);
+
+		if (response.status !== 200) throw Error('Could not fetch configurations...');
+
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
+};
+export const getCompanyApplications = async (id?: number): Promise<Contact[]> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/?conditions=company/id=${id} and status/id=2 and type/id=191&orderBy=name&fields=id,name,questions,type&childConditions=questions/questionId=1597 or questions/questionId=1600 or questions/questionId=1603`,
 			{
 				headers: baseHeaders,
 			}
@@ -73,8 +104,6 @@ export const getCompanies = async (): Promise<Company[]> => {
 };
 
 export const getTickets = async (id: number): Promise<ServiceTicket[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets?conditions=company/id = ${id} and status/id in (615, 995)`,
 		{
@@ -85,8 +114,6 @@ export const getTickets = async (id: number): Promise<ServiceTicket[]> => {
 };
 
 export const getTicket = async (id: number): Promise<ServiceTicket> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}`, {
 		headers: baseHeaders,
 	});
@@ -94,8 +121,6 @@ export const getTicket = async (id: number): Promise<ServiceTicket> => {
 };
 
 export const getTicketNotes = async (id: number): Promise<Note[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/allNotes?orderBy=dateEntered desc`,
 		{
@@ -106,8 +131,6 @@ export const getTicketNotes = async (id: number): Promise<Note[]> => {
 };
 
 export const getSystemMembers = async (): Promise<SystemMember[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/system/members?orderBy=firstName,lastName&conditions=inactiveFlag = false&pageSize=1000`,
 		{
@@ -121,8 +144,6 @@ export const getSystemMembers = async (): Promise<SystemMember[]> => {
 };
 
 export const getStatuses = async (id: number) => {
-	// const headers = new Headers(baseHeaders);
-	// headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/statuses?orderBy=name`, {
 		headers: baseHeaders,
 	});
@@ -136,8 +157,6 @@ export const getStatuses = async (id: number) => {
 };
 
 export const getPriorities = async () => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/priorities?orderBy=sortOrder`, {
 		headers: baseHeaders,
 	});
@@ -150,8 +169,6 @@ export const getPriorities = async () => {
 };
 
 export const getBoards = async () => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/boards?orderBy=name&pageSize=1000`, {
 		headers: baseHeaders,
 	});
@@ -164,8 +181,6 @@ export const getBoards = async () => {
 };
 
 export const getProjectStatuses = async (id: number) => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/statuses?orderBy=name`, {
 		headers: baseHeaders,
 	});
@@ -178,8 +193,6 @@ export const getProjectStatuses = async (id: number) => {
 };
 
 export const getTriageTickets = async (): Promise<ServiceTicket[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets?pageSize=1000&conditions=board/id = 30 and closedFlag = false`,
 		{
@@ -187,29 +200,30 @@ export const getTriageTickets = async (): Promise<ServiceTicket[]> => {
 		}
 	);
 
-	if (!response.ok) throw Error('Error fetching triage tickets...');
+	if (!response.ok) {
+		// console.error(response);
+		throw Error('Error fetching triage tickets...');
+	}
 
 	return await response.json();
 };
 
 export const getUserTickets = async (id: number): Promise<ServiceTicket[]> => {
-	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets?conditions=contact/id = 10 and status/id in (846, 662, 848, 571, 560, 645)`,
-		{
-			headers: baseHeaders,
-		}
-	);
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets`, {
+		headers: baseHeaders,
+	});
 
-	if (!response.ok) throw Error('Error fetching user tickets...');
+	if (!response.ok) {
+		console.error(response.statusText, baseHeaders.get('Authorization'));
+		throw Error('Error fetching user tickets...');
+	}
 
 	return await response.json();
 };
 
 export const getAuditTrail = async (id: number): Promise<AuditTrailEntry[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/audittrail?type=Ticket&id=${id}`, {
-		headers,
+		headers: baseHeaders,
 	});
 
 	if (!response.ok) throw Error('Error fetchnig audit trail...');
@@ -217,12 +231,13 @@ export const getAuditTrail = async (id: number): Promise<AuditTrailEntry[]> => {
 	return await response.json();
 };
 
-export const getDocuments = async (id: number): Promise<Document[]> => {
-	const headers = new Headers(baseHeaders);
-	headers.set('Authorization', 'Basic ' + btoa('velo+rKqwnh9Ijh16pki6:Ogvza13eeEVUA1gS'));
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/documents?recordType=Ticket&recordId=${id}`, {
-		headers,
-	});
+export const getDocuments = async (recordType: RecordType = 'Ticket', id: number): Promise<Document[]> => {
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/system/documents?recordType=${recordType}&recordId=${id}`,
+		{
+			headers: baseHeaders,
+		}
+	);
 
 	if (!response.ok) throw Error('Error fetching documents...');
 

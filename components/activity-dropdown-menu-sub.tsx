@@ -7,15 +7,17 @@ import { ActivityInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/activi
 import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Activity } from 'twilio-taskrouter';
 
 type Props = {
 	activities: ActivityInstance[];
+	selectedAccount: string;
+	setSelectedAccount: React.Dispatch<React.SetStateAction<string>>;
+	selectedActivity?: Activity;
 };
 
-const ActivityDropdownMenuSub = ({ activities }: Props) => {
+const ActivityDropdownMenuSub = ({ activities, selectedAccount, setSelectedAccount, selectedActivity }: Props) => {
 	const { worker } = useWorker();
-	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.workerActivitySid ?? '');
-	const selectedActivity = worker?.activities.get(selectedAccount);
 
 	return (
 		<DropdownMenuSub>

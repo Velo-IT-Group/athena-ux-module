@@ -47,16 +47,16 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 					</span>
 
 					<ContactSelector
-						companyId={companyId ?? ''}
-						contactId={parseInt(contactId ?? '')}
+						companyId={companyId ?? '250'}
+						contactId={parseInt(contactId ?? '10')}
 						minimal
 					/>
 				</h2>
 			) : (
 				<Suspense>
 					<ContactSelector
-						companyId={companyId ?? ''}
-						contactId={parseInt(contactId ?? '')}
+						companyId={companyId ?? '250'}
+						contactId={parseInt(contactId ?? '10')}
 					/>
 				</Suspense>
 			)}

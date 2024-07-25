@@ -16,7 +16,7 @@ import { getDocuments } from '@/lib/manage/read';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default async function Properties({ ticket }: { ticket: ServiceTicket }) {
-	const attachments = await getDocuments(ticket.id);
+	const attachments = await getDocuments('Ticket', ticket.id);
 
 	console.log(ticket.board);
 
@@ -124,54 +124,6 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 						</Tooltip>
 					))}
 			</section>
-
-			{/* <style
-				dangerouslySetInnerHTML={{
-					__html: `
-html {
-  box-sizing: border-box;
-  touch-action: pan-x pan-y;
-  background-color: #ececec;
-  height: 100%;
-  border: 0px;
-  font-size: inherit;
-  font-family: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  vertical-align: baseline;
-  margin: 0px;
-  padding: 0px;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
-  position: fixed;
-  overflow: hidden;
-}
-
-body {
-  box-sizing: border-box;
-  touch-action: pan-x pan-y;
-  height: 100%;
-  border: 0px;
-  font-size: inherit;
-  font-weight: inherit;
-  vertical-align: baseline;
-  margin: 0px;
-  padding: 0px;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
-  font-family: "Inter UI","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizelegibility;
-  text-size-adjust: 100%;
-  position: fixed;
-  overflow: hidden;
-  user-select: none;
-  cursor: default;
-}
-`,
-				}}
-			/> */}
 		</div>
 	);
 }

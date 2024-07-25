@@ -11,15 +11,15 @@ import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
 import HistorySelector from '@/app/(user)/history-selector';
 import { Suspense } from 'react';
+import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
 
 const Navbar = async () => {
-	const [numbers, calls, session] = await Promise.all([
+	const [numbers, calls, session, activities] = await Promise.all([
 		getPhoneNumbers(),
 		getAllCalls('client:nblack_40velomethod_2Ecom'),
 		auth(),
+		getActivies(),
 	]);
-
-	// console.log(session);
 
 	return (
 		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
@@ -55,7 +55,10 @@ const Navbar = async () => {
 					/>
 				</Popover>
 
-				<UserInfo />
+				<UserInfo
+					session={session}
+					activities={activities}
+				/>
 			</div>
 		</nav>
 	);

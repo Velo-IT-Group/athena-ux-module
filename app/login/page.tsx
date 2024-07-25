@@ -17,7 +17,7 @@ const Page = async () => {
 			<form
 				action={async () => {
 					'use server';
-					await signIn('microsoft-entra-id', { redirectTo: '/' });
+					await signIn('microsoft-entra-id', { redirectTo: '/conversations' });
 				}}
 				className='grid place-items-center'
 			>

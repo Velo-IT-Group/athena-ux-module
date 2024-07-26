@@ -56,7 +56,7 @@ const UserInfo = ({ session, activities }: Props) => {
 				</Button>
 			</DropdownMenuTrigger>
 
-			<DropdownMenuContent className='w-56'>
+			<DropdownMenuContent className='w-72'>
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 

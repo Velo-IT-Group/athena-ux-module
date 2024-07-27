@@ -4,15 +4,23 @@ import { Command, CommandGroup, CommandItem, CommandList } from './ui/command';
 import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { activityListState, activityState } from '@/atoms/twilioStateAtom';
 import { useWorker } from '@/providers/worker-provider';
+import { useEffect, useState } from 'react';
+import { Activity } from 'twilio-taskrouter';
 
 type Props = {};
 
 const ActivityDropdownMenuSub = ({}: Props) => {
 	const { worker } = useWorker();
-	const [currentActivity, setCurrentActivity] = useRecoilState(activityState);
+	const [currentActivity, setCurrentActivity] = useState<Activity | undefined>(undefined);
+
+	useEffect(() => {
+		setCurrentActivity(worker?.activity);
+
+		return () => {
+			setCurrentActivity(undefined);
+		};
+	}, [worker?.activity]);
 
 	return (
 		<DropdownMenuSub>
@@ -26,10 +34,8 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 										key={sid}
 										value={sid}
 										onSelect={async (currentValue) => {
-											console.log(currentValue);
 											try {
 												const act = worker?.activities.get(currentValue);
-												console.log(act);
 												const activity = await act?.setAsCurrent();
 												if (!activity) throw Error('No activity provided...');
 												setCurrentActivity(activity);

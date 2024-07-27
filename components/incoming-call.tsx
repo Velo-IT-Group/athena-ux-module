@@ -8,13 +8,15 @@ import { ConferenceOptions, Reservation } from 'twilio-taskrouter';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { useTwilio } from '@/providers/twilio-provider';
 import { toast } from 'sonner';
+import { useRecoilState } from 'recoil';
+import { callStateAtom } from '@/atoms/twilioStateAtom';
 
 type Props = {
 	reservation: Reservation;
 };
 
 const IncomingTask = ({ reservation }: Props) => {
-	const { activeCall, setActiveCall } = useTwilio();
+	const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
 	const task = reservation.task;
 	const { attributes } = task;
 
@@ -67,14 +69,12 @@ const IncomingTask = ({ reservation }: Props) => {
 				<Button
 					className='bg-green-600 hover:bg-green-600/90 text-sm'
 					onClick={async () => {
-						await reservation.conference();
+						const res = await reservation.conference();
+						const conference = await getConferenceByName(task.sid);
 
-						// const conference = await getConferenceByName(task.sid);
+						console.log(activeCall, res, conference);
 
-						// console.log(task.sid, conference);
-						// setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
-
-						// console.log(conference);
+						setActiveCall({ ...activeCall, task: res.task, conference });
 					}}
 				>
 					Accept

@@ -1,5 +1,4 @@
 'use client';
-import React, { useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,19 +15,16 @@ import { LogOut } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import type { Session } from 'next-auth';
-import type { ActivityInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
-import { useWorker } from '@/providers/worker-provider';
 import { cn } from '@/lib/utils';
+import { useRecoilValue } from 'recoil';
+import { activityState } from '@/atoms/twilioStateAtom';
 
 type Props = {
 	session: Session | null;
-	activities: ActivityInstance[];
 };
 
-const UserInfo = ({ session, activities }: Props) => {
-	const { worker } = useWorker();
-	const [selectedAccount, setSelectedAccount] = useState<string>(worker?.workerActivitySid ?? '');
-	const selectedActivity = worker?.activities.get(selectedAccount);
+const UserInfo = ({ session }: Props) => {
+	const currentActivity = useRecoilValue(activityState);
 
 	return (
 		<DropdownMenu>
@@ -47,7 +43,7 @@ const UserInfo = ({ session, activities }: Props) => {
 						<div
 							className={cn(
 								'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5',
-								selectedActivity?.available ? 'bg-green-500' : 'bg-red-500'
+								currentActivity?.available ? 'bg-green-500' : 'bg-red-500'
 							)}
 						/>
 					</div>
@@ -62,12 +58,7 @@ const UserInfo = ({ session, activities }: Props) => {
 
 					<DropdownMenuSeparator />
 
-					<ActivityDropdownMenuSub
-						activities={activities}
-						selectedAccount={selectedAccount}
-						setSelectedAccount={setSelectedAccount}
-						selectedActivity={selectedActivity}
-					/>
+					<ActivityDropdownMenuSub />
 
 					<DeviceDropdownMenuSub />
 

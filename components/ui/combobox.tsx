@@ -58,6 +58,7 @@ export function Combobox({
 				align={align}
 				className='min-w-52 p-0'
 				side={side}
+				avoidCollisions
 			>
 				<Command>
 					<CommandInput placeholder={placeholder} />

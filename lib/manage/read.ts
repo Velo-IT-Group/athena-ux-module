@@ -8,16 +8,19 @@ export const getCompany = async (id: number): Promise<Company> => {
 };
 
 export const getCompanySites = async (id: number): Promise<Company> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/sites`, {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/sites?orderBy=name`, {
 		headers: baseHeaders,
 	});
 	return await response.json();
 };
 
 export const getCompanyNotes = async (id: number): Promise<Company> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes`, {
-		headers: baseHeaders,
-	});
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes?orderBy=lastUpdated desc&conditions=text not contains 'DO_NOT_REMOVE_NILEAR'`,
+		{
+			headers: baseHeaders,
+		}
+	);
 	return await response.json();
 };
 

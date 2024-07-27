@@ -2,7 +2,7 @@ import { Twilio, jwt } from 'twilio';
 import { WorkerListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { createTask } from './taskrouter/helpers';
 
-const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_PUBLIC_API_KEY_SECRET, {
+const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
 });
 

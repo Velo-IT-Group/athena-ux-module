@@ -4,13 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Phone } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '@/components/ui/popover';
-import { Dialpad } from './dialpad';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from './ui/labeled-input';
 import WorkerSelect from './worker-select';
-import { useTwilio } from '@/providers/twilio-provider';
 import { PhoneInput } from './phone-input';
-import { makeOutboundCall } from '@/app/phone-actions';
 import { useWorker } from '@/providers/worker-provider';
 
 type Props = {
@@ -47,7 +44,6 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 							},
 						}
 					);
-					// toast.custom((t) => <ActiveCall activeCall={activeCall} />);
 				}}
 				className='space-y-3'
 			>

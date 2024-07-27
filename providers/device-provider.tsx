@@ -1,13 +1,12 @@
 'use client';
-import { useContext, createContext, useRef, useEffect, useState, Dispatch, SetStateAction } from 'react';
+import { useContext, createContext, useEffect, Dispatch, SetStateAction } from 'react';
 import { Device, type Call } from '@twilio/voice-sdk';
-
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
-import { ActiveCall, ActiveCall as CustomCall } from '@/components/call-modal';
+import { ActiveCall } from '@/components/active-call';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { toast } from 'sonner';
-import { useTwilio } from './twilio-provider';
-import { useJabra } from './jabra-provider';
+import { useSetRecoilState } from 'recoil';
+import { callStateAtom } from '@/atoms/twilioStateAtom';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -36,7 +35,7 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const { activeCall, setActiveCall } = useTwilio();
+	const setActiveCall = useSetRecoilState(callStateAtom);
 
 	const device = new Device(authToken, {
 		disableAudioContextSounds: true,
@@ -55,11 +54,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');
-			// try {
-			// 	await currentCallControl?.signalIncomingCall();
-			// } catch (error) {
-			// 	console.error(error);
-			// }
 		});
 
 		device.on('error', (error) => {
@@ -69,27 +63,16 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		device.on('incoming', async (call: Call) => {
 			console.log(`Incoming call from ${call.parameters.From}`);
 
-			// if (currentCallControl) {
-			// 	currentCallControl.signalIncomingCall();
-			// }
-
 			call.accept();
 
-			// await currentCallControl?.signalIncomingCall();
-
 			call.on('accept', async (c) => {
-				console.log(call.parameters, c);
+				setActiveCall((prev: CustomCall) => ({ ...prev, call: c }));
 
-				// await currentCallControl?.startCall();
-				// const conference = getConferenceParticipants();
-
-				// setActiveCall({ call });
-
-				// toast.custom(() => <ActiveCall activeCall={activeCall!} />, {
-				// 	duration: Infinity,
-				// 	dismissible: false,
-				// 	id: call.parameters.CallSid,
-				// });
+				toast.custom(() => <ActiveCall />, {
+					duration: Infinity,
+					dismissible: false,
+					id: call.parameters.CallSid,
+				});
 			});
 		});
 
@@ -100,17 +83,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			}
 		};
 	}, [device]);
-
-	// useEffect(() => {
-	// 	if (!device) return;
-	// 	window.addEventListener('click', () => {
-	// 		if (device?.state === Device.State.Unregistered) {
-	// 			console.log('registering device');
-	// 			device?.register();
-	// 			// currentCallControl?.endCall();
-	// 		}
-	// 	});
-	// }, [device]);
 
 	return (
 		<Provider value={{ device, setDevice: () => undefined, hasExternalFunctionality: device?.identity === '' }}>

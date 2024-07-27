@@ -10,7 +10,6 @@ import { Separator } from '@/components/ui/separator';
 import { TooltipContent } from '@/components/ui/tooltip';
 import { useWorker } from '@/providers/worker-provider';
 import { Copy, Ellipsis, Mail, PhoneOutgoing } from 'lucide-react';
-import React from 'react';
 import parsePhoneNumber from 'libphonenumber-js';
 
 type Props = {

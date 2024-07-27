@@ -41,7 +41,7 @@ const Page = async ({ params }: Props) => {
 		<main className='h-full bg-muted/15'>
 			<ResizablePanelGroup direction='horizontal'>
 				<ResizablePanel>
-					<ScrollArea className='grid min-h-0'>
+					<ScrollArea className='grid min-h-0 px-3'>
 						<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
 							<form action=''>
 								<Textarea
@@ -205,7 +205,7 @@ const Page = async ({ params }: Props) => {
 				<ResizablePanel
 					minSize={24}
 					defaultSize={27}
-					maxSize={30}
+					maxSize={45}
 				>
 					<div className='h-full'>
 						<div className='py-6 space-y-7'>

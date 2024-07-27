@@ -3,7 +3,7 @@ import { Twilio, twiml } from 'twilio';
 import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { getConferenceByName, getConferenceParticipants } from './conference/helpers';
 
-const client = new Twilio(process.env.NEXT_PUBLIC_API_KEY_SID, process.env.NEXT_PUBLIC_API_KEY_SECRET, {
+const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
 });
 

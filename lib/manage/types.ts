@@ -806,3 +806,33 @@ export type RecordType =
 	| 'Schedule'
 	| 'Priority'
 	| 'Unassigned';
+
+export interface Schedule {
+	id: number;
+	name: string;
+	holidayList: ReferenceType;
+	mondayStartTime: string;
+	mondayEndTime: string;
+	tuesdayStartTime: string;
+	tuesdayEndTime: string;
+	wednesdayStartTime: string;
+	wednesdayEndTime: string;
+	thursdayStartTime: string;
+	thursdayEndTime: string;
+	fridayStartTime: string;
+	fridayEndTime: string;
+	saturdayStartTime: string;
+	saturdayEndTime: string;
+	sundayStartTime: string;
+	sundayEndTime: string;
+}
+
+export interface Holiday {
+	id: number;
+	name: string;
+	allDayFlag: boolean;
+	date: string;
+	timeStart: string;
+	timeEnd: string;
+	holidayList: ReferenceType;
+}

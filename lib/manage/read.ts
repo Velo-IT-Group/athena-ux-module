@@ -1,6 +1,17 @@
 'use server';
 import { baseHeaders } from '../utils';
-import { AuditTrailEntry, Company, Contact, Document, Note, RecordType, ServiceTicket, SystemMember } from './types';
+import {
+	AuditTrailEntry,
+	Company,
+	Contact,
+	Document,
+	Holiday,
+	Note,
+	RecordType,
+	Schedule,
+	ServiceTicket,
+	SystemMember,
+} from './types';
 
 export const getCompany = async (id: number): Promise<Company> => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}`, { headers: baseHeaders });
@@ -243,6 +254,36 @@ export const getDocuments = async (recordType: RecordType = 'Ticket', id: number
 	);
 
 	if (!response.ok) throw Error('Error fetching documents...');
+
+	return await response.json();
+};
+
+export const getSchedule = async (id: number = 1): Promise<Schedule> => {
+	console.log(id);
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/schedules/${id}`, {
+		headers: baseHeaders,
+	});
+
+	console.log(response.headers);
+
+	if (!response.ok) throw Error('Error fetching schedule...');
+
+	return await response.json();
+};
+
+export const getHoliday = async (
+	id: number = 13,
+	date: string = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date())
+): Promise<Holiday[]> => {
+	console.log(date);
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/schedule/holidayLists/${id}/holidays?conditions=date = [${date}]`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	if (!response.ok) throw Error('Error fetching holiday...');
 
 	return await response.json();
 };

@@ -55,10 +55,7 @@ const Navbar = async () => {
 					/>
 				</Popover>
 
-				<UserInfo
-					session={session}
-					activities={activities}
-				/>
+				<UserInfo session={session} />
 			</div>
 		</nav>
 	);

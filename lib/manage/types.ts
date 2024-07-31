@@ -836,3 +836,50 @@ export interface Holiday {
 	timeEnd: string;
 	holidayList: ReferenceType;
 }
+
+export interface Site {
+	id: number;
+	name: string;
+	addressLine1: string;
+	addressLine2: string;
+	city: string;
+	stateReference: ReferenceType;
+	zip: string;
+	country: ReferenceType;
+	addressFormat: string;
+	phoneNumber: string;
+	phoneNumberExt: string;
+	faxNumber: string;
+	taxCode: ReferenceType;
+	entityType: ReferenceType;
+	expenseReimbursement: number;
+	primaryAddressFlag: boolean;
+	defaultShippingFlag: boolean;
+	defaultBillingFlag: boolean;
+	defaultMailingFlag: boolean;
+	inactiveFlag: boolean;
+	billSeparateFlag: boolean;
+	mobileGuid: string;
+	calendar: ReferenceType;
+	timeZone: ReferenceType;
+	company: ReferenceType;
+	customFields: CustomField[];
+}
+
+export interface Note {
+	id: number;
+	text: string;
+	type: ReferenceType;
+	flagged: boolean;
+	enteredBy: string;
+	company: ReferenceType;
+}
+
+export interface CustomField {
+	id: number;
+	caption: string;
+	type: string;
+	entryMethod: string;
+	numberOfDecimals: number;
+	value: Record<string, any>;
+}

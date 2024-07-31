@@ -1,13 +1,16 @@
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getTickets, getTriageTickets } from '@/lib/manage/read';
+import { getTickets } from '@/lib/manage/read';
 import Link from 'next/link';
 import React from 'react';
 
 type Props = {};
 
 const Page = async (props: Props) => {
-	const tickets = await getTriageTickets();
+	const tickets = await getTickets({
+		conditions: [{ 'board/id': 30 }, { closedFlag: false }],
+		pageSize: 1000,
+		orderBy: { key: 'id', order: 'desc' },
+	});
 
 	return (
 		<main>

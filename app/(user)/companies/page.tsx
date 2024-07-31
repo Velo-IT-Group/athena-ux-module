@@ -15,11 +15,18 @@ import CompanyTooltipDetail from './company-tooltip-detail';
 import parsePhoneNumber from 'libphonenumber-js';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Company } from '@/types/manage';
 
 type Props = {};
 
 const Page = async (props: Props) => {
-	const companies = await getCompanies();
+	const companies = await getCompanies({
+		conditions: [{ 'status/id': 1 }],
+		childConditions: [{ 'types/id': 1 }],
+		orderBy: { key: 'name', order: 'asc' },
+		fields: ['id', 'identifier', 'name', 'phoneNumber', 'territory'],
+		pageSize: 1000,
+	});
 
 	return (
 		<main className='p-3 space-y-3'>

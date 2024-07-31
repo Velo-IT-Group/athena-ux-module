@@ -1,12 +1,4 @@
-import {
-	getCompany,
-	getCompanyApplications,
-	getCompanyNotes,
-	getCompanySites,
-	getConfigurations,
-	getTicket,
-	getTicketNotes,
-} from '@/lib/manage/read';
+import { getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,8 +25,17 @@ const Page = async ({ params }: Props) => {
 		getCompany(Number(params.id)),
 		getCompanyNotes(Number(params.id)),
 		getCompanySites(Number(params.id)),
-		getCompanyApplications(Number(params.id)),
-		getConfigurations(Number(params.id)),
+		getConfigurations({
+			fields: ['id', 'name', 'type', 'notes'],
+			conditions: [{ 'company/id': Number(params.id) }, { 'status/id': 2 }, { 'type/id': 191 }],
+			childConditions: [{ 'questions/questionId': '1597' }],
+			orderBy: { key: 'name' },
+		}),
+		getConfigurations({
+			fields: ['id', 'name', 'type', 'notes'],
+			conditions: [{ 'company/id': Number(params.id) }, { 'status/id': 2 }, { 'type/id': 'in (211, 212, 219)' }],
+			orderBy: { key: 'name' },
+		}),
 	]);
 
 	return (

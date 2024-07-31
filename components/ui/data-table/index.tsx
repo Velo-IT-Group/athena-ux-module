@@ -14,6 +14,7 @@ import {
 	getPaginationRowModel,
 	getSortedRowModel,
 	useReactTable,
+	TableMeta,
 } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,9 +25,10 @@ import { DataTableToolbar } from './toolbar';
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
+	meta?: TableMeta<TData>;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -52,11 +54,12 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
+		meta,
 	});
 
 	return (
 		<div className='space-y-4'>
-			{/* <DataTableToolbar table={table} /> */}
+			<DataTableToolbar table={table} />
 
 			<div className='rounded-md border'>
 				<Table>

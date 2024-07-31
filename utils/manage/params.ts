@@ -21,7 +21,6 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 		conditions.forEach((condition) => {
 			Object.entries(condition).forEach(([key, value]) => {
 				const conditions = params.get('conditions');
-				// @ts-ignore
 				params.set('conditions', conditions ? `${`${conditions} and ${key} = ${value}`}` : `${key} = ${value}`);
 			});
 		});
@@ -31,7 +30,6 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 		childConditions.forEach((condition) => {
 			Object.entries(condition).forEach(([key, value]) => {
 				const childConditions = params.get('childConditions');
-				// @ts-ignore
 				params.set(
 					'childConditions',
 					childConditions ? `${`${childConditions} and ${key} = ${value}`}` : `${key} = ${value}`

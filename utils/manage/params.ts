@@ -1,5 +1,5 @@
 interface KeyValue {
-	[key: string]: number | string;
+	[key: string]: number | string | boolean;
 }
 
 export type Conditions<T> = {
@@ -12,7 +12,8 @@ export type Conditions<T> = {
 	pageSize?: number;
 };
 
-export const generateParams = <T>(init: Conditions<T>): string | undefined => {
+const generateParams = <T>(init?: Conditions<T>): string => {
+	if (!init) return '';
 	const { conditions, childConditions, orderBy, fields, page, pageSize } = init;
 	let params = new URLSearchParams();
 
@@ -59,5 +60,15 @@ export const generateParams = <T>(init: Conditions<T>): string | undefined => {
 		params.set('page', page.toString());
 	}
 
-	return params.toString();
+	return '?' + params.toString();
 };
+
+const baseHeaders = new Headers();
+baseHeaders.set('clientId', process.env.CONNECT_WISE_CLIENT_ID!);
+baseHeaders.set(
+	'Authorization',
+	'Basic ' + btoa(process.env.CONNECT_WISE_USERNAME! + ':' + process.env.CONNECT_WISE_PASSWORD!)
+);
+baseHeaders.set('Content-Type', 'application/json');
+
+export { baseHeaders, generateParams };

@@ -124,7 +124,7 @@ export const getConfigurations = async (conditions?: Conditions<Configuration>):
 	}
 };
 
-export const getTickets = async (conditions?: Conditions<Company>): Promise<ServiceTicket[]> => {
+export const getTickets = async (conditions?: Conditions<ServiceTicket>): Promise<ServiceTicket[]> => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
@@ -183,7 +183,7 @@ export const getStatuses = async (id: number, conditions?: Conditions<BoardStatu
 	return await response.json();
 };
 
-export const getPriorities = async (conditions?: Conditions<Priority>): Promise<Priority> => {
+export const getPriorities = async (conditions?: Conditions<Priority>): Promise<Priority[]> => {
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/priorities/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
@@ -212,11 +212,15 @@ export const getAuditTrail = async (
 	id: number,
 	conditions?: Conditions<AuditTrailEntry>
 ): Promise<AuditTrailEntry[]> => {
-	let params = generateParams(conditions);
-	params?.replace('?', '&');
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/audittrail?type=${type}&id=${id}${params}`, {
-		headers: baseHeaders,
-	});
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/system/audittrail?type=${type}&id=${id}${generateParams(conditions)?.replace(
+			'?',
+			'&'
+		)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
 
 	if (!response.ok) throw Error('Error fetchnig audit trail...');
 
@@ -228,10 +232,10 @@ export const getDocuments = async (
 	id: number,
 	conditions?: Conditions<Document>
 ): Promise<Document[]> => {
-	let params = generateParams(conditions);
-	params?.replace('?', '&');
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/system/documents?recordType=${recordType}&recordId=${id}${params}`,
+		`${process.env.NEXT_PUBLIC_CW_URL}/system/documents?recordType=${recordType}&recordId=${id}${generateParams(
+			conditions
+		)?.replace('?', '&')}`,
 		{
 			headers: baseHeaders,
 		}

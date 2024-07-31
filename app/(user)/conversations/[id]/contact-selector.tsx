@@ -9,7 +9,7 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getContacts } from '@/lib/manage/read';
 import { useTaskContext } from './task-context';
-import { Contact } from '@/lib/manage/types';
+import { Contact } from '@/types/manage';
 import { updateTask } from '@/lib/twilio/taskrouter/helpers';
 import { revalidatePath } from 'next/cache';
 

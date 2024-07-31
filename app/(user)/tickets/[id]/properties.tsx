@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Paperclip, Tag } from 'lucide-react';
 import React, { Suspense } from 'react';
 import StatusSelector from './status-selector';
-import { ServiceTicket } from '@/lib/manage/types';
+import { ServiceTicket } from '@/types/manage';
 import MemberSelector from './member-selector';
 import BoardSelector from './board-selector';
 import PrioritySelector from './priority-selector';

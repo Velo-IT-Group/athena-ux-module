@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getPriorities } from '@/lib/manage/read';
-import { Priority, ReferenceType } from '@/lib/manage/types';
+import { Priority, ReferenceType } from '@/types/manage';
 import { Circle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getSystemMembers } from '@/lib/manage/read';
-import { ReferenceType, SystemMember } from '@/lib/manage/types';
+import { ReferenceType, SystemMember } from '@/types/manage';
 import { CircleUser } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 

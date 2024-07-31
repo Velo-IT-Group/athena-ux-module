@@ -2,7 +2,7 @@ import { Building } from 'lucide-react';
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCompany, getTickets, getUserTickets } from '@/lib/manage/read';
+import { getCompany, getTickets } from '@/lib/manage/read';
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 const ConversationCompanyDetail = async ({ id }: Props) => {
-	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getUserTickets(id ?? 250)]);
+	const [company, tickets] = await Promise.all([getCompany(id ?? 250), getTickets()]);
 
 	console.log(tickets);
 

@@ -1,5 +1,4 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { AuditTrailEntry } from '@/lib/manage/types';
+import { AuditTrailEntry } from '@/types/manage';
 import { relativeDate } from '@/utils/date';
 import {
 	ArrowLeftRight,

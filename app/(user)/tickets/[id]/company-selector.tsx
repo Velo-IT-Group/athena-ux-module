@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getCompanies, getContacts } from '@/lib/manage/read';
-import { ReferenceType } from '@/lib/manage/types';
+import { ReferenceType } from '@/types/manage';
 import { Building } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 

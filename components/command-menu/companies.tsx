@@ -1,6 +1,6 @@
 'use client';
 import { getCompanies } from '@/lib/manage/read';
-import { Company } from '@/lib/manage/types';
+import { Company } from '@/types/manage';
 import React, { useEffect, useState } from 'react';
 import { CommandItem } from '../ui/command';
 import { Building } from 'lucide-react';

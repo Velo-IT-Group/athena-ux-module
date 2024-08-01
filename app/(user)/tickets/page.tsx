@@ -1,58 +1,23 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { columns } from '@/components/table-columns/ticket';
+import { DataTable } from '@/components/ui/data-table';
 import { getTickets } from '@/lib/manage/read';
-import Link from 'next/link';
-import React from 'react';
 
 type Props = {};
 
 const Page = async (props: Props) => {
-	const tickets = await getTickets({
-		conditions: [{ 'board/id': 30 }, { closedFlag: false }],
-		pageSize: 1000,
-		orderBy: { key: 'id', order: 'desc' },
-	});
+	const tickets = await getTickets({ conditions: [{ 'board/id': 30 }, { closedFlag: false }], pageSize: 1000 });
 
 	return (
-		<main>
-			<header>
+		<main className='p-3 grow space-y-3'>
+			<header className='flex items-center gap-3'>
 				<h1 className='text-lg font-semibold'>Tickets</h1>
 			</header>
 
 			<section>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>ID</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>Company</TableHead>
-							<TableHead>Summary</TableHead>
-							<TableHead>Priority</TableHead>
-						</TableRow>
-					</TableHeader>
-
-					<TableBody>
-						{tickets.map((ticket) => (
-							<Link
-								className='table-row border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted'
-								style={{ verticalAlign: 'inherit', unicodeBidi: 'isolate' }}
-								href={`/tickets/${ticket.id}`}
-								key={ticket.id}
-							>
-								<TableCell className='border-r'>#{ticket.id}</TableCell>
-
-								<TableCell className='border-r'>{ticket.status?.name}</TableCell>
-
-								<TableCell className='border-r'>{ticket.company?.name}</TableCell>
-
-								<TableCell className='border-r max-w-[500px]'>
-									<span className='line-clamp-1'>{ticket.summary}</span>
-								</TableCell>
-
-								<TableCell>{ticket.priority?.name}</TableCell>
-							</Link>
-						))}
-					</TableBody>
-				</Table>
+				<DataTable
+					data={tickets}
+					columns={columns}
+				/>
 			</section>
 		</main>
 	);

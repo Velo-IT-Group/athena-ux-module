@@ -35,13 +35,7 @@ const Layout = async ({ children }: Props) => {
 				<Navbar />
 
 				<ResizablePanelGroup direction='horizontal'>
-					<ResizablePanel
-						minSize={10}
-						maxSize={25}
-						collapsible
-					>
-						<SideNav />
-					</ResizablePanel>
+					<SideNav />
 
 					<ResizableHandle />
 

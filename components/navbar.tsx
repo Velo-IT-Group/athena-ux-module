@@ -12,6 +12,7 @@ import OutboundDialerContent from './outbound-dialer-content';
 import HistorySelector from '@/app/(user)/history-selector';
 import { Suspense } from 'react';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
+import CollapsibleButton from './collapsible-button';
 
 const Navbar = async () => {
 	const [numbers, calls, session, activities] = await Promise.all([
@@ -23,13 +24,17 @@ const Navbar = async () => {
 
 	return (
 		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
-			<Image
-				src='/velo-logo-black.svg'
-				alt='Velo logo logo'
-				width={50}
-				height={50}
-				className='object-contain'
-			/>
+			<div className='flex items-center gap-3'>
+				<Image
+					src='/velo-logo-black.svg'
+					alt='Velo logo logo'
+					width={50}
+					height={50}
+					className='object-contain'
+				/>
+
+				<CollapsibleButton />
+			</div>
 
 			<Suspense>
 				<CommandMenu />

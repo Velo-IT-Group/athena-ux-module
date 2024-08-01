@@ -22,7 +22,11 @@ import { Combobox } from '@/components/ui/combobox';
 type Props = {};
 
 const Page = async (props: Props) => {
-	const contacts = await getContacts(250);
+	const contacts = await getContacts({
+		pageSize: 1000,
+		orderBy: { key: 'firstName' },
+		conditions: [{ inactiveFlag: false }],
+	});
 
 	return (
 		<div className='p-9 space-y-3 bg-muted/50'>

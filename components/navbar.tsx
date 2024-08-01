@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import DeviceSelector from './device-selector';
 import { getAllCalls } from '@/lib/twilio/read';
 import { getPhoneNumbers } from '@/lib/twilio/phoneNumbers';
 import { auth } from '@/auth';
@@ -9,7 +8,6 @@ import { Popover, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
-import HistorySelector from '@/app/(user)/history-selector';
 import { Suspense } from 'react';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
 import CollapsibleButton from './collapsible-button';

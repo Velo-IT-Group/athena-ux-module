@@ -1,10 +1,91 @@
-import { Buda } from 'next/font/google';
 import { z } from 'zod';
 
 export const referenceTypeSchema = z.object({
 	id: z.number().optional(),
 	identity: z.string().optional(),
 	name: z.string().optional(),
+});
+
+const auditTypeSchema = z.enum([
+	'Attachment',
+	'Combined Tickets',
+	'Company',
+	'Configuration',
+	'Contact',
+	'Control',
+	'Custom Field',
+	'Date',
+	'Email',
+	'Finance',
+	'Knowledge Base',
+	'Meeting',
+	'Notes',
+	'Product',
+	'Record',
+	'Resource',
+	'SLA',
+	'Task',
+	'Template',
+	'Tickets',
+	'Ticket Template',
+	'Time Entry',
+	'Workflow',
+]);
+
+export const auditTrailEntrySchema = z.object({
+	text: z.string().optional(),
+	enteredDate: z.string().optional(),
+	enteredBy: z.string().optional(),
+	auditType: auditTypeSchema.optional(),
+	auditSubType: z.string().optional(),
+	auditSource: z.string().optional(),
+});
+
+export const communicationItemSchema = z.object({
+	id: z.number().optional(),
+	type: referenceTypeSchema,
+	value: z.string().optional(),
+	defaultFlag: z.boolean().optional(),
+	domain: z.string().optional(),
+	communicationType: z.string().optional(),
+});
+
+export const contactSchema = z.object({
+	id: z.number().optional(),
+	firstName: z.string().optional(),
+	lastName: z.string().optional(),
+	company: referenceTypeSchema.optional(),
+	site: referenceTypeSchema.optional(),
+	addressLine1: z.string().optional(),
+	addressLine2: z.string().optional(),
+	city: z.string().optional(),
+	state: z.string().optional(),
+	school: z.string().optional(),
+	date: z.string().optional(),
+	zip: z.string().optional(),
+	country: referenceTypeSchema.optional(),
+	relationshipOverride: z.string().optional(),
+	inactiveFlag: z.boolean().optional(),
+	managerContact: referenceTypeSchema.optional(),
+	title: z.string().optional(),
+	nickName: z.string().optional(),
+	marriedFlag: z.boolean().optional(),
+	childrenFlag: z.boolean().optional(),
+	significantOther: z.string().optional(),
+	portalSecurityLevel: z.number().optional(),
+	disablePortalLoginFlag: z.boolean().optional(),
+	unsubscribeFlag: z.boolean().optional(),
+	gender: z.string().optional(),
+	birthDay: z.string().optional(),
+	anniversary: z.string().optional(),
+	mobileGuid: z.string().optional(),
+	defaultPhoneType: z.string().optional(),
+	defaultPhoneNbr: z.string().optional(),
+	defaultBillingFlag: z.boolean().optional(),
+	defaultFlag: z.boolean().optional(),
+	communicationItems: z.array(communicationItemSchema).optional(),
+	types: z.array(referenceTypeSchema).optional(),
+	ignoreDuplicates: z.boolean().optional(),
 });
 
 export const customFieldSchema = z.object({
@@ -17,7 +98,7 @@ export const customFieldSchema = z.object({
 });
 
 export const serviceTicketSchema = z.object({
-	id: z.number(),
+	id: z.number().optional(),
 	summary: z.string().max(100),
 	recordType: z.enum(['ProjectIssue', 'ProjectTicket', 'ServiceTicket']).optional().default('ServiceTicket'),
 	board: referenceTypeSchema.optional(),
@@ -133,24 +214,230 @@ export const serviceTicketSchema = z.object({
 	customFields: z.array(customFieldSchema).optional(),
 });
 
+export const documentSchema = z.object({
+	id: z.number().optional(),
+	title: z.string().optional(),
+	fileName: z.string().optional(),
+	serverFileName: z.string().optional(),
+	owner: z.string().optional(),
+	linkFlag: z.boolean().optional(),
+	imageFlag: z.boolean().optional(),
+	publicFlag: z.boolean().optional(),
+	htmlTemplateFlag: z.boolean().optional(),
+	readOnlyFlag: z.boolean().optional(),
+	size: z.number().optional(),
+	urlFlag: z.boolean().optional(),
+	createdOnDate: z.string().optional(),
+	documentType: referenceTypeSchema.optional(),
+	guid: z.string().optional(),
+});
+
+export const systemMemberSchema = z.object({
+	id: z.number(),
+	identifier: z.string().max(15),
+	password: z.string().optional(),
+	disableOnlineFlag: z.boolean().optional(),
+	licenseClass: z.enum(['A', 'C', 'F', 'X']).optional(),
+	notes: z.string().optional(),
+	employeeIdentifer: z.string().optional(),
+	vendorNumber: z.string().optional(),
+	enableMobileGpsFlag: z.boolean().optional(),
+	inactiveDate: z.string().optional(),
+	inactiveFlag: z.boolean().optional(),
+	lastLogin: z.string().optional(),
+	clientId: z.string().optional(),
+	token: z.string().optional(),
+	firstName: z.string().max(30),
+	middleInitial: z.string().optional(),
+	lastName: z.string().max(30),
+	hireDate: z.string(),
+	country: referenceTypeSchema.optional(),
+	photo: referenceTypeSchema.optional(),
+	officeEmail: z.string().optional(),
+	mobileEmail: z.string().optional(),
+	homeEmail: z.string().optional(),
+	defaultEmail: z.enum(['Office', 'Mobile', 'Home']),
+	primaryEmail: z.string().optional(),
+	officePhone: z.string().optional(),
+	officeExtension: z.string().optional(),
+	mobilePhone: z.string().optional(),
+	mobileExtension: z.string().optional(),
+	homePhone: z.string().optional(),
+	homeExtension: z.string().optional(),
+	defaultPhone: z.enum(['Office', 'Mobile', 'Home']),
+	securityRole: referenceTypeSchema,
+	office365: referenceTypeSchema.optional(),
+	mapiName: z.string().optional(),
+	calendarSyncIntegrationFlag: z.boolean().optional(),
+	authenticationServiceType: z.enum(['AuthAnvil', 'GoogleAuthenticator', 'Email']).optional(),
+	timebasedOneTimePasswordActivated: z.boolean().optional(),
+	enableLdapAuthenticationFlag: z.boolean().optional(),
+	ldapConfiguration: referenceTypeSchema.optional(),
+	ldapUserName: z.string().optional(),
+	directionalSync: referenceTypeSchema.optional(),
+	ssoSettings: referenceTypeSchema.optional(),
+	signature: z.string().optional(),
+	phoneIntegrationType: z.enum(['TAPI', 'SKYPE', 'TEL', 'CALLTO', 'NONE']).optional(),
+	useBrowserLanguageFlag: z.boolean().optional(),
+	title: z.string().optional(),
+	reportCard: referenceTypeSchema.optional(),
+	enableMobileFlag: z.boolean().optional(),
+	type: referenceTypeSchema.optional(),
+	timeZone: referenceTypeSchema.optional(),
+	partnerPortalFlag: z.boolean().optional(),
+	stsUserAdminUrl: z.string().optional(),
+	toastNotificationFlag: z.boolean().optional(),
+	memberPersonas: z.array(z.number()),
+	adminFlag: z.boolean().optional(),
+	structureLevel: referenceTypeSchema.optional(),
+	securityLocation: referenceTypeSchema.optional(),
+	defaultLocation: referenceTypeSchema.optional(),
+	defaultDepartment: referenceTypeSchema.optional(),
+	reportsTo: referenceTypeSchema.optional(),
+	restrictLocationFlag: z.boolean().optional(),
+	restrictDepartmentFlag: z.boolean().optional(),
+	workRole: referenceTypeSchema.optional(),
+	workType: referenceTypeSchema.optional(),
+	timeApprover: referenceTypeSchema.optional(),
+	expenseApprover: referenceTypeSchema.optional(),
+	billableForecast: z.number().optional(),
+	dailyCapacity: z.number().optional(),
+	hourlyCost: z.number().optional(),
+	hourlyRate: z.number().optional(),
+	includeInUtilizationReportingFlag: z.boolean().optional(),
+	requireExpenseEntryFlag: z.boolean().optional(),
+	requireTimeSheetEntryFlag: z.boolean().optional(),
+	requireStartAndEndTimeOnTimeEntryFlag: z.boolean().optional(),
+	allowInCellEntryOnTimeSheet: z.boolean().optional(),
+	enterTimeAgainstCompanyFlag: z.boolean().optional(),
+	allowExpensesEnteredAgainstCompaniesFlag: z.boolean().optional(),
+	timeReminderEmailFlag: z.boolean().optional(),
+	daysTolerance: z.number().optional(),
+	minimumHours: z.number().optional(),
+	timeSheetStartDate: z.string().optional(),
+	serviceDefaultLocation: referenceTypeSchema.optional(),
+	serviceDefaultDepartment: referenceTypeSchema.optional(),
+	serviceDefaultBoard: referenceTypeSchema.optional(),
+	restrictServiceDefaultLocationFlag: z.boolean().optional(),
+	restrictServiceDefaultDepartmentFlag: z.boolean().optional(),
+	excludedServiceBoardIds: z.array(z.number()),
+	teams: z.array(z.number()),
+	serviceBoardTeamIds: z.array(z.number()),
+	projectDefaultLocation: referenceTypeSchema.optional(),
+	projectDefaultDepartment: referenceTypeSchema.optional(),
+	projectDefaultBoard: referenceTypeSchema.optional(),
+	restrictProjectDefaultLocationFlag: z.boolean().optional(),
+	restrictProjectDefaultDepartmentFlag: z.boolean().optional(),
+	excludedProjectBoardIds: z.array(z.number()),
+	scheduleDefaultLocation: referenceTypeSchema.optional(),
+	scheduleDefaultDepartment: referenceTypeSchema.optional(),
+	scheduleCapacity: z.number().optional(),
+	serviceLocation: referenceTypeSchema.optional(),
+	restrictScheduleFlag: z.boolean().optional(),
+	hideMemberInDispatchPortalFlag: z.boolean().optional(),
+	calendar: referenceTypeSchema.optional(),
+	salesDefaultLocation: referenceTypeSchema.optional(),
+	restrictDefaultSalesTerritoryFlag: z.boolean().optional(),
+	warehouse: referenceTypeSchema.optional(),
+	warehouseBin: referenceTypeSchema.optional(),
+	restrictDefaultWarehouseFlag: z.boolean().optional(),
+	restrictDefaultWarehouseBinFlag: z.boolean().optional(),
+	companyActivityTabFormat: z.enum(['SummaryList', 'DetailList']).optional(),
+	invoiceTimeTabFormat: z.enum(['SummaryList', 'DetailList']).optional(),
+	invoiceScreenDefaultTabFormat: z.enum(['ShowInvoicingTab', 'ShowAgreementInvoicingTab']).optional(),
+	invoicingDisplayOptions: z.enum(['RemainOnInvoicingScreen', 'ShowRecentInvoices']).optional().nullable(),
+	agreementInvoicingDisplayOptions: z.enum(['RemainOnInvoicingScreen', 'ShowRecentInvoices']).optional().nullable(),
+	autoStartStopwatch: z.boolean().optional(),
+	autoPopupQuickNotesWithStopwatch: z.boolean().optional(),
+	globalSearchDefaultTicketFilter: z.enum(['OpenRecords', 'ClosedRecords', 'AllRecords']).optional().nullable(),
+	globalSearchDefaultSort: z
+		.enum(['None', 'LastUpdatedDesc', 'LastUpdatedAsc', 'CreatedDesc', 'CreatedAsc'])
+		.optional(),
+	phoneSource: z.string().optional(),
+	copyPodLayouts: z.boolean().optional(),
+	copySharedDefaultViews: z.boolean().optional(),
+	copyColumnLayoutsAndFilters: z.boolean().optional(),
+	fromMemberRecId: z.number().optional(),
+	fromMemberTemplateRecId: z.number(),
+});
+
+export const projectSchema = z.object({
+	id: z.number(),
+	actualEnd: z.string().optional(),
+	actualHours: z.number().optional(),
+	actualStart: z.string().optional(),
+	agreement: referenceTypeSchema.optional(),
+	billExpenses: z.string().optional(),
+	billingAmount: z.number().optional(),
+	billingAttention: z.string().optional(),
+	billingMethod: z.string().optional(),
+	billingRateType: z.string().optional(),
+	billingTerms: referenceTypeSchema.optional(),
+	billProducts: z.string().optional(),
+	billProjectAfterClosedFlag: z.boolean().optional(),
+	billTime: z.string().optional(),
+	billToCompany: referenceTypeSchema.optional(),
+	billToContact: referenceTypeSchema.optional(),
+	billToSite: referenceTypeSchema.optional(),
+	billUnapprovedTimeAndExpense: z.boolean().optional(),
+	board: referenceTypeSchema.optional(),
+	budgetAnalysis: z.string().optional(),
+	budgetFlag: z.boolean().optional(),
+	budgetHours: z.number().optional(),
+	company: referenceTypeSchema.optional(),
+	contact: referenceTypeSchema.optional(),
+	customerPO: z.string().optional(),
+	description: z.string().optional(),
+	currency: referenceTypeSchema.optional(),
+	downpayment: z.number().optional(),
+	estimatedEnd: z.string().optional(),
+	percentComplete: z.number().optional(),
+	estimatedExpenseRevenue: z.number().optional(),
+	estimatedHours: z.number().optional(),
+	estimatedProductRevenue: z.number().optional(),
+	estimatedStart: z.string().optional(),
+	estimatedTimeRevenue: z.number().optional(),
+	expenseApprover: referenceTypeSchema.optional(),
+	includeDependenciesFlag: z.boolean().optional(),
+	includeEstimatesFlag: z.boolean().optional(),
+	location: referenceTypeSchema.optional(),
+	department: referenceTypeSchema.optional(),
+	manager: referenceTypeSchema.optional(),
+	name: z.string().optional(),
+	opportunity: referenceTypeSchema.optional(),
+	projectTemplateId: z.number().optional(),
+	restrictDownPaymentFlag: z.boolean().optional(),
+	scheduledEnd: z.string().optional(),
+	scheduledHours: z.number().optional(),
+	scheduledStart: z.string().optional(),
+	shipToCompany: referenceTypeSchema.optional(),
+	shipToContact: referenceTypeSchema.optional(),
+	shipToSite: referenceTypeSchema.optional(),
+	site: referenceTypeSchema.optional(),
+	status: referenceTypeSchema.optional(),
+	closedFlag: z.boolean().optional(),
+	timeApprover: referenceTypeSchema.optional(),
+	type: referenceTypeSchema.optional(),
+	doNotDisplayInPortalFlag: z.boolean().optional(),
+	billingStartDate: z.string().optional(),
+	poAmount: z.number().optional(),
+	estimatedTimeCost: z.number().optional(),
+	estimatedExpenseCost: z.number().optional(),
+	estimatedProductCost: z.number().optional(),
+	taxCode: referenceTypeSchema.optional(),
+	companyLocation: referenceTypeSchema.optional(),
+});
+
+export type AuditType = z.infer<typeof auditTypeSchema>;
+export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
+export type CustomField = z.infer<typeof customFieldSchema>;
+export type CommunicationItem = z.infer<typeof communicationItemSchema>;
+export type Contact = z.infer<typeof contactSchema>;
+export type Document = z.infer<typeof documentSchema>;
+export type Project = z.infer<typeof projectSchema>;
 export type Reference = z.infer<typeof referenceTypeSchema>;
-
 export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
-
-export type ProjectTemplate = {
-	id: number;
-	name: string;
-	description?: string;
-	type?: ProjectType;
-	workplan?: ProjectWorkPlan;
-};
-
-export type ProjectType = {
-	id: number;
-	name: string;
-	defaultFlag?: boolean;
-	inactiveFlag?: boolean;
-};
+export type SystemMember = z.infer<typeof systemMemberSchema>;
 
 export type TicketNote = {
 	id: number;
@@ -171,536 +458,12 @@ export type TicketNote = {
 	externalFlag: boolean;
 	sentimentScore: number;
 };
-
-export type ProjectPhase = {
-	id: number;
-	templateId: number;
-	projectId?: number;
-	description: string;
-	markAsMilestoneFlag: boolean;
-	billPhaseSeparately: boolean;
-	wbsCode: string;
-	tickets: Array<ProjectTemplateTicket>;
-};
-
-export type ProjectTemplateTicket = {
-	id: number;
-	projectTemplateId?: number;
-	projectTemplatePhaseId?: number;
-	lineNumber?: number;
-	description?: string;
-	notes?: string;
-	internalAnalysis?: string;
-	resolution?: string;
-	budgetHours: number;
-	duration?: number;
-	summary: string;
-	wbsCode?: string;
-	billSeparatelyFlag?: boolean;
-	markAsMilestoneFlag?: boolean;
-	tasks?: Array<ProjectTemplateTask>;
-	recordType?: string;
-	pmTmpProjectRecID?: number;
-	priority?: {
-		id: number;
-		name: string;
-		sort: number;
-		level: string;
-		_info: {
-			additionalProp1: string;
-			additionalProp2: string;
-			additionalProp3: string;
-		};
-	};
-	source?: {
-		id: number;
-		name: string;
-		_info: {
-			additionalProp1: string;
-			additionalProp2: string;
-			additionalProp3: string;
-		};
-	};
-	workRole?: {
-		id: number;
-		name: string;
-		_info: {
-			additionalProp1: string;
-			additionalProp2: string;
-			additionalProp3: string;
-		};
-	};
-	workType?: {
-		id: number;
-		name: string;
-		_info: {
-			additionalProp1: string;
-			additionalProp2: string;
-			additionalProp3: string;
-		};
-	};
-};
-
-export type ProjectTemplateTask = {
-	id: number;
-	ticketId?: number;
-	sequence?: number;
-	notes?: string;
-	description?: string;
-	priority?: number;
-	summary?: string;
-};
-
-export type ProjectWorkPlan = {
-	templateId: number;
-	phases: Array<ProjectPhase>;
-};
-
-export type ProductClass = 'Agreement' | 'Bundle' | 'Inventory' | 'NonInventory' | 'Service';
-
-export type CatalogItem = {
-	id: number;
-	identifier?: string;
-	description?: string;
-	inactiveFlag?: boolean;
-	subcategory?: ReferenceType;
-	type?: ReferenceType;
-	productClass: ProductClass;
-	bundledItems?: CatalogItem[] | undefined;
-	serializedFlag?: boolean;
-	serializedCostFlag?: boolean;
-	phaseProductFlag?: boolean;
-	unitOfMeasure?: ReferenceType;
-	price?: number;
-	cost?: number;
-	priceAttribute?: string;
-	taxableFlag?: boolean;
-	dropShipFlag?: boolean;
-	specialOrderFlag?: boolean;
-	customerDescription?: string;
-	manufacturer?: ReferenceType;
-	manufacturerPartNumber?: string;
-	vendor?: ReferenceType;
-	vendorSku?: string;
-	notes?: string;
-	integrationXRef?: string;
-	sla?: ReferenceType;
-	entityType?: ReferenceType;
-	recurringFlag?: boolean;
-	recurringRevenue?: number;
-	recurringCost?: number;
-	recurringOneTimeFlag?: boolean;
-	recurringBillCycle?: ReferenceType;
-	recurringCycleType?: string;
-	calculatedPriceFlag?: boolean;
-	calculatedCostFlag?: boolean;
-	category?: ReferenceType;
-	calculatedPrice?: number;
-	calculatedCost?: number;
-	billableOption?: string;
-};
-
-export type CatalogComponent = {
-	id: number;
-	sequenceNumber: number;
-	quantity: number;
-	catalogItem: CatalogItem;
-	hidePriceFlag: boolean;
-	hideItemIdentifierFlag: boolean;
-	hideDescriptionFlag: boolean;
-	hideQuantityFlag: boolean;
-	hideExtendedPriceFlag: boolean;
-	parentCatalogItem: { id: number };
-	price: number;
-	cost: number;
-};
-export interface SystemMember {
-	id: number;
-	identifier: string;
-	firstName: string;
-	lastName: string;
-}
-
-export interface Priority {
-	id: number;
-	name: string;
-	color: string;
-	sortOrder: number;
-	defaultFlag: boolean;
-}
-
-// export interface ServiceTicket {
-// 	id: number;
-// 	summary: string;
-// 	recordType?: string;
-// 	board?: ReferenceType;
-// 	status?: ReferenceType;
-// 	workRole?: ReferenceType;
-// 	workType?: ReferenceType;
-// 	company?: ReferenceType;
-// 	site?: ReferenceType;
-// 	siteName?: string;
-// 	addressLine1?: string;
-// 	addressLine2?: string;
-// 	city?: string;
-// 	stateIdentifier?: string;
-// 	zip?: string;
-// 	country?: ReferenceType;
-// 	contact?: ReferenceType;
-// 	contactName?: string;
-// 	contactPhoneNumber?: string;
-// 	contactPhoneExtension?: string;
-// 	contactEmailAddress?: string;
-// 	type?: ReferenceType;
-// 	subType?: ReferenceType;
-// 	item?: ReferenceType;
-// 	team?: ReferenceType;
-// 	owner?: ReferenceType;
-// 	priority?: ReferenceType;
-// 	serviceLocation?: ReferenceType;
-// 	source?: ReferenceType;
-// 	requiredDate?: string;
-// 	budgetHours?: number;
-// 	opportunity?: ReferenceType;
-// 	agreement?: ReferenceType;
-// 	severity?: string;
-// 	impact?: string;
-// 	externalXRef?: string;
-// 	poNumber?: string;
-// 	knowledgeBaseCategoryId?: number;
-// 	knowledgeBaseSubCategoryId?: number;
-// 	allowAllClientsPortalView?: boolean;
-// 	customerUpdatedFlag?: boolean;
-// 	automaticEmailContactFlag?: boolean;
-// 	automaticEmailResourceFlag?: boolean;
-// 	automaticEmailCcFlag?: boolean;
-// 	automaticEmailCc?: string;
-// 	initialDescription?: string;
-// 	initialInternalAnalysis?: string;
-// 	initialResolution?: string;
-// 	initialDescriptionFrom?: string;
-// 	contactEmailLookup?: string;
-// 	processNotifications?: boolean;
-// 	skipCallback?: boolean;
-// 	closedDate?: string;
-// 	closedBy?: string;
-// 	closedFlag?: boolean;
-// 	actualHours?: number;
-// 	approved?: boolean;
-// 	estimatedExpenseCost?: number;
-// 	estimatedExpenseRevenue?: number;
-// 	estimatedProductCost?: number;
-// 	estimatedProductRevenue?: number;
-// 	estimatedTimeCost?: number;
-// 	estimatedTimeRevenue?: number;
-// 	billingMethod?: string;
-// 	billingAmount?: number;
-// 	hourlyRate?: number;
-// 	subBillingMethod?: string;
-// 	subBillingAmount?: number;
-// 	subDateAccepted?: string;
-// 	dateResolved?: string;
-// 	dateResplan?: string;
-// 	dateResponded?: string;
-// 	resolveMinutes?: number;
-// 	resPlanMinutes?: number;
-// 	respondMinutes?: number;
-// 	isInSla?: boolean;
-// 	knowledgeBaseLinkId?: number;
-// 	resources?: string;
-// 	parentTicketId?: number;
-// 	hasChildTicket?: boolean;
-// 	hasMergedChildTicketFlag?: boolean;
-// 	knowledgeBaseLinkType?: string;
-// 	billTime?: string;
-// 	billExpenses?: string;
-// 	billProducts?: string;
-// 	predecessorType?: string;
-// 	predecessorId?: number;
-// 	predecessorClosedFlag?: boolean;
-// 	lagDays?: number;
-// 	lagNonworkingDaysFlag?: boolean;
-// 	estimatedStartDate?: string;
-// 	duration?: number;
-// 	location?: Location;
-// 	department?: ReferenceType;
-// 	mobileGuid?: string;
-// 	sla?: ReferenceType;
-// 	slaStatus?: string;
-// 	requestForChangeFlag?: boolean;
-// 	currency?: Currency;
-// 	mergedParentTicket?: ReferenceType;
-// 	integratorTags?: string[];
-// 	escalationStartDateUTC?: string;
-// 	escalationLevel?: number;
-// 	minutesBeforeWaiting?: number;
-// 	respondedSkippedMinutes?: number;
-// 	resplanSkippedMinutes?: number;
-// 	respondedHours?: number;
-// 	respondedBy?: string;
-// 	resplanHours?: number;
-// 	resplanBy?: string;
-// 	resolutionHours?: number;
-// 	resolvedBy?: string;
-// 	minutesWaiting?: number;
-// }
-
-export interface Opportunity {
-	id: number;
-	name: string;
-	expectedCloseDate: string;
-	type: ReferenceType;
-	stage: ReferenceType;
-	status: ReferenceType;
-	priority: ReferenceType;
-	probability: ReferenceType;
-	rating: ReferenceType;
-	primarySalesRep: ReferenceType;
-	locationId: number;
-	businessUnitId: number;
-	company: ReferenceType;
-	contact: ReferenceType;
-	site: ReferenceType;
-	dateBecameLead: string;
-	totalSalesTax: number;
-	shipToCompany: ReferenceType;
-	shipToSite: ReferenceType;
-	billToCompany: ReferenceType;
-	billToContact: ReferenceType;
-	billToSite: ReferenceType;
-	billingTerms: ReferenceType;
-	currency: Currency;
-	companyLocationId: number;
-}
-
-export interface ProductsItem {
-	id: number;
-	catalogItem: CatalogItem;
-	description?: string;
-	sequenceNumber?: number;
-	quantity?: number;
-	unitOfMeasure?: ReferenceType;
-	price: number;
-	cost: number;
-	extPrice: number;
-	extCost: number;
-	discount?: number;
-	margin?: number;
-	agreementAmount?: number;
-	priceMethod?: string;
-	billableOption?: string;
-	agreement?: ReferenceType;
-	locationId?: number;
-	location?: ReferenceType;
-	businessUnitId?: number;
-	businessUnit?: ReferenceType;
-	vendor?: ReferenceType;
-	vendorSku?: string;
-	taxableFlag?: boolean;
-	dropshipFlag?: boolean;
-	specialOrderFlag?: boolean;
-	phaseProductFlag?: boolean;
-	cancelledFlag?: boolean;
-	quantityCancelled?: number;
-	cancelledReason?: string;
-	customerDescription?: string;
-	internalNotes?: string;
-	productSuppliedFlag?: boolean;
-	subContractorShipToId?: number;
-	subContractorAmountLimit?: number;
-	recurring?: Recurring;
-	sla?: ReferenceType;
-	entityType?: ReferenceType;
-	ticket?: ReferenceType;
-	project?: ReferenceType;
-	phase?: ReferenceType;
-	salesOrder?: ReferenceType;
-	opportunity?: ReferenceType;
-	invoice?: Invoice;
-	warehouseId?: number;
-	warehouseIdObject?: ReferenceType;
-	warehouseBinId?: number;
-	warehouseBinIdObject?: ReferenceType;
-	calculatedPriceFlag?: boolean;
-	calculatedCostFlag?: boolean;
-	forecastDetailId?: number;
-	cancelledBy?: number;
-	cancelledDate?: string;
-	warehouse?: string;
-	warehouseBin?: string;
-	purchaseDate?: string;
-	taxCode?: ReferenceType;
-	integrationXRef?: string;
-	listPrice?: number;
-	serialNumberIds?: Array<number>;
-	serialNumbers?: Array<string>;
-	company?: ReferenceType;
-	forecastStatus?: ReferenceType;
-	productClass?: string;
-	needToPurchaseFlag?: boolean;
-	needToOrderQuantity?: number;
-	minimumStockFlag?: boolean;
-	shipSet?: string;
-	calculatedPrice?: number;
-	calculatedCost?: number;
-	poApprovedFlag?: boolean;
-	uom?: string;
-	addComponentsFlag?: boolean;
-	ignorePricingSchedulesFlag?: boolean;
-	asioSubscriptionsID?: string;
-	bypassForecastUpdate?: boolean;
-}
-
-export interface Project {
-	id: number;
-	actualEnd?: string;
-	actualHours?: number;
-	actualStart?: string;
-	agreement?: ReferenceType;
-	billExpenses?: string;
-	billingAmount?: number;
-	billingAttention?: string;
-	billingMethod?: string;
-	billingRateType?: string;
-	billingTerms?: ReferenceType;
-	billProducts?: string;
-	billProjectAfterClosedFlag?: boolean;
-	billTime?: string;
-	billToCompany?: ReferenceType;
-	billToContact?: ReferenceType;
-	billToSite?: ReferenceType;
-	billUnapprovedTimeAndExpense?: boolean;
-	board?: ReferenceType;
-	budgetAnalysis?: string;
-	budgetFlag?: boolean;
-	budgetHours?: number;
-	company?: ReferenceType;
-	contact?: ReferenceType;
-	customerPO?: string;
-	description?: string;
-	currency?: Currency;
-	downpayment?: number;
-	estimatedEnd?: string;
-	percentComplete?: number;
-	estimatedExpenseRevenue?: number;
-	estimatedHours?: number;
-	estimatedProductRevenue?: number;
-	estimatedStart?: string;
-	estimatedTimeRevenue?: number;
-	expenseApprover?: ReferenceType;
-	includeDependenciesFlag?: boolean;
-	includeEstimatesFlag?: boolean;
-	location?: ReferenceType;
-	department?: ReferenceType;
-	manager?: ReferenceType;
-	name?: string;
-	opportunity?: ReferenceType;
-	projectTemplateId?: number;
-	restrictDownPaymentFlag?: boolean;
-	scheduledEnd?: string;
-	scheduledHours?: number;
-	scheduledStart?: string;
-	shipToCompany?: ReferenceType;
-	shipToContact?: ReferenceType;
-	shipToSite?: ReferenceType;
-	site?: ReferenceType;
-	status?: ReferenceType;
-	closedFlag?: boolean;
-	timeApprover?: ReferenceType;
-	type?: ReferenceType;
-	doNotDisplayInPortalFlag?: boolean;
-	billingStartDate?: string;
-	poAmount?: number;
-	estimatedTimeCost?: number;
-	estimatedExpenseCost?: number;
-	estimatedProductCost?: number;
-	taxCode?: ReferenceType;
-	companyLocation?: ReferenceType;
-}
-
-export interface Invoice {
-	id: number;
-	identifier: string;
-	billingType: string;
-	applyToType: string;
-	invoiceDate: string;
-	chargeFirmFlag: boolean;
-}
-
-export interface Recurring {
-	recurringRevenue: number;
-	recurringCost: number;
-	startDate: string;
-	endDate: string;
-	billCycleId: number;
-	billCycle: ReferenceType;
-	cycles: number;
-	cycleType: string;
-}
-
 export interface ReferenceType {
 	id: number;
 	identifier?: string;
 	name: string;
 }
 
-export interface Note {
-	id: number;
-	ticketId: number;
-	text: string;
-	detailDescriptionFlag: boolean;
-	internalAnalysisFlag: boolean;
-	resolutionFlag: boolean;
-	issueFlag: boolean;
-	member: {
-		id: number;
-		identifier: string;
-		name: string;
-		dailyCapacity: number;
-	};
-	contact: ReferenceType;
-	customerUpdatedFlag: boolean;
-	processNotifications: boolean;
-	internalFlag: boolean;
-	externalFlag: boolean;
-}
-export interface Contact {
-	id: number;
-	firstName: string;
-	lastName: string;
-	company: ReferenceType;
-	site: ReferenceType;
-	addressLine1: string;
-	addressLine2: string;
-	city: string;
-	state: string;
-	school?: string;
-	date?: string;
-	zip: string;
-	country: ReferenceType;
-	relationshipOverride: string;
-	inactiveFlag: boolean;
-	managerContact: ReferenceType;
-	title: string;
-	nickName: string;
-	marriedFlag: boolean;
-	childrenFlag: boolean;
-	significantOther: string;
-	portalSecurityLevel: number;
-	disablePortalLoginFlag: boolean;
-	unsubscribeFlag: boolean;
-	gender: string;
-	birthDay: string;
-	anniversary: string;
-	mobileGuid: string;
-	defaultPhoneType: string;
-	defaultPhoneNbr: string;
-	defaultBillingFlag: boolean;
-	defaultFlag: boolean;
-	communicationItems: CommunicationItem[];
-	types: ReferenceType[];
-	ignoreDuplicates: boolean;
-}
 export interface Configuration {
 	id: number;
 	name: string;
@@ -752,15 +515,6 @@ export interface Configuration {
 	needsRenewalFlag: boolean;
 }
 
-export interface CommunicationItem {
-	id: number;
-	type: ReferenceType;
-	value: string;
-	defaultFlag: boolean;
-	domain?: string;
-	communicationType: string;
-}
-
 export interface Currency {
 	id: number;
 	symbol: string;
@@ -774,58 +528,6 @@ export interface Currency {
 	displayIdFlag: boolean;
 	rightAlign: boolean;
 	name: string;
-}
-
-type AuditType =
-	| 'Attachment'
-	| 'Combined Tickets'
-	| 'Company'
-	| 'Configuration'
-	| 'Contact'
-	| 'Control'
-	| 'Custom Field'
-	| 'Date'
-	| 'Email'
-	| 'Finance'
-	| 'Knowledge Base'
-	| 'Meeting'
-	| 'Notes'
-	| 'Product'
-	| 'Record'
-	| 'Resource'
-	| 'SLA'
-	| 'Task'
-	| 'Template'
-	| 'Tickets'
-	| 'Ticket Template'
-	| 'Time Entry'
-	| 'Workflow';
-
-export interface AuditTrailEntry {
-	text: string;
-	enteredDate: string;
-	enteredBy: string;
-	auditType: AuditType;
-	auditSubType: string;
-	auditSource: string;
-}
-
-export interface Document {
-	id: number;
-	title: string;
-	fileName: string;
-	serverFileName: string;
-	owner: string;
-	linkFlag: boolean;
-	imageFlag: boolean;
-	publicFlag: boolean;
-	htmlTemplateFlag: boolean;
-	readOnlyFlag: boolean;
-	size: number;
-	urlFlag: boolean;
-	createdOnDate: string;
-	documentType: ReferenceType;
-	guid: string;
 }
 
 export interface Company {
@@ -1013,16 +715,6 @@ export interface Note {
 	enteredBy: string;
 	company: ReferenceType;
 }
-
-export interface CustomField {
-	id: number;
-	caption: string;
-	type: string;
-	entryMethod: string;
-	numberOfDecimals: number;
-	value: Record<string, any>;
-}
-
 export interface BoardStatus {
 	id: number;
 	name: string;

@@ -41,7 +41,7 @@ const Navbar = async () => {
 			</Suspense>
 
 			<div className='flex items-center'>
-				<HistorySelector calls={calls} />
+				{/* <HistorySelector calls={calls} /> */}
 
 				<Popover>
 					<PopoverTrigger asChild>

@@ -15,9 +15,8 @@ const BoardSelector = ({ board }: Props) => {
 	const [selectedBoard, setSelectedBoard] = useState<ReferenceType>();
 
 	useEffect(() => {
-		getBoards().then((data) => {
+		getBoards({ orderBy: { key: 'name' }, pageSize: 1000 }).then((data) => {
 			setBoards(data);
-			console.log(data);
 			setSelectedBoard(data.find((d: ReferenceType) => d.id === board?.id));
 		});
 	}, []);

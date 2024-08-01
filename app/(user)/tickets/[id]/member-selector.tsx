@@ -16,10 +16,12 @@ const MemberSelector = ({ member }: Props) => {
 	const [selectedMember, setSelectedMember] = useState<SystemMember | undefined>();
 
 	useEffect(() => {
-		getSystemMembers().then((data) => {
-			setMembers(data);
-			setSelectedMember(data.find((d) => d.id === member?.id));
-		});
+		getSystemMembers({ orderBy: { key: 'firstName' }, conditions: [{ inactiveFlag: false }], pageSize: 1000 }).then(
+			(data) => {
+				setMembers(data);
+				setSelectedMember(data.find((d) => d.id === member?.id));
+			}
+		);
 	}, []);
 
 	return (

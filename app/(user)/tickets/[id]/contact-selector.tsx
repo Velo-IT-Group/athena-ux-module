@@ -20,7 +20,11 @@ const ContactSelector = ({ company, contact }: Props) => {
 	useEffect(() => {
 		if (!company?.id || !contact?.id) return;
 
-		getContacts(company.id).then((data) => {
+		getContacts({
+			conditions: [{ 'company/id': company.id }],
+			pageSize: 1000,
+			orderBy: { key: 'firstName' },
+		}).then((data) => {
 			setContacts(data);
 			setSelectedContact(data.find((d) => d.id === contact?.id));
 		});

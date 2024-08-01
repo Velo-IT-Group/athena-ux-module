@@ -15,7 +15,12 @@ const CompanySelector = ({ company }: Props) => {
 	const [selectedCompany, setSelectedCompany] = useState<ReferenceType>();
 
 	useEffect(() => {
-		getCompanies().then((data) => {
+		getCompanies({
+			conditions: [{ 'status/id': 1 }],
+			childConditions: [{ 'types/id': 1 }],
+			orderBy: { key: 'name' },
+			pageSize: 1000,
+		}).then((data) => {
 			setCompanies(data);
 			setSelectedCompany(data.find((d: ReferenceType) => d.id === company?.id));
 		});

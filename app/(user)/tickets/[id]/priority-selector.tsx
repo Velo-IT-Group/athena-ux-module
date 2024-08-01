@@ -13,11 +13,11 @@ type Props = {
 const PrioritySelector = ({ priority }: Props) => {
 	const [priorities, setPriorities] = useState<Priority[] | undefined>();
 	const [selectedPriority, setSelectedPriority] = useState<Priority | undefined>(
-		priority ? { ...priority, color: 'gray', defaultFlag: false, sortOrder: 1 } : undefined
+		priority ? { ...(priority as Priority), color: 'gray', defaultFlag: false, sortOrder: 1 } : undefined
 	);
 
 	useEffect(() => {
-		getPriorities().then((data) => {
+		getPriorities({ orderBy: { key: 'sortOrder' } }).then((data) => {
 			setPriorities(data);
 			const p = data?.find((p: Priority) => p.id === priority?.id);
 			setSelectedPriority(p);

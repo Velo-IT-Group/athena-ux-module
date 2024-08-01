@@ -17,7 +17,7 @@ const StatusSelector = ({ board, status }: Props) => {
 
 	useEffect(() => {
 		if (!board) return;
-		getStatuses(board.id).then(setStatuses);
+		getStatuses(board.id, { orderBy: { key: 'name' } }).then(setStatuses);
 	}, [status]);
 
 	return (

@@ -1,3 +1,142 @@
+import { Buda } from 'next/font/google';
+import { z } from 'zod';
+
+export const referenceTypeSchema = z.object({
+	id: z.number().optional(),
+	identity: z.string().optional(),
+	name: z.string().optional(),
+});
+
+export const customFieldSchema = z.object({
+	id: z.number().optional(),
+	caption: z.string().optional(),
+	type: z.string().optional(),
+	entryMethod: z.string().optional(),
+	numberOfDecimals: z.number().optional(),
+	value: z.object({}),
+});
+
+export const serviceTicketSchema = z.object({
+	id: z.number(),
+	summary: z.string().max(100),
+	recordType: z.enum(['ProjectIssue', 'ProjectTicket', 'ServiceTicket']).optional().default('ServiceTicket'),
+	board: referenceTypeSchema.optional(),
+	status: referenceTypeSchema.optional(),
+	workRole: referenceTypeSchema.optional(),
+	workType: referenceTypeSchema.optional(),
+	company: referenceTypeSchema.optional(),
+	site: referenceTypeSchema.optional(),
+	siteName: z.string().max(50).optional(),
+	addressLine1: z.string().max(50).optional(),
+	addressLine2: z.string().max(50).optional(),
+	city: z.string().max(50).optional(),
+	stateIdentifier: z.string().max(50).optional(),
+	zip: z.string().max(12).optional(),
+	country: referenceTypeSchema.optional(),
+	contact: referenceTypeSchema.optional(),
+	contactName: z.string().max(62).optional(),
+	contactPhoneNumber: z.string().max(20).optional(),
+	contactPhoneExtension: z.string().max(15).optional(),
+	contactEmailAddress: z.string().max(250).optional(),
+	type: referenceTypeSchema.optional(),
+	subType: referenceTypeSchema.optional(),
+	item: referenceTypeSchema.optional(),
+	team: referenceTypeSchema.optional(),
+	owner: referenceTypeSchema.optional(),
+	priority: referenceTypeSchema.optional(),
+	serviceLocation: referenceTypeSchema.optional(),
+	source: referenceTypeSchema.optional(),
+	requiredDate: z.string().optional(),
+	budgetHours: z.number().optional(),
+	opportunity: referenceTypeSchema.optional(),
+	agreement: referenceTypeSchema.optional(),
+	severity: z.enum(['Low', 'Medium', 'High']).optional(),
+	impact: z.enum(['Low', 'Medium', 'High']).optional(),
+	externalXRef: z.string().max(100).optional(),
+	poNumber: z.string().max(50).optional(),
+	knowledgeBaseCategoryId: z.number().optional(),
+	knowledgeBaseSubCategoryId: z.number().optional(),
+	allowAllClientsPortalView: z.boolean().optional(),
+	customerUpdatedFlag: z.boolean().optional(),
+	automaticEmailContactFlag: z.boolean().optional(),
+	automaticEmailResourceFlag: z.boolean().optional(),
+	automaticEmailCcFlag: z.boolean().optional(),
+	automaticEmailCc: z.string().max(100).optional(),
+	initialDescription: z.string().optional(),
+	initialInternalAnalysis: z.string().optional(),
+	initialResolution: z.string().optional(),
+	initialDescriptionFrom: z.string().optional(),
+	contactEmailLookup: z.string().optional(),
+	processNotifications: z.boolean().optional(),
+	skipCallback: z.boolean().optional(),
+	closedDate: z.string().optional(),
+	closedBy: z.string().optional(),
+	closedFlag: z.boolean().optional(),
+	actualHours: z.number().optional(),
+	approved: z.boolean().optional(),
+	estimatedExpenseCost: z.number().optional(),
+	estimatedExpenseRevenue: z.number().optional(),
+	estimatedProductCost: z.number().optional(),
+	estimatedProductRevenue: z.number().optional(),
+	estimatedTimeCost: z.number().optional(),
+	estimatedTimeRevenue: z.number().optional(),
+	billingMethod: z.enum(['ActualRates', 'FixedFee', 'NotToExceed', 'OverrideRate']).optional(),
+	billingAmount: z.number().optional(),
+	hourlyRate: z.number().optional(),
+	subBillingMethod: z.enum(['ActualRates', 'FixedFee', 'NotToExceed', 'OverrideRate']).optional(),
+	subBillingAmount: z.number().optional(),
+	subDateAccepted: z.string().optional(),
+	dateResolved: z.string().optional(),
+	dateResplan: z.string().optional(),
+	dateResponded: z.string().optional(),
+	resolveMinutes: z.number().optional(),
+	resPlanMinutes: z.number().optional(),
+	respondMinutes: z.number().optional(),
+	isInSla: z.boolean().optional(),
+	knowledgeBaseLinkId: z.number().optional(),
+	resources: z.string().optional(),
+	parentTicketId: z.number().optional(),
+	hasChildTicket: z.boolean().optional(),
+	hasMergedChildTicketFlag: z.boolean().optional(),
+	knowledgeBaseLinkType: z.string().optional(),
+	billTime: z.enum(['Billable', 'DoNotBill', 'NoCharge', 'NoDefault']).optional(),
+	billExpenses: z.enum(['Billable', 'DoNotBill', 'NoCharge', 'NoDefault']).optional(),
+	billProducts: z.enum(['Billable', 'DoNotBill', 'NoCharge', 'NoDefault']).optional(),
+	predecessorType: z.enum(['Ticket', 'Phase']).optional(),
+	predecessorId: z.number().optional(),
+	predecessorClosedFlag: z.boolean().optional(),
+	lagDays: z.number().optional(),
+	lagNonworkingDaysFlag: z.boolean().optional(),
+	estimatedStartDate: z.string().optional(),
+	duration: z.number().optional(),
+	location: referenceTypeSchema.optional(),
+	department: referenceTypeSchema.optional(),
+	mobileGuid: z.string().optional(),
+	sla: referenceTypeSchema.optional(),
+	slaStatus: z.string().optional(),
+	requestForChangeFlag: z.boolean().optional(),
+	currency: referenceTypeSchema.optional(),
+	mergedParentTicket: referenceTypeSchema.optional(),
+	integratorTags: z.array(z.string()),
+	escalationStartDateUTC: z.string().optional(),
+	escalationLevel: z.number().optional(),
+	minutesBeforeWaiting: z.number().optional(),
+	respondedSkippedMinutes: z.number().optional(),
+	resplanSkippedMinutes: z.number().optional(),
+	respondedHours: z.number().optional(),
+	respondedBy: z.string().optional(),
+	resplanHours: z.number().optional(),
+	resplanBy: z.string().optional(),
+	resolutionHours: z.number().optional(),
+	resolvedBy: z.string().optional(),
+	minutesWaiting: z.number().optional(),
+	customFields: z.array(customFieldSchema).optional(),
+});
+
+export type Reference = z.infer<typeof referenceTypeSchema>;
+
+export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
+
 export type ProjectTemplate = {
 	id: number;
 	name: string;
@@ -190,121 +329,121 @@ export interface Priority {
 	defaultFlag: boolean;
 }
 
-export interface ServiceTicket {
-	id: number;
-	summary: string;
-	recordType?: string;
-	board?: ReferenceType;
-	status?: ReferenceType;
-	workRole?: ReferenceType;
-	workType?: ReferenceType;
-	company?: ReferenceType;
-	site?: ReferenceType;
-	siteName?: string;
-	addressLine1?: string;
-	addressLine2?: string;
-	city?: string;
-	stateIdentifier?: string;
-	zip?: string;
-	country?: ReferenceType;
-	contact?: ReferenceType;
-	contactName?: string;
-	contactPhoneNumber?: string;
-	contactPhoneExtension?: string;
-	contactEmailAddress?: string;
-	type?: ReferenceType;
-	subType?: ReferenceType;
-	item?: ReferenceType;
-	team?: ReferenceType;
-	owner?: ReferenceType;
-	priority?: ReferenceType;
-	serviceLocation?: ReferenceType;
-	source?: ReferenceType;
-	requiredDate?: string;
-	budgetHours?: number;
-	opportunity?: ReferenceType;
-	agreement?: ReferenceType;
-	severity?: string;
-	impact?: string;
-	externalXRef?: string;
-	poNumber?: string;
-	knowledgeBaseCategoryId?: number;
-	knowledgeBaseSubCategoryId?: number;
-	allowAllClientsPortalView?: boolean;
-	customerUpdatedFlag?: boolean;
-	automaticEmailContactFlag?: boolean;
-	automaticEmailResourceFlag?: boolean;
-	automaticEmailCcFlag?: boolean;
-	automaticEmailCc?: string;
-	initialDescription?: string;
-	initialInternalAnalysis?: string;
-	initialResolution?: string;
-	initialDescriptionFrom?: string;
-	contactEmailLookup?: string;
-	processNotifications?: boolean;
-	skipCallback?: boolean;
-	closedDate?: string;
-	closedBy?: string;
-	closedFlag?: boolean;
-	actualHours?: number;
-	approved?: boolean;
-	estimatedExpenseCost?: number;
-	estimatedExpenseRevenue?: number;
-	estimatedProductCost?: number;
-	estimatedProductRevenue?: number;
-	estimatedTimeCost?: number;
-	estimatedTimeRevenue?: number;
-	billingMethod?: string;
-	billingAmount?: number;
-	hourlyRate?: number;
-	subBillingMethod?: string;
-	subBillingAmount?: number;
-	subDateAccepted?: string;
-	dateResolved?: string;
-	dateResplan?: string;
-	dateResponded?: string;
-	resolveMinutes?: number;
-	resPlanMinutes?: number;
-	respondMinutes?: number;
-	isInSla?: boolean;
-	knowledgeBaseLinkId?: number;
-	resources?: string;
-	parentTicketId?: number;
-	hasChildTicket?: boolean;
-	hasMergedChildTicketFlag?: boolean;
-	knowledgeBaseLinkType?: string;
-	billTime?: string;
-	billExpenses?: string;
-	billProducts?: string;
-	predecessorType?: string;
-	predecessorId?: number;
-	predecessorClosedFlag?: boolean;
-	lagDays?: number;
-	lagNonworkingDaysFlag?: boolean;
-	estimatedStartDate?: string;
-	duration?: number;
-	location?: Location;
-	department?: ReferenceType;
-	mobileGuid?: string;
-	sla?: ReferenceType;
-	slaStatus?: string;
-	requestForChangeFlag?: boolean;
-	currency?: Currency;
-	mergedParentTicket?: ReferenceType;
-	integratorTags?: string[];
-	escalationStartDateUTC?: string;
-	escalationLevel?: number;
-	minutesBeforeWaiting?: number;
-	respondedSkippedMinutes?: number;
-	resplanSkippedMinutes?: number;
-	respondedHours?: number;
-	respondedBy?: string;
-	resplanHours?: number;
-	resplanBy?: string;
-	resolutionHours?: number;
-	resolvedBy?: string;
-	minutesWaiting?: number;
-}
+// export interface ServiceTicket {
+// 	id: number;
+// 	summary: string;
+// 	recordType?: string;
+// 	board?: ReferenceType;
+// 	status?: ReferenceType;
+// 	workRole?: ReferenceType;
+// 	workType?: ReferenceType;
+// 	company?: ReferenceType;
+// 	site?: ReferenceType;
+// 	siteName?: string;
+// 	addressLine1?: string;
+// 	addressLine2?: string;
+// 	city?: string;
+// 	stateIdentifier?: string;
+// 	zip?: string;
+// 	country?: ReferenceType;
+// 	contact?: ReferenceType;
+// 	contactName?: string;
+// 	contactPhoneNumber?: string;
+// 	contactPhoneExtension?: string;
+// 	contactEmailAddress?: string;
+// 	type?: ReferenceType;
+// 	subType?: ReferenceType;
+// 	item?: ReferenceType;
+// 	team?: ReferenceType;
+// 	owner?: ReferenceType;
+// 	priority?: ReferenceType;
+// 	serviceLocation?: ReferenceType;
+// 	source?: ReferenceType;
+// 	requiredDate?: string;
+// 	budgetHours?: number;
+// 	opportunity?: ReferenceType;
+// 	agreement?: ReferenceType;
+// 	severity?: string;
+// 	impact?: string;
+// 	externalXRef?: string;
+// 	poNumber?: string;
+// 	knowledgeBaseCategoryId?: number;
+// 	knowledgeBaseSubCategoryId?: number;
+// 	allowAllClientsPortalView?: boolean;
+// 	customerUpdatedFlag?: boolean;
+// 	automaticEmailContactFlag?: boolean;
+// 	automaticEmailResourceFlag?: boolean;
+// 	automaticEmailCcFlag?: boolean;
+// 	automaticEmailCc?: string;
+// 	initialDescription?: string;
+// 	initialInternalAnalysis?: string;
+// 	initialResolution?: string;
+// 	initialDescriptionFrom?: string;
+// 	contactEmailLookup?: string;
+// 	processNotifications?: boolean;
+// 	skipCallback?: boolean;
+// 	closedDate?: string;
+// 	closedBy?: string;
+// 	closedFlag?: boolean;
+// 	actualHours?: number;
+// 	approved?: boolean;
+// 	estimatedExpenseCost?: number;
+// 	estimatedExpenseRevenue?: number;
+// 	estimatedProductCost?: number;
+// 	estimatedProductRevenue?: number;
+// 	estimatedTimeCost?: number;
+// 	estimatedTimeRevenue?: number;
+// 	billingMethod?: string;
+// 	billingAmount?: number;
+// 	hourlyRate?: number;
+// 	subBillingMethod?: string;
+// 	subBillingAmount?: number;
+// 	subDateAccepted?: string;
+// 	dateResolved?: string;
+// 	dateResplan?: string;
+// 	dateResponded?: string;
+// 	resolveMinutes?: number;
+// 	resPlanMinutes?: number;
+// 	respondMinutes?: number;
+// 	isInSla?: boolean;
+// 	knowledgeBaseLinkId?: number;
+// 	resources?: string;
+// 	parentTicketId?: number;
+// 	hasChildTicket?: boolean;
+// 	hasMergedChildTicketFlag?: boolean;
+// 	knowledgeBaseLinkType?: string;
+// 	billTime?: string;
+// 	billExpenses?: string;
+// 	billProducts?: string;
+// 	predecessorType?: string;
+// 	predecessorId?: number;
+// 	predecessorClosedFlag?: boolean;
+// 	lagDays?: number;
+// 	lagNonworkingDaysFlag?: boolean;
+// 	estimatedStartDate?: string;
+// 	duration?: number;
+// 	location?: Location;
+// 	department?: ReferenceType;
+// 	mobileGuid?: string;
+// 	sla?: ReferenceType;
+// 	slaStatus?: string;
+// 	requestForChangeFlag?: boolean;
+// 	currency?: Currency;
+// 	mergedParentTicket?: ReferenceType;
+// 	integratorTags?: string[];
+// 	escalationStartDateUTC?: string;
+// 	escalationLevel?: number;
+// 	minutesBeforeWaiting?: number;
+// 	respondedSkippedMinutes?: number;
+// 	resplanSkippedMinutes?: number;
+// 	respondedHours?: number;
+// 	respondedBy?: string;
+// 	resplanHours?: number;
+// 	resplanBy?: string;
+// 	resolutionHours?: number;
+// 	resolvedBy?: string;
+// 	minutesWaiting?: number;
+// }
 
 export interface Opportunity {
 	id: number;

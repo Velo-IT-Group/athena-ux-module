@@ -9,7 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 
 export default async function ActivityFeed({ id }: { id: number }) {
-	const [entries, notes] = await Promise.all([getAuditTrail(id), getTicketNotes(id)]);
+	const [entries, notes] = await Promise.all([
+		getAuditTrail('Ticket', id, { orderBy: { key: 'enteredDate', order: 'desc' } }),
+		getTicketNotes(id),
+	]);
 
 	console.log(notes);
 
@@ -30,7 +33,7 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								/>
 
 								<div className='space-y-3'>
-									{entries.reverse().map((entry) => (
+									{entries.map((entry) => (
 										<ActivityItem
 											key={entry.text}
 											entry={entry}

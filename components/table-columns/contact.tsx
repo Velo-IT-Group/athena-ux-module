@@ -3,19 +3,15 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Checkbox } from '@/components/ui/checkbox';
-import type { Company, ReferenceType } from '@/types/manage';
+import type { CommunicationItem, Company, Contact, ReferenceType } from '@/types/manage';
 import { DataTableColumnHeader } from '../ui/data-table/column-header';
 import { DataTableRowActions } from '../ui/data-table/row-actions';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
-import { Tooltip, TooltipTrigger } from '../ui/tooltip';
-import CompanyTooltipDetail from '@/app/(user)/companies/company-tooltip-detail';
 import parsePhoneNumber from 'libphonenumber-js';
 
-// 'id', 'identifier', 'name', 'phoneNumber', 'territory'
-
-export const columns: ColumnDef<Company>[] = [
+export const columns: ColumnDef<Contact>[] = [
 	{
 		id: 'select',
 		header: ({ table }) => (
@@ -38,45 +34,30 @@ export const columns: ColumnDef<Company>[] = [
 		enableHiding: false,
 	},
 	{
-		accessorKey: 'identifier',
+		accessorKey: 'firstName',
 		header: ({ column }) => (
 			<DataTableColumnHeader
 				column={column}
-				title='Company'
+				title='First Name'
 			/>
 		),
 		cell: ({ row }) => (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Link
-						href={`/companies/${row.original.id}`}
-						className='font-medium w-[80px]'
-					>
-						{row.getValue('identifier')}
-					</Link>
-				</TooltipTrigger>
-
-				<CompanyTooltipDetail
-					name={row.original.name}
-					phoneNumber={row.original.phoneNumber}
-				/>
-			</Tooltip>
-			// <Link
-			// 	href={`/tickets/${row.getValue('identifier')}`}
-			// 	className={cn(buttonVariants({ variant: 'link' }), 'w-[80px]')}
-			// >
-			// 	{row.getValue('identifier')}
-			// </Link>
+			<Link
+				href={`/companies/${row.original.id}`}
+				className='font-medium w-[80px]'
+			>
+				{row.getValue('firstName')}
+			</Link>
 		),
 		enableSorting: false,
 		enableHiding: false,
 	},
 	{
-		accessorKey: 'name',
+		accessorKey: 'lastName',
 		header: ({ column }) => (
 			<DataTableColumnHeader
 				column={column}
-				title='Name'
+				title='Last Name'
 			/>
 		),
 		cell: ({ row }) => {
@@ -86,13 +67,13 @@ export const columns: ColumnDef<Company>[] = [
 				<div className='flex items-center space-x-2'>
 					{/* {label && <Badge variant='outline'>{label.label}</Badge>} */}
 					{/* <Circle className={cn('stroke-none fill-primary', row?.original?.priority?.id === 7 && 'fill-green-500')} /> */}
-					<span className='max-w-[500px] truncate font-medium'>{row.getValue('name')}</span>
+					<span className='max-w-[500px] truncate font-medium'>{row.getValue('lastName')}</span>
 				</div>
 			);
 		},
 	},
 	{
-		accessorKey: 'phoneNumber',
+		accessorKey: 'defaultPhoneNbr',
 		header: ({ column }) => (
 			<DataTableColumnHeader
 				column={column}
@@ -100,23 +81,38 @@ export const columns: ColumnDef<Company>[] = [
 			/>
 		),
 		cell: ({ row }) => {
-			const number = parsePhoneNumber(row.getValue('phoneNumber'), 'US');
+			const number = parsePhoneNumber(row.getValue('defaultPhoneNbr'), 'US');
 
 			return <span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{number?.format('NATIONAL')}</span>;
 		},
 	},
 	{
-		accessorKey: 'territory',
+		accessorKey: 'communicationItems',
 		header: ({ column }) => (
 			<DataTableColumnHeader
 				column={column}
-				title='Territory'
+				title='Email'
 			/>
 		),
 		cell: ({ row }) => {
-			const territory = row.getValue('territory') as ReferenceType;
+			const communicationItems = row.getValue('communicationItems') as CommunicationItem[];
+			const defaultEmail = communicationItems?.find((item) => item.defaultFlag && item.type.name === 'Email');
 
-			return <span>{territory.name}</span>;
+			return <span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{defaultEmail?.value}</span>;
+		},
+	},
+	{
+		accessorKey: 'company',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Company'
+			/>
+		),
+		cell: ({ row }) => {
+			const company = row.getValue('company') as ReferenceType;
+
+			return <span>{company.name}</span>;
 		},
 	},
 	{

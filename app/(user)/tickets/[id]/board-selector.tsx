@@ -2,15 +2,18 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getBoards } from '@/lib/manage/read';
+import { updateTicket } from '@/lib/manage/update';
 import { ReferenceType } from '@/types/manage';
 import { Box } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type Props = {
+	ticketId: number;
 	board?: ReferenceType;
 };
 
-const BoardSelector = ({ board }: Props) => {
+const BoardSelector = ({ ticketId, board }: Props) => {
 	const [boards, setBoards] = useState<ReferenceType[]>([]);
 	const [selectedBoard, setSelectedBoard] = useState<ReferenceType>();
 
@@ -30,9 +33,15 @@ const BoardSelector = ({ board }: Props) => {
 			align='start'
 			placeholder='Select a board...'
 			value={`${selectedBoard?.id}-${selectedBoard?.name}`}
-			setValue={(e) => {
+			setValue={async (e) => {
 				const id = e.toString().split('-')[0];
 				setSelectedBoard(boards.find((b) => b.id === Number(id)));
+				if (!board) return;
+				try {
+					await updateTicket(ticketId, [{ op: 'replace', path: 'board/id', value: Number(id) }]);
+				} catch (error) {
+					toast.error(error as string);
+				}
 			}}
 		>
 			<Button

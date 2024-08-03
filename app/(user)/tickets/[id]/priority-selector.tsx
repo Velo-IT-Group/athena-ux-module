@@ -2,15 +2,18 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getPriorities } from '@/lib/manage/read';
+import { updateTicket } from '@/lib/manage/update';
 import { Priority, ReferenceType } from '@/types/manage';
 import { Circle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type Props = {
+	ticketId: number;
 	priority?: ReferenceType;
 };
 
-const PrioritySelector = ({ priority }: Props) => {
+const PrioritySelector = ({ ticketId, priority }: Props) => {
 	const [priorities, setPriorities] = useState<Priority[] | undefined>();
 	const [selectedPriority, setSelectedPriority] = useState<Priority | undefined>(
 		priority ? { ...(priority as Priority), color: 'gray', defaultFlag: false, sortOrder: 1 } : undefined
@@ -32,10 +35,16 @@ const PrioritySelector = ({ priority }: Props) => {
 				}) ?? []
 			}
 			value={`${selectedPriority?.id}-${selectedPriority?.name}`}
-			setValue={(e) => {
+			setValue={async (e) => {
 				let id = Number(e.toString().split('-')[0]);
 
 				setSelectedPriority(priorities?.find((p) => p.id === id));
+				if (!priority) return;
+				try {
+					await updateTicket(ticketId, [{ op: 'replace', path: 'priority/id', value: Number(id) }]);
+				} catch (error) {
+					toast.error(error as string);
+				}
 			}}
 			placeholder='Filter statuses...'
 			side='left'

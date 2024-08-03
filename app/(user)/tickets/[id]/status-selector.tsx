@@ -2,16 +2,19 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getStatuses } from '@/lib/manage/read';
+import { updateTicket } from '@/lib/manage/update';
 import { ReferenceType } from '@/types/manage';
 import { CircleDashed } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type Props = {
+	ticketId: number;
 	board?: ReferenceType;
 	status?: ReferenceType;
 };
 
-const StatusSelector = ({ board, status }: Props) => {
+const StatusSelector = ({ ticketId, board, status }: Props) => {
 	const [statuses, setStatuses] = useState<ReferenceType[] | undefined>();
 	const [selectedStatus, setSelectedStatus] = useState<ReferenceType | undefined>(status);
 
@@ -28,10 +31,16 @@ const StatusSelector = ({ board, status }: Props) => {
 				}) ?? []
 			}
 			value={`${selectedStatus?.id}-${selectedStatus?.name}`}
-			setValue={(e) => {
+			setValue={async (e) => {
 				let id = Number(e.toString().split('-')[0]);
 				let name = e.toString().split('-')[1];
 				setSelectedStatus({ id, name });
+				if (!board) return;
+				try {
+					await updateTicket(ticketId, [{ op: 'replace', path: 'status/id', value: Number(id) }]);
+				} catch (error) {
+					toast.error(error as string);
+				}
 			}}
 			placeholder='Filter statuses...'
 			side='left'

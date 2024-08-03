@@ -1,16 +1,17 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Button, buttonVariants } from '@/components/ui/button';
+import React, { useEffect } from 'react';
+import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useWorker } from '@/providers/worker-provider';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import IncomingTask from './incoming-call';
-import type { Reservation, Task } from 'twilio-taskrouter';
+import type { Reservation } from 'twilio-taskrouter';
 import TaskWrapup from './task/wrapup';
 import { toast } from 'sonner';
-import { useRecoilState } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { callStateAtom, deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 import { reservationsListState } from '@/atoms/twilioStateAtom';
+import { useDevice } from '@/providers/device-provider';
 
 type Props = {
 	className?: String;
@@ -18,8 +19,86 @@ type Props = {
 
 const TaskList = ({ className }: Props) => {
 	const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
+	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
+	const { device } = useDevice();
 	const [reservations, setReservations] = useRecoilState(reservationsListState);
 	const { worker } = useWorker();
+
+	const onReservationCreated = async (r: Reservation) => {
+		if (!deviceRegistration) {
+			try {
+				await r.reject();
+			} catch (error) {
+				console.error(error);
+			}
+			return;
+		}
+
+		try {
+			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
+			await r.conference({ beep: false });
+
+			// if (r.task.attributes.direction === 'outboundDial') {
+			// 	const res = await r.conference({ beep: false });
+			// 	console.log(res.task);
+			// 	setActiveCall({ ...activeCall, task: res.task });
+			// }
+
+			r.on('accepted', async (reservation) => {
+				setActiveCall({ ...activeCall, task: reservation.task });
+				setReservations((prev) => [...prev.filter((res) => res.sid !== r.sid), r]);
+
+				console.log(`Reservation ${reservation.sid} was accepted.`);
+			});
+
+			r.on('rejected', async (reservation) => {
+				try {
+					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
+				} catch (error) {
+					console.error('No call pending', error);
+				}
+			});
+
+			r.on('canceled', async (reservation) => {
+				try {
+					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
+					toast.dismiss(reservation.task.attributes.call_sid);
+				} catch (error) {
+					console.error('No call pending', error);
+				}
+			});
+
+			r.on('wrapup', async (reservation) => {
+				setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
+
+				toast.custom(
+					() => (
+						<TaskWrapup
+							dateUpdated={reservation.task.dateUpdated}
+							taskSid={reservation.task.sid}
+						/>
+					),
+					{ id: reservation.task.attributes.call_sid }
+				);
+			});
+
+			r.on('completed', async (reservation) => {
+				setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
+				toast.dismiss(reservation.task.attributes.call_sid);
+			});
+
+			r.on('timeout', async (reservation) => {
+				try {
+					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
+					toast.dismiss(reservation.task.attributes.call_sid);
+				} catch (error) {
+					console.error('No call pending', error);
+				}
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	useEffect(() => {
 		if (!worker) return;
@@ -28,74 +107,29 @@ const TaskList = ({ className }: Props) => {
 			console.error('failed res', r);
 		});
 
-		worker.on('reservationCreated', async (r: Reservation) => {
-			setReservations((prev) => [...prev, r]);
+		worker.on('reservationCreated', onReservationCreated);
 
-			toast.info(`Reservation ${r.sid} has been created for ${worker?.sid}`);
+		if (!device) return;
 
-			try {
-				console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
+		// device.on('incoming', async (call: Call) => {
+		// 	console.log(`Incoming call from ${call.parameters.From}`);
 
-				if (r.task.attributes.direction === 'outboundDial') {
-					const res = await r.conference({ beep: false });
-					setActiveCall({ ...activeCall, task: res.task });
-				}
+		// 	call.on('accept', async (c) => {
+		// 		setActiveCall((prev) => {
+		// 			return { ...prev, call };
+		// 		});
 
-				r.on('accepted', async (reservation) => {
-					setActiveCall({ ...activeCall, task: reservation.task });
-					console.log(`Reservation ${reservation.sid} was accepted.`);
-				});
+		// toast.custom(() => <ActiveCall />, {
+		// 	duration: Infinity,
+		// 	dismissible: false,
+		// 	id: call.parameters.CallSid,
+		// });
+		// 	});
+		// });
 
-				r.on('rejected', async (reservation) => {
-					try {
-						setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-					} catch (error) {
-						console.error('No call pending', error);
-					}
-				});
-
-				r.on('canceled', async (reservation) => {
-					try {
-						setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-						toast.dismiss(reservation.task.attributes.call_sid);
-					} catch (error) {
-						console.error('No call pending', error);
-					}
-				});
-
-				r.on('wrapup', async (reservation) => {
-					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-
-					toast.custom(
-						() => (
-							<TaskWrapup
-								dateUpdated={reservation.task.dateUpdated}
-								taskSid={reservation.task.sid}
-							/>
-						),
-						{ id: reservation.task.attributes.call_sid }
-					);
-				});
-
-				r.on('completed', async (reservation) => {
-					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-					toast.dismiss(reservation.task.attributes.call_sid);
-				});
-
-				r.on('timeout', async (reservation) => {
-					try {
-						setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-						toast.dismiss(reservation.task.attributes.call_sid);
-					} catch (error) {
-						console.error('No call pending', error);
-					}
-				});
-			} catch (error) {}
-		});
-
-		return () => {
-			worker?.removeAllListeners();
-		};
+		// return () => {
+		// 	worker?.removeListener('reservationCreated', onReservationCreated);
+		// };
 	}, [worker]);
 
 	return (

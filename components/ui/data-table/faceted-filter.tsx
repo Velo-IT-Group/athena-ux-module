@@ -41,7 +41,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 				<Button
 					variant='outline'
 					size='sm'
-					className='h-8 border-dashed'
+					className='h-8 border-dashed capitalize'
 				>
 					<CirclePlus className='mr-2 h-4 w-4' />
 					{title}

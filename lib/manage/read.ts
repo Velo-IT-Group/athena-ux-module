@@ -9,6 +9,7 @@ import type {
 	Contact,
 	Document,
 	Holiday,
+	Location,
 	Note,
 	Priority,
 	RecordType,
@@ -168,6 +169,7 @@ export const getSystemMembers = async (conditions?: Conditions<SystemMember>): P
 };
 
 export const getStatuses = async (id: number, conditions?: Conditions<BoardStatus>): Promise<BoardStatus[]> => {
+	console.log(id);
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/statuses/${generateParams(conditions)}`,
 		{
@@ -273,5 +275,12 @@ export const getHoliday = async (
 
 	if (!response.ok) throw Error('Error fetching holiday...');
 
+	return await response.json();
+};
+
+export const getLocations = async (conditions?: Conditions<Location>): Promise<Location[]> => {
+	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/locations${generateParams(conditions)}`, {
+		headers: baseHeaders,
+	});
 	return await response.json();
 };

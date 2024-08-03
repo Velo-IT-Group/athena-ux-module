@@ -8,24 +8,20 @@ import { cn } from '@/lib/utils';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { Reservation } from 'twilio-taskrouter';
 import { toast } from 'sonner';
+import { Call } from '@twilio/voice-sdk';
 
 type Props = {
 	toastId: number | string;
-	r: Reservation;
+	r: Call;
 };
 
 const IncomingCallTest = ({ toastId, r }: Props) => {
-	const { task } = r;
-	const { attributes } = task;
 	return (
-		<Card
-			key={r.sid}
-			className={cn('w-[356px] shadow-sm')}
-		>
+		<Card className={cn('w-[356px] shadow-sm')}>
 			<CardHeader className='flex-row items-center justify-between p-3 gap-12 border-b space-y-0'>
 				<CardTitle className='flex items-center'>
 					<Rocket className='h-3.5 w-3.5 inline-block mr-1.5 text-yellow-400' />
-					<span className='text-sm font-normal'>{task.queueName}</span>
+					<span className='text-sm font-normal'>Testing</span>
 				</CardTitle>
 
 				<CardDescription className='flex items-center'>
@@ -47,8 +43,8 @@ const IncomingCallTest = ({ toastId, r }: Props) => {
 					<AvatarFallback>AC</AvatarFallback>
 				</Avatar>
 				<div className='text-center'>
-					<p className='font-medium text-sm'>{attributes.name}</p>
-					<p className='text-gray-400 text-xs'>is calling {task.queueName}</p>
+					<p className='font-medium text-sm'>Nick</p>
+					<p className='text-gray-400 text-xs'>is calling Quueue</p>
 				</div>
 			</CardContent>
 
@@ -57,7 +53,7 @@ const IncomingCallTest = ({ toastId, r }: Props) => {
 					variant='destructive'
 					className='text-sm'
 					onClick={async () => {
-						await r.reject();
+						// await r.reject();
 					}}
 				>
 					Decline
@@ -65,14 +61,12 @@ const IncomingCallTest = ({ toastId, r }: Props) => {
 
 				<Button
 					className='bg-green-600 hover:bg-green-600/90 text-sm'
-					onClick={async () => {
-						// await r.accept();
-						const reservation = await r.conference({
-							from: attributes.from,
-						});
-
-						const conference = await getConferenceByName(reservation.task.sid);
-
+					onClick={() => {
+						r.accept();
+						// const reservation = await r.conference({
+						// 	from: attributes.from,
+						// });
+						// const conference = await getConferenceByName(reservation.task.sid);
 						// setActiveCall(activeCall ? { ...activeCall, conference } : { conference });
 					}}
 				>

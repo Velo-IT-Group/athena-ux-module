@@ -15,20 +15,27 @@ import {
 	getSortedRowModel,
 	useReactTable,
 	TableMeta,
+	RowData,
 } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { DataTablePagination } from './pagination';
-import { DataTableToolbar } from './toolbar';
+import { DataTableToolbar, FacetedFilter } from './toolbar';
 
+declare module '@tanstack/table-core' {
+	interface TableMeta<TData extends RowData> {
+		filterKey: keyof TData;
+	}
+}
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	meta?: TableMeta<TData>;
+	facetedFilters?: FacetedFilter<TData>[];
 }
 
-export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, meta, facetedFilters }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -59,7 +66,10 @@ export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps
 
 	return (
 		<div className='space-y-4'>
-			<DataTableToolbar table={table} />
+			<DataTableToolbar
+				table={table}
+				facetedFilters={facetedFilters}
+			/>
 
 			<div className='rounded-md border'>
 				<Table>
@@ -79,6 +89,7 @@ export function DataTable<TData, TValue>({ columns, data, meta }: DataTableProps
 							</TableRow>
 						))}
 					</TableHeader>
+
 					<TableBody>
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (

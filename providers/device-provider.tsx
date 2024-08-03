@@ -6,7 +6,7 @@ import { ActiveCall } from '@/components/active-call';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { toast } from 'sonner';
 import { useSetRecoilState } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
+import { callStateAtom, deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -36,6 +36,7 @@ export type CustomCall = {
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	const setActiveCall = useSetRecoilState(callStateAtom);
+	const setDeviceRegistration = useSetRecoilState(deviceEligibleAtom);
 
 	const device = new Device(authToken, {
 		disableAudioContextSounds: true,
@@ -54,10 +55,12 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');
+			setDeviceRegistration(true);
 		});
 
 		device.on('error', (error) => {
 			console.error(error);
+			setDeviceRegistration(false);
 		});
 
 		device.on('incoming', async (call: Call) => {
@@ -65,14 +68,30 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.accept();
 
-			call.on('accept', async (c) => {
-				setActiveCall((prev: CustomCall) => ({ ...prev, call: c }));
+			// toast.custom(
+			// 	() => (
+			// 		<IncomingCallTest
+			// 			toastId={call.parameters.CallSid}
+			// 			r={call}
+			// 		/>
+			// 	),
+			// 	{
+			// 		duration: Infinity,
+			// 		dismissible: false,
+			// 		id: call.parameters.CallSid,
+			// 	}
+			// );
 
-				toast.custom(() => <ActiveCall />, {
-					duration: Infinity,
-					dismissible: false,
-					id: call.parameters.CallSid,
+			call.on('accept', async (c) => {
+				setActiveCall((prev) => {
+					return { ...prev, call: c };
 				});
+
+				// toast.custom(() => <ActiveCall />, {
+				// 	duration: Infinity,
+				// 	dismissible: false,
+				// 	id: call.parameters.CallSid,
+				// });
 			});
 		});
 

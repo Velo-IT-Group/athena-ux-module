@@ -12,63 +12,48 @@ import { Suspense, useEffect, useState } from 'react';
 import { getPriorities, getStatuses } from '@/lib/manage/read';
 import { BoardStatus, Priority } from '@/types/manage';
 import { Skeleton } from '../skeleton';
-import AsyncSelector from '@/components/async-selector';
+import AsyncSelector, { Identifiable } from '@/components/async-selector';
 
+export interface FacetedFilter<TData> {
+	accessoryKey: keyof TData;
+	items: Identifiable[];
+}
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
+	facetedFilters?: FacetedFilter<TData>[];
 }
 
-export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
+export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
-	const [statuses, setStatuses] = useState<BoardStatus[]>([]);
-	const [priorities, setPriorities] = useState<Priority[]>([]);
-
-	useEffect(() => {
-		getStatuses(30, { orderBy: { key: 'name' } }).then(setStatuses);
-		getPriorities({ orderBy: { key: 'sortOrder' } }).then(setPriorities);
-	}, []);
 
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
-				<Input
-					placeholder='Filter tickets...'
-					value={(table.getColumn('summary')?.getFilterValue() as string) ?? ''}
-					onChange={(event) => table.getColumn('summary')?.setFilterValue(event.target.value)}
-					className='h-8 w-[150px] lg:w-[250px]'
-				/>
-				{table.getColumn('status') && (
-					<Suspense fallback={<Skeleton className='h-9 w-48' />}>
-						<AsyncSelector
-							Icon={PlusCircle}
-							fetchFunction={getStatuses(30, { orderBy: { key: 'name' } })}
-						>
-							{(data) => (
-								<ul>
-									{data.map((user) => (
-										<li key={user.id}>{user.name}</li>
-									))}
-								</ul>
-							)}
-						</AsyncSelector>
-						{/* <DataTableFacetedFilter
-							column={table.getColumn('status')}
-							title='Status'
-							options={statuses.map(({ name, id }) => {
-								return { label: name, value: String(id) };
-							})}
-						/> */}
-					</Suspense>
-				)}
-				{table.getColumn('priority') && (
-					<DataTableFacetedFilter
-						column={table.getColumn('priority')}
-						title='Priority'
-						options={priorities.map(({ name, id }) => {
-							return { label: name, value: String(id) };
-						})}
+				{table.options?.meta?.filterKey && (
+					<Input
+						placeholder='Filter...'
+						value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
+						onChange={(event) =>
+							table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
+						}
+						className='h-8 w-[150px] lg:w-[250px]'
 					/>
 				)}
+
+				{facetedFilters?.map(({ accessoryKey, items }) => (
+					<>
+						{table.getColumn(accessoryKey as string) && (
+							<DataTableFacetedFilter
+								column={table.getColumn(accessoryKey as string)}
+								title={accessoryKey.toString()}
+								options={items.map(({ name, id }) => {
+									return { label: name, value: String(id) };
+								})}
+							/>
+						)}
+					</>
+				))}
+
 				{isFiltered && (
 					<Button
 						variant='ghost'

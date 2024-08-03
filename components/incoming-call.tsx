@@ -1,24 +1,21 @@
-'use client';
+'use server';
 import { Rocket, X } from 'lucide-react';
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ConferenceOptions, Reservation } from 'twilio-taskrouter';
-import { getConferenceByName } from '@/lib/twilio/conference/helpers';
-import { useTwilio } from '@/providers/twilio-provider';
-import { toast } from 'sonner';
-import { useRecoilState } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
+import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { PopoverClose } from '@radix-ui/react-popover';
+import { ReservationInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker/reservation';
+import ReservationAcceptButton from './reservation-accept-button';
 
 type Props = {
-	reservation: Reservation;
+	reservation: ReservationInstance;
+	task: TaskInstance;
 };
 
-const IncomingTask = ({ reservation }: Props) => {
-	const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
-	const task = reservation.task;
-	const { attributes } = task;
+const IncomingTask = async ({ reservation, task }: Props) => {
+	const attributes = JSON.parse(task.attributes);
 
 	return (
 		<Card
@@ -28,7 +25,7 @@ const IncomingTask = ({ reservation }: Props) => {
 			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
 				<CardTitle>
 					<Rocket className='h-3.5 w-3.5 inline-block mr-1.5 text-yellow-400' />
-					<span className='text-sm font-normal'>{task.queueName}</span>
+					<span className='text-sm font-normal'>{task.taskQueueFriendlyName}</span>
 				</CardTitle>
 
 				<CardDescription>
@@ -39,8 +36,12 @@ const IncomingTask = ({ reservation }: Props) => {
 						className='p-0 w-8 h-8'
 						onClick={() => toast.dismiss(attributes.call_sid)}
 					>
-						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
+					
+						
 					</Button> */}
+					<PopoverClose>
+						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
+					</PopoverClose>
 				</CardDescription>
 			</CardHeader>
 
@@ -51,7 +52,7 @@ const IncomingTask = ({ reservation }: Props) => {
 				</Avatar>
 				<div className='text-center'>
 					<p className='font-medium text-sm'>{attributes.name}</p>
-					<p className='text-gray-400 text-xs'>is calling {task.queueName}</p>
+					<p className='text-gray-400 text-xs'>is calling {task.taskQueueFriendlyName}</p>
 				</div>
 			</CardContent>
 
@@ -59,26 +60,20 @@ const IncomingTask = ({ reservation }: Props) => {
 				<Button
 					variant='destructive'
 					className='text-sm'
-					onClick={async () => {
-						await reservation.reject();
-					}}
+					// onClick={async () => {
+					// 	await reservation.reject();
+					// }}
 				>
 					Decline
 				</Button>
 
-				<Button
-					className='bg-green-600 hover:bg-green-600/90 text-sm'
-					onClick={async () => {
-						const res = await reservation.conference();
-						const conference = await getConferenceByName(task.sid);
-
-						console.log(activeCall, res, conference);
-
-						setActiveCall({ ...activeCall, task: res.task, conference });
-					}}
-				>
-					Accept
-				</Button>
+				<ReservationAcceptButton
+					attributes={attributes}
+					to={reservation.workerName}
+					from={attributes.from}
+					reservationSid={reservation.sid}
+					taskSid={task.sid}
+				/>
 			</CardFooter>
 		</Card>
 	);

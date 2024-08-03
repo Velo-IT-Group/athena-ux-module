@@ -43,7 +43,7 @@ export const columns: ColumnDef<Contact>[] = [
 		),
 		cell: ({ row }) => (
 			<Link
-				href={`/companies/${row.original.id}`}
+				href={`/contacts/${row.original.id}`}
 				className='font-medium w-[80px]'
 			>
 				{row.getValue('firstName')}
@@ -64,11 +64,12 @@ export const columns: ColumnDef<Contact>[] = [
 			// const label = labels.find((label) => label.value === row.original.label);
 
 			return (
-				<div className='flex items-center space-x-2'>
-					{/* {label && <Badge variant='outline'>{label.label}</Badge>} */}
-					{/* <Circle className={cn('stroke-none fill-primary', row?.original?.priority?.id === 7 && 'fill-green-500')} /> */}
-					<span className='max-w-[500px] truncate font-medium'>{row.getValue('lastName')}</span>
-				</div>
+				<Link
+					href={`/contacts/${row.original.id}`}
+					className='font-medium w-[80px]'
+				>
+					{row.getValue('lastName')}
+				</Link>
 			);
 		},
 	},
@@ -81,9 +82,11 @@ export const columns: ColumnDef<Contact>[] = [
 			/>
 		),
 		cell: ({ row }) => {
-			const number = parsePhoneNumber(row.getValue('defaultPhoneNbr'), 'US');
+			const number = parsePhoneNumber(row?.getValue('defaultPhoneNbr') ?? '', 'US');
 
-			return <span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{number?.format('NATIONAL')}</span>;
+			return (
+				<span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{number?.format('NATIONAL') ?? ''}</span>
+			);
 		},
 	},
 	{
@@ -112,7 +115,7 @@ export const columns: ColumnDef<Contact>[] = [
 		cell: ({ row }) => {
 			const company = row.getValue('company') as ReferenceType;
 
-			return <span>{company.name}</span>;
+			return <span>{company?.name}</span>;
 		},
 	},
 	{

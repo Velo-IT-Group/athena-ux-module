@@ -1,6 +1,5 @@
-'use client';
 import { buttonVariants } from '@/components/ui/button';
-import { Building2, Home, LineChart, LucideIcon, Notebook, Settings, Tags } from 'lucide-react';
+import { Building2, Home, LineChart, LucideIcon, Notebook, Server, Settings, Tags } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { getWorkers } from '@/lib/twilio/read';
@@ -13,6 +12,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';
 import { useRecoilState } from 'recoil';
 import { collapsedState } from '@/atoms/sidebarStateAtom';
+import ServerTaskList from './server-task-list';
 
 type Props = {};
 
@@ -55,24 +55,24 @@ const links: NavLink[] = [
 	},
 ];
 
-const SideNav = (props: Props) => {
+const SideNav = async (props: Props) => {
 	// const [workers, activities] = await Promise.all([getWorkers(), getActivies()]);
-	const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
+	// const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
 
 	return (
 		<ResizablePanel
 			minSize={10}
-			defaultSize={isCollapsed ? 0 : 15}
+			defaultSize={15}
 			maxSize={25}
-			collapsible={isCollapsed}
-			onResize={() => {
-				setIsCollapsed(false);
-				document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
-			}}
-			onCollapse={() => {
-				setIsCollapsed(true);
-				document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(true)}`;
-			}}
+			// collapsible={isCollapsed}
+			// onResize={() => {
+			// 	setIsCollapsed(false);
+			// 	document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
+			// }}
+			// onCollapse={() => {
+			// 	setIsCollapsed(true);
+			// 	document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(true)}`;
+			// }}
 		>
 			<ScrollArea className='flex flex-col min-h-0 h-full border-r'>
 				<aside className='flex flex-col gap-3 py-1.5 '>
@@ -91,7 +91,7 @@ const SideNav = (props: Props) => {
 						))}
 					</section>
 
-					<TaskList />
+					<ServerTaskList />
 
 					<section className='space-y-1.5 px-1.5'>
 						<h2 className='text-xs text-muted-foreground px-3 font-medium'>Workers</h2>

@@ -12,18 +12,9 @@ export const getConferenceByName = async (friendlyName: string) => {
 
 	const conference = conferences[0];
 
-	console.log(conference);
-
 	return conference;
 };
 
 export const getConferenceParticipants = async (conferenceSid: string) => {
-	try {
-		const participants = await client.conferences(conferenceSid).participants.list();
-
-		return participants;
-	} catch (error) {
-		console.error(error);
-		return [];
-	}
+	return await client.conferences(conferenceSid).participants.list();
 };

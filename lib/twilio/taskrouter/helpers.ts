@@ -1,11 +1,13 @@
 'use server';
-import { revalidatePath } from 'next/cache';
+import { auth } from '@/auth';
+import { revalidatePath, unstable_cache } from 'next/cache';
 import { Twilio, jwt } from 'twilio';
 import {
 	TaskContextUpdateOptions,
 	TaskInstance,
 	TaskListInstanceOptions,
 } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { ReservationContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task/reservation';
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
@@ -24,30 +26,8 @@ export const createTask = async (workflowSid: string, attributes: Object) => {
 	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.create(payload);
 };
 
-export const getTask = async (taskSid?: string, params?: TaskListInstanceOptions) => {
-	let task: TaskInstance | undefined;
-	if (taskSid) {
-		task = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks(taskSid).fetch();
-	} else if (params) {
-		const taskList = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.list(params);
-		if (taskList.length === 0) return;
-		task = taskList[0];
-	}
-
-	// @ts-ignore
-	delete task['_version'];
-	// @ts-ignore
-	delete task['_proxy'];
-	// @ts-ignore
-	delete task['_solution'];
-	// @ts-ignore
-	delete task['_version'];
-	// @ts-ignore
-	delete task['toJSON'];
-	// @ts-ignore
-	delete task['update'];
-
-	return task;
+export const getTask = async (taskSid: string, params?: TaskListInstanceOptions) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks(taskSid).fetch();
 };
 
 export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
@@ -73,10 +53,10 @@ export const getEvents = async () => {
 	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).events.list({ limit: 20 });
 };
 
-export const getOngoingTasks = (name: string) => {
+export const getOngoingTasks = () => {
 	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).tasks.list({
 		assignmentStatus: ['pending', 'assigned', 'reserved'],
-		evaluateTaskAttributes: "name='" + name + "'",
+		// evaluateTaskAttributes: "name='" + name + "'",
 	});
 };
 
@@ -120,4 +100,25 @@ export const createWorkerCapabilityToken = (sid: string) => {
 
 export const getWorkflows = async () => {
 	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows.list();
+};
+
+export const getWorkerReservations = unstable_cache(
+	async () => {
+		const session = await auth();
+		return await client.taskrouter.v1
+			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+			.workers(session?.user.workerSid)
+			.reservations.list({ limit: 20, reservationStatus: ['pending', 'accepted'] });
+	},
+	['reservations'],
+	{ tags: ['reservations'] }
+);
+
+export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
+	const session = await auth();
+	return await client.taskrouter.v1
+		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+		.workers(session?.user.workerSid)
+		.reservations(id)
+		.update(update);
 };

@@ -91,6 +91,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			);
 		},
 		filterFn: (row, id, value) => {
+			console.log(value, id, row);
 			return value.includes(row.getValue(id));
 		},
 	},

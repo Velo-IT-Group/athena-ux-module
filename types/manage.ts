@@ -98,7 +98,7 @@ export const customFieldSchema = z.object({
 });
 
 export const serviceTicketSchema = z.object({
-	id: z.number().optional(),
+	id: z.number(),
 	summary: z.string().max(100),
 	recordType: z.enum(['ProjectIssue', 'ProjectTicket', 'ServiceTicket']).optional().default('ServiceTicket'),
 	board: referenceTypeSchema.optional(),
@@ -428,35 +428,71 @@ export const projectSchema = z.object({
 	companyLocation: referenceTypeSchema.optional(),
 });
 
+export const locationSchema = z.object({
+	id: z.number(),
+	ownerLevelId: z.number(),
+	structureLevel: z.object({ id: z.number(), name: z.string() }),
+	name: z.string(),
+	manager: z.object({
+		id: z.number(),
+		identifier: z.string(),
+		name: z.string(),
+		dailyCapacity: z.number(),
+	}),
+	reportsTo: z.object({ id: z.number(), name: z.string() }),
+	salesRep: z.string(),
+	timeZoneSetup: z.object({ id: z.number(), name: z.string() }),
+	calendar: z.object({ id: z.number(), name: z.string() }),
+	overrideAddressLine1: z.string(),
+	overrideAddressLine2: z.string(),
+	overrideCity: z.string(),
+	overrideState: z.string(),
+	overrideZip: z.string(),
+	overrideCountry: z.object({
+		id: z.number(),
+		identifier: z.string(),
+		name: z.string(),
+	}),
+	overridePhoneNumber: z.string(),
+	overrideFaxNumber: z.string(),
+	owaUrl: z.string(),
+	payrollXref: z.string(),
+	locationFlag: z.boolean(),
+	clientFlag: z.boolean(),
+	workRoleIds: z.array(z.number()),
+	departmentIds: z.array(z.number()),
+});
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type CustomField = z.infer<typeof customFieldSchema>;
 export type CommunicationItem = z.infer<typeof communicationItemSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type Document = z.infer<typeof documentSchema>;
+export type Location = z.infer<typeof locationSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type Reference = z.infer<typeof referenceTypeSchema>;
 export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
 export type SystemMember = z.infer<typeof systemMemberSchema>;
 
 export type TicketNote = {
-	id: number;
-	ticketId: number;
+	id?: number;
+	ticketId?: number;
 	text: string;
-	detailDescriptionFlag: boolean;
-	internalAnalysisFlag: boolean;
-	resolutionFlag: boolean;
-	issueFlag: boolean;
-	member: {
+	detailDescriptionFlag?: boolean;
+	internalAnalysisFlag?: boolean;
+	resolutionFlag?: boolean;
+	issueFlag?: boolean;
+	member?: {
 		id: number;
 		identifier: string;
 		name: string;
 	};
-	dateCreated: string;
-	createdBy: string;
-	internalFlag: boolean;
-	externalFlag: boolean;
-	sentimentScore: number;
+	dateCreated?: string;
+	createdBy?: string;
+	internalFlag?: boolean;
+	externalFlag?: boolean;
+	sentimentScore?: number;
 };
 export interface ReferenceType {
 	id: number;

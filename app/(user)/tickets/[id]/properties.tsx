@@ -25,13 +25,17 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 			<section>
 				<Suspense>
 					<StatusSelector
+						ticketId={ticket.id}
 						board={ticket.board}
 						status={ticket.status}
 					/>
 				</Suspense>
 
 				<Suspense>
-					<PrioritySelector priority={ticket.priority} />
+					<PrioritySelector
+						ticketId={ticket.id}
+						priority={ticket.priority}
+					/>
 				</Suspense>
 
 				<Suspense>
@@ -61,7 +65,10 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Board</h4>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<BoardSelector board={ticket.board} />
+					<BoardSelector
+						ticketId={ticket.id}
+						board={ticket.board}
+					/>
 				</Suspense>
 			</section>
 

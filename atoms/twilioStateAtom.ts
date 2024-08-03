@@ -24,6 +24,11 @@ export const callStateAtom = atom<CustomCall>({
 	},
 });
 
+export const deviceEligibleAtom = atom<boolean>({
+	key: 'DeviceEligibleState',
+	default: false,
+});
+
 export const activityState = atom<Activity | undefined>({
 	key: 'ActivityState',
 	default: undefined,

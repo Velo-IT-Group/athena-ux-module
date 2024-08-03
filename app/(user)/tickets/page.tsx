@@ -1,11 +1,13 @@
 import { columns } from '@/components/table-columns/ticket';
 import { DataTable } from '@/components/ui/data-table';
-import { getTickets } from '@/lib/manage/read';
+import { getBoards, getTickets } from '@/lib/manage/read';
 
 type Props = {};
 
 const Page = async (props: Props) => {
 	const tickets = await getTickets({ conditions: [{ 'board/id': 30 }, { closedFlag: false }], pageSize: 1000 });
+
+	const boards = await getBoards({ orderBy: { key: 'name' }, pageSize: 1000 });
 
 	return (
 		<main className='p-3 grow space-y-3'>
@@ -17,6 +19,7 @@ const Page = async (props: Props) => {
 				<DataTable
 					data={tickets}
 					columns={columns}
+					facetedFilters={[{ accessoryKey: 'board', items: boards }]}
 				/>
 			</section>
 		</main>

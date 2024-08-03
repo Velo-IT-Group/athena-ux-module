@@ -23,6 +23,8 @@ const Page = async (props: Props) => {
 				<DataTable
 					data={companies}
 					columns={columns}
+					meta={{ filterKey: 'name' }}
+					facetedFilters={[{ accessoryKey: 'territory', items: [] }]}
 				/>
 			</section>
 		</main>

@@ -9,7 +9,8 @@ const Page = async (props: Props) => {
 		pageSize: 1000,
 		orderBy: { key: 'firstName' },
 		conditions: [{ inactiveFlag: false }],
-		fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
+		childConditions: [{ 'types/id': 17 }],
+		fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr', 'types'],
 	});
 
 	return (
@@ -22,6 +23,7 @@ const Page = async (props: Props) => {
 				<DataTable
 					data={contacts}
 					columns={columns}
+					meta={{ filterKey: 'firstName' }}
 				/>
 			</section>
 		</main>

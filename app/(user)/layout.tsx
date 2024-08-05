@@ -34,7 +34,10 @@ const Layout = async ({ children }: Props) => {
 			<UserLayout token={token}>
 				<Navbar />
 
-				<ResizablePanelGroup direction='horizontal'>
+				<ResizablePanelGroup
+					direction='horizontal'
+					className='grow'
+				>
 					<SideNav />
 
 					<ResizableHandle />

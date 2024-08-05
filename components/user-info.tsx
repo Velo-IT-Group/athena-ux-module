@@ -7,17 +7,21 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { LogOut } from 'lucide-react';
+import { LogOut, Moon, Sun, SunMoon } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import type { Session } from 'next-auth';
 import { cn } from '@/lib/utils';
 import { useRecoilValue } from 'recoil';
 import { activityState } from '@/atoms/twilioStateAtom';
+import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
 
 type Props = {
 	session: Session | null;
@@ -61,6 +65,10 @@ const UserInfo = ({ session }: Props) => {
 					<ActivityDropdownMenuSub />
 
 					<DeviceDropdownMenuSub />
+
+					<DropdownMenuSeparator />
+
+					<ThemeDropdownSelectorSub />
 
 					<DropdownMenuSeparator />
 

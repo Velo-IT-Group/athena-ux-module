@@ -54,7 +54,6 @@ export const config: NextAuthConfig = {
 					image: image ?? null,
 					workerSid: worker?.sid,
 				};
-				// console.log(newProfile);
 
 				return newProfile;
 			},
@@ -64,23 +63,13 @@ export const config: NextAuthConfig = {
 	// pages: {
 	// 	signIn: '/login',
 	// },
-	// callbacks: {
-	// 	async session({ session, token, user }) {
-	// 		// console.log(session.user, user);
-	// 		const worker = await findWorker(session.user.email);
-	// 		session.user.workerSid = worker.sid;
-	// 		return session;
-	// 		// `session.user.address` is now a valid property, and will be type-checked
-	// 		// in places like `useSession().data.user` or `auth().user`
-	// 		return {
-	// 			...session,
-	// 			user: {
-	// 				...session.user,
-	// 				workerSid: worker.sid,
-	// 			},
-	// 		};
-	// 	},
-	// },
+	callbacks: {
+		async session({ session }) {
+			const worker = await findWorker(session.user.email);
+			session.user.workerSid = worker.sid;
+			return session;
+		},
+	},
 };
 
 export const { signIn, signOut, handlers, auth } = NextAuth(config);

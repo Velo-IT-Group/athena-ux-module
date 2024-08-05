@@ -74,11 +74,36 @@
 	h1 {
 		@apply text-2xl font-bold;
 	}
-	.tiptap p.is-editor-empty:first-child::before {
+
+	.prose {
+		@apply text-muted-foreground min-h-0;
+	}
+
+	.prose {
+		@apply first:mt-0;
+	}
+
+	.mention {
+		@apply box-decoration-clone border-transparent bg-primary text-primary-foreground hover:bg-primary/80 rounded-md px-1.5;
+	}
+	/* .prose {
+		.mention {
+			background-color: hsl(var(--primary));
+			border-radius: 0.4rem;
+			box-decoration-break: clone;
+			color: hsl(var(--primary-foreground));
+			padding: 0.1rem 0.3rem;
+		}
+	} */
+
+	/* .prose p.is-editor-empty:first-child::before {
 		color: #adb5bd;
 		content: attr(data-placeholder);
 		float: left;
 		height: 0;
 		pointer-events: none;
+	} */
+	ol {
+		@apply list-decimal ps-5 mt-4 [&>li]:my-2 [&>li]:ps-2;
 	}
 }

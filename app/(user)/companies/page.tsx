@@ -6,8 +6,8 @@ type Props = {};
 
 const Page = async (props: Props) => {
 	const companies = await getCompanies({
-		conditions: [{ 'status/id': 1 }],
-		childConditions: [{ 'types/id': 1 }],
+		conditions: [{ parameter: { 'status/id': 1 } }],
+		childConditions: [{ parameter: { 'types/id': 1 } }],
 		orderBy: { key: 'name', order: 'asc' },
 		fields: ['id', 'identifier', 'name', 'phoneNumber', 'territory'],
 		pageSize: 1000,

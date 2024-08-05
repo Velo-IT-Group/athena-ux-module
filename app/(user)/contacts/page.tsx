@@ -8,8 +8,8 @@ const Page = async (props: Props) => {
 	const contacts = await getContacts({
 		pageSize: 1000,
 		orderBy: { key: 'firstName' },
-		conditions: [{ inactiveFlag: false }],
-		childConditions: [{ 'types/id': 17 }],
+		conditions: [{ parameter: { inactiveFlag: false } }],
+		childConditions: [{ parameter: { 'types/id': 17 } }],
 		fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr', 'types'],
 	});
 

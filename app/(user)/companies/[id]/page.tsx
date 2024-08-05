@@ -1,4 +1,4 @@
-import { getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
+import { getBoards, getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,8 @@ import parsePhoneNumber from 'libphonenumber-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { groupBy } from 'lodash';
+import Tiptap from '@/components/tip-tap';
+import AsyncSelector from '@/components/async-selector';
 
 type Props = {
 	params: { id: number };
@@ -23,17 +25,25 @@ type Props = {
 const Page = async ({ params }: Props) => {
 	const [company, notes, sites, applications, servers] = await Promise.all([
 		getCompany(Number(params.id)),
-		getCompanyNotes(Number(params.id)),
+		getCompanyNotes(Number(params.id), { conditions: [{ parameter: { 'type/id': 3 }, comparator: '!=' }] }),
 		getCompanySites(Number(params.id)),
 		getConfigurations({
 			fields: ['id', 'name', 'type', 'notes'],
-			conditions: [{ 'company/id': Number(params.id) }, { 'status/id': 2 }, { 'type/id': 191 }],
-			childConditions: [{ 'questions/questionId': '1597' }],
+			conditions: [
+				{ parameter: { 'company/id': Number(params.id) } },
+				{ parameter: { 'status/id': 2 } },
+				{ parameter: { 'type/id': 191 } },
+			],
+			childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
 			orderBy: { key: 'name' },
 		}),
 		getConfigurations({
 			fields: ['id', 'name', 'type', 'notes'],
-			conditions: [{ 'company/id': Number(params.id) }, { 'status/id': 2 }, { 'type/id': 'in (211, 212, 219)' }],
+			conditions: [
+				{ parameter: { 'company/id': Number(params.id) } },
+				{ parameter: { 'status/id': 2 } },
+				{ parameter: { 'type/id': 'in (211, 212, 219)' } },
+			],
 			orderBy: { key: 'name' },
 		}),
 	]);
@@ -44,20 +54,22 @@ const Page = async ({ params }: Props) => {
 				<ResizablePanel>
 					<ScrollArea className='grid min-h-0 px-3'>
 						<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
-							<form action=''>
-								<Textarea
-									name='summary'
-									defaultValue={company.name}
-									className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
-								/>
+							<Textarea
+								name='summary'
+								defaultValue={company.name}
+								className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
+							/>
 
-								<Textarea
-									placeholder='Add a description...'
-									className='border-none shadow-none resize-none'
-									defaultValue='Acadiana Bottling distributes Pepsi and Dr. Pepper products throughout the Acadiana region. They have about 70 full time office and sales workers depending on a laptop or desktop to complete tasks on a daily basis, and about 20 delivery drivers in the field depending on handheld devices, iPhones, and mobile printers to do their work throughout the day.'
-									minRows={2}
-								/>
-							</form>
+							<Textarea
+								placeholder='Add a description...'
+								className='border-none shadow-none resize-none'
+								defaultValue='Acadiana Bottling distributes Pepsi and Dr. Pepper products throughout the Acadiana region. They have about 70 full time office and sales workers depending on a laptop or desktop to complete tasks on a daily basis, and about 20 delivery drivers in the field depending on handheld devices, iPhones, and mobile printers to do their work throughout the day.'
+								minRows={2}
+							/>
+
+							<h2>SOP Exceptions</h2>
+
+							<Tiptap />
 
 							<Separator />
 
@@ -309,6 +321,13 @@ const Page = async ({ params }: Props) => {
 
 								<Suspense fallback={<Skeleton className='w-full h-9' />}>
 									{/* <BoardSelector board={ticket.board} /> */}
+									{/* <AsyncSelector
+										fetchFunction={getBoards()}
+										placeholder=''
+										prompt=''
+										updateFunction={() => {}}
+										defaultValue={ticket.board}
+									/> */}
 								</Suspense>
 							</section>
 

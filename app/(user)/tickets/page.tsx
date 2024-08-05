@@ -5,7 +5,10 @@ import { getBoards, getTickets } from '@/lib/manage/read';
 type Props = {};
 
 const Page = async (props: Props) => {
-	const tickets = await getTickets({ conditions: [{ 'board/id': 30 }, { closedFlag: false }], pageSize: 1000 });
+	const tickets = await getTickets({
+		conditions: [{ parameter: { 'board/id': 30 } }, { parameter: { closedFlag: false } }],
+		pageSize: 1000,
+	});
 
 	const boards = await getBoards({ orderBy: { key: 'name' }, pageSize: 1000 });
 
@@ -20,6 +23,7 @@ const Page = async (props: Props) => {
 					data={tickets}
 					columns={columns}
 					facetedFilters={[{ accessoryKey: 'board', items: boards }]}
+					meta={{ filterKey: 'summary' }}
 				/>
 			</section>
 		</main>

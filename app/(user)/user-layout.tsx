@@ -5,6 +5,7 @@ import RecoilProvider from '@/providers/recoil-provider';
 import { TwilioProvider } from '@/providers/twilio-provider';
 import { DeviceProvider } from '@/providers/device-provider';
 import { WorkerProvider } from '@/providers/worker-provider';
+import { NotificationProvider } from '@/providers/notification-provider';
 
 type Props = {
 	token: string;
@@ -14,13 +15,15 @@ type Props = {
 const UserLayout = ({ token, children }: Props) => {
 	return (
 		<RecoilProvider>
-			<JabraProvider>
-				<TwilioProvider authToken={token}>
-					<DeviceProvider authToken={token}>
-						<WorkerProvider authToken={token}>{children}</WorkerProvider>
-					</DeviceProvider>
-				</TwilioProvider>
-			</JabraProvider>
+			<NotificationProvider>
+				<JabraProvider>
+					<TwilioProvider authToken={token}>
+						<DeviceProvider authToken={token}>
+							<WorkerProvider authToken={token}>{children}</WorkerProvider>
+						</DeviceProvider>
+					</TwilioProvider>
+				</JabraProvider>
+			</NotificationProvider>
 		</RecoilProvider>
 	);
 };

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
+import { ConferenceAttributes } from 'twilio/lib/twiml/VoiceResponse';
 
 export async function POST(request: Request) {
 	const data = await request.formData();
@@ -8,7 +9,15 @@ export async function POST(request: Request) {
 	console.log(data);
 
 	const dial = twiml.dial({ callerId: data.get('Caller') as string });
-	dial.client('nblack_40velomethod_2Ecom');
+	dial.client('nblack@velomethod.com');
+	dial.conference(
+		{
+			beep: false,
+			startConferenceOnEnter: true,
+			endConferenceOnExit: true,
+		},
+		'NoMusicNoBeepRoom'
+	);
 	// console.log(dial);
 	// console.log(data, twiml);
 

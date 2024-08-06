@@ -40,11 +40,22 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 	const device = new Device(authToken, {
 		disableAudioContextSounds: true,
-		sounds: {
-			incoming: undefined,
-		},
 		enableImprovedSignalingErrorPrecision: true,
 	});
+
+	const registerConnectionHandler = (connection: Call) => {
+		console.log('Phone: register connection handler');
+
+		connection.on('warning', (name, data) => {
+			if (name === 'low-mos') {
+			}
+		});
+
+		connection.on('warning-cleared', function (name) {
+			if (name === 'low-mos') {
+			}
+		});
+	};
 
 	useEffect(() => {
 		if (!device) return;

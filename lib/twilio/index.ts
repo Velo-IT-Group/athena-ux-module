@@ -28,7 +28,7 @@ export const createAccessToken = async (
 	});
 
 	const voiceGrant = new VoiceGrant({
-		outgoingApplicationSid: 'AP12b03567b8c9ff30a6a3746e2b45ea3a',
+		outgoingApplicationSid: process.env.TWILIO_APPLICATION_SID,
 		incomingAllow: true, // Optional: add to allow incoming calls
 	});
 

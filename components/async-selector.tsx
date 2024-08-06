@@ -2,7 +2,7 @@
 import { useState, useEffect, useTransition, ReactNode } from 'react';
 import { Combobox } from './ui/combobox';
 import { Button } from './ui/button';
-import { LucideIcon } from 'lucide-react';
+import type { PopoverTriggerProps } from '@radix-ui/react-popover';
 
 export type Identifiable = {
 	id: number;
@@ -16,6 +16,7 @@ type Props<T extends Identifiable> = {
 	defaultValue?: T;
 	prompt: string;
 	placeholder: string;
+	popoverProps?: PopoverTriggerProps;
 };
 
 const AsyncSelector = async <T extends Identifiable>({
@@ -25,6 +26,7 @@ const AsyncSelector = async <T extends Identifiable>({
 	defaultValue,
 	prompt,
 	placeholder,
+	popoverProps,
 }: Props<T>) => {
 	const [pending, startTransition] = useTransition();
 	const [selectedData, setSelectedData] = useState<T | undefined>(defaultValue);
@@ -34,8 +36,6 @@ const AsyncSelector = async <T extends Identifiable>({
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				console.log(await fetchFunction);
-
 				const result = await fetchFunction;
 				console.log(result);
 				setData(result);
@@ -43,8 +43,6 @@ const AsyncSelector = async <T extends Identifiable>({
 				setError((err as Error).message);
 			}
 		};
-
-		console.log('running func');
 
 		fetchData();
 	}, [fetchFunction]);
@@ -58,8 +56,6 @@ const AsyncSelector = async <T extends Identifiable>({
 			items={data.map((board) => {
 				return { label: board?.name, value: `${board?.id}-${board?.name}` };
 			})}
-			side='left'
-			align='start'
 			placeholder={placeholder}
 			value={`${selectedData?.id}-${selectedData?.name}`}
 			setValue={(e) => {
@@ -72,6 +68,7 @@ const AsyncSelector = async <T extends Identifiable>({
 					}
 				});
 			}}
+			popoverTriggerProps={{ ...popoverProps }}
 		>
 			<Button
 				size='sm'

@@ -33,12 +33,12 @@ const auditTypeSchema = z.enum([
 ]);
 
 export const auditTrailEntrySchema = z.object({
-	text: z.string().optional(),
-	enteredDate: z.string().optional(),
-	enteredBy: z.string().optional(),
-	auditType: auditTypeSchema.optional(),
-	auditSubType: z.string().optional(),
-	auditSource: z.string().optional(),
+	text: z.string(),
+	enteredDate: z.string(),
+	enteredBy: z.string(),
+	auditType: auditTypeSchema,
+	auditSubType: z.string(),
+	auditSource: z.string(),
 });
 
 export const communicationItemSchema = z.object({
@@ -51,7 +51,7 @@ export const communicationItemSchema = z.object({
 });
 
 export const contactSchema = z.object({
-	id: z.number().optional(),
+	id: z.number(),
 	firstName: z.string().optional(),
 	lastName: z.string().optional(),
 	company: referenceTypeSchema.optional(),
@@ -428,6 +428,21 @@ export const projectSchema = z.object({
 	companyLocation: referenceTypeSchema.optional(),
 });
 
+export const ticketNoteSchema = z.object({
+	id: z.number().optional(),
+	ticketId: z.number().optional(),
+	text: z.string().optional(),
+	detailDescriptionFlag: z.boolean().optional(),
+	internalAnalysisFlag: z.boolean().optional(),
+	resolutionFlag: z.boolean().optional(),
+	issueFlag: z.boolean().optional(),
+	member: referenceTypeSchema.optional(),
+	dateCreated: z.string().optional(),
+	createdBy: z.string().optional(),
+	internalFlag: z.boolean().optional(),
+	externalFlag: z.boolean().optional(),
+});
+
 export const locationSchema = z.object({
 	id: z.number(),
 	ownerLevelId: z.number(),
@@ -471,34 +486,10 @@ export type Contact = z.infer<typeof contactSchema>;
 export type Document = z.infer<typeof documentSchema>;
 export type Location = z.infer<typeof locationSchema>;
 export type Project = z.infer<typeof projectSchema>;
-export type Reference = z.infer<typeof referenceTypeSchema>;
+export type ReferenceType = z.infer<typeof referenceTypeSchema>;
 export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
 export type SystemMember = z.infer<typeof systemMemberSchema>;
-
-export type TicketNote = {
-	id?: number;
-	ticketId?: number;
-	text: string;
-	detailDescriptionFlag?: boolean;
-	internalAnalysisFlag?: boolean;
-	resolutionFlag?: boolean;
-	issueFlag?: boolean;
-	member?: {
-		id: number;
-		identifier: string;
-		name: string;
-	};
-	dateCreated?: string;
-	createdBy?: string;
-	internalFlag?: boolean;
-	externalFlag?: boolean;
-	sentimentScore?: number;
-};
-export interface ReferenceType {
-	id: number;
-	identifier?: string;
-	name: string;
-}
+export type TicketNote = z.infer<typeof ticketNoteSchema>;
 
 export interface Configuration {
 	id: number;

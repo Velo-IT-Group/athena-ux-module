@@ -7,48 +7,48 @@ const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.en
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
 });
 
-export const getWorkers = async (
-	options: WorkerListInstanceOptions = { available: 'true' }
-): Promise<WorkerInstance[]> => {
+export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promise<WorkerInstance[]> => {
 	try {
-		const workers = await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers.list(options);
+		return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers.list(options);
+		// console.log(workers);
 
-		return workers.map((worker) => {
-			delete worker['_context'];
-			// @ts-ignore
-			delete worker['_proxy'];
-			// @ts-ignore
-			delete worker['_solution'];
-			// @ts-ignore
-			delete worker['_version'];
-			// @ts-ignore
-			delete worker['toJSON'];
-			// @ts-ignore
-			delete worker['update'];
-			// @ts-ignore
-			delete worker['userDefinedMessages'];
-			// @ts-ignore
-			delete worker['userDefinedMessageSubscriptions'];
-			// @ts-ignore
-			delete worker['events'];
-			// @ts-ignore
-			delete worker['fetch'];
-			// @ts-ignore
-			delete worker['notifications'];
-			// @ts-ignore
-			delete worker['payments'];
-			// @ts-ignore
-			delete worker['recordings'];
-			// @ts-ignore
-			delete worker['remove'];
-			// @ts-ignore
-			delete worker['siprec'];
-			// @ts-ignore
-			delete worker['streams'];
-			// @ts-ignore
-			delete worker['transcriptions'];
-			return worker;
-		});
+		// return workers
+		// return workers.map((worker) => {
+		// 	delete worker['_context'];
+		// 	// @ts-ignore
+		// 	delete worker['_proxy'];
+		// 	// @ts-ignore
+		// 	delete worker['_solution'];
+		// 	// @ts-ignore
+		// 	delete worker['_version'];
+		// 	// @ts-ignore
+		// 	delete worker['toJSON'];
+		// 	// @ts-ignore
+		// 	delete worker['update'];
+		// 	// @ts-ignore
+		// 	delete worker['userDefinedMessages'];
+		// 	// @ts-ignore
+		// 	delete worker['userDefinedMessageSubscriptions'];
+		// 	// @ts-ignore
+		// 	delete worker['events'];
+		// 	// @ts-ignore
+		// 	delete worker['fetch'];
+		// 	// @ts-ignore
+		// 	delete worker['notifications'];
+		// 	// @ts-ignore
+		// 	delete worker['payments'];
+		// 	// @ts-ignore
+		// 	delete worker['recordings'];
+		// 	// @ts-ignore
+		// 	delete worker['remove'];
+		// 	// @ts-ignore
+		// 	delete worker['siprec'];
+		// 	// @ts-ignore
+		// 	delete worker['streams'];
+		// 	// @ts-ignore
+		// 	delete worker['transcriptions'];
+		// 	return worker;
+		// });
 	} catch (error) {
 		console.error(error);
 		return [];

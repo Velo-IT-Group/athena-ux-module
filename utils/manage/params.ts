@@ -1,10 +1,17 @@
+type Comparator = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'contains' | 'like' | 'in' | 'not';
+
 interface KeyValue {
 	[key: string]: number | string | boolean;
 }
 
+interface Comparison {
+	parameter: KeyValue;
+	comparator?: Comparator;
+}
+
 export type Conditions<T> = {
-	conditions?: Array<KeyValue>;
-	childConditions?: Array<KeyValue>;
+	conditions?: Array<Comparison>;
+	childConditions?: Array<Comparison>;
 	customFieldConditions?: string;
 	orderBy?: { key: keyof T; order?: 'asc' | 'desc' };
 	fields?: Array<keyof T>;
@@ -19,20 +26,28 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 
 	if (conditions) {
 		conditions.forEach((condition) => {
-			Object.entries(condition).forEach(([key, value]) => {
+			Object.entries(condition.parameter).forEach(([key, value]) => {
 				const conditions = params.get('conditions');
-				params.set('conditions', conditions ? `${`${conditions} and ${key} = ${value}`}` : `${key} = ${value}`);
+				params.set(
+					'conditions',
+					conditions
+						? `${`${conditions} and ${key} ${condition.comparator ?? '='} ${value}`}`
+						: `${key} ${condition.comparator ?? '='} ${value}`
+				);
+				console.log(params.get('conditions'));
 			});
 		});
 	}
 
 	if (childConditions) {
 		childConditions.forEach((condition) => {
-			Object.entries(condition).forEach(([key, value]) => {
+			Object.entries(condition.parameter).forEach(([key, value]) => {
 				const childConditions = params.get('childConditions');
 				params.set(
 					'childConditions',
-					childConditions ? `${`${childConditions} and ${key} = ${value}`}` : `${key} = ${value}`
+					childConditions
+						? `${`${childConditions} and ${key} ${condition.comparator ?? '='} ${value}`}`
+						: `${key} ${condition.comparator ?? '='} ${value}`
 				);
 			});
 		});

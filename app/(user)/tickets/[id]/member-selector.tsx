@@ -2,16 +2,18 @@
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { getSystemMembers } from '@/lib/manage/read';
+import { updateTicket } from '@/lib/manage/update';
 import { ReferenceType, SystemMember } from '@/types/manage';
 import { CircleUser } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type Props = {
+	ticketId: number;
 	member?: ReferenceType;
 };
 
-const MemberSelector = ({ member }: Props) => {
-	console.log(member);
+const MemberSelector = ({ ticketId, member }: Props) => {
 	const [members, setMembers] = useState<SystemMember[]>([]);
 	const [selectedMember, setSelectedMember] = useState<SystemMember | undefined>();
 
@@ -36,12 +38,18 @@ const MemberSelector = ({ member }: Props) => {
 			align='start'
 			placeholder='Select a member...'
 			value={`${selectedMember?.id}-${selectedMember?.firstName} ${selectedMember?.lastName ?? ''}`}
-			setValue={(e) => {
+			setValue={async (e) => {
 				let id = Number(e.toString().split('-')[0]);
 				let firstName = e.toString().split('-')[1].split(' ')[0];
 				let lastName = e.toString().split('-')[1].split(' ')[1];
 
 				setSelectedMember({ id, firstName, lastName, identifier: '' });
+				try {
+					toast.info(id);
+					await updateTicket(ticketId, [{ op: 'replace', path: 'owner/id', value: id }]);
+				} catch (error) {
+					toast.error(JSON.stringify(error) as string);
+				}
 			}}
 		>
 			<Button

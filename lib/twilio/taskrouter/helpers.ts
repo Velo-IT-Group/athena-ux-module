@@ -2,12 +2,15 @@
 import { auth } from '@/auth';
 import { revalidatePath, unstable_cache } from 'next/cache';
 import { Twilio, jwt } from 'twilio';
+import { ActivityListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
 import {
 	TaskContextUpdateOptions,
 	TaskInstance,
 	TaskListInstanceOptions,
 } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { ReservationContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task/reservation';
+import { TaskQueueListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/taskQueue';
+import { WorkflowListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/workflow';
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
@@ -102,23 +105,44 @@ export const getWorkflows = async () => {
 	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows.list();
 };
 
-export const getWorkerReservations = unstable_cache(
-	async () => {
-		const session = await auth();
-		return await client.taskrouter.v1
-			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-			.workers(session?.user.workerSid)
-			.reservations.list({ limit: 20, reservationStatus: ['pending', 'accepted'] });
-	},
-	['reservations'],
-	{ tags: ['reservations'] }
-);
-
-export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
+export const getWorkerReservations = async () => {
 	const session = await auth();
+
 	return await client.taskrouter.v1
 		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-		.workers(session?.user.workerSid)
+		.workers(session!.user.workerSid)
+		.reservations.list({ limit: 20, reservationStatus: ['pending', 'accepted'] });
+};
+export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
+	const session = await auth();
+
+	return await client.taskrouter.v1
+		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+		.workers(session!.user.workerSid)
 		.reservations(id)
 		.update(update);
+};
+
+export const listWorkflows = async (option: WorkflowListInstanceOptions = {}) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows.list(option);
+};
+
+export const fetchWorkflow = async (sid: string) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows(sid).fetch();
+};
+
+export const listQueues = async (option: TaskQueueListInstanceOptions = {}) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).taskQueues.list(option);
+};
+
+export const fetchQueue = async (sid: string) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).taskQueues(sid).fetch();
+};
+
+export const listActivities = async (option: ActivityListInstanceOptions = {}) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).activities.list(option);
+};
+
+export const fetchActivity = async (sid: string) => {
+	return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).activities(sid).fetch();
 };

@@ -33,9 +33,16 @@ interface DataTableProps<TData, TValue> {
 	data: TData[];
 	meta?: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
+	hidePagination?: boolean;
 }
 
-export function DataTable<TData, TValue>({ columns, data, meta, facetedFilters }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+	columns,
+	data,
+	meta,
+	facetedFilters,
+	hidePagination = false,
+}: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -57,7 +64,7 @@ export function DataTable<TData, TValue>({ columns, data, meta, facetedFilters }
 		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
+		getPaginationRowModel: !hidePagination ? getPaginationRowModel() : undefined,
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -116,7 +123,7 @@ export function DataTable<TData, TValue>({ columns, data, meta, facetedFilters }
 				</Table>
 			</div>
 
-			<DataTablePagination table={table} />
+			{!hidePagination && <DataTablePagination table={table} />}
 		</div>
 	);
 }

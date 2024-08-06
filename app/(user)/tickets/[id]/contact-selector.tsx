@@ -21,7 +21,7 @@ const ContactSelector = ({ company, contact }: Props) => {
 		if (!company?.id || !contact?.id) return;
 
 		getContacts({
-			conditions: [{ 'company/id': company.id }],
+			conditions: [{ parameter: { 'company/id': company.id } }],
 			pageSize: 1000,
 			orderBy: { key: 'firstName' },
 		}).then((data) => {

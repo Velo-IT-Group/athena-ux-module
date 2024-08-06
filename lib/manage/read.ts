@@ -17,6 +17,7 @@ import type {
 	ServiceTicket,
 	Site,
 	SystemMember,
+	TicketNote,
 } from '@/types/manage';
 
 export const getCompany = async (id: number, conditions?: Conditions<Company>): Promise<Company> => {
@@ -29,6 +30,7 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 };
 
 export const getCompanies = async (conditions?: Conditions<Company>): Promise<Company[]> => {
+	console.log(generateParams(conditions));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies${generateParams(conditions)}`, {
 		headers: baseHeaders,
 		method: 'GET',
@@ -52,6 +54,7 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 };
 
 export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
+	console.log(generateParams(conditions));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
 		{
@@ -142,9 +145,9 @@ export const getTicket = async (id: number, conditions?: Conditions<ServiceTicke
 	return await response.json();
 };
 
-export const getTicketNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
+export const getTicketNotes = async (id: number, conditions?: Conditions<Note>): Promise<TicketNote[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/allNotes/${generateParams(conditions)}`,
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/notes/${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}

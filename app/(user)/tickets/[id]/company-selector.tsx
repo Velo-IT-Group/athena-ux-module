@@ -16,8 +16,8 @@ const CompanySelector = ({ company }: Props) => {
 
 	useEffect(() => {
 		getCompanies({
-			conditions: [{ 'status/id': 1 }],
-			childConditions: [{ 'types/id': 1 }],
+			conditions: [{ parameter: { 'status/id': 1 } }],
+			childConditions: [{ parameter: { 'types/id': 1 } }],
 			orderBy: { key: 'name' },
 			pageSize: 1000,
 		}).then((data) => {

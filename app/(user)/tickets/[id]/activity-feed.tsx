@@ -18,6 +18,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 		getTicketNotes(id),
 	]);
 
+	const discussionNotes = notes.filter((note) => note.detailDescriptionFlag && !note.internalAnalysisFlag);
+	const internalNotes = notes.filter((note) => note.internalFlag && note.internalAnalysisFlag);
+	const resolutionNotes = notes.filter((note) => note.resolutionFlag);
+
 	return (
 		<div className='space-y-3'>
 			<Accordion type='multiple'>
@@ -55,10 +59,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 					<AccordionContent>
 						<Tabs defaultValue='all'>
 							<TabsList>
-								<TabsTrigger value='all'>All (1)</TabsTrigger>
-								<TabsTrigger value='discussion'>Discussion (1)</TabsTrigger>
-								<TabsTrigger value='internal'>Internal</TabsTrigger>
-								<TabsTrigger value='resolution'>Resolution</TabsTrigger>
+								<TabsTrigger value='all'>All ({notes.length})</TabsTrigger>
+								<TabsTrigger value='discussion'>Discussion ({discussionNotes.length})</TabsTrigger>
+								<TabsTrigger value='internal'>Internal ({internalNotes.length})</TabsTrigger>
+								<TabsTrigger value='resolution'>Resolution ({resolutionNotes.length})</TabsTrigger>
 							</TabsList>
 
 							<TabsContent
@@ -66,6 +70,45 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								className='space-y-3'
 							>
 								{notes.map((note) => (
+									<Card>
+										<CardContent className='p-3'>
+											<p>{note.text}</p>
+										</CardContent>
+									</Card>
+								))}
+							</TabsContent>
+
+							<TabsContent
+								value='discussion'
+								className='space-y-3'
+							>
+								{discussionNotes.map((note) => (
+									<Card>
+										<CardContent className='p-3'>
+											<p>{note.text}</p>
+										</CardContent>
+									</Card>
+								))}
+							</TabsContent>
+
+							<TabsContent
+								value='internal'
+								className='space-y-3'
+							>
+								{internalNotes.map((note) => (
+									<Card>
+										<CardContent className='p-3'>
+											<p>{note.text}</p>
+										</CardContent>
+									</Card>
+								))}
+							</TabsContent>
+
+							<TabsContent
+								value='resolution'
+								className='space-y-3'
+							>
+								{resolutionNotes.map((note) => (
 									<Card>
 										<CardContent className='p-3'>
 											<p>{note.text}</p>
@@ -83,9 +126,11 @@ export default async function ActivityFeed({ id }: { id: number }) {
 					'use server';
 					try {
 						const noteType = data.get('noteType');
+						console.log(noteType);
 						await createTicketNote(id, {
 							text: data.get('text') as string,
 							internalFlag: noteType === 'internalFlag',
+							internalAnalysisFlag: noteType === 'internalFlag',
 							detailDescriptionFlag: noteType === 'detailDescriptionFlag',
 						});
 					} catch (error) {

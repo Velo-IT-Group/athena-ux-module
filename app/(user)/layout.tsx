@@ -20,18 +20,9 @@ const Layout = async ({ children }: Props) => {
 		redirect('/login');
 	}
 
-	const token = await createAccessToken(
-		process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID as string,
-		process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID as string,
-		process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET as string,
-		process.env.NEXT_PUBLIC_WORKSPACE_SID as string,
-		session?.user.workerSid ?? (process.env.NEXT_PUBLIC_WORKER_SID as string),
-		session?.user.email ?? 'nblack@velomethod.com'
-	);
-
 	return (
 		<TooltipProvider>
-			<UserLayout token={token}>
+			<UserLayout token={session.user.twilioToken}>
 				<Navbar />
 
 				<ResizablePanelGroup

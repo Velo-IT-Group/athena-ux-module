@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { PopoverTriggerProps } from '@radix-ui/react-popover';
 
 export type ComboBoxItem = {
 	label: string | React.ReactNode;
@@ -21,6 +22,7 @@ type Props = {
 	side?: 'top' | 'right' | 'bottom' | 'left';
 	value: string;
 	setValue: React.Dispatch<React.SetStateAction<string>>;
+	popoverTriggerProps?: PopoverTriggerProps;
 };
 
 export function Combobox({
@@ -31,6 +33,7 @@ export function Combobox({
 	side = 'bottom',
 	value = '',
 	setValue,
+	popoverTriggerProps,
 }: Props) {
 	const [open, setOpen] = useState(false);
 
@@ -39,7 +42,10 @@ export function Combobox({
 			open={open}
 			onOpenChange={setOpen}
 		>
-			<PopoverTrigger asChild={children !== undefined}>
+			<PopoverTrigger
+				asChild={children !== undefined}
+				{...popoverTriggerProps}
+			>
 				{children === undefined ? (
 					<Button
 						variant='outline'

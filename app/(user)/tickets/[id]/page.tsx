@@ -1,8 +1,6 @@
 import React from 'react';
 import Properties from './properties';
-import { Input } from '@/components/ui/input';
 import { getTicket, getTicketNotes } from '@/lib/manage/read';
-import Tiptap from '@/components/tip-tap';
 import { Separator } from '@/components/ui/separator';
 import ActivityFeed from './activity-feed';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -19,22 +17,20 @@ export default async function Page({ params }: Props) {
 
 	return (
 		<main className='grid grid-cols-[1fr_280px] items-start gap-3 h-full bg-muted/15'>
-			<ScrollArea className='grid min-h-0'>
-				<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
-					<form action=''>
-						<Textarea
-							name='summary'
-							defaultValue={ticket.summary}
-							className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
-						/>
+			<ScrollArea className='grid min-h-0 h-full'>
+				<div className='max-w-3xl w-full mx-auto py-10 grid items-start space-y-1.5'>
+					<Textarea
+						name='summary'
+						defaultValue={ticket.summary}
+						className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
+					/>
 
-						<Textarea
-							placeholder='Add a comment...'
-							className='border-none shadow-none resize-none'
-							defaultValue={initalNote?.text}
-							minRows={2}
-						/>
-					</form>
+					<Textarea
+						placeholder='Add a comment...'
+						className='border-none shadow-none resize-none'
+						defaultValue={initalNote?.text}
+						minRows={3}
+					/>
 
 					<Separator />
 

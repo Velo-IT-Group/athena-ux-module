@@ -1,9 +1,9 @@
-import { buttonVariants } from '@/components/ui/button';
-import { Building2, Home, LineChart, LucideIcon, Notebook, Server, Settings, Tags } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Building2, Circle, Home, LineChart, LucideIcon, Notebook, Server, Settings, Tags } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { getWorkers } from '@/lib/twilio/read';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
 import { getWorkflows } from '@/lib/twilio/taskrouter/helpers';
 import TaskList from './task-list';
@@ -13,6 +13,9 @@ import { ResizablePanel } from './ui/resizable';
 import { useRecoilState } from 'recoil';
 import { collapsedState } from '@/atoms/sidebarStateAtom';
 import ServerTaskList from './server-task-list';
+import { useWorker } from '@/providers/worker-provider';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Input } from './ui/input';
 
 type Props = {};
 
@@ -56,8 +59,9 @@ const links: NavLink[] = [
 ];
 
 const SideNav = async (props: Props) => {
-	// const [workers, activities] = await Promise.all([getWorkers(), getActivies()]);
+	const [workers, activities, session] = await Promise.all([getWorkers(), getActivies(), auth()]);
 	// const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
+	// const { worker } = useWorker();
 
 	return (
 		<ResizablePanel
@@ -81,7 +85,7 @@ const SideNav = async (props: Props) => {
 							<Link
 								key={link.href}
 								href={link.href}
-								className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'justify-start text-muted-foreground')}
+								className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'justify-start')}
 								aria-label={link.name}
 							>
 								<link.icon className='size-3.5 mr-1.5' />
@@ -91,43 +95,88 @@ const SideNav = async (props: Props) => {
 						))}
 					</section>
 
-					<ServerTaskList />
+					<TaskList />
 
 					<section className='space-y-1.5 px-1.5'>
 						<h2 className='text-xs text-muted-foreground px-3 font-medium'>Workers</h2>
 
-						{/* <div className='space-y-1.5'>
+						<div className='space-y-1.5'>
 							{activities.map((activity) => {
 								const filteredWorkers = workers.filter((w) => w.activitySid === activity.sid);
 								return (
-									<>
-										{filteredWorkers.length > 0 && (
-											<div
-												key={activity.sid}
-												className='border border-green-500 rounded-lg p-1.5 space-y-1.5'
-											>
-												<h3 className='text-xs text-muted-foreground flex items-center gap-1.5 font-medium'>
-													{activity.friendlyName}
-												</h3>
+									<Popover>
+										<PopoverTrigger asChild>
+											<Button variant='ghost'>
+												<Circle className='stroke-none fill-green-500 h-5 w-5 mr-1.5' />
+												<span>
+													{activity.friendlyName} ({filteredWorkers.length})
+												</span>
+											</Button>
+										</PopoverTrigger>
 
+										<PopoverContent
+											side='right'
+											align='start'
+											sideOffset={12}
+											className='space-y-3'
+										>
+											<header>
+												<h3 className='text-sm font-medium'>{activity.friendlyName}</h3>
+											</header>
+
+											<Input
+												placeholder='Search here...'
+												className='h-auto text-xs'
+											/>
+
+											<section>
 												{filteredWorkers.map((worker) => (
-													<div
-														key={worker.sid}
-														className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), '')}
+													<Button
+														variant='ghost'
+														size='sm'
+														className='w-full justify-start'
 													>
-														<Avatar className='w-5 h-5'>
-															<AvatarFallback className='text-[10px]'>NB</AvatarFallback>
+														<Avatar className='w-7 h-7 mr-1.5'>
+															<AvatarFallback>NB</AvatarFallback>
+															<AvatarImage src={session?.user?.image ?? undefined} />
 														</Avatar>
 
 														<span>{worker.friendlyName}</span>
-													</div>
+													</Button>
 												))}
-											</div>
-										)}
-									</>
+											</section>
+										</PopoverContent>
+									</Popover>
 								);
+								// return (
+								// 	<>
+								// 		{filteredWorkers.length > 0 && (
+								// 			<div
+								// 				key={activity.sid}
+								// 				className='border border-green-500 rounded-lg p-1.5 space-y-1.5'
+								// 			>
+								// 				<h3 className='text-xs text-muted-foreground flex items-center gap-1.5 font-medium'>
+								// 					{activity.friendlyName}
+								// 				</h3>
+
+								// 				{filteredWorkers.map((worker) => (
+								// 					<div
+								// 						key={worker.sid}
+								// 						className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), '')}
+								// 					>
+								// 						<Avatar className='w-5 h-5'>
+								// 							<AvatarFallback className='text-[10px]'>NB</AvatarFallback>
+								// 						</Avatar>
+
+								// 						<span>{worker.friendlyName}</span>
+								// 					</div>
+								// 				))}
+								// 			</div>
+								// 		)}
+								// 	</>
+								// );
 							})}
-						</div> */}
+						</div>
 					</section>
 				</aside>
 			</ScrollArea>

@@ -1,73 +1,101 @@
-import { Button } from '@/components/ui/button';
-import { Combobox } from '@/components/ui/combobox';
+'use client';
 import DatePicker from '@/components/ui/date-picker';
 import { Separator } from '@/components/ui/separator';
-import { Paperclip, Tag } from 'lucide-react';
+import { Circle, CircleDashed, CircleUser } from 'lucide-react';
 import React, { Suspense } from 'react';
-import StatusSelector from './status-selector';
-import { ServiceTicket } from '@/types/manage';
-import MemberSelector from './member-selector';
+import {
+	Board,
+	BoardStatus,
+	Company,
+	Contact,
+	Priority,
+	ReferenceType,
+	ServiceTicket,
+	SystemMember,
+} from '@/types/manage';
 import BoardSelector from './board-selector';
-import PrioritySelector from './priority-selector';
 import { Skeleton } from '@/components/ui/skeleton';
 import CompanySelector from './company-selector';
 import ContactSelector from './contact-selector';
-import { getDocuments } from '@/lib/manage/read';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { getBoards, getCompanies, getContacts, getPriorities, getStatuses, getSystemMembers } from '@/lib/manage/read';
+import AsyncSelector, { Identifiable } from '@/components/async-selector';
+import { updateTicket } from '@/lib/manage/update';
+import { toast } from 'sonner';
 
-export default async function Properties({ ticket }: { ticket: ServiceTicket }) {
-	const attachments = await getDocuments('Ticket', ticket.id);
+export default function Properties({ ticket }: { ticket: ServiceTicket }) {
+	// const attachments = await getDocuments('Ticket', ticket.id);
 
-	console.log(ticket.board);
+	const fetchMembers = async () => {
+		const members = await getSystemMembers({
+			orderBy: { key: 'firstName' },
+			conditions: [{ parameter: { inactiveFlag: false } }],
+			pageSize: 1000,
+		});
+
+		return members.map((member) => {
+			return { ...member, name: `${member.firstName} ${member.lastName}` };
+		});
+	};
 
 	return (
 		<div className='pl-3 pb-6 pt-2.5 pr-1.5 space-y-7'>
 			<section>
-				<Suspense>
-					<StatusSelector
-						ticketId={ticket.id}
-						board={ticket.board}
-						status={ticket.status}
+				<Suspense fallback={<Skeleton className='w-full h-9' />}>
+					<AsyncSelector
+						icon={<CircleDashed className='mr-1.5' />}
+						fetchFunction={getStatuses(ticket.board!.id!, { orderBy: { key: 'name' } })}
+						placeholder=''
+						prompt=''
+						updateFunction={async (arg) => {}}
+						defaultValue={ticket.board as BoardStatus}
 					/>
 				</Suspense>
 
-				<Suspense>
-					<PrioritySelector
-						ticketId={ticket.id}
-						priority={ticket.priority}
+				<Suspense fallback={<Skeleton className='w-full h-9' />}>
+					<AsyncSelector
+						icon={
+							<Circle
+								className='mr-1.5'
+								style={{ color: ticket.priority?.color?.toLowerCase() }}
+							/>
+						}
+						fetchFunction={getPriorities({ orderBy: { key: 'sortOrder' } })}
+						placeholder=''
+						prompt=''
+						updateFunction={async (arg) => {}}
+						defaultValue={ticket.priority as Priority}
 					/>
 				</Suspense>
 
-				<Suspense>
-					<MemberSelector member={ticket.owner} />
+				<Suspense fallback={<Skeleton className='w-full h-9' />}>
+					<AsyncSelector
+						icon={<CircleUser className='mr-1.5' />}
+						fetchFunction={fetchMembers()}
+						placeholder=''
+						prompt=''
+						updateFunction={async (arg) => {}}
+						defaultValue={ticket.owner}
+					/>
 				</Suspense>
-			</section>
-
-			<section>
-				<h4 className='text-xs text-muted-foreground font-medium px-3'>Labels</h4>
-
-				<Combobox
-					items={[]}
-					side='left'
-					align='start'
-				>
-					<Button
-						size='sm'
-						variant='ghost'
-						className='flex'
-					>
-						<Tag className='mr-1.5' /> <span className='text-xs text-muted-foreground'>Add label</span>
-					</Button>
-				</Combobox>
 			</section>
 
 			<section>
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Board</h4>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<BoardSelector
-						ticketId={ticket.id}
-						board={ticket.board}
+					<AsyncSelector
+						icon={<CircleUser className='mr-1.5' />}
+						fetchFunction={getBoards({ orderBy: { key: 'name' }, pageSize: 1000 })}
+						placeholder=''
+						prompt=''
+						updateFunction={async (e) => {
+							try {
+								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
+							} catch (error) {
+								toast.error(error as string);
+							}
+						}}
+						defaultValue={ticket.board as Board}
 					/>
 				</Suspense>
 			</section>
@@ -76,14 +104,50 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Company</h4>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<CompanySelector company={ticket.company} />
+					<AsyncSelector
+						icon={<CircleUser className='mr-1.5' />}
+						fetchFunction={getCompanies({
+							conditions: [{ parameter: { 'status/id': 1 } }],
+							childConditions: [{ parameter: { 'types/id': 1 } }],
+							orderBy: { key: 'name' },
+							pageSize: 1000,
+						})}
+						placeholder=''
+						prompt=''
+						updateFunction={async (e) => {
+							try {
+								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
+							} catch (error) {
+								toast.error(error as string);
+							}
+						}}
+						defaultValue={ticket.company as Company}
+					/>
 				</Suspense>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<ContactSelector
+					<AsyncSelector
+						icon={<CircleUser className='mr-1.5' />}
+						fetchFunction={getContacts({
+							conditions: [{ parameter: { 'company/id': ticket.company?.id! } }],
+							pageSize: 1000,
+							orderBy: { key: 'firstName' },
+						})}
+						placeholder=''
+						prompt=''
+						updateFunction={async (e) => {
+							try {
+								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
+							} catch (error) {
+								toast.error(error as string);
+							}
+						}}
+						defaultValue={ticket.company as Contact}
+					/>
+					{/* <ContactSelector
 						company={ticket.company}
 						contact={ticket.contact}
-					/>
+					/> */}
 				</Suspense>
 			</section>
 
@@ -100,7 +164,7 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 			<section>
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Attachments</h4>
 
-				{attachments
+				{/* {attachments
 					?.filter((attachment) => attachment.documentType.id === 7)
 					.map((attachment) => (
 						<Tooltip>
@@ -129,7 +193,7 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 								</audio>
 							</TooltipContent>
 						</Tooltip>
-					))}
+					))} */}
 			</section>
 		</div>
 	);

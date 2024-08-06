@@ -1,7 +1,6 @@
 import { AuditTrailEntry } from '@/types/manage';
 import { relativeDate } from '@/utils/date';
 import {
-	ArrowLeftRight,
 	Calendar,
 	Circle,
 	Clock,
@@ -10,7 +9,6 @@ import {
 	Pencil,
 	Phone,
 	Shield,
-	ShieldHalf,
 	Tag,
 	ThumbsUp,
 	User,
@@ -42,9 +40,7 @@ const ActivityItem = ({ entry }: Props) => {
 			</div>
 
 			<div className='text-xs leading-5 break-words line-clamp-6'>
-				<span className='font-medium whitespace-nowrap text-ellipsis overflow-hidden min-w-0 text-black'>
-					{entry.enteredBy}
-				</span>
+				<span className='font-medium whitespace-nowrap text-ellipsis overflow-hidden min-w-0'>{entry.enteredBy}</span>
 
 				<span> {entry.text}</span>
 

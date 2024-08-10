@@ -1,6 +1,14 @@
+import { getSchedule } from '@/lib/manage/read';
 import { NextResponse } from 'next/server';
 
 export const GET = async (req: Request) => {
+	try {
+		const schedule = await getSchedule(2);
+	} catch (error) {
+		console.error(error);
+		return NextResponse.json({ error: 'Internal Server Error' + JSON.stringify(error) }, { status: 500 });
+	}
+
 	return NextResponse.json({
 		rules: [
 			{

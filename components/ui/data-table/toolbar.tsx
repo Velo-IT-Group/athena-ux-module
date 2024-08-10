@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusCircle, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,9 @@ import { Input } from '@/components/ui/input';
 import { DataTableViewOptions } from './view-options';
 
 import { DataTableFacetedFilter } from './faceted-filter';
-import { Suspense, useEffect, useState } from 'react';
-import { getPriorities, getStatuses } from '@/lib/manage/read';
-import { BoardStatus, Priority } from '@/types/manage';
-import { Skeleton } from '../skeleton';
-import AsyncSelector, { Identifiable } from '@/components/async-selector';
+import { Identifiable } from '@/components/async-selector';
+import { usePathname } from 'next/navigation';
+import Search from '@/components/search';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
@@ -25,19 +23,26 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
+	const pathname = usePathname();
 
+	console.log(pathname);
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
-					<Input
+					<Search
+						baseUrl={pathname}
 						placeholder='Filter...'
-						value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
-						onChange={(event) =>
-							table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
-						}
-						className='h-8 w-[150px] lg:w-[250px]'
+						className='w-[150px] lg:w-[250px]'
 					/>
+					// <Input
+					// 	placeholder='Filter...'
+					// 	value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
+					// 	onChange={(event) =>
+					// 		table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
+					// 	}
+					// 	className='h-8 w-[150px] lg:w-[250px]'
+					// />
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => (

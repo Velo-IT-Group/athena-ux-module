@@ -5,35 +5,42 @@ import { Check, Circle, Headset } from 'lucide-react';
 import { useJabra } from '@/providers/jabra-provider';
 import { Command, CommandGroup, CommandItem, CommandList, CommandSeparator } from './ui/command';
 import { cn } from '@/lib/utils';
+import { useRecoilValue } from 'recoil';
+import { callControlDevicesState, currentCallControlState } from '@/atoms/jabraStateAtom';
+import { useDevice } from '@/providers/device-provider';
+import { selectInputDevice, selectOutputDevice } from '@/utils/twilio/device';
 
 type Props = {};
 
 const DeviceDropdownMenuSub = (props: Props) => {
 	const [open, setOpen] = useState(false);
 	const [inputLevel, setInputLevel] = useState(0);
-	const { callControlDevices, currentCallControl, jabra, deviceState } = useJabra();
+	const { device } = useDevice();
+	const callControlDevices = useRecoilValue(callControlDevicesState);
+	const currentCallControl = useRecoilValue(currentCallControlState);
 	const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [selectedDevice, setSelectedDevice] = useState<string>();
 
-	useEffect(() => {
-		navigator.mediaDevices.enumerateDevices().then((devices) => {
-			console.log(devices);
-			const iDevices = devices.filter((d) => d.kind === 'audioinput');
-			const oDevices = devices.filter((d) => d.kind === 'audiooutput');
+	// useEffect(() => {
+	// 	if (!device?.audio) return;
+	// 	navigator.mediaDevices.enumerateDevices().then((devices) => {
+	// 		console.log(devices);
+	// 		const iDevices = devices.filter((d) => d.kind === 'audioinput');
+	// 		const oDevices = devices.filter((d) => d.kind === 'audiooutput');
 
-			const inputIndex = iDevices.findIndex((d) => d.label.includes('Default'));
-			const outputIndex = oDevices.findIndex((d) => d.label.includes('Default'));
+	// 		const inputIndex = iDevices.findIndex((d) => d.label.includes('Default'));
+	// 		const outputIndex = oDevices.findIndex((d) => d.label.includes('Default'));
 
-			const [iRemoved] = iDevices.splice(inputIndex, 1);
-			const [oRemoved] = oDevices.splice(outputIndex, 1);
+	// 		const [iRemoved] = iDevices.splice(inputIndex, 1);
+	// 		const [oRemoved] = oDevices.splice(outputIndex, 1);
 
-			setInputDevices(iDevices);
-			setOutputDevices(oDevices);
+	// 		setInputDevices(iDevices);
+	// 		setOutputDevices(oDevices);
 
-			setSelectedDevice(iRemoved.groupId);
-		});
-	}, []);
+	// 		setSelectedDevice(iRemoved.groupId);
+	// 	});
+	// }, []);
 
 	useEffect(() => {
 		if (!currentCallControl) return;
@@ -80,6 +87,8 @@ const DeviceDropdownMenuSub = (props: Props) => {
 			});
 	}, [open]);
 
+	if (!device?.audio) return;
+
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubContent>
@@ -87,34 +96,50 @@ const DeviceDropdownMenuSub = (props: Props) => {
 					<CommandList>
 						<CommandGroup heading='Speaker'>
 							<CommandList>
-								{outputDevices.map((device) => (
-									<CommandItem
-										key={device.groupId}
-										value={device.groupId}
-									>
-										<Check
-											className={cn('mr-2 h-4 w-4', device?.groupId === selectedDevice ? 'opacity-100' : 'opacity-0')}
-										/>
-										{device.label}
-									</CommandItem>
-								))}
+								{Object.values(device?.audio.availableOutputDevices).map((value) => {
+									const mediaDevice = value as MediaDeviceInfo;
+									console.log(value);
+									return (
+										<CommandItem
+											key={mediaDevice.deviceId}
+											value={mediaDevice.deviceId}
+											onClick={async () => {
+												await selectOutputDevice(mediaDevice.deviceId, device);
+											}}
+										>
+											<Check
+												className={cn('mr-2 h-4 w-4', mediaDevice?.groupId === '' ? 'opacity-100' : 'opacity-0')}
+											/>
+											{mediaDevice.label}
+										</CommandItem>
+									);
+								})}
 							</CommandList>
 						</CommandGroup>
 
 						<CommandSeparator />
 
 						<CommandGroup heading='Microphone'>
-							{inputDevices.map((device) => (
-								<CommandItem
-									key={device.groupId}
-									value={device.groupId}
-								>
-									<Check
-										className={cn('mr-2 h-4 w-4', device?.groupId === selectedDevice ? 'opacity-100' : 'opacity-0')}
-									/>
-									{device.label}
-								</CommandItem>
-							))}
+							{Object.entries(device?.audio.availableInputDevices).map(([key, value]) => {
+								const mediaDevice = value as MediaDeviceInfo;
+								return (
+									<CommandItem
+										key={key}
+										value={mediaDevice.groupId}
+										onClick={async () => {
+											await selectInputDevice(key, device);
+										}}
+									>
+										<Check
+											className={cn(
+												'mr-2 h-4 w-4',
+												mediaDevice?.groupId === device.audio?.inputDevice?.groupId ? 'opacity-100' : 'opacity-0'
+											)}
+										/>
+										{mediaDevice.label}
+									</CommandItem>
+								);
+							})}
 						</CommandGroup>
 					</CommandList>
 				</Command>

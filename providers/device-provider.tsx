@@ -1,23 +1,27 @@
 'use client';
-import { useContext, createContext, useEffect, Dispatch, SetStateAction } from 'react';
+import { useContext, createContext, useEffect, Dispatch, SetStateAction, useState, useRef } from 'react';
 import { Device, type Call } from '@twilio/voice-sdk';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { ActiveCall } from '@/components/active-call';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { toast } from 'sonner';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { callStateAtom, deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
 	setDevice: Dispatch<SetStateAction<Device | undefined>>;
 	hasExternalFunctionality: boolean;
+	activeCalls: Call[];
+	setActiveCalls: Dispatch<SetStateAction<Call[]>>;
 }
 
 const initialValues: DeviceProviderProps = {
 	device: undefined,
 	setDevice: () => undefined,
 	hasExternalFunctionality: false,
+	activeCalls: [],
+	setActiveCalls: () => [],
 };
 
 type WithChildProps = {
@@ -35,27 +39,18 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const setActiveCall = useSetRecoilState(callStateAtom);
+	// const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
+	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
 	const setDeviceRegistration = useSetRecoilState(deviceEligibleAtom);
-
 	const device = new Device(authToken, {
 		disableAudioContextSounds: true,
 		enableImprovedSignalingErrorPrecision: true,
+		// logLevel: 1,
 	});
-
-	const registerConnectionHandler = (connection: Call) => {
-		console.log('Phone: register connection handler');
-
-		connection.on('warning', (name, data) => {
-			if (name === 'low-mos') {
-			}
-		});
-
-		connection.on('warning-cleared', function (name) {
-			if (name === 'low-mos') {
-			}
-		});
-	};
+	// let device = new Device(authToken, {
+	// 	disableAudioContextSounds: true,
+	// 	enableImprovedSignalingErrorPrecision: true,
+	// });
 
 	useEffect(() => {
 		if (!device) return;
@@ -67,6 +62,10 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');
 			setDeviceRegistration(true);
+
+			// setActiveCall((prev) => {
+			// 	return { ...prev, call };
+			// });
 		});
 
 		device.on('error', (error) => {
@@ -74,35 +73,21 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			setDeviceRegistration(false);
 		});
 
-		device.on('incoming', async (call: Call) => {
+		device.on('incoming', (call: Call) => {
 			console.log(`Incoming call from ${call.parameters.From}`);
 
 			call.accept();
 
-			// toast.custom(
-			// 	() => (
-			// 		<IncomingCallTest
-			// 			toastId={call.parameters.CallSid}
-			// 			r={call}
-			// 		/>
-			// 	),
-			// 	{
-			// 		duration: Infinity,
-			// 		dismissible: false,
-			// 		id: call.parameters.CallSid,
-			// 	}
-			// );
-
-			call.on('accept', async (c) => {
-				setActiveCall((prev) => {
-					return { ...prev, call: c };
-				});
-
-				// toast.custom(() => <ActiveCall />, {
-				// 	duration: Infinity,
-				// 	dismissible: false,
-				// 	id: call.parameters.CallSid,
+			call.on('accept', (c: Call) => {
+				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
+				console.log(c);
+				// setActiveCall((prev) => {
+				// 	return { ...prev, call: c };
 				// });
+			});
+
+			call.on('disconnect', (c: Call) => {
+				setActiveCalls((prev) => [...prev.filter((call) => call.parameters.CallSid !== c.parameters.CallSid)]);
 			});
 		});
 
@@ -114,8 +99,36 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		};
 	}, [device]);
 
+	useEffect(() => {
+		if (!device.calls.length) return;
+
+		// device.calls.forEach((call) => {
+		// 	toast.custom(
+		// 		() => (
+		// 			<ActiveCall
+		// 				attributes={activeCall.task?.attributes}
+		// 				conferenceSid={''}
+		// 			/>
+		// 		),
+		// 		{
+		// 			duration: Infinity,
+		// 			dismissible: false,
+		// 			id: call.parameters.CallSid,
+		// 		}
+		// 	);
+		// });
+	}, [device.calls]);
+
 	return (
-		<Provider value={{ device, setDevice: () => undefined, hasExternalFunctionality: device?.identity === '' }}>
+		<Provider
+			value={{
+				device,
+				setDevice: () => undefined,
+				hasExternalFunctionality: device?.identity === '',
+				activeCalls,
+				setActiveCalls,
+			}}
+		>
 			{children}
 		</Provider>
 	);

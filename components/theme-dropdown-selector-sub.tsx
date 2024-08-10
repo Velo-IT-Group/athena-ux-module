@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import {
+	DropdownMenuCheckboxItem,
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuSub,
@@ -13,29 +14,36 @@ import { useTheme } from 'next-themes';
 type Props = {};
 
 const ThemeDropdownSelectorSub = (props: Props) => {
-	const { setTheme } = useTheme();
+	const { setTheme, theme: activeTheme, themes } = useTheme();
 
 	return (
 		<DropdownMenuSub>
-			<DropdownMenuSubTrigger>
+			<DropdownMenuSubTrigger className='capitalize'>
 				<Sun className='rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 mr-1.5' />
 				<Moon className='absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 mr-1.5' />
-				Theme
+				{activeTheme}
 			</DropdownMenuSubTrigger>
 			<DropdownMenuSubContent>
 				<DropdownMenuGroup>
-					<DropdownMenuItem onClick={() => setTheme('light')}>
-						<Sun className='mr-1.5' /> Light
-					</DropdownMenuItem>
-
-					<DropdownMenuItem onClick={() => setTheme('dark')}>
-						<Moon className='mr-1.5' /> Dark
-					</DropdownMenuItem>
-
-					<DropdownMenuItem onClick={() => setTheme('system')}>
-						<SunMoon className='mr-1.5' />
-						System
-					</DropdownMenuItem>
+					{themes.map((theme) => (
+						<DropdownMenuCheckboxItem
+							key={theme}
+							checked={theme === activeTheme}
+							onCheckedChange={(e) => {
+								if (e) {
+									setTheme(theme);
+								} else {
+									setTheme('system');
+								}
+							}}
+							className='capitalize'
+						>
+							{theme === 'light' && <Sun className='mr-1.5' />}
+							{theme === 'dark' && <Moon className='mr-1.5' />}
+							{theme === 'system' && <Sun className='mr-1.5' />}
+							{theme}
+						</DropdownMenuCheckboxItem>
+					))}
 				</DropdownMenuGroup>
 			</DropdownMenuSubContent>
 		</DropdownMenuSub>

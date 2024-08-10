@@ -1,3 +1,4 @@
+'use client';
 import { Card } from '@/components/ui/card';
 import { Popover, PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from '../dialpad';
@@ -14,12 +15,14 @@ type Props = {
 	conferenceSid: string;
 };
 
-export async function ActiveCall({ attributes, conferenceSid }: Props) {
+export function ActiveCall({ attributes, conferenceSid }: Props) {
 	const [participants, setParticipants] = useState<ParticipantInstance[]>([]);
 
 	useEffect(() => {
 		getConferenceParticipants(conferenceSid)
-			.then(setParticipants)
+			.then((e) => {
+				console.log(e);
+			})
 			.catch((e) => console.error(e));
 	}, [conferenceSid]);
 

@@ -11,10 +11,21 @@ export const getConferenceByName = async (friendlyName: string) => {
 	if (conferences.length === 0) return;
 
 	const conference = conferences[0];
+	const participants = conference.participants();
 
-	return conference;
+	return {
+		conference: {
+			sid: conference.sid,
+			participants: {
+				...participants,
+			},
+		},
+	};
 };
 
 export const getConferenceParticipants = async (conferenceSid: string) => {
-	return await client.conferences(conferenceSid).participants.list();
+	const participants = await client.conferences(conferenceSid).participants.list();
+	const conference = await client.conferences(conferenceSid).fetch();
+	console.log('participants', conference.participants());
+	return conference.participants();
 };

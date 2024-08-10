@@ -9,18 +9,24 @@ import LabeledInput from './ui/labeled-input';
 import WorkerSelect from './worker-select';
 import { PhoneInput } from './phone-input';
 import { useWorker } from '@/providers/worker-provider';
+import { useDevice } from '@/providers/device-provider';
+import { useSetRecoilState } from 'recoil';
+import { callStateAtom } from '@/atoms/twilioStateAtom';
+import { toast } from 'sonner';
 
 type Props = {
 	numbers: { phoneNumber: string; friendlyName: string }[];
 };
 
 const OutboundDialerContent = ({ numbers }: Props) => {
+	// const setActiveCall = useSetRecoilState(callStateAtom);
+
 	const { worker } = useWorker();
+	const { device } = useDevice();
 
 	return (
 		<PopoverContent align='end'>
 			<form
-				// action={makeOutboundCall}
 				onSubmit={async (e) => {
 					e.preventDefault();
 					var data = new FormData(e.currentTarget);
@@ -33,17 +39,28 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 					const workflowSid = data.get('from') as string;
 					const taskQueueSid = data.get('from') as string;
 					console.log(data);
-					await worker.createTask(
-						'+19015988651',
-						'+18449402678',
-						'WW497b90bc1703176f6845c09c8bf4fa8a',
-						'WQee659e96340b3899ad1fad7578fe6515',
-						{
-							attributes: {
-								direction: 'outboundDial',
-							},
-						}
-					);
+
+					try {
+						await device?.connect({
+							params: { To: '+19015988651', From: '+18449402678', agent: 'nblack@velomethod.com' },
+						});
+						// setActiveCall((prev) => {
+						// 	return { ...prev, call };
+						// });
+					} catch (error) {
+						toast.error("Can't create call" + JSON.stringify(error));
+					}
+					// await worker.createTask(
+					// 	'+19015988651',
+					// 	'+18449402678',
+					// 	'WW497b90bc1703176f6845c09c8bf4fa8a',
+					// 	'WQee659e96340b3899ad1fad7578fe6515',
+					// 	{
+					// 		attributes: {
+					// 			direction: 'outboundDial',
+					// 		},
+					// 	}
+					// );
 				}}
 				className='space-y-3'
 			>
@@ -80,9 +97,7 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 				<Separator />
 
 				<LabeledInput label='Agent'>
-					<Suspense>
-						<WorkerSelect />
-					</Suspense>
+					<Suspense>{/* <WorkerSelect /> */}</Suspense>
 				</LabeledInput>
 
 				<Button className='w-full space-x-1.5'>

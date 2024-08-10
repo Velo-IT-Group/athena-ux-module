@@ -24,11 +24,11 @@ const Page = async ({ params }: Props) => {
 			/>
 
 			<ConversationDetails
-				userId={attributes.userId}
+				contactId={attributes.userId}
 				className='p-6'
 			/>
 
-			<ConversationCompanyDetail id={attributes.companyId} />
+			<ConversationCompanyDetail companyId={attributes.companyId} />
 		</main>
 	);
 };

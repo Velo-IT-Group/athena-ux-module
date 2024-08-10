@@ -1,80 +1,46 @@
-'use client';
 import DatePicker from '@/components/ui/date-picker';
 import { Separator } from '@/components/ui/separator';
-import { Circle, CircleDashed, CircleUser } from 'lucide-react';
 import React, { Suspense } from 'react';
-import {
-	Board,
-	BoardStatus,
-	Company,
-	Contact,
-	Priority,
-	ReferenceType,
-	ServiceTicket,
-	SystemMember,
-} from '@/types/manage';
-import BoardSelector from './board-selector';
+import { ServiceTicket } from '@/types/manage';
 import { Skeleton } from '@/components/ui/skeleton';
-import CompanySelector from './company-selector';
-import ContactSelector from './contact-selector';
-import { getBoards, getCompanies, getContacts, getPriorities, getStatuses, getSystemMembers } from '@/lib/manage/read';
-import AsyncSelector, { Identifiable } from '@/components/async-selector';
-import { updateTicket } from '@/lib/manage/update';
-import { toast } from 'sonner';
+import BoardList from '@/components/board-list';
+import ContactList from '@/components/contact-list';
+import MemberList from '@/components/member-list';
+import CompanyList from '@/components/company-list';
+import PriorityList from '@/components/priority-list';
 
-export default function Properties({ ticket }: { ticket: ServiceTicket }) {
+export default async function Properties({ ticket }: { ticket: ServiceTicket }) {
 	// const attachments = await getDocuments('Ticket', ticket.id);
-
-	const fetchMembers = async () => {
-		const members = await getSystemMembers({
-			orderBy: { key: 'firstName' },
-			conditions: [{ parameter: { inactiveFlag: false } }],
-			pageSize: 1000,
-		});
-
-		return members.map((member) => {
-			return { ...member, name: `${member.firstName} ${member.lastName}` };
-		});
-	};
 
 	return (
 		<div className='pl-3 pb-6 pt-2.5 pr-1.5 space-y-7'>
 			<section>
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={<CircleDashed className='mr-1.5' />}
-						fetchFunction={getStatuses(ticket.board!.id!, { orderBy: { key: 'name' } })}
-						placeholder=''
-						prompt=''
-						updateFunction={async (arg) => {}}
-						defaultValue={ticket.board as BoardStatus}
+					<BoardList
+						type='combobox'
+						defaultValue={ticket.board}
 					/>
 				</Suspense>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={
-							<Circle
-								className='mr-1.5'
-								style={{ color: ticket.priority?.color?.toLowerCase() }}
-							/>
-						}
-						fetchFunction={getPriorities({ orderBy: { key: 'sortOrder' } })}
-						placeholder=''
-						prompt=''
-						updateFunction={async (arg) => {}}
-						defaultValue={ticket.priority as Priority}
+					<PriorityList
+						type='combobox'
+						defaultValue={ticket.priority}
 					/>
 				</Suspense>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={<CircleUser className='mr-1.5' />}
-						fetchFunction={fetchMembers()}
-						placeholder=''
-						prompt=''
-						updateFunction={async (arg) => {}}
-						defaultValue={ticket.owner}
+					<ContactList
+						type='combobox'
+						defaultValue={ticket.contact}
+						params={{
+							conditions: ticket.company
+								? [{ parameter: { 'company/id': ticket.company.id } }, { parameter: { inactiveFlag: false } }]
+								: [],
+							childConditions: [{ parameter: { 'types/id': 17 } }],
+							pageSize: 1000,
+							orderBy: { key: 'firstName' },
+						}}
 					/>
 				</Suspense>
 			</section>
@@ -83,19 +49,9 @@ export default function Properties({ ticket }: { ticket: ServiceTicket }) {
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Board</h4>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={<CircleUser className='mr-1.5' />}
-						fetchFunction={getBoards({ orderBy: { key: 'name' }, pageSize: 1000 })}
-						placeholder=''
-						prompt=''
-						updateFunction={async (e) => {
-							try {
-								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
-							} catch (error) {
-								toast.error(error as string);
-							}
-						}}
-						defaultValue={ticket.board as Board}
+					<BoardList
+						type='combobox'
+						defaultValue={ticket.board}
 					/>
 				</Suspense>
 			</section>
@@ -104,50 +60,17 @@ export default function Properties({ ticket }: { ticket: ServiceTicket }) {
 				<h4 className='text-xs text-muted-foreground font-medium px-3'>Company</h4>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={<CircleUser className='mr-1.5' />}
-						fetchFunction={getCompanies({
-							conditions: [{ parameter: { 'status/id': 1 } }],
-							childConditions: [{ parameter: { 'types/id': 1 } }],
-							orderBy: { key: 'name' },
-							pageSize: 1000,
-						})}
-						placeholder=''
-						prompt=''
-						updateFunction={async (e) => {
-							try {
-								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
-							} catch (error) {
-								toast.error(error as string);
-							}
-						}}
-						defaultValue={ticket.company as Company}
+					<CompanyList
+						type='combobox'
+						defaultValue={ticket.company}
 					/>
 				</Suspense>
 
 				<Suspense fallback={<Skeleton className='w-full h-9' />}>
-					<AsyncSelector
-						icon={<CircleUser className='mr-1.5' />}
-						fetchFunction={getContacts({
-							conditions: [{ parameter: { 'company/id': ticket.company?.id! } }],
-							pageSize: 1000,
-							orderBy: { key: 'firstName' },
-						})}
-						placeholder=''
-						prompt=''
-						updateFunction={async (e) => {
-							try {
-								await updateTicket(ticket.id, [{ op: 'replace', path: 'board/id', value: e.id }]);
-							} catch (error) {
-								toast.error(error as string);
-							}
-						}}
-						defaultValue={ticket.company as Contact}
+					<MemberList
+						type='combobox'
+						defaultValue={ticket.owner}
 					/>
-					{/* <ContactSelector
-						company={ticket.company}
-						contact={ticket.contact}
-					/> */}
 				</Suspense>
 			</section>
 

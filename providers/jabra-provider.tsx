@@ -1,6 +1,6 @@
 'use client';
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
-import { EasyCallControlFactory, IApi } from '@gnaudio/jabra-js';
+import { EasyCallControlFactory, IApi, ISingleCallControl } from '@gnaudio/jabra-js';
 import { initalizeJabra } from '@/lib/jabra';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { callControlDevicesState, currentCallControlState, deviceState } from '@/atoms/jabraStateAtom';
@@ -21,9 +21,9 @@ const context = React.createContext(initialValues);
 const { Provider } = context;
 
 export const JabraProvider = ({ children }: WithChildProps) => {
+	const [currentCallControl, setCurrentCallControl] = useState<ISingleCallControl | undefined>();
 	const setDeviceState = useSetRecoilState(deviceState);
 	const setCallControlDevices = useSetRecoilState(callControlDevicesState);
-	const currentCallControl = useRecoilValue(currentCallControlState);
 
 	useEffect(() => {
 		initalizeJabra()
@@ -37,7 +37,7 @@ export const JabraProvider = ({ children }: WithChildProps) => {
 
 					// Convert the ISdkDevice to a ICallControlDevice
 					const ccDevice = await eccFactory.createSingleCallControl(d);
-					// setCurrentCallControl(ccDevice);
+					setCurrentCallControl(ccDevice);
 					setCallControlDevices((prev) => [...prev, ccDevice]);
 				});
 			})

@@ -1,31 +1,43 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Computer, Search, Tag } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Computer, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
 import ConfigurationsList from './configurations-list';
-import { getConfigurations, getUserTickets } from '@/lib/manage/read';
-import TicketList from './ticket-list';
+import { getConfigurations } from '@/lib/manage/read';
+import TicketList from '@/components/ticket-list';
+import { getAllCalls } from '@/lib/twilio/read';
+import { CommunicationItem } from '@/types/manage';
+import { cn, parsePhoneNumber } from '@/lib/utils';
+import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@/auth';
+import ActivityList from '@/components/activity-list';
+import { Suspense } from 'react';
+import TableSkeleton from '@/components/ui/data-table/skeleton';
 
 type Props = {
-	userId?: number;
+	contactId?: number;
 	className?: string;
+	communicationItems?: CommunicationItem[];
 };
 
-const ConversationDetails = async ({ userId, className }: Props) => {
-	const [configurations] = await Promise.all([getConfigurations(userId)]);
-	const tabs = ['Activities', 'Attachments', 'Configurations', 'Tickets'];
+const ConversationDetails = async ({ contactId: userId, className, communicationItems }: Props) => {
+	const [configurations, session] = await Promise.all([
+		getConfigurations({ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }),
+		auth(),
+	]);
+
+	const [calls] = await Promise.all(
+		communicationItems?.length
+			? communicationItems
+					?.filter((item) => item.communicationType === 'Phone' && parsePhoneNumber(item.value).isValid)
+					.map((item) => getAllCalls(item.value))
+			: []
+	);
+
+	const tabs = ['Overview', 'Attachments', 'Configurations', 'Tickets'];
 
 	return (
-		<div className={className}>
-			<div className='flex items-center gap-3 text-muted-foreground border-b'>
-				<Search />
-
-				<Input
-					className='border-none border-b bg-transparent px-0 h-auto'
-					placeholder='Search activity, notes, email and more...'
-				/>
-			</div>
-
-			<Tabs defaultValue={tabs[0]}>
+		<div className={cn('w-full overflow-x-hidden', className)}>
+			<Tabs defaultValue={tabs[3]}>
 				<TabsList className='w-full'>
 					{tabs.map((tab) => (
 						<TabsTrigger
@@ -38,7 +50,27 @@ const ConversationDetails = async ({ userId, className }: Props) => {
 					))}
 				</TabsList>
 
-				<TabsContent value={tabs[0]}></TabsContent>
+				<TabsContent value={tabs[0]}>
+					<ActivityList
+						activities={(calls as CallInstance[])
+							?.sort((a, b) => {
+								if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
+								if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
+								return 0;
+							})
+							.map((call: CallInstance) => {
+								const isInbound = call.direction === 'inbound';
+								return {
+									icon: isInbound ? PhoneIncoming : PhoneOutgoing,
+									date: call.endTime,
+									text: `${
+										isInbound ? call.fromFormatted : session?.user.email === call.toFormatted ? 'You' : call.toFormatted
+									}
+												called ${isInbound ? call.toFormatted : call.fromFormatted}`,
+								};
+							})}
+					/>
+				</TabsContent>
 
 				<TabsContent value={tabs[2]}>
 					{configurations.length ? (
@@ -53,16 +85,22 @@ const ConversationDetails = async ({ userId, className }: Props) => {
 				</TabsContent>
 
 				<TabsContent value={tabs[3]}>
-					{/* {tickets.length ? (
-						<TicketList tickets={[]} />
-					) : (
-						<div className='grow grid place-items-center gap-3 p-6'>
-							<Tag className='w-9 h-9' />
+					<Suspense>
+						<Card>
+							<CardHeader>
+								<CardTitle>Tickets</CardTitle>
+							</CardHeader>
 
-							<h1 className='text-xl font-semibold'>No Tickets</h1>
-						</div>
-					)} */}
-					<TicketList tickets={[]} />
+							<CardContent className='p-3'>
+								<Suspense fallback={<TableSkeleton />}>
+									<TicketList
+										type='table'
+										params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
+									/>
+								</Suspense>
+							</CardContent>
+						</Card>
+					</Suspense>
 				</TabsContent>
 			</Tabs>
 		</div>

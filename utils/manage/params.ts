@@ -1,7 +1,7 @@
-type Comparator = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'contains' | 'like' | 'in' | 'not';
+type Comparator = '=' | '!=' | '<' | '<=' | '>' | '>=' | '==' | 'contains' | 'like' | 'in' | 'not';
 
 interface KeyValue {
-	[key: string]: number | string | boolean;
+	[key: string]: number | string | boolean | null;
 }
 
 interface Comparison {
@@ -34,7 +34,6 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 						? `${`${conditions} and ${key} ${condition.comparator ?? '='} ${value}`}`
 						: `${key} ${condition.comparator ?? '='} ${value}`
 				);
-				console.log(params.get('conditions'));
 			});
 		});
 	}
@@ -59,10 +58,6 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 
 	if (fields) {
 		params.set('fields', fields.toString());
-	}
-
-	if (fields) {
-		params.set('page', fields.toString());
 	}
 
 	if (pageSize) {

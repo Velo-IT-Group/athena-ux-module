@@ -4,13 +4,16 @@ import { getAuditTrail, getTicketNotes } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, Paperclip } from 'lucide-react';
+import { ArrowUp, Ellipsis, Paperclip, Reply, SmilePlus, User } from 'lucide-react';
 import { createTicketNote } from '@/lib/manage/create';
 import { toast } from 'sonner';
+import ActivityList from '@/components/activity-list';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { relativeDate } from '@/utils/date';
 
 export default async function ActivityFeed({ id }: { id: number }) {
 	const [entries, notes] = await Promise.all([
@@ -32,21 +35,11 @@ export default async function ActivityFeed({ id }: { id: number }) {
 
 					<AccordionContent>
 						<div className='text-muted-foreground grid gap-6'>
-							<div className='relative'>
-								<Separator
-									orientation='vertical'
-									className='absolute top-0 bottom-4 left-[18px] -z-10'
-								/>
-
-								<div className='space-y-3'>
-									{entries.map((entry) => (
-										<ActivityItem
-											key={entry.text}
-											entry={entry}
-										/>
-									))}
-								</div>
-							</div>
+							<ActivityList
+								activities={entries.map((entry) => {
+									return { icon: User, date: new Date(entry.enteredDate), text: `${entry.enteredBy} ${entry.text}` };
+								})}
+							/>
 						</div>
 					</AccordionContent>
 				</AccordionItem>
@@ -71,7 +64,46 @@ export default async function ActivityFeed({ id }: { id: number }) {
 							>
 								{notes.map((note) => (
 									<Card>
-										<CardContent className='p-3'>
+										<CardHeader className='flex flex-row items-center gap-1.5 p-3 space-y-0 group'>
+											<CardTitle className='text-sm flex items-center gap-1.5'>
+												<Avatar className='h-5 w-5'>
+													<AvatarFallback className='text-[9px] uppercase'>
+														{note?.createdBy && note?.createdBy[0]}
+														{note?.createdBy && note?.createdBy[1]}
+													</AvatarFallback>
+												</Avatar>
+
+												<span>{note.createdBy}</span>
+											</CardTitle>
+
+											<CardDescription className='text-xs'>
+												{relativeDate(note?.dateCreated ? new Date(note?.dateCreated) : new Date())}
+											</CardDescription>
+
+											<div className='opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1.5 ml-auto'>
+												<Button
+													variant='ghost'
+													size='sm'
+												>
+													<SmilePlus />
+												</Button>
+
+												<Button
+													variant='ghost'
+													size='sm'
+												>
+													<Reply />
+												</Button>
+
+												<Button
+													variant='ghost'
+													size='sm'
+												>
+													<Ellipsis />
+												</Button>
+											</div>
+										</CardHeader>
+										<CardContent className='p-3 pt-0'>
 											<p>{note.text}</p>
 										</CardContent>
 									</Card>
@@ -85,7 +117,7 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								{discussionNotes.map((note) => (
 									<Card>
 										<CardContent className='p-3'>
-											<p>{note.text}</p>
+											<p className='text-wrap line-clamp-5'>{note.text}</p>
 										</CardContent>
 									</Card>
 								))}
@@ -139,23 +171,7 @@ export default async function ActivityFeed({ id }: { id: number }) {
 				}}
 			>
 				<Card>
-					<CardHeader className='p-3'>
-						<Select
-							name='noteType'
-							defaultValue='detailDescriptionFlag'
-						>
-							<SelectTrigger className='w-1/5'>
-								<SelectValue placeholder='Select a note type...' />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value='detailDescriptionFlag'>Discussion</SelectItem>
-								<SelectItem value='internalFlag'>Internal</SelectItem>
-								<SelectItem value='resolutionFlag'>Resolution</SelectItem>
-							</SelectContent>
-						</Select>
-					</CardHeader>
-
-					<CardContent className='p-3 pt-0'>
+					<CardContent className='p-3'>
 						<Textarea
 							placeholder='Add a comment...'
 							className='border-none shadow-none resize-none'
@@ -164,26 +180,37 @@ export default async function ActivityFeed({ id }: { id: number }) {
 						/>
 					</CardContent>
 
-					<CardFooter className='justify-end p-3 pt-0'>
+					<CardFooter className='justify-end space-x-1.5 p-3 pt-0'>
+						<Select
+							name='noteType'
+							defaultValue='detailDescriptionFlag'
+						>
+							<SelectTrigger className='w-1/5'>
+								<SelectValue placeholder='Select a note type...' />
+							</SelectTrigger>
+
+							<SelectContent side='top'>
+								<SelectItem value='detailDescriptionFlag'>Discussion</SelectItem>
+								<SelectItem value='internalFlag'>Internal</SelectItem>
+								<SelectItem value='resolutionFlag'>Resolution</SelectItem>
+							</SelectContent>
+						</Select>
+
 						<Button
 							variant='ghost'
 							size='icon'
-							className='rounded-full'
 						>
 							<Paperclip />
 						</Button>
 
 						<Button
-							variant='ghost'
+							variant='outline'
 							size='icon'
-							className='border rounded-full'
 						>
 							<ArrowUp />
 						</Button>
 					</CardFooter>
 				</Card>
-
-				<div className='flex justify-end gap-3 text-muted-foreground'></div>
 			</form>
 		</div>
 	);

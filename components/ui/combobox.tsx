@@ -23,6 +23,7 @@ type Props = {
 	value: string;
 	setValue: React.Dispatch<React.SetStateAction<string>>;
 	popoverTriggerProps?: PopoverTriggerProps;
+	className?: string;
 };
 
 export function Combobox({
@@ -34,6 +35,7 @@ export function Combobox({
 	value = '',
 	setValue,
 	popoverTriggerProps,
+	className,
 }: Props) {
 	const [open, setOpen] = useState(false);
 
@@ -62,7 +64,7 @@ export function Combobox({
 			</PopoverTrigger>
 			<PopoverContent
 				align={align}
-				className='min-w-52 p-0'
+				className={cn('min-w-52 p-0', className)}
 				side={side}
 				avoidCollisions
 			>

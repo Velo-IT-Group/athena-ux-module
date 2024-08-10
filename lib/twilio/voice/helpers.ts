@@ -6,5 +6,6 @@ const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.en
 });
 
 export const getConferenceParticipants = async (conferenceSid: string) => {
-	return await client.conferences(conferenceSid).participants.list();
+	return await client.conferences(conferenceSid).participants.list({ muted: false });
 };
+t;

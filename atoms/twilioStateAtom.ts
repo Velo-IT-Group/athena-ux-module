@@ -53,3 +53,13 @@ export const reservationsListState = atom<Reservation[]>({
 	key: 'ReservationsList',
 	default: [],
 });
+
+export const tasksListState = atom<Task[]>({
+	key: 'TasksList',
+	default: [],
+});
+
+export const activeTaskAttributesListState = atom<Array<Record<string, any>>>({
+	key: 'ActiveTaskAttributesList',
+	default: [],
+});

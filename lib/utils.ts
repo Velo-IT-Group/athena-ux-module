@@ -12,3 +12,18 @@ baseHeaders.set(
 	'Basic ' + btoa(process.env.CONNECT_WISE_USERNAME! + ':' + process.env.CONNECT_WISE_PASSWORD!)
 );
 baseHeaders.set('Content-Type', 'application/json');
+
+import parser, { CountryCode, NumberFormat, FormatNumberOptions } from 'libphonenumber-js';
+
+export const parsePhoneNumber = (
+	text: string,
+	country: CountryCode = 'US',
+	format: NumberFormat = 'NATIONAL',
+	formatOptions?: FormatNumberOptions
+) => {
+	const number = parser(text, country);
+	return {
+		isValid: number ? number.isValid() : false,
+		formattedNumber: number?.format(format, formatOptions),
+	};
+};

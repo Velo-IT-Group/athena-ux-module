@@ -1,19 +1,14 @@
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Building2, Circle, Home, LineChart, LucideIcon, Notebook, Server, Settings, Tags } from 'lucide-react';
+import { Building2, Circle, Home, LineChart, LucideIcon, Notebook, Settings, Tags } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { getWorkers } from '@/lib/twilio/read';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
-import { getWorkflows } from '@/lib/twilio/taskrouter/helpers';
 import TaskList from './task-list';
 import { auth } from '@/auth';
 import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';
-import { useRecoilState } from 'recoil';
-import { collapsedState } from '@/atoms/sidebarStateAtom';
-import ServerTaskList from './server-task-list';
-import { useWorker } from '@/providers/worker-provider';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Input } from './ui/input';
 
@@ -60,6 +55,11 @@ const links: NavLink[] = [
 
 const SideNav = async (props: Props) => {
 	const [workers, activities, session] = await Promise.all([getWorkers(), getActivies(), auth()]);
+	const response = await fetch(`https://graph.microsoft.com/v1.0/me/calendar`, {
+		headers: { Authorization: `Bearer ${session?.user.microsoftToken}` },
+	});
+
+	// console.log(response);
 	// const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
 	// const { worker } = useWorker();
 
@@ -100,13 +100,16 @@ const SideNav = async (props: Props) => {
 					<section className='space-y-1.5 px-1.5'>
 						<h2 className='text-xs text-muted-foreground px-3 font-medium'>Workers</h2>
 
-						<div className='space-y-1.5'>
+						<div className='grid justify-start space-y-1.5'>
 							{activities.map((activity) => {
 								const filteredWorkers = workers.filter((w) => w.activitySid === activity.sid);
 								return (
 									<Popover>
 										<PopoverTrigger asChild>
-											<Button variant='ghost'>
+											<Button
+												variant='ghost'
+												className='justify-start'
+											>
 												<Circle className='stroke-none fill-green-500 h-5 w-5 mr-1.5' />
 												<span>
 													{activity.friendlyName} ({filteredWorkers.length})
@@ -178,6 +181,12 @@ const SideNav = async (props: Props) => {
 							})}
 						</div>
 					</section>
+
+					{/* <section className='space-y-1.5 px-1.5'>
+						<h2>Calendar</h2>
+
+						<CalendarList />
+					</section> */}
 				</aside>
 			</ScrollArea>
 		</ResizablePanel>

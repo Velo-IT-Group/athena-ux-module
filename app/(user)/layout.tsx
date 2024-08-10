@@ -8,6 +8,8 @@ import Navbar from '@/components/navbar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import SideNav from '@/components/side-nav';
 import { Toaster } from 'sonner';
+import Toolbar from './toolbar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Props = {
 	children: ReactNode;
@@ -25,16 +27,17 @@ const Layout = async ({ children }: Props) => {
 			<UserLayout token={session.user.twilioToken}>
 				<Navbar />
 
-				<ResizablePanelGroup
-					direction='horizontal'
-					className='grow'
-				>
+				<ResizablePanelGroup direction='horizontal'>
 					<SideNav />
 
 					<ResizableHandle />
 
-					<ResizablePanel className='grow min-h-0'>{children}</ResizablePanel>
+					<ResizablePanel>
+						<ScrollArea className='h-[calc(100vh-48px)]'>{children}</ScrollArea>
+					</ResizablePanel>
 				</ResizablePanelGroup>
+
+				<Toolbar />
 
 				<Toaster />
 			</UserLayout>

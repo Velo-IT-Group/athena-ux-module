@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -12,9 +12,10 @@ import { useTaskContext } from './task-context';
 import { Contact } from '@/types/manage';
 import { updateTask } from '@/lib/twilio/taskrouter/helpers';
 import { revalidatePath } from 'next/cache';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 type Props = {
-	companyId: string;
+	companyId?: number;
 	contactId?: number;
 	minimal?: boolean;
 };
@@ -24,9 +25,16 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 	const [open, setOpen] = useState(false);
 	const [contact, setContact] = useState<Contact>();
 	const [contacts, setContacts] = useState<Contact[]>([]);
-
+	const searchParams = useSearchParams();
+	const router = useRouter();
+	const pathname = usePathname();
 	useEffect(() => {
-		getContacts(parseInt(companyId)).then((c) => {
+		getContacts({
+			conditions: companyId ? [{ parameter: { 'company/id': companyId } }, { parameter: { inactiveFlag: false } }] : [],
+			childConditions: [{ parameter: { 'types/id': 17 } }],
+			pageSize: 1000,
+			orderBy: { key: 'firstName' },
+		}).then((c) => {
 			setContacts(c);
 			console.log(
 				contactId,
@@ -38,6 +46,18 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 			}
 		});
 	}, [companyId, task, contactId]);
+
+	// Get a new searchParams string by merging the current
+	// searchParams with a provided key/value pair
+	const createQueryString = useCallback(
+		(name: string, value: string) => {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set(name, value);
+
+			return params.toString();
+		},
+		[searchParams]
+	);
 
 	return (
 		<Popover
@@ -51,7 +71,8 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 					aria-expanded={open}
 					className='justify-between'
 				>
-					{!minimal && contact && `${contact.firstName} ${contact.lastName}`}
+					{!minimal && 'Select a user...'}
+
 					<ChevronsUpDown className={cn('h-4 w-4 shrink-0 opacity-50', !minimal && 'ml-1.5')} />
 				</Button>
 			</PopoverTrigger>
@@ -70,7 +91,7 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 									const c = contacts.find((con) => con.id === userId);
 									setContact(c);
 									setOpen(false);
-									console.log(task?.sid, userId);
+									router.push(pathname + '?' + createQueryString('contactId', String(userId)));
 									if (!task || !userId) return;
 									const tt = await updateTask(task.sid, {
 										attributes: JSON.stringify({

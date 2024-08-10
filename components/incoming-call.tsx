@@ -1,4 +1,4 @@
-'use server';
+'use client';
 import { Rocket, X } from 'lucide-react';
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,14 +8,15 @@ import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { ReservationInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker/reservation';
 import ReservationAcceptButton from './reservation-accept-button';
+import { Reservation, Task } from 'twilio-taskrouter';
 
 type Props = {
-	reservation: ReservationInstance;
-	task: TaskInstance;
+	reservation: Reservation;
+	task: Task;
 };
 
-const IncomingTask = async ({ reservation, task }: Props) => {
-	const attributes = JSON.parse(task.attributes);
+const IncomingTask = ({ reservation, task }: Props) => {
+	const { attributes } = task;
 
 	return (
 		<Card
@@ -25,7 +26,7 @@ const IncomingTask = async ({ reservation, task }: Props) => {
 			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
 				<CardTitle>
 					<Rocket className='h-3.5 w-3.5 inline-block mr-1.5 text-yellow-400' />
-					<span className='text-sm font-normal'>{task.taskQueueFriendlyName}</span>
+					<span className='text-sm font-normal'>{task.queueName}</span>
 				</CardTitle>
 
 				<CardDescription>
@@ -52,7 +53,7 @@ const IncomingTask = async ({ reservation, task }: Props) => {
 				</Avatar>
 				<div className='text-center'>
 					<p className='font-medium text-sm'>{attributes.name}</p>
-					<p className='text-gray-400 text-xs'>is calling {task.taskQueueFriendlyName}</p>
+					<p className='text-gray-400 text-xs'>is calling {task.queueName}</p>
 				</div>
 			</CardContent>
 
@@ -67,13 +68,28 @@ const IncomingTask = async ({ reservation, task }: Props) => {
 					Decline
 				</Button>
 
-				<ReservationAcceptButton
+				<Button
+					variant='accepting'
+					size={'sm'}
+					className='text-sm'
+					onClick={async () => {
+						await reservation.conference({
+							beep: false,
+							startConferenceOnEnter: true,
+							endConferenceOnExit: true,
+						});
+					}}
+				>
+					Accept
+				</Button>
+
+				{/* <ReservationAcceptButton
 					attributes={attributes}
 					to={reservation.workerName}
 					from={attributes.from}
 					reservationSid={reservation.sid}
 					taskSid={task.sid}
-				/>
+				/> */}
 			</CardFooter>
 		</Card>
 	);

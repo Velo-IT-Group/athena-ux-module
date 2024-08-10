@@ -8,7 +8,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 	const { toasts } = useSonner();
 
 	useEffect(() => {
-		if (toasts.length) return;
+		if (!toasts.length) return;
 		if (!('Notification' in window)) {
 			// Check if the browser supports notifications
 			alert('This browser does not support desktop notification');
@@ -35,7 +35,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 		return () => {
 			window.removeEventListener('blur', function () {});
 		};
-	}, [window]);
+	}, []);
 
 	useEffect(() => {
 		if (toasts.length) return;

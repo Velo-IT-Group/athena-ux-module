@@ -5,13 +5,19 @@ import { cn } from '@/lib/utils';
 import { useWorker } from '@/providers/worker-provider';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import IncomingTask from './incoming-call';
-import type { Reservation } from 'twilio-taskrouter';
+import type { Reservation, Task } from 'twilio-taskrouter';
 import TaskWrapup from './task/wrapup';
 import { toast } from 'sonner';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { callStateAtom, deviceEligibleAtom } from '@/atoms/twilioStateAtom';
+import {
+	activeTaskAttributesListState,
+	callStateAtom,
+	deviceEligibleAtom,
+	tasksListState,
+} from '@/atoms/twilioStateAtom';
 import { reservationsListState } from '@/atoms/twilioStateAtom';
 import { useDevice } from '@/providers/device-provider';
+import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 
 type Props = {
 	className?: String;
@@ -22,6 +28,8 @@ const TaskList = ({ className }: Props) => {
 	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
 	const { device } = useDevice();
 	const [reservations, setReservations] = useRecoilState(reservationsListState);
+	const [taskAttributes, setTaskAttributes] = useRecoilState(activeTaskAttributesListState);
+	const [tasks, setTasks] = useRecoilState(tasksListState);
 	const { worker } = useWorker();
 
 	const onReservationCreated = async (r: Reservation) => {
@@ -36,7 +44,6 @@ const TaskList = ({ className }: Props) => {
 
 		try {
 			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
-			await r.conference({ beep: false });
 
 			// if (r.task.attributes.direction === 'outboundDial') {
 			// 	const res = await r.conference({ beep: false });
@@ -45,10 +52,22 @@ const TaskList = ({ className }: Props) => {
 			// }
 
 			r.on('accepted', async (reservation) => {
-				setActiveCall({ ...activeCall, task: reservation.task });
+				// setActiveCall({ ...activeCall, task: reservation.task });
 				setReservations((prev) => [...prev.filter((res) => res.sid !== r.sid), r]);
+				setTasks((prev) => [...prev.filter((res) => res.sid !== reservation.task.sid), reservation.task]);
 
-				console.log(`Reservation ${reservation.sid} was accepted.`);
+				if (!reservation.task.attributes.conference) {
+					const conferenceInfo = await getConferenceByName(reservation.task.sid);
+					setTaskAttributes((prev) => [
+						...prev.filter((item) => item.call_sid !== reservation.task.attributes.call_sid),
+						{ ...reservation.task.attributes, conferenceInfo },
+					]);
+				} else {
+					setTaskAttributes((prev) => [
+						...prev.filter((item) => item.call_sid !== reservation.task.attributes.call_sid),
+						reservation.task.attributes,
+					]);
+				}
 			});
 
 			r.on('rejected', async (reservation) => {
@@ -110,26 +129,6 @@ const TaskList = ({ className }: Props) => {
 		worker.on('reservationCreated', onReservationCreated);
 
 		if (!device) return;
-
-		// device.on('incoming', async (call: Call) => {
-		// 	console.log(`Incoming call from ${call.parameters.From}`);
-
-		// 	call.on('accept', async (c) => {
-		// 		setActiveCall((prev) => {
-		// 			return { ...prev, call };
-		// 		});
-
-		// toast.custom(() => <ActiveCall />, {
-		// 	duration: Infinity,
-		// 	dismissible: false,
-		// 	id: call.parameters.CallSid,
-		// });
-		// 	});
-		// });
-
-		// return () => {
-		// 	worker?.removeListener('reservationCreated', onReservationCreated);
-		// };
 	}, [worker]);
 
 	return (
@@ -138,10 +137,11 @@ const TaskList = ({ className }: Props) => {
 				<section className='space-y-1.5 px-1.5'>
 					<h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>
 
-					<Popover open={true}>
+					<Popover open={reservations.some((reservation) => reservation.status === 'pending')}>
 						<div className='flex flex-col gap-1.5'>
 							{reservations.map((reservation) => {
 								const { attributes } = reservation.task;
+								console.log(attributes.call_sid);
 
 								return (
 									<>
@@ -166,7 +166,10 @@ const TaskList = ({ className }: Props) => {
 											align='center'
 											className='p-0'
 										>
-											<IncomingTask reservation={reservation} />
+											<IncomingTask
+												reservation={reservation}
+												task={reservation.task}
+											/>
 										</PopoverContent>
 									</>
 								);

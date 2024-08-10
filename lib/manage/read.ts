@@ -4,6 +4,7 @@ import type {
 	AuditTrailEntry,
 	Board,
 	BoardStatus,
+	CommunicationItem,
 	Company,
 	Configuration,
 	Contact,
@@ -15,6 +16,7 @@ import type {
 	RecordType,
 	Schedule,
 	ServiceTicket,
+	ServiceTicketTask,
 	Site,
 	SystemMember,
 	TicketNote,
@@ -64,7 +66,7 @@ export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>)
 	return await response.json();
 };
 
-export const getContact = async (id?: number, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
+export const getContact = async (id: number, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
 	try {
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}/${generateParams(conditions)}`,
@@ -72,6 +74,24 @@ export const getContact = async (id?: number, conditions?: Conditions<Contact>):
 		);
 
 		if (response.status !== 200) throw Error('Could not find contact...');
+
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const getContactCommunications = async (
+	id: number,
+	conditions?: Conditions<CommunicationItem>
+): Promise<CommunicationItem[] | undefined> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}/communications${generateParams(conditions)}`,
+			{ headers: baseHeaders }
+		);
+
+		if (response.status !== 200) throw Error('Could not find contact communications...');
 
 		return await response.json();
 	} catch (error) {
@@ -128,11 +148,43 @@ export const getConfigurations = async (conditions?: Conditions<Configuration>):
 	}
 };
 
-export const getTickets = async (conditions?: Conditions<ServiceTicket>): Promise<ServiceTicket[]> => {
+export const getTasks = async (
+	id: number,
+	conditions?: Conditions<ServiceTicketTask>
+): Promise<ServiceTicketTask[]> => {
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/tasks${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	console.log(response.statusText);
+
+	return await response.json();
+};
+
+export const getTickets = async (
+	conditions?: Conditions<ServiceTicket>
+): Promise<{ tickets: ServiceTicket[]; count: number }> => {
+	console.log(generateParams(conditions));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
-	return await response.json();
+
+	const responseCount = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/count${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	const { count } = await responseCount.json();
+
+	return {
+		tickets: await response.json(),
+		count,
+	};
 };
 
 export const getTicket = async (id: number, conditions?: Conditions<ServiceTicket>): Promise<ServiceTicket> => {
@@ -259,7 +311,7 @@ export const getSchedule = async (id: number = 1, conditions?: Conditions<Schedu
 		}
 	);
 
-	if (!response.ok) throw Error('Error fetching schedule...');
+	// if (!response.ok) throw Error(`Error fetching schedule... ${response.statusText}`);
 
 	return await response.json();
 };
@@ -276,7 +328,9 @@ export const getHoliday = async (
 		}
 	);
 
-	if (!response.ok) throw Error('Error fetching holiday...');
+	console.log(response);
+
+	// if (!response.ok) throw Error('Error fetching holiday...');
 
 	return await response.json();
 };

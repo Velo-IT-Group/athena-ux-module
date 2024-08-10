@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const referenceTypeSchema = z.object({
-	id: z.number().optional(),
+	id: z.number(),
 	identity: z.string().optional(),
-	name: z.string().optional(),
+	name: z.string(),
 });
 
 const auditTypeSchema = z.enum([
@@ -42,12 +42,12 @@ export const auditTrailEntrySchema = z.object({
 });
 
 export const communicationItemSchema = z.object({
-	id: z.number().optional(),
+	id: z.number(),
 	type: referenceTypeSchema,
-	value: z.string().optional(),
+	value: z.string(),
 	defaultFlag: z.boolean().optional(),
 	domain: z.string().optional(),
-	communicationType: z.string().optional(),
+	communicationType: z.enum(['Email', 'Fax', 'Phone']).optional(),
 });
 
 export const contactSchema = z.object({
@@ -478,6 +478,15 @@ export const locationSchema = z.object({
 	departmentIds: z.array(z.number()),
 });
 
+export const serviceTicketTaskSchema = z.object({
+	id: z.number(),
+	ticketId: z.number(),
+	closedFlag: z.boolean(),
+	priority: z.number(),
+	childTicketId: z.number(),
+	summary: z.string(),
+});
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type CustomField = z.infer<typeof customFieldSchema>;
@@ -488,6 +497,7 @@ export type Location = z.infer<typeof locationSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type ReferenceType = z.infer<typeof referenceTypeSchema>;
 export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
+export type ServiceTicketTask = z.infer<typeof serviceTicketTaskSchema>;
 export type SystemMember = z.infer<typeof systemMemberSchema>;
 export type TicketNote = z.infer<typeof ticketNoteSchema>;
 

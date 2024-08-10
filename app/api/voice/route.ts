@@ -8,16 +8,18 @@ export async function POST(request: Request) {
 
 	console.log(data);
 
-	const dial = twiml.dial({ callerId: data.get('Caller') as string });
+	const dial = twiml.dial({ callerId: data.get('Caller') as string, answerOnBridge: true });
 	dial.client('nblack@velomethod.com');
-	dial.conference(
-		{
-			beep: false,
-			startConferenceOnEnter: true,
-			endConferenceOnExit: true,
-		},
-		'NoMusicNoBeepRoom'
-	);
+	console.log(dial);
+
+	// dial.conference(
+	// {
+	// 	beep: false,
+	// 	startConferenceOnEnter: true,
+	// 	endConferenceOnExit: true,
+	// },
+	// 	'NoMusicNoBeepRoom'
+	// );
 	// console.log(dial);
 	// console.log(data, twiml);
 

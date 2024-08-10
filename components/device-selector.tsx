@@ -24,7 +24,7 @@ type Props = {
 const DeviceSelector = ({ className }: Props) => {
 	const [open, setOpen] = useState(false);
 	const [inputLevel, setInputLevel] = useState(0);
-	const { callControlDevices, setCurrentCallControl, currentCallControl, jabra, deviceState } = useJabra();
+	// const { callControlDevices, setCurrentCallControl, currentCallControl, jabra, deviceState } = useJabra();
 	const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [selectedDevice, setSelectedDevice] = useState<string>();

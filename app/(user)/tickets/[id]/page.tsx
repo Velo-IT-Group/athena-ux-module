@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Properties from './properties';
 import { getTicket, getTicketNotes } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import ActivityFeed from './activity-feed';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
+import ParentTicket from '../(tickets)/parent-ticket';
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import ChildTickets from './child-tickets';
 
 type Props = {
 	params: { id: string };
@@ -17,13 +27,35 @@ export default async function Page({ params }: Props) {
 
 	return (
 		<main className='grid grid-cols-[1fr_280px] items-start gap-3 h-full bg-muted/15'>
-			<ScrollArea className='grid min-h-0 h-full'>
-				<div className='max-w-3xl w-full mx-auto py-10 grid items-start space-y-1.5'>
+			<ScrollArea className='grid min-h-0 h-full overflow-y-auto'>
+				<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
+					{ticket.parentTicketId && (
+						<Breadcrumb>
+							<BreadcrumbList>
+								<BreadcrumbItem>
+									<BreadcrumbLink href={`/tickets/${ticket.parentTicketId}`}>#{ticket.parentTicketId}</BreadcrumbLink>
+								</BreadcrumbItem>
+
+								<BreadcrumbSeparator />
+
+								<BreadcrumbItem>
+									<BreadcrumbLink href='/'>{ticket.summary}</BreadcrumbLink>
+								</BreadcrumbItem>
+							</BreadcrumbList>
+						</Breadcrumb>
+					)}
+
 					<Textarea
 						name='summary'
 						defaultValue={ticket.summary}
 						className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
 					/>
+
+					{ticket.parentTicketId && (
+						<Suspense fallback={<Skeleton className='h-9 w-24' />}>
+							<ParentTicket ticketId={ticket.parentTicketId} />
+						</Suspense>
+					)}
 
 					<Textarea
 						placeholder='Add a comment...'
@@ -32,7 +64,13 @@ export default async function Page({ params }: Props) {
 						minRows={3}
 					/>
 
-					<Separator />
+					{ticket.hasChildTicket ? (
+						<Suspense>
+							<ChildTickets ticketId={ticket.id} />{' '}
+						</Suspense>
+					) : (
+						<Separator />
+					)}
 
 					<ActivityFeed id={Number(params.id)} />
 				</div>

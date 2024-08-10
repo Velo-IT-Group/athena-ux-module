@@ -21,7 +21,7 @@ const Navbar = async () => {
 	]);
 
 	return (
-		<nav className='flex items-center justify-between border-b px-3 py-0.5'>
+		<nav className='flex items-center justify-between border-b px-3 py-0.5 h-12'>
 			<div className='flex items-center gap-3'>
 				<Image
 					src='/velo-logo-black.svg'
@@ -51,11 +51,7 @@ const Navbar = async () => {
 						</Button>
 					</PopoverTrigger>
 
-					<OutboundDialerContent
-						numbers={numbers.map(({ phoneNumber, friendlyName }) => {
-							return { phoneNumber, friendlyName };
-						})}
-					/>
+					<OutboundDialerContent numbers={[]} />
 				</Popover>
 
 				<UserInfo session={session} />

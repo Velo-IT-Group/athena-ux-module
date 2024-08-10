@@ -1,6 +1,8 @@
+const formatter = new Intl.RelativeTimeFormat('en', { style: 'long' });
+
 export function relativeDate(date: Date) {
-	// @ts-ignore
-	const diff: number = Math.round((new Date() - new Date(date)) / 1000);
+	const now = new Date();
+	const diff: number = Math.round((now.getTime() - date.getTime()) / 1000);
 
 	const minute = 60;
 	const hour = minute * 60;
@@ -9,29 +11,19 @@ export function relativeDate(date: Date) {
 	const month = day * 30;
 	const year = month * 12;
 
-	if (diff < 30) {
-		return 'just now';
-	} else if (diff < minute) {
-		return diff + ' seconds ago';
-	} else if (diff < 2 * minute) {
-		return 'a minute ago';
+	if (diff < minute) {
+		return formatter.format(-diff, 'seconds');
 	} else if (diff < hour) {
-		return Math.floor(diff / minute) + ' minutes ago';
-	} else if (Math.floor(diff / hour) == 1) {
-		return '1 hour ago';
+		return formatter.format(-Math.floor(diff / minute), 'minutes');
 	} else if (diff < day) {
-		return Math.floor(diff / hour) + ' hours ago';
-	} else if (diff < day * 2) {
-		return 'yesterday';
+		return formatter.format(-Math.floor(diff / hour), 'hours');
 	} else if (diff < week) {
-		const dayAmount = Math.floor(diff / day);
-		return `${dayAmount} ${dayAmount > 1 ? ' days ago' : 'day ago'}`;
+		return formatter.format(-Math.floor(diff / day), 'days');
 	} else if (diff < month) {
-		return Math.floor(diff / week) + ' weeks ago';
+		return formatter.format(-Math.floor(diff / week), 'weeks');
 	} else if (diff < year && diff < year) {
-		const monthAmount = Math.floor(diff / month);
-		return `${monthAmount} ${monthAmount > 1 ? ' months ago' : ' month ago'}`;
+		return formatter.format(-Math.floor(diff / month), 'months');
 	} else {
-		return Math.floor(diff / year) + ' years ago';
+		return formatter.format(-Math.floor(diff / year), 'years');
 	}
 }

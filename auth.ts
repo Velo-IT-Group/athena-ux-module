@@ -2,6 +2,7 @@ import Entra from 'next-auth/providers/microsoft-entra-id';
 import NextAuth, { type NextAuthConfig, type DefaultSession, type Account } from 'next-auth';
 import { findWorker } from './lib/twilio/taskrouter/helpers';
 import { createAccessToken } from './lib/twilio';
+import { getSystemMember, getSystemMembers } from './lib/manage/read';
 
 declare module 'next-auth' {
 	/**
@@ -12,6 +13,8 @@ declare module 'next-auth' {
 			/** The user's postal address. */
 			workerSid: string;
 			twilioToken: string;
+			referenceId: number;
+			microsoftToken: string;
 			/**
 			 * By default, TypeScript merges new interface properties and overwrites existing ones.
 			 * In this case, the default session user properties will be overwritten,
@@ -28,12 +31,23 @@ export const config: NextAuthConfig = {
 			clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
 			clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
 			tenantId: process.env.AUTH_MICROSOFT_ENTRA_ID_TENANT_ID,
+			authorization: {
+				params: {
+					scope: 'openid profile email User.Read Calendars.ReadBasic Calendars.Read Calendars.ReadWrite',
+				},
+			},
 			profilePhotoSize: 120,
 			async profile(profile, tokens) {
 				// https://learn.microsoft.com/en-us/graph/api/profilephoto-get?view=graph-rest-1.0&tabs=http#examples
 				const response = await fetch(`https://graph.microsoft.com/v1.0/me/photos/${120}x${120}/$value`, {
 					headers: { Authorization: `Bearer ${tokens.access_token}` },
 				});
+
+				const calendarResponse = await fetch(`https://graph.microsoft.com/v1.0/me/calendar/events`, {
+					headers: { Authorization: `Bearer ${tokens.access_token}` },
+				});
+
+				console.log(await calendarResponse.json());
 
 				// Confirm that profile photo was returned
 				let image;
@@ -62,9 +76,13 @@ export const config: NextAuthConfig = {
 		}),
 	],
 	callbacks: {
-		async session({ session }) {
-			const worker = await findWorker(session.user.email);
-			const token = await createAccessToken(
+		async session({ session, token }) {
+			const [worker, members] = await Promise.all([
+				findWorker(session.user.email),
+				getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${session.user.email}'` } }] }),
+			]);
+
+			const twilioToken = await createAccessToken(
 				process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID as string,
 				process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID as string,
 				process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET as string,
@@ -73,7 +91,8 @@ export const config: NextAuthConfig = {
 				worker.friendlyName ?? 'nblack@velomethod.com'
 			);
 			session.user.workerSid = worker.sid;
-			session.user.twilioToken = token;
+			session.user.twilioToken = twilioToken;
+			session.user.referenceId = members[0].id;
 			return session;
 		},
 	},

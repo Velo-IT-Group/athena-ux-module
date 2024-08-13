@@ -37,7 +37,7 @@ const Layout = async ({ children }: Props) => {
 					</ResizablePanel>
 				</ResizablePanelGroup>
 
-				<Toolbar />
+				{/* <Toolbar /> */}
 
 				<Toaster />
 			</UserLayout>

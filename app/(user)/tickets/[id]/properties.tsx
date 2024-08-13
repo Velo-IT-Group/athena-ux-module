@@ -8,8 +8,11 @@ import ContactList from '@/components/contact-list';
 import MemberList from '@/components/member-list';
 import CompanyList from '@/components/company-list';
 import PriorityList from '@/components/priority-list';
+import ConfigurationsList from '@/components/configurations-list';
+import { getConfigurations } from '@/lib/manage/read';
 
 export default async function Properties({ ticket }: { ticket: ServiceTicket }) {
+	const { configurations } = await getConfigurations();
 	// const attachments = await getDocuments('Ticket', ticket.id);
 
 	return (
@@ -70,6 +73,17 @@ export default async function Properties({ ticket }: { ticket: ServiceTicket }) 
 					<MemberList
 						type='combobox'
 						defaultValue={ticket.owner}
+					/>
+				</Suspense>
+			</section>
+
+			<section>
+				<h4 className='text-xs text-muted-foreground font-medium px-3'>Configuration</h4>
+
+				<Suspense fallback={<Skeleton className='w-full h-9' />}>
+					<ConfigurationsList
+						type='combobox'
+						defaultValue={[configurations[0], configurations[1]]}
 					/>
 				</Suspense>
 			</section>

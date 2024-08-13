@@ -11,6 +11,7 @@
   "dependencies": {
     "@gnaudio/jabra-js": "^4.2.2",
     "@gnaudio/jabra-node-sdk": "^3.6.2",
+    "@hookform/resolvers": "^3.9.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.1.0",
@@ -57,6 +58,7 @@
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.52.2",
     "react-phone-number-input": "^3.4.5",
     "react-querybuilder": "^7.6.1",
     "react-resizable-panels": "^2.0.22",

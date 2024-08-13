@@ -1,6 +1,6 @@
 import { Contact, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Combobox } from './ui/combobox';
 import { getContacts } from '@/lib/manage/read';
 import { Button } from './ui/button';
@@ -10,6 +10,7 @@ type Props = {
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<Contact>;
+	children?: ReactNode;
 };
 
 const ContactList = async ({
@@ -20,6 +21,7 @@ const ContactList = async ({
 		pageSize: 1000,
 		orderBy: { key: 'firstName' },
 	},
+	children,
 }: Props) => {
 	const contacts = await getContacts(params);
 
@@ -38,15 +40,19 @@ const ContactList = async ({
 					side='left'
 					align='start'
 				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<User className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add contact'}</span>
-					</Button>
+					{children ? (
+						children
+					) : (
+						<Button
+							size='sm'
+							variant='ghost'
+							role='combobox'
+							className='flex'
+						>
+							<User className='mr-1.5' />
+							<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add contact'}</span>
+						</Button>
+					)}
 				</Combobox>
 			)}
 		</>

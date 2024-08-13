@@ -478,6 +478,19 @@ export const locationSchema = z.object({
 	departmentIds: z.array(z.number()),
 });
 
+export const communicationTypeSchema = z.object({
+	id: z.number(),
+	description: z.string(),
+	phoneFlag: z.boolean(),
+	faxFlag: z.boolean(),
+	emailFlag: z.boolean(),
+	defaultFlag: z.boolean(),
+	exchangeXref: z.string(),
+	iphoneXref: z.string(),
+	androidXref: z.string(),
+	googleXref: z.string(),
+});
+
 export const serviceTicketTaskSchema = z.object({
 	id: z.number(),
 	ticketId: z.number(),
@@ -491,6 +504,7 @@ export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type CustomField = z.infer<typeof customFieldSchema>;
 export type CommunicationItem = z.infer<typeof communicationItemSchema>;
+export type CommunicationType = z.infer<typeof communicationTypeSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type Document = z.infer<typeof documentSchema>;
 export type Location = z.infer<typeof locationSchema>;

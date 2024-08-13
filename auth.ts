@@ -2,7 +2,7 @@ import Entra from 'next-auth/providers/microsoft-entra-id';
 import NextAuth, { type NextAuthConfig, type DefaultSession, type Account } from 'next-auth';
 import { findWorker } from './lib/twilio/taskrouter/helpers';
 import { createAccessToken } from './lib/twilio';
-import { getSystemMember, getSystemMembers } from './lib/manage/read';
+import { getContacts, getSystemMember, getSystemMembers } from './lib/manage/read';
 
 declare module 'next-auth' {
 	/**
@@ -14,6 +14,7 @@ declare module 'next-auth' {
 			workerSid: string;
 			twilioToken: string;
 			referenceId: number;
+			contactId: number;
 			microsoftToken: string;
 			/**
 			 * By default, TypeScript merges new interface properties and overwrites existing ones.
@@ -77,9 +78,10 @@ export const config: NextAuthConfig = {
 	],
 	callbacks: {
 		async session({ session, token }) {
-			const [worker, members] = await Promise.all([
+			const [worker, members, contacts] = await Promise.all([
 				findWorker(session.user.email),
 				getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${session.user.email}'` } }] }),
+				getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${session.user.email}'` } }] }),
 			]);
 
 			const twilioToken = await createAccessToken(
@@ -93,6 +95,7 @@ export const config: NextAuthConfig = {
 			session.user.workerSid = worker.sid;
 			session.user.twilioToken = twilioToken;
 			session.user.referenceId = members[0].id;
+			session.user.contactId = contacts[0].id;
 			return session;
 		},
 	},

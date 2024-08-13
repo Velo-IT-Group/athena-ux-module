@@ -27,3 +27,12 @@ export const parsePhoneNumber = (
 		formattedNumber: number?.format(format, formatOptions),
 	};
 };
+
+/**
+ * Checks if the given value is valid as phone number
+ * @param {Number|String} number
+ * @return {Boolean}
+ */
+export const isAValidPhoneNumber = (phoneNumber: string) => {
+	return /^[\d\+\-\(\) ]+$/.test(phoneNumber);
+};

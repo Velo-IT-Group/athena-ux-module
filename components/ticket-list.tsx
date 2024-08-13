@@ -11,9 +11,10 @@ type Props = {
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: number;
 	params?: Conditions<ServiceTicket>;
+	hidePagination?: boolean;
 };
 
-const TicketList = async ({ type, defaultValue, params }: Props) => {
+const TicketList = async ({ type, defaultValue, params, hidePagination = false }: Props) => {
 	const [{ tickets, count }, boards] = await Promise.all([
 		getTickets(params),
 		getBoards({ orderBy: { key: 'name' }, pageSize: 1000 }),
@@ -28,6 +29,7 @@ const TicketList = async ({ type, defaultValue, params }: Props) => {
 					facetedFilters={[{ accessoryKey: 'board', items: boards }]}
 					count={count}
 					meta={{ filterKey: 'summary' }}
+					hidePagination={hidePagination}
 				/>
 			)}
 

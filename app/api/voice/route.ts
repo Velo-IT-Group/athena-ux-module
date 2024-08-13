@@ -1,45 +1,36 @@
+import { auth } from '@/auth';
+import { isAValidPhoneNumber } from '@/lib/utils';
 import { NextResponse } from 'next/server';
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
-import { ConferenceAttributes } from 'twilio/lib/twiml/VoiceResponse';
 
 export async function POST(request: Request) {
-	const data = await request.formData();
 	const twiml = new VoiceResponse();
+	const [session, data] = await Promise.all([auth(), request.formData()]);
+	const toNumberOrClientName = data.get('To') as string;
+	const To = data.get('To') as string;
+	const callerId = '+18449402678';
 
-	console.log(data);
+	if (toNumberOrClientName == callerId) {
+		let dial = twiml.dial({ callerId: data.get('Caller') as string, answerOnBridge: true });
 
-	const dial = twiml.dial({ callerId: data.get('Caller') as string, answerOnBridge: true });
-	dial.client('nblack@velomethod.com');
-	console.log(dial);
+		// This will connect the caller with your Twilio.Device/client
+		dial.client(session?.user.email ?? '');
+	} else if (To) {
+		// This is an outgoing call
 
-	// dial.conference(
-	// {
-	// 	beep: false,
-	// 	startConferenceOnEnter: true,
-	// 	endConferenceOnExit: true,
-	// },
-	// 	'NoMusicNoBeepRoom'
-	// );
-	// console.log(dial);
-	// console.log(data, twiml);
+		// set the callerId
+		let dial = twiml.dial({ callerId, answerOnBridge: true });
 
-	// response.
+		// Check if the 'To' parameter is a Phone Number or Client Name
+		// in order to use the appropriate TwiML noun
+		const attr = isAValidPhoneNumber(toNumberOrClientName) ? 'number' : 'client';
+		dial[attr]({}, toNumberOrClientName);
+	} else {
+		twiml.say('Thanks for calling!');
+	}
 
-	// response.type = 'application/json';
-	// response.send({
-	//   instruction: "dequeue",
-	//   post_work_activity_sid: app.get('workspaceInfo').activities.idle
-	// });
 	let response = new NextResponse(twiml.toString());
 	response.headers.set('Content-Type', 'text/xml');
 
 	return response;
-	// return Response.json({
-	// 	instruction: "dequeue",
-	// 	to: "469-344-2265",
-	// 	"from": "{the caller ID that you want to send to the Worker. Required.}",
-	// 	"post_work_activity_sid": "{the ActivitySid that should be assigned to the Worker after the call ends. Optional.}
-	// })
-
-	// return response.
 }

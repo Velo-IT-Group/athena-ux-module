@@ -47,7 +47,7 @@ const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
 			</CardTitle>
 
 			<div className='flex items-center gap-1.5'>
-				<Link href={`/conversations/attributes?.sid}`}>
+				<Link href={`/?contactId=${attributes?.contactId}&companyId=${attributes?.companyId}`}>
 					<Button
 						variant='ghost'
 						size='icon'

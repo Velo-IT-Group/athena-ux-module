@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import IncomingTask from './incoming-call';
 import type { Reservation, Task } from 'twilio-taskrouter';
 import TaskWrapup from './task/wrapup';
-import { toast } from 'sonner';
+import { toast, useSonner } from 'sonner';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
 	activeTaskAttributesListState,
@@ -18,12 +18,14 @@ import {
 import { reservationsListState } from '@/atoms/twilioStateAtom';
 import { useDevice } from '@/providers/device-provider';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
+import { ActiveCall } from './active-call';
 
 type Props = {
 	className?: String;
 };
 
 const TaskList = ({ className }: Props) => {
+	const { toasts } = useSonner();
 	const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
 	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
 	const { device } = useDevice();
@@ -45,11 +47,25 @@ const TaskList = ({ className }: Props) => {
 		try {
 			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 
-			// if (r.task.attributes.direction === 'outboundDial') {
-			// 	const res = await r.conference({ beep: false });
-			// 	console.log(res.task);
-			// 	setActiveCall({ ...activeCall, task: res.task });
-			// }
+			if (r.task.attributes.direction === 'outboundDial') {
+				const res = await r.conference({ beep: false });
+				console.log(res.task);
+				toast.custom(
+					() => (
+						<ActiveCall
+							taskSid={r.task.sid}
+							attributes={r.task.attributes}
+							conferenceSid={r.task.attributes?.conference?.sid ?? ''}
+						/>
+					),
+					{
+						duration: Infinity,
+						dismissible: false,
+						id: r.task.sid,
+					}
+				);
+				// setActiveCall({ ...activeCall, task: res.task });
+			}
 
 			r.on('accepted', async (reservation) => {
 				// setActiveCall({ ...activeCall, task: reservation.task });
@@ -68,6 +84,23 @@ const TaskList = ({ className }: Props) => {
 						reservation.task.attributes,
 					]);
 				}
+
+				if (!toasts.some((toast) => toast.id === reservation.task.sid)) {
+					toast.custom(
+						() => (
+							<ActiveCall
+								taskSid={reservation.task.sid}
+								attributes={reservation.task.attributes}
+								conferenceSid={reservation.task.attributes?.conference?.sid ?? ''}
+							/>
+						),
+						{
+							duration: Infinity,
+							dismissible: false,
+							id: reservation.task.sid,
+						}
+					);
+				}
 			});
 
 			r.on('rejected', async (reservation) => {
@@ -81,7 +114,7 @@ const TaskList = ({ className }: Props) => {
 			r.on('canceled', async (reservation) => {
 				try {
 					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-					toast.dismiss(reservation.task.attributes.call_sid);
+					toast.dismiss(reservation.task.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -103,13 +136,13 @@ const TaskList = ({ className }: Props) => {
 
 			r.on('completed', async (reservation) => {
 				setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-				toast.dismiss(reservation.task.attributes.call_sid);
+				toast.dismiss(reservation.task.sid);
 			});
 
 			r.on('timeout', async (reservation) => {
 				try {
 					setReservations((prev) => prev.filter((r) => r.sid !== reservation.sid));
-					toast.dismiss(reservation.task.attributes.call_sid);
+					toast.dismiss(reservation.task.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 				}

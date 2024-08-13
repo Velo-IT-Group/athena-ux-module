@@ -3,21 +3,20 @@ import { Card } from '@/components/ui/card';
 import { Popover, PopoverContent } from '@/components/ui/popover';
 import { Dialpad } from '../dialpad';
 import { TooltipProvider } from '../ui/tooltip';
-import ActiveCallHeader from './active-call-header';
+import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
-import { useEffect, useState } from 'react';
-import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
+import { useEffect } from 'react';
+import { SessionProvider } from 'next-auth/react';
 import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
-import ParticipantListItem from './participant-list-item';
+import ActiveCallParticipants from './participants';
 
 type Props = {
+	taskSid: string;
 	attributes: any;
 	conferenceSid: string;
 };
 
-export function ActiveCall({ attributes, conferenceSid }: Props) {
-	const [participants, setParticipants] = useState<ParticipantInstance[]>([]);
-
+export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
 	useEffect(() => {
 		getConferenceParticipants(conferenceSid)
 			.then((e) => {
@@ -27,29 +26,29 @@ export function ActiveCall({ attributes, conferenceSid }: Props) {
 	}, [conferenceSid]);
 
 	return (
-		<TooltipProvider>
-			<Popover>
-				<Card className='shadow-sm w-80 dark'>
-					<ActiveCallHeader attributes={attributes} />
+		<SessionProvider>
+			<TooltipProvider>
+				<Popover>
+					<Card className='shadow-sm w-80 dark'>
+						<ActiveCallHeader attributes={attributes} />
 
-					{participants.map((participant) => (
-						<ParticipantListItem
-							key={participant.accountSid}
-							participant={participant}
+						<ActiveCallParticipants
+							conferenceSid=''
+							customerName={attributes.name ?? attributes.from}
 						/>
-					))}
 
-					<ActiveCallFooter />
-				</Card>
+						<ActiveCallFooter />
+					</Card>
 
-				<PopoverContent
-					side='left'
-					className='dark'
-					avoidCollisions
-				>
-					<Dialpad />
-				</PopoverContent>
-			</Popover>
-		</TooltipProvider>
+					<PopoverContent
+						side='left'
+						className='dark'
+						avoidCollisions
+					>
+						<Dialpad />
+					</PopoverContent>
+				</Popover>
+			</TooltipProvider>
+		</SessionProvider>
 	);
 }

@@ -5,6 +5,7 @@ import type {
 	Board,
 	BoardStatus,
 	CommunicationItem,
+	CommunicationType,
 	Company,
 	Configuration,
 	Contact,
@@ -32,7 +33,6 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 };
 
 export const getCompanies = async (conditions?: Conditions<Company>): Promise<Company[]> => {
-	console.log(generateParams(conditions));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies${generateParams(conditions)}`, {
 		headers: baseHeaders,
 		method: 'GET',
@@ -74,6 +74,23 @@ export const getContact = async (id: number, conditions?: Conditions<Contact>): 
 		);
 
 		if (response.status !== 200) throw Error('Could not find contact...');
+
+		return await response.json();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+export const getCommunicationTypes = async (
+	conditions?: Conditions<CommunicationType>
+): Promise<CommunicationType[] | undefined> => {
+	try {
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_CW_URL}/company/communicationTypes${generateParams(conditions)}`,
+			{ headers: baseHeaders }
+		);
+
+		if (response.status !== 200) throw Error('Could not find communication types...');
 
 		return await response.json();
 	} catch (error) {
@@ -130,21 +147,30 @@ export const getConfiguration = async (id: number, conditions?: Conditions<Confi
 	return await response.json();
 };
 
-export const getConfigurations = async (conditions?: Conditions<Configuration>): Promise<Configuration[]> => {
+export const getConfigurations = async (
+	conditions?: Conditions<Configuration>
+): Promise<{ configurations: Configuration[]; count: number }> => {
 	try {
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/${generateParams(conditions)}`,
-			{
+		const [configResponse, countResponse] = await Promise.all([
+			fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams(conditions)}`, {
 				headers: baseHeaders,
-			}
-		);
+			}),
+			fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/count${generateParams(conditions)}`, {
+				headers: baseHeaders,
+			}),
+		]);
 
-		if (response.status !== 200) throw Error('Could not fetch configurations...');
+		if (configResponse.status !== 200 || countResponse.status !== 200) throw Error('Could not fetch configurations...');
 
-		return await response.json();
+		const [configurations, { count }] = await Promise.all([configResponse.json(), countResponse.json()]);
+
+		return {
+			configurations,
+			count,
+		};
 	} catch (error) {
 		console.error(error);
-		return [];
+		return { configurations: [], count: 0 };
 	}
 };
 

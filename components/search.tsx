@@ -20,7 +20,7 @@ const Search = ({ baseUrl, placeholder, className, queryParam = 'search' }: Prop
 	const [text, setText] = useState('');
 	const debounced = useDebouncedCallback((value) => {
 		setText(value);
-	}, 500);
+	}, 250);
 	// const [query] = useDebounce(text, 500);
 	const router = useRouter();
 	const searchParams = useSearchParams();

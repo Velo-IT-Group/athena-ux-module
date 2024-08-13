@@ -2,7 +2,7 @@ const formatter = new Intl.RelativeTimeFormat('en', { style: 'long' });
 
 export function relativeDate(date: Date) {
 	const now = new Date();
-	const diff: number = Math.round((now.getTime() - date.getTime()) / 1000);
+	const diff: number = Math.round((now.getTime() - (date?.getTime() ? date.getTime() : 0)) / 1000);
 
 	const minute = 60;
 	const hour = minute * 60;

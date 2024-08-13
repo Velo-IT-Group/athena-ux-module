@@ -41,26 +41,26 @@ const OutboundDialerContent = ({ numbers }: Props) => {
 					console.log(data);
 
 					try {
-						await device?.connect({
-							params: { To: '+19015988651', From: '+18449402678', agent: 'nblack@velomethod.com' },
-						});
+						// await device?.connect({
+						// 	params: { To: '+19015988651', From: '+18449402678', agent: 'nblack@velomethod.com' },
+						// });
+						await worker.createTask(
+							'+19015988651',
+							'+18449402678',
+							'WW497b90bc1703176f6845c09c8bf4fa8a',
+							'WQee659e96340b3899ad1fad7578fe6515',
+							{
+								attributes: {
+									direction: 'outboundDial',
+								},
+							}
+						);
 						// setActiveCall((prev) => {
 						// 	return { ...prev, call };
 						// });
 					} catch (error) {
 						toast.error("Can't create call" + JSON.stringify(error));
 					}
-					// await worker.createTask(
-					// 	'+19015988651',
-					// 	'+18449402678',
-					// 	'WW497b90bc1703176f6845c09c8bf4fa8a',
-					// 	'WQee659e96340b3899ad1fad7578fe6515',
-					// 	{
-					// 		attributes: {
-					// 			direction: 'outboundDial',
-					// 		},
-					// 	}
-					// );
 				}}
 				className='space-y-3'
 			>

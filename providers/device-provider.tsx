@@ -81,9 +81,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			call.on('accept', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
 				console.log(c);
-				// setActiveCall((prev) => {
-				// 	return { ...prev, call: c };
-				// });
 			});
 
 			call.on('disconnect', (c: Call) => {
@@ -101,22 +98,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 	useEffect(() => {
 		if (!device.calls.length) return;
-
-		// device.calls.forEach((call) => {
-		// 	toast.custom(
-		// 		() => (
-		// 			<ActiveCall
-		// 				attributes={activeCall.task?.attributes}
-		// 				conferenceSid={''}
-		// 			/>
-		// 		),
-		// 		{
-		// 			duration: Infinity,
-		// 			dismissible: false,
-		// 			id: call.parameters.CallSid,
-		// 		}
-		// 	);
-		// });
 	}, [device.calls]);
 
 	return (

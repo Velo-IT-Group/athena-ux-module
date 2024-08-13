@@ -21,7 +21,7 @@ const DatePicker = ({ date, setDate, name }: Props) => {
 			<Popover>
 				<PopoverTrigger asChild>
 					<Button
-						variant={'ghost'}
+						variant={'outline'}
 						size={'sm'}
 						className={cn('justify-start text-left font-normal text-xs', !date && 'text-muted-foreground')}
 					>

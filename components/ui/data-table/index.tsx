@@ -58,7 +58,6 @@ export function DataTable<TData, TValue>({
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
-	const pageCount = Math.round(count / limit);
 
 	const createQueryString = React.useCallback(
 		(name: string, value: string) => {
@@ -71,11 +70,12 @@ export function DataTable<TData, TValue>({
 	);
 
 	React.useEffect(() => {
-		console.log(pagination, onPaginationChange, limit);
+		if (hidePagination) return;
 		router.push(pathname + '?' + createQueryString('page', `${pagination.pageIndex + 1}`));
 	}, [createQueryString, pagination.pageIndex, pathname, router, searchParams]);
 
 	React.useEffect(() => {
+		if (hidePagination) return;
 		router.push(pathname + '?' + createQueryString('pageSize', `${pagination.pageSize}`));
 	}, [pagination.pageSize]);
 
@@ -87,9 +87,10 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			rowSelection,
 			columnFilters,
-			pagination,
+			pagination: !hidePagination ? pagination : undefined,
 		},
 		enableRowSelection: true,
+		manualPagination: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
@@ -100,10 +101,8 @@ export function DataTable<TData, TValue>({
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
-		manualPagination: true,
-		onPaginationChange: onPaginationChange,
+		onPaginationChange: !hidePagination ? onPaginationChange : undefined,
 		rowCount: count,
-		// pageCount: pageCount,
 		meta,
 	});
 

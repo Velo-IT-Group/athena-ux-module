@@ -1,6 +1,5 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Computer, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
-import ConfigurationsList from './configurations-list';
 import { getConfigurations } from '@/lib/manage/read';
 import TicketList from '@/components/ticket-list';
 import { getAllCalls } from '@/lib/twilio/read';
@@ -12,6 +11,11 @@ import { auth } from '@/auth';
 import ActivityList from '@/components/activity-list';
 import { Suspense } from 'react';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
+import ConfigurationsList from '@/components/configurations-list';
+import { groupBy } from 'lodash';
+import { relativeDate } from '@/utils/date';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import ActivityItem from '../../tickets/[id]/activity-item';
 
 type Props = {
 	contactId?: number;
@@ -20,10 +24,7 @@ type Props = {
 };
 
 const ConversationDetails = async ({ contactId: userId, className, communicationItems }: Props) => {
-	const [configurations, session] = await Promise.all([
-		getConfigurations({ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }),
-		auth(),
-	]);
+	const [configurations, session] = await Promise.all([getConfigurations(), auth()]);
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -31,6 +32,15 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 					?.filter((item) => item.communicationType === 'Phone' && parsePhoneNumber(item.value).isValid)
 					.map((item) => getAllCalls(item.value))
 			: []
+	);
+
+	const groupedCalls = groupBy(
+		calls.sort((a, b) => {
+			if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
+			if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
+			return 0;
+		}),
+		({ endTime }) => relativeDate(endTime)
 	);
 
 	const tabs = ['Overview', 'Attachments', 'Configurations', 'Tickets'];
@@ -51,37 +61,45 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 				</TabsList>
 
 				<TabsContent value={tabs[0]}>
-					<ActivityList
-						activities={(calls as CallInstance[])
-							?.sort((a, b) => {
-								if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
-								if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
-								return 0;
-							})
-							.map((call: CallInstance) => {
-								const isInbound = call.direction === 'inbound';
-								return {
-									icon: isInbound ? PhoneIncoming : PhoneOutgoing,
-									date: call.endTime,
-									text: `${
-										isInbound ? call.fromFormatted : session?.user.email === call.toFormatted ? 'You' : call.toFormatted
-									}
+					<Accordion type='multiple'>
+						{Object.entries(groupedCalls).map(([date, calls]) => (
+							<AccordionItem value={date}>
+								<AccordionTrigger>{date}</AccordionTrigger>
+								<AccordionContent className='space-y-3 flex flex-col'>
+									<ActivityList
+										activities={(calls as CallInstance[])
+											?.sort((a, b) => {
+												if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
+												if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
+												return 0;
+											})
+											.map((call: CallInstance) => {
+												const isInbound = call.direction === 'inbound';
+												return {
+													icon: isInbound ? PhoneIncoming : PhoneOutgoing,
+													date: call.endTime,
+													text: `${
+														isInbound
+															? call.fromFormatted
+															: session?.user.email === call.toFormatted
+															? 'You'
+															: call.toFormatted
+													}
 												called ${isInbound ? call.toFormatted : call.fromFormatted}`,
-								};
-							})}
-					/>
+												};
+											})}
+									/>
+								</AccordionContent>
+							</AccordionItem>
+						))}
+					</Accordion>
 				</TabsContent>
 
 				<TabsContent value={tabs[2]}>
-					{configurations.length ? (
-						<ConfigurationsList configurations={configurations} />
-					) : (
-						<div className='grow grid place-items-center gap-3 p-6'>
-							<Computer className='w-9 h-9' />
-
-							<h1 className='text-xl font-semibold'>No Configurations</h1>
-						</div>
-					)}
+					<ConfigurationsList
+						type='table'
+						params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
+					/>
 				</TabsContent>
 
 				<TabsContent value={tabs[3]}>
@@ -96,6 +114,7 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 									<TicketList
 										type='table'
 										params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
+										hidePagination
 									/>
 								</Suspense>
 							</CardContent>

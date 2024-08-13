@@ -1,5 +1,5 @@
 import React from 'react';
-import { Separator } from './ui/separator';
+import { Separator } from '../ui/separator';
 import ActivityItem, { ActivityItemProps } from '@/app/(user)/tickets/[id]/activity-item';
 
 type Props = {

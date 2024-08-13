@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp, Ellipsis, Paperclip, Reply, SmilePlus, User } from 'lucide-react';
 import { createTicketNote } from '@/lib/manage/create';
 import { toast } from 'sonner';
-import ActivityList from '@/components/activity-list';
+import ActivityList from '@/components/lists/activity-list';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { relativeDate } from '@/utils/date';
 

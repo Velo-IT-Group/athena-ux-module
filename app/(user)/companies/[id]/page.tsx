@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { groupBy } from 'lodash';
 import Tiptap from '@/components/tip-tap';
 import AsyncSelector from '@/components/async-selector';
-import ConfigurationsList from '@/components/configurations-list';
+import ConfigurationsList from '@/components/lists/configurations-list';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 
 type Props = {

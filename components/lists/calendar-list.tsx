@@ -1,8 +1,8 @@
 import React from 'react';
-import { Separator } from './ui/separator';
-import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Separator } from '../ui/separator';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 type Props = {};
 

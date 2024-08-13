@@ -1,9 +1,9 @@
 import { Company, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
-import { Combobox } from './ui/combobox';
+import { Combobox } from '../ui/combobox';
 import { getCompanies } from '@/lib/manage/read';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { Building } from 'lucide-react';
 
 type Props = {

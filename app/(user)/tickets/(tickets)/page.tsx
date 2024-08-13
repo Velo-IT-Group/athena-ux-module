@@ -1,4 +1,4 @@
-import TicketList from '@/components/ticket-list';
+import TicketList from '@/components/lists/ticket-list';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 import { Suspense } from 'react';
 

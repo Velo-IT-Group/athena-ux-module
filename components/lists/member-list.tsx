@@ -2,8 +2,8 @@ import { getSystemMembers } from '@/lib/manage/read';
 import { ReferenceType, SystemMember } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
-import { Combobox } from './ui/combobox';
-import { Button } from './ui/button';
+import { Combobox } from '../ui/combobox';
+import { Button } from '../ui/button';
 import { CircleUser } from 'lucide-react';
 
 type Props = {

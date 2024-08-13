@@ -2,10 +2,10 @@ import { getBoards, getTickets } from '@/lib/manage/read';
 import { ServiceTicket } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
-import { DataTable } from './ui/data-table';
-import { columns } from './table-columns/ticket';
-import { Combobox } from './ui/combobox';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { DataTable } from '../ui/data-table';
+import { columns } from '../table-columns/ticket';
+import { Combobox } from '../ui/combobox';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 type Props = {
 	type: 'table' | 'combobox' | 'select';

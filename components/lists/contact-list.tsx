@@ -1,9 +1,9 @@
 import { Contact, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React, { ReactNode } from 'react';
-import { Combobox } from './ui/combobox';
+import { Combobox } from '../ui/combobox';
 import { getContacts } from '@/lib/manage/read';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { User } from 'lucide-react';
 
 type Props = {

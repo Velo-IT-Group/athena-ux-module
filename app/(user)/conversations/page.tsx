@@ -1,5 +1,5 @@
 import ConversationDetails from './[id]/active-conversation';
-import TaskList from '@/components/task-list';
+import TaskList from '@/components/lists/task-list';
 import React from 'react';
 
 type Props = {};

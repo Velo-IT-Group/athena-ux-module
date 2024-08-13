@@ -2,8 +2,8 @@ import { getPriorities } from '@/lib/manage/read';
 import { Priority, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
-import { Combobox } from './ui/combobox';
-import { Button } from './ui/button';
+import { Combobox } from '../ui/combobox';
+import { Button } from '../ui/button';
 import { Circle } from 'lucide-react';
 
 type Props = {

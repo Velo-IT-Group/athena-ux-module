@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LabeledInput from '@/components/ui/labeled-input';
 import DatePicker from '@/components/ui/date-picker';
 import { Skeleton } from '@/components/ui/skeleton';
-import ContactList from '@/components/contact-list';
+import ContactList from '@/components/lists/contact-list';
 import ContactProfileForm from '../contact-profile-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CommunicationItemForm from '@/components/forms/communication-item-form';

@@ -3,12 +3,12 @@ import { Separator } from '@/components/ui/separator';
 import React, { Suspense } from 'react';
 import { ServiceTicket } from '@/types/manage';
 import { Skeleton } from '@/components/ui/skeleton';
-import BoardList from '@/components/board-list';
-import ContactList from '@/components/contact-list';
-import MemberList from '@/components/member-list';
-import CompanyList from '@/components/company-list';
-import PriorityList from '@/components/priority-list';
-import ConfigurationsList from '@/components/configurations-list';
+import BoardList from '@/components/lists/board-list';
+import ContactList from '@/components/lists/contact-list';
+import MemberList from '@/components/lists/member-list';
+import CompanyList from '@/components/lists/company-list';
+import PriorityList from '@/components/lists/priority-list';
+import ConfigurationsList from '@/components/lists/configurations-list';
 import { getConfigurations } from '@/lib/manage/read';
 
 export default async function Properties({ ticket }: { ticket: ServiceTicket }) {

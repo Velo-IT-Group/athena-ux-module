@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { getWorkers } from '@/lib/twilio/read';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
-import TaskList from './task-list';
+import TaskList from './lists/task-list';
 import { auth } from '@/auth';
 import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';

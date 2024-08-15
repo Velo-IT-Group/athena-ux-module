@@ -117,6 +117,14 @@ export const columns: ColumnDef<Contact>[] = [
 
 			return <span>{company?.name}</span>;
 		},
+		filterFn: (row, id, value) => {
+			// console.log(value, id, row);
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			console.log(referenceRow, value);
+
+			return referenceRow ? value.includes(referenceRow.id) : false;
+		},
 	},
 	{
 		id: 'actions',

@@ -62,6 +62,14 @@ const config = {
 					from: { height: 'var(--radix-accordion-content-height)' },
 					to: { height: '0' },
 				},
+				'collapsible-down': {
+					from: { height: '0' },
+					to: { height: 'var(--radix-collapsible-content-height)' },
+				},
+				'collapsible-up': {
+					from: { height: 'var(--radix-collapsible-content-height)' },
+					to: { height: '0' },
+				},
 				'call-show': {
 					from: { right: '-48px' },
 					to: { right: '6px' },
@@ -76,6 +84,8 @@ const config = {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'call-show': 'call-show 0.2s ease-out',
 				'call-hide': 'call-hide 0.2s ease-in',
+				'collapsible-down': 'collapsible-down 0.2s ease-out',
+				'collapsible-up': 'collapsible-up 0.2s ease-out',
 			},
 		},
 	},

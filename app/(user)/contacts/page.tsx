@@ -6,7 +6,7 @@ import TableSkeleton from '@/components/ui/data-table/skeleton';
 type Props = {};
 
 const Page = async (props: Props) => {
-	const [companies] = await Promise.all([
+	const [{ companies }] = await Promise.all([
 		getCompanies({
 			conditions: [{ parameter: { 'status/id': 1 } }],
 			childConditions: [{ parameter: { 'types/id': 1 } }],

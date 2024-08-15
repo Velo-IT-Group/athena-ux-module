@@ -1,7 +1,7 @@
 type Comparator = '=' | '!=' | '<' | '<=' | '>' | '>=' | '==' | 'contains' | 'like' | 'in' | 'not';
 
 interface KeyValue {
-	[key: string]: number | string | boolean | null;
+	[key: string]: number | string | boolean | null | undefined;
 }
 
 interface Comparison {
@@ -45,7 +45,7 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 				params.set(
 					'childConditions',
 					childConditions
-						? `${`${childConditions} and ${key} ${condition.comparator ?? '='} ${value}`}`
+						? `${`${childConditions} or ${key} ${condition.comparator ?? '='} ${value}`}`
 						: `${key} ${condition.comparator ?? '='} ${value}`
 				);
 			});

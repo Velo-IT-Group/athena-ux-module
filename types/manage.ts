@@ -500,6 +500,69 @@ export const serviceTicketTaskSchema = z.object({
 	summary: z.string(),
 });
 
+export const timeEntrySchema = z.object({
+	id: z.number(),
+	company: referenceTypeSchema,
+	companyType: z.string(),
+	chargeToId: z.number(),
+	chargeToType: z.string(),
+	member: referenceTypeSchema,
+	locationId: z.number(),
+	businessUnitId: z.number(),
+	businessGroupDesc: z.string(),
+	workType: referenceTypeSchema,
+	workRole: referenceTypeSchema,
+	agreement: referenceTypeSchema,
+	agreementType: z.string(),
+	activity: referenceTypeSchema,
+	opportunityRecid: z.number(),
+	projectActivity: z.string(),
+	territory: z.string(),
+	timeStart: z.string(),
+	timeEnd: z.string(),
+	hoursDeduct: z.number(),
+	actualHours: z.number(),
+	billableOption: z.string(),
+	notes: z.string(),
+	internalNotes: z.string(),
+	addToDetailDescriptionFlag: z.boolean(),
+	addToInternalAnalysisFlag: z.boolean(),
+	addToResolutionFlag: z.boolean(),
+	emailResourceFlag: z.boolean(),
+	emailContactFlag: z.boolean(),
+	emailCcFlag: z.boolean(),
+	emailCc: z.string(),
+	hoursBilled: z.number(),
+	invoiceHours: z.number(),
+	hourlyCost: z.string(),
+	enteredBy: z.string(),
+	dateEntered: z.string(),
+	invoice: referenceTypeSchema,
+	mobileGuid: z.string(),
+	hourlyRate: z.number(),
+	overageRate: z.number(),
+	agreementHours: z.number(),
+	agreementAmount: z.number(),
+	agreementAdjustment: z.number(),
+	adjustment: z.number(),
+	invoiceReady: z.number(),
+	timeSheet: referenceTypeSchema,
+	status: z.string(),
+	ticket: referenceTypeSchema,
+	project: referenceTypeSchema,
+	phase: referenceTypeSchema,
+	ticketBoard: z.string(),
+	ticketStatus: z.string(),
+	ticketType: z.string(),
+	ticketSubType: z.string(),
+	invoiceFlag: z.boolean(),
+	extendedInvoiceAmount: z.number(),
+	locationName: z.string(),
+	taxCode: referenceTypeSchema,
+
+	customFields: z.array(customFieldSchema),
+});
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type CustomField = z.infer<typeof customFieldSchema>;
@@ -514,6 +577,7 @@ export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
 export type ServiceTicketTask = z.infer<typeof serviceTicketTaskSchema>;
 export type SystemMember = z.infer<typeof systemMemberSchema>;
 export type TicketNote = z.infer<typeof ticketNoteSchema>;
+export type TimeEntry = z.infer<typeof timeEntrySchema>;
 
 export interface Configuration {
 	id: number;

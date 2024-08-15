@@ -1,5 +1,6 @@
 import TicketList from '@/components/lists/ticket-list';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
+import { getBoards, getPriorities, getSystemMembers } from '@/lib/manage/read';
 import { Suspense } from 'react';
 
 type Props = {
@@ -9,12 +10,28 @@ type Props = {
 };
 
 const Page = async ({ searchParams }: Props) => {
-	const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : undefined;
-	const pageSize = typeof searchParams.page === 'string' ? Number(searchParams.pageSize) : undefined;
-	const search = typeof searchParams.search === 'string' ? String(searchParams.pageSize) : undefined;
+	const [boards, priorities, members] = await Promise.all([
+		getBoards({
+			conditions: [
+				{ parameter: { inactiveFlag: false } },
+				{ parameter: { projectFlag: false } },
+				// { parameter: { 'workRole/id': ' (9, 5)' }, comparator: 'in' },
+			],
+			orderBy: { key: 'name' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
+		getPriorities({ fields: ['id', 'name'], orderBy: { key: 'name' }, pageSize: 1000 }),
+		getSystemMembers({
+			conditions: [{ parameter: { inactiveFlag: false } }],
+			fields: ['id', 'firstName', 'lastName'],
+			orderBy: { key: 'firstName' },
+			pageSize: 1000,
+		}),
+	]);
 
 	return (
-		<main className='p-3 grow space-y-3'>
+		<main className='p-3 space-y-3'>
 			<header className='flex items-center gap-3'>
 				<h1 className='text-lg font-semibold'>Tickets</h1>
 			</header>
@@ -25,13 +42,21 @@ const Page = async ({ searchParams }: Props) => {
 						type='table'
 						params={{
 							conditions: [
-								{ parameter: { 'board/id': 30 } },
 								{ parameter: { closedFlag: false } },
-								// { parameter: { parentTicketId: null }, comparator: '==' },
+								{ parameter: { parentTicketId: null }, comparator: '=' },
 							],
-							pageSize: pageSize || 10,
-							page: page || 1,
+							fields: ['id', 'summary', 'board', 'status', 'slaStatus', 'priority', 'owner'],
 						}}
+						facetedFilters={[
+							{ accessoryKey: 'board', items: boards },
+							{ accessoryKey: 'priority', items: priorities },
+							{
+								accessoryKey: 'owner',
+								items: members.map((member) => {
+									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+								}),
+							},
+						]}
 					/>
 				</Suspense>
 			</section>

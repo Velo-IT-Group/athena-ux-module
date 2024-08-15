@@ -6,15 +6,17 @@ import { DataTable } from '../ui/data-table';
 import { columns } from '../table-columns/ticket';
 import { Combobox } from '../ui/combobox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: number;
 	params?: Conditions<ServiceTicket>;
 	hidePagination?: boolean;
+	facetedFilters?: FacetedFilter<ServiceTicket>[];
 };
 
-const TicketList = async ({ type, defaultValue, params, hidePagination = false }: Props) => {
+const TicketList = async ({ type, defaultValue, params, hidePagination = false, facetedFilters }: Props) => {
 	const [{ tickets, count }, boards] = await Promise.all([
 		getTickets(params),
 		getBoards({ orderBy: { key: 'name' }, pageSize: 1000 }),
@@ -26,7 +28,7 @@ const TicketList = async ({ type, defaultValue, params, hidePagination = false }
 				<DataTable
 					data={tickets}
 					columns={columns}
-					// facetedFilters={[{ accessoryKey: 'board', items: boards }]}
+					facetedFilters={facetedFilters}
 					count={count}
 					meta={{ filterKey: 'summary' }}
 					hidePagination={hidePagination}

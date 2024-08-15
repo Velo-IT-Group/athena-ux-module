@@ -94,7 +94,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			// console.log(value, id, row);
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(referenceRow.id);
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{
@@ -118,7 +118,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(referenceRow.id);
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{
@@ -146,7 +146,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(referenceRow.id);
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{
@@ -174,7 +174,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(referenceRow.id);
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{
@@ -207,7 +207,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			if (!referenceRow) return false;
 
-			return value.includes(referenceRow.id);
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{

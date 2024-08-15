@@ -1,18 +1,10 @@
-import { getCompanies } from '@/lib/manage/read';
-import { DataTable } from '@/components/ui/data-table';
-import { columns } from '@/components/table-columns/company';
+import CompanyList from '@/components/lists/company-list';
+import TableSkeleton from '@/components/ui/data-table/skeleton';
+import { Suspense } from 'react';
 
 type Props = {};
 
 const Page = async (props: Props) => {
-	const companies = await getCompanies({
-		conditions: [{ parameter: { 'status/id': 1 } }],
-		childConditions: [{ parameter: { 'types/id': 1 } }],
-		orderBy: { key: 'name', order: 'asc' },
-		fields: ['id', 'identifier', 'name', 'phoneNumber', 'territory'],
-		pageSize: 1000,
-	});
-
 	return (
 		<main className='p-3 space-y-3'>
 			<header>
@@ -20,12 +12,9 @@ const Page = async (props: Props) => {
 			</header>
 
 			<section>
-				<DataTable
-					data={companies}
-					columns={columns}
-					meta={{ filterKey: 'name' }}
-					facetedFilters={[{ accessoryKey: 'territory', items: [] }]}
-				/>
+				<Suspense fallback={<TableSkeleton />}>
+					<CompanyList type='table' />
+				</Suspense>
 			</section>
 		</main>
 	);

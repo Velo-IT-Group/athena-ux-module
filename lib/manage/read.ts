@@ -309,8 +309,6 @@ export const getAllTickets = async (
 	if (pageCount > 1) {
 		const arrayCount = Array(pageCount).fill(null);
 
-		console.log(pageCount, arrayCount);
-
 		const [...allResponses] = await Promise.all(
 			arrayCount.map((_, index) =>
 				fetch(
@@ -328,13 +326,12 @@ export const getAllTickets = async (
 
 		const [...data] = await Promise.all(allResponses.flatMap((response) => response.json()));
 		const items: ServiceTicket[] = data.flatMap((item) => item);
-		// console.log(items);
 		tickets = items;
 	} else {
 		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
 			headers: baseHeaders,
 		});
-		tickets = [...tickets, await response.json()];
+		return { tickets: await response.json(), count };
 	}
 
 	return {

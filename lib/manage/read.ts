@@ -118,7 +118,6 @@ export const getContactCommunications = async (
 };
 
 export const getContacts = async (conditions?: Conditions<Contact>): Promise<Contact[]> => {
-	console.log(generateParams(conditions));
 	try {
 		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${generateParams(conditions)}`, {
 			headers: baseHeaders,
@@ -134,6 +133,69 @@ export const getContacts = async (conditions?: Conditions<Contact>): Promise<Con
 		console.error(error);
 		return [];
 	}
+};
+
+export const getAllContacts = async (
+	conditions?: Conditions<Contact>
+): Promise<{ contacts: Contact[]; count: number }> => {
+	let contacts: Contact[] = [];
+	console.log(generateParams(conditions));
+	const responseCount = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/count${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	const { count } = await responseCount.json();
+
+	const pageCount = Math.ceil(count / 1000);
+
+	console.log(count, pageCount);
+
+	try {
+		if (pageCount > 1) {
+			const arrayCount = Array(pageCount).fill(null);
+
+			const [...allResponses] = await Promise.all(
+				arrayCount.map((_, index) =>
+					fetch(
+						`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts${generateParams({
+							...conditions,
+							page: index + 1,
+							pageSize: 1000,
+						})}`,
+						{
+							headers: baseHeaders,
+						}
+					)
+				)
+			);
+
+			const [...data] = await Promise.all(allResponses.flatMap((response) => response.json()));
+			const items: Contact[] = data.flatMap((item) => item);
+			contacts = items;
+		} else {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts${generateParams(conditions)}`, {
+				headers: baseHeaders,
+			});
+
+			if (response.status !== 200) {
+				console.error(response.statusText);
+				throw Error('Could not fetch contacts...');
+			}
+
+			return await response.json();
+		}
+	} catch (error) {
+		console.error(error);
+		return { contacts: [], count: 0 };
+	}
+
+	return {
+		contacts,
+		count,
+	};
 };
 
 export const getConfiguration = async (id: number, conditions?: Conditions<Configuration>): Promise<Configuration> => {

@@ -13,6 +13,7 @@ import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
 import { relativeDate } from '@/utils/date';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { getBoards, getPriorities, getSystemMembers } from '@/lib/manage/read';
 
 type Props = {
 	contactId?: number;
@@ -22,7 +23,26 @@ type Props = {
 };
 
 const ConversationDetails = async ({ contactId: userId, companyId, className, communicationItems }: Props) => {
-	const session = auth();
+	const [session, boards, priorities, members] = await Promise.all([
+		auth(),
+		getBoards({
+			conditions: [
+				{ parameter: { inactiveFlag: false } },
+				{ parameter: { projectFlag: false } },
+				{ parameter: { 'workRole/id': ' (9, 5)' }, comparator: 'in' },
+			],
+			orderBy: { key: 'name' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
+		getPriorities({ fields: ['id', 'name'], orderBy: { key: 'name' }, pageSize: 1000 }),
+		getSystemMembers({
+			conditions: [{ parameter: { inactiveFlag: false } }],
+			fields: ['id', 'firstName', 'lastName'],
+			orderBy: { key: 'firstName' },
+			pageSize: 1000,
+		}),
+	]);
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -101,9 +121,20 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 								conditions: [
 									{ parameter: { 'company/id': companyId! } },
 									{ parameter: { 'contact/id': userId }, comparator: '!=' },
+									{ parameter: { closedFlag: false } },
 								],
-								pageSize: 1000,
+								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
 							}}
+							facetedFilters={[
+								{ accessoryKey: 'board', items: boards },
+								{ accessoryKey: 'priority', items: priorities },
+								{
+									accessoryKey: 'owner',
+									items: members.map((member) => {
+										return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+									}),
+								},
+							]}
 						/>
 					</Suspense>
 				</TabsContent>
@@ -119,8 +150,20 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 					<Suspense fallback={<TableSkeleton />}>
 						<TicketList
 							type='table'
-							params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
-							hidePagination
+							params={{
+								conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+							}}
+							facetedFilters={[
+								{ accessoryKey: 'board', items: boards },
+								{ accessoryKey: 'priority', items: priorities },
+								{
+									accessoryKey: 'owner',
+									items: members.map((member) => {
+										return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+									}),
+								},
+							]}
 						/>
 					</Suspense>
 				</TabsContent>

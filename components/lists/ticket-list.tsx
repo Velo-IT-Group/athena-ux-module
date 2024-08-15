@@ -1,4 +1,4 @@
-import { getBoards, getTickets } from '@/lib/manage/read';
+import { getAllTickets } from '@/lib/manage/read';
 import { ServiceTicket } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
@@ -17,10 +17,7 @@ type Props = {
 };
 
 const TicketList = async ({ type, defaultValue, params, hidePagination = false, facetedFilters }: Props) => {
-	const [{ tickets, count }, boards] = await Promise.all([
-		getTickets(params),
-		getBoards({ orderBy: { key: 'name' }, pageSize: 1000 }),
-	]);
+	const { tickets, count } = await getAllTickets(params);
 
 	return (
 		<>

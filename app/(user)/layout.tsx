@@ -8,15 +8,24 @@ import Navbar from '@/components/navbar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import SideNav from '@/components/side-nav';
 import { Toaster } from 'sonner';
-import Toolbar from './toolbar';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getWorkers } from '@/lib/twilio/read';
+import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
+import { cookies } from 'next/headers';
+import { onLayoutChange } from './layout-actions';
 
 type Props = {
 	children: ReactNode;
 };
 
 const Layout = async ({ children }: Props) => {
-	const session = await auth();
+	const [workers, activities, session] = await Promise.all([getWorkers(), getActivies(), auth()]);
+	const cookieStore = cookies();
+	const layout = cookieStore.get('react-resizable-panels:layout:mail');
+	const collapsed = cookieStore.get('react-resizable-panels:collapsed');
+
+	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
+	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
 	if (!session || !session.user) {
 		redirect('/login');
@@ -27,8 +36,14 @@ const Layout = async ({ children }: Props) => {
 			<UserLayout token={session.user.twilioToken}>
 				<Navbar />
 
-				<ResizablePanelGroup direction='horizontal'>
-					<SideNav />
+				<ResizablePanelGroup
+					direction='horizontal'
+					onLayout={onLayoutChange}
+				>
+					<SideNav
+						isDefaultCollapsed={defaultCollapsed ?? true}
+						defaultLayout={defaultLayout ?? [15, 32, 48]}
+					/>
 
 					<ResizableHandle />
 

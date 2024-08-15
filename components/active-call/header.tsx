@@ -7,31 +7,13 @@ import Link from 'next/link';
 import WorkerSelector from '@/app/(user)/worker-selector';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { toast } from 'sonner';
-import { useRecoilValue } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
+import Timer from '../timer';
 
 const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
-	const activeCall = useRecoilValue(callStateAtom);
 	const [seconds, setSeconds] = useState(0);
 	const [minutes, setMinutes] = useState(0);
 	const [hours, setHours] = useState(0);
 	const intialDate = new Date();
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			const time = new Date().getTime() - intialDate.getTime();
-
-			const m = Math.floor((time / 1000 / 60) % 60);
-			const h = Math.floor((time / (1000 * 60 * 60)) % 24);
-			const s = Math.floor((time / 1000) % 60);
-
-			setHours(h);
-			setMinutes(m);
-			setSeconds(s);
-		}, 1000);
-
-		return () => clearInterval(interval);
-	}, []);
 
 	return (
 		<CardHeader className='flex-row items-center justify-between p-3 gap-3 border-b space-y-0'>
@@ -39,6 +21,8 @@ const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
 				<Rocket className='inline-block text-yellow-400' />
 
 				<span className='text-sm font-normal'>Customer support</span>
+
+				<Timer startTime={intialDate} />
 
 				<span className='text-xs text-muted-foreground tabular-nums'>
 					{hours > 0 && `${String(hours).padStart(2, '0')}:`}

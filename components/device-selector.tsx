@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import LabeledInput from '@/components/ui/labeled-input';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from './ui/progress';
+import { useDevice } from '@/providers/device-provider';
 
 type Props = {
 	className?: string;
@@ -28,6 +29,7 @@ const DeviceSelector = ({ className }: Props) => {
 	const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
 	const [selectedDevice, setSelectedDevice] = useState<string>();
+	const { currentCallControl } = useDevice();
 
 	useEffect(() => {
 		navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -50,14 +52,14 @@ const DeviceSelector = ({ className }: Props) => {
 
 	useEffect(() => {
 		if (!currentCallControl) return;
-		callControlDevices.forEach(async (d) => {
-			const { device } = d;
-			const de = inputDevices.find((d) => d.groupId === selectedDevice)?.label.includes(device.name);
-			if (!de) return;
-			// await webHidPairing();
-			// setCurrentCallControl(d);
-		});
-	}, [callControlDevices, inputDevices, selectedDevice]);
+		// callControlDevices.forEach(async (d) => {
+		// 	const { device } = d;
+		// 	const de = inputDevices.find((d) => d.groupId === selectedDevice)?.label.includes(device.name);
+		// 	if (!de) return;
+		// 	// await webHidPairing();
+		// 	// setCurrentCallControl(d);
+		// });
+	}, [inputDevices, selectedDevice]);
 
 	useEffect(() => {
 		if (!open) return;
@@ -143,17 +145,17 @@ const DeviceSelector = ({ className }: Props) => {
 							variant='outline'
 							className='text-xs'
 							type='button'
-							onClick={async () => {
-								try {
-									if (deviceState?.callActive) {
-										await currentCallControl?.endCall();
-									}
+							// onClick={async () => {
+							// 	try {
+							// 		if (deviceState?.callActive) {
+							// 			await currentCallControl?.endCall();
+							// 		}
 
-									await currentCallControl?.signalIncomingCall(5000);
-								} catch (error) {
-									console.error(error);
-								}
-							}}
+							// 		await currentCallControl?.signalIncomingCall(5000);
+							// 	} catch (error) {
+							// 		console.error(error);
+							// 	}
+							// }}
 						>
 							Test Speaker
 						</Button>

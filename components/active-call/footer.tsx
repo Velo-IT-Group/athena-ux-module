@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
@@ -27,20 +27,25 @@ import {
 } from '../ui/dropdown-menu';
 import { useRecoilValue } from 'recoil';
 import { callStateAtom } from '@/atoms/twilioStateAtom';
+import { useDevice } from '@/providers/device-provider';
+import { updateConference, updateConferenceParticipants } from '@/lib/twilio/conference/helpers';
 
-type Props = {};
+type Props = {
+	conferenceSid: string;
+	participants: Record<string, any>;
+};
 
-const ActiveCallFooter = (props: Props) => {
-	const activeCall = useRecoilValue(callStateAtom);
+const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
+	const { activeCall, muted, setMuted } = useDevice();
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
 			<Tooltip>
 				<TooltipTrigger asChild>
 					<Button
-						variant={activeCall.call?.isMuted() ? 'destructive' : 'accepting'}
+						variant={muted ? 'destructive' : 'accepting'}
 						size='icon'
-						onClick={() => activeCall.call?.mute(!activeCall.call?.isMuted() ?? true)}
+						onClick={() => setMuted((prev) => !prev)}
 					>
 						<Mic className='w-3.5 h-3.5' />
 					</Button>
@@ -100,6 +105,9 @@ const ActiveCallFooter = (props: Props) => {
 						<Button
 							variant='secondary'
 							size='icon'
+							onClick={async () => {
+								const allParticipants = await updateConferenceParticipants(conferenceSid, '', { hold: true });
+							}}
 						>
 							<Pause className='h-3.5 w-3.5' />
 						</Button>
@@ -192,7 +200,7 @@ const ActiveCallFooter = (props: Props) => {
 					<Button
 						variant='destructive'
 						size='icon'
-						onClick={() => activeCall.call?.disconnect()}
+						onClick={() => activeCall?.disconnect()}
 					>
 						<Phone className='rotate-[135deg]' />
 					</Button>

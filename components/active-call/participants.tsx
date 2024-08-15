@@ -21,9 +21,11 @@ const ActiveCallParticipants = ({ conferenceSid, customerName }: Props) => {
 		});
 	}, [customerName, data]);
 
+	const entries = Object.entries(participants);
+
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
-			{Object.entries(participants).map(([key, value]) => (
+			{entries.map(([key, value]) => (
 				<ParticipantListItem
 					key={key}
 					name={value}

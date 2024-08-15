@@ -1,12 +1,10 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Computer, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
-import { getConfigurations } from '@/lib/manage/read';
+import { PhoneIncoming, PhoneOutgoing } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { getAllCalls } from '@/lib/twilio/read';
 import { CommunicationItem } from '@/types/manage';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/auth';
 import ActivityList from '@/components/lists/activity-list';
 import { Suspense } from 'react';
@@ -15,16 +13,16 @@ import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
 import { relativeDate } from '@/utils/date';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import ActivityItem from '../../tickets/[id]/activity-item';
 
 type Props = {
 	contactId?: number;
+	companyId?: number;
 	className?: string;
 	communicationItems?: CommunicationItem[];
 };
 
-const ConversationDetails = async ({ contactId: userId, className, communicationItems }: Props) => {
-	const [configurations, session] = await Promise.all([getConfigurations(), auth()]);
+const ConversationDetails = async ({ contactId: userId, companyId, className, communicationItems }: Props) => {
+	const session = auth();
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -43,7 +41,7 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 		({ endTime }) => relativeDate(endTime)
 	);
 
-	const tabs = ['Overview', 'Attachments', 'Configurations', 'Tickets'];
+	const tabs = ['Overview', 'Company', 'Configurations', 'Tickets'];
 
 	return (
 		<div className={cn('w-full overflow-x-hidden', className)}>
@@ -81,7 +79,7 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 													text: `${
 														isInbound
 															? call.fromFormatted
-															: session?.user.email === call.toFormatted
+															: session?.user?.email === call.toFormatted
 															? 'You'
 															: call.toFormatted
 													}
@@ -95,6 +93,21 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 					</Accordion>
 				</TabsContent>
 
+				<TabsContent value={tabs[1]}>
+					<Suspense fallback={<TableSkeleton />}>
+						<TicketList
+							type='table'
+							params={{
+								conditions: [
+									{ parameter: { 'company/id': companyId! } },
+									{ parameter: { 'contact/id': userId }, comparator: '!=' },
+								],
+								pageSize: 1000,
+							}}
+						/>
+					</Suspense>
+				</TabsContent>
+
 				<TabsContent value={tabs[2]}>
 					<ConfigurationsList
 						type='table'
@@ -103,22 +116,12 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 				</TabsContent>
 
 				<TabsContent value={tabs[3]}>
-					<Suspense>
-						<Card>
-							<CardHeader>
-								<CardTitle>Tickets</CardTitle>
-							</CardHeader>
-
-							<CardContent className='p-3'>
-								<Suspense fallback={<TableSkeleton />}>
-									<TicketList
-										type='table'
-										params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
-										hidePagination
-									/>
-								</Suspense>
-							</CardContent>
-						</Card>
+					<Suspense fallback={<TableSkeleton />}>
+						<TicketList
+							type='table'
+							params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
+							hidePagination
+						/>
 					</Suspense>
 				</TabsContent>
 			</Tabs>

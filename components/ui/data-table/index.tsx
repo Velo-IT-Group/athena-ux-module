@@ -54,30 +54,30 @@ export function DataTable<TData, TValue>({
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	const { limit, onPaginationChange, pagination } = usePagination();
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const pathname = usePathname();
+	// const { limit, onPaginationChange, pagination } = usePagination();
+	// const router = useRouter();
+	// const searchParams = useSearchParams();
+	// const pathname = usePathname();
 
-	const createQueryString = React.useCallback(
-		(name: string, value: string) => {
-			const params = new URLSearchParams(searchParams.toString());
-			params.set(name, value);
+	// const createQueryString = React.useCallback(
+	// 	(name: string, value: string) => {
+	// 		const params = new URLSearchParams(searchParams.toString());
+	// 		params.set(name, value);
 
-			return params.toString();
-		},
-		[searchParams]
-	);
+	// 		return params.toString();
+	// 	},
+	// 	[searchParams]
+	// );
 
-	React.useEffect(() => {
-		if (hidePagination) return;
-		router.push(pathname + '?' + createQueryString('page', `${pagination.pageIndex + 1}`));
-	}, [createQueryString, pagination.pageIndex, pathname, router, searchParams]);
+	// React.useEffect(() => {
+	// 	if (hidePagination) return;
+	// 	router.push(pathname + '?' + createQueryString('page', `${pagination.pageIndex + 1}`));
+	// }, [createQueryString, pagination.pageIndex, pathname, router, searchParams]);
 
-	React.useEffect(() => {
-		if (hidePagination) return;
-		router.push(pathname + '?' + createQueryString('pageSize', `${pagination.pageSize}`));
-	}, [pagination.pageSize]);
+	// React.useEffect(() => {
+	// 	if (hidePagination) return;
+	// 	router.push(pathname + '?' + createQueryString('pageSize', `${pagination.pageSize}`));
+	// }, [pagination.pageSize]);
 
 	const table = useReactTable({
 		data,
@@ -87,10 +87,10 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			rowSelection,
 			columnFilters,
-			pagination: !hidePagination ? pagination : undefined,
+			// pagination: !hidePagination ? pagination : undefined,
 		},
 		enableRowSelection: true,
-		manualPagination: true,
+		// manualPagination: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
@@ -101,8 +101,9 @@ export function DataTable<TData, TValue>({
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
-		onPaginationChange: !hidePagination ? onPaginationChange : undefined,
-		rowCount: count,
+		// onPaginationChange: !hidePagination ? onPaginationChange : undefined,
+		// rowCount: count,
+		// pageCount: count,
 		meta,
 	});
 

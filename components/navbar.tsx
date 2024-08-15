@@ -10,7 +10,6 @@ import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
 import { Suspense } from 'react';
 import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
-import CollapsibleButton from './collapsible-button';
 
 const Navbar = async () => {
 	const [numbers, calls, session, activities] = await Promise.all([
@@ -30,8 +29,6 @@ const Navbar = async () => {
 					height={50}
 					className='object-contain'
 				/>
-
-				<CollapsibleButton />
 			</div>
 
 			<Suspense>

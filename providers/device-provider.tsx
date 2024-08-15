@@ -1,12 +1,13 @@
 'use client';
-import { useContext, createContext, useEffect, Dispatch, SetStateAction, useState, useRef } from 'react';
+import { useContext, createContext, useEffect, Dispatch, SetStateAction, useState, useRef, act } from 'react';
 import { Device, type Call } from '@twilio/voice-sdk';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
-import { ActiveCall } from '@/components/active-call';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { useSetRecoilState } from 'recoil';
+import { deviceEligibleAtom } from '@/atoms/twilioStateAtom';
+import { initalizeJabra } from '@/lib/jabra';
+import { CallControlFactory, ICallControl, SignalType } from '@gnaudio/jabra-js';
 import { toast } from 'sonner';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { callStateAtom, deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -14,6 +15,12 @@ interface DeviceProviderProps {
 	hasExternalFunctionality: boolean;
 	activeCalls: Call[];
 	setActiveCalls: Dispatch<SetStateAction<Call[]>>;
+	activeCall: Call | undefined;
+	setActiveCall: Dispatch<SetStateAction<Call | undefined>>;
+	currentCallControl: ICallControl | undefined;
+	setCurrentCallControl: Dispatch<SetStateAction<ICallControl | undefined>>;
+	muted: boolean;
+	setMuted: Dispatch<SetStateAction<boolean>>;
 }
 
 const initialValues: DeviceProviderProps = {
@@ -22,6 +29,12 @@ const initialValues: DeviceProviderProps = {
 	hasExternalFunctionality: false,
 	activeCalls: [],
 	setActiveCalls: () => [],
+	activeCall: undefined,
+	setActiveCall: () => undefined,
+	currentCallControl: undefined,
+	setCurrentCallControl: () => undefined,
+	muted: true,
+	setMuted: () => false,
 };
 
 type WithChildProps = {
@@ -39,21 +52,21 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	// const [activeCall, setActiveCall] = useRecoilState(callStateAtom);
-	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
-	const setDeviceRegistration = useSetRecoilState(deviceEligibleAtom);
 	const device = new Device(authToken, {
 		disableAudioContextSounds: true,
 		enableImprovedSignalingErrorPrecision: true,
 		// logLevel: 1,
 	});
-	// let device = new Device(authToken, {
-	// 	disableAudioContextSounds: true,
-	// 	enableImprovedSignalingErrorPrecision: true,
-	// });
+	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
+	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
+	const [muted, setMuted] = useState(false);
+	const [activeCall, setActiveCall] = useState<Call | undefined>(initialValues.activeCall);
+	const setDeviceRegistration = useSetRecoilState(deviceEligibleAtom);
 
 	useEffect(() => {
 		if (!device) return;
+
+		device.audio?.incoming(false);
 
 		if (device.state === Device.State.Unregistered) {
 			device?.register();
@@ -80,11 +93,14 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.on('accept', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
+				currentCallControl?.ring(false);
+				currentCallControl?.offHook(true);
 				console.log(c);
 			});
 
 			call.on('disconnect', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((call) => call.parameters.CallSid !== c.parameters.CallSid)]);
+				currentCallControl?.offHook(false);
 			});
 		});
 
@@ -97,8 +113,82 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 	}, [device]);
 
 	useEffect(() => {
+		setMuted(muted);
+		currentCallControl?.mute(muted);
+		if (!activeCall) return;
+		activeCall.mute(muted);
+	}, [muted]);
+
+	useEffect(() => {
+		initalizeJabra()
+			.then((j) => {
+				const eccFactory = new CallControlFactory(j);
+
+				j.deviceAdded.subscribe(async (d) => {
+					if (!eccFactory.supportsCallControl(d)) {
+						return;
+					}
+
+					// Convert the ISdkDevice to a ICallControlDevice
+					const ccDevice = await eccFactory.createCallControl(d);
+					console.log(ccDevice);
+
+					try {
+						const isLocked = await ccDevice.takeCallLock();
+						if (isLocked) {
+							setCurrentCallControl(ccDevice);
+							ccDevice.ring(false);
+						} else {
+							toast.error('Unable to get headset lock.');
+						}
+					} catch (error) {
+						toast.error('Call lock already established.');
+					}
+				});
+			})
+			.catch((e) => console.log(e));
+
+		return () => {
+			if (currentCallControl) {
+				currentCallControl.releaseCallLock();
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!currentCallControl) return;
+
+		currentCallControl.deviceSignals.subscribe((signal) => {
+			console.log(signal);
+			if (signal.type === SignalType.PHONE_MUTE) {
+				setMuted(signal.value);
+			}
+		});
+	}, [currentCallControl]);
+
+	useEffect(() => {
 		if (!device.calls.length) return;
 	}, [device.calls]);
+
+	// useEffect(() => {
+	// 	if (!currentCallControl) return;
+	// 	currentCallControl.muteState?.subscribe((muteState) => {
+	// 		console.log(`Mute state emitted: ${muteState}`);
+	// 		// setDeviceState((prev) => ({ ...prev, muteState }));
+	// 	});
+
+	// 	currentCallControl.ringState?.subscribe((ringState) => {
+	// 		console.log(ringState);
+	// 	});
+
+	// 	currentCallControl?.callActive?.subscribe((callActive) => {
+	// 		console.log(`Call state emitted: ${callActive}`);
+
+	// 		setDeviceState((prev) => ({ ...prev, callActive }));
+	// 		// state.deviceState.callActive = callActive;
+	// 		// uiUpdateState();
+	// 	});
+	// }, [currentCallControl]);
 
 	return (
 		<Provider
@@ -108,6 +198,12 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 				hasExternalFunctionality: device?.identity === '',
 				activeCalls,
 				setActiveCalls,
+				activeCall,
+				setActiveCall,
+				currentCallControl,
+				setCurrentCallControl,
+				muted,
+				setMuted,
 			}}
 		>
 			{children}

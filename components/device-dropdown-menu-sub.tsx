@@ -96,13 +96,14 @@ const DeviceDropdownMenuSub = (props: Props) => {
 					<CommandList>
 						<CommandGroup heading='Speaker'>
 							<CommandList>
-								{Object.values(device?.audio.availableOutputDevices).map((value) => {
+								{/* setAvailableInputDevices(Array.from(device.audio?.availableInputDevices?.values() ?? []));
+								setAvailableOutputDevices(Array.from(device.audio?.availableOutputDevices?.values() ?? [])); */}
+								{Array.from(device?.audio.availableOutputDevices?.values()).map((value) => {
 									const mediaDevice = value as MediaDeviceInfo;
-									console.log(value);
 									return (
 										<CommandItem
 											key={mediaDevice.deviceId}
-											value={mediaDevice.deviceId}
+											value={mediaDevice.groupId}
 											onClick={async () => {
 												await selectOutputDevice(mediaDevice.deviceId, device);
 											}}
@@ -120,14 +121,14 @@ const DeviceDropdownMenuSub = (props: Props) => {
 						<CommandSeparator />
 
 						<CommandGroup heading='Microphone'>
-							{Object.entries(device?.audio.availableInputDevices).map(([key, value]) => {
+							{Array.from(device?.audio.availableInputDevices?.values()).map((value) => {
 								const mediaDevice = value as MediaDeviceInfo;
 								return (
 									<CommandItem
-										key={key}
+										key={mediaDevice.deviceId}
 										value={mediaDevice.groupId}
 										onClick={async () => {
-											await selectInputDevice(key, device);
+											await selectInputDevice(mediaDevice.deviceId, device);
 										}}
 									>
 										<Check
@@ -144,8 +145,9 @@ const DeviceDropdownMenuSub = (props: Props) => {
 					</CommandList>
 				</Command>
 			</DropdownMenuSubContent>
+
 			<DropdownMenuSubTrigger>
-				<Headset className='mr-1.5' /> {outputDevices.find((d) => d.groupId === selectedDevice)?.label}
+				<Headset className='mr-1.5' /> {device.audio.inputDevice?.label}
 			</DropdownMenuSubTrigger>
 		</DropdownMenuSub>
 	);

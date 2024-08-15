@@ -1,22 +1,27 @@
 'use client';
-import { useContext, createContext, useEffect } from 'react';
+import { useContext, createContext, useEffect, useState, SetStateAction, Dispatch } from 'react';
 import type { Call } from '@twilio/voice-sdk';
 
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { ActiveCall as CustomCall } from '@/components/active-call';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
-import { Worker } from 'twilio-taskrouter';
+import { Reservation, Worker } from 'twilio-taskrouter';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { activityState, deviceEligibleAtom, reservationsListState } from '@/atoms/twilioStateAtom';
 import { toast } from 'sonner';
 import TaskWrapup from '@/components/task/wrapup';
+import { useDevice } from './device-provider';
 
 interface WorkerProviderProps {
 	worker: Worker | undefined;
+	reservations: Reservation[];
+	setReservations: Dispatch<SetStateAction<Reservation[]>>;
 }
 
 const initialValues: WorkerProviderProps = {
 	worker: undefined,
+	reservations: [],
+	setReservations: () => [],
 };
 
 type WithChildProps = {
@@ -34,16 +39,18 @@ export type CustomCall = {
 };
 
 export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
-	const setReservations = useSetRecoilState(reservationsListState);
+	const [reservations, setReservations] = useState<Reservation[]>(initialValues.reservations);
 	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
+	const { currentCallControl } = useDevice();
 
 	const worker = new Worker(authToken, { closeExistingSessions: true });
 
 	const onWorkerReady = async (w: Worker) => {
-		// 	console.log('ready', w);
+		console.log('Worker Ready', w.sid);
 		// setActivity(w.activity);
 		// 	// setActivityList(w.activities);
 		const ress = Array.from(w.reservations.values());
+
 		ress.forEach(async (res) => {
 			switch (res.status) {
 				case 'wrapping':
@@ -57,16 +64,15 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 						{
 							important: true,
 							duration: res.timeout * 1000,
-							id: res.task.attributes.call_sid,
+							id: res.task.sid,
 						}
 					);
 					break;
-				case 'pending':
-					setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);
-					// await res.conference();
-
-					break;
 				default:
+					setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);
+					if (res.task.taskChannelUniqueName === 'voice') {
+						// currentCallControl?.signalIncomingCall();
+					}
 					break;
 			}
 		});
@@ -77,12 +83,12 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 
 		worker?.on('ready', onWorkerReady);
 
-		// return () => {
-		// 	worker?.removeListener('ready', onWorkerReady);
-		// };
+		return () => {
+			worker?.removeListener('ready', onWorkerReady);
+		};
 	}, [authToken, deviceRegistration]);
 
-	return <Provider value={{ worker }}>{children}</Provider>;
+	return <Provider value={{ worker, reservations, setReservations }}>{children}</Provider>;
 };
 
 export const useWorker = () => {

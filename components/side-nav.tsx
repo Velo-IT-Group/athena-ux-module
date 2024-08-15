@@ -1,18 +1,21 @@
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Building2, Circle, Home, LineChart, LucideIcon, Notebook, Settings, Tags } from 'lucide-react';
+'use client';
+import { buttonVariants } from '@/components/ui/button';
+import { Building2, Home, LineChart, LucideIcon, Notebook, Settings, Tags } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { getWorkers } from '@/lib/twilio/read';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
-import TaskList from './lists/task-list';
-import { auth } from '@/auth';
 import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Input } from './ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useRecoilState } from 'recoil';
+import { collapsedState } from '@/atoms/sidebarStateAtom';
+import { useEffect } from 'react';
+import TaskList from './lists/task-list';
+import { Separator } from './ui/separator';
 
-type Props = {};
+type Props = {
+	isDefaultCollapsed: boolean;
+	defaultLayout?: number[];
+};
 
 export type NavLink = {
 	name: string;
@@ -53,141 +56,96 @@ const links: NavLink[] = [
 	},
 ];
 
-const SideNav = async (props: Props) => {
-	const [workers, activities, session] = await Promise.all([getWorkers(), getActivies(), auth()]);
-	const response = await fetch(`https://graph.microsoft.com/v1.0/me/calendar`, {
-		headers: { Authorization: `Bearer ${session?.user.microsoftToken}` },
-	});
+const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) => {
+	const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
 
-	// console.log(response);
-	// const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
-	// const { worker } = useWorker();
+	useEffect(() => {
+		setIsCollapsed(isDefaultCollapsed);
+	}, []);
 
 	return (
 		<ResizablePanel
 			minSize={10}
-			defaultSize={15}
+			defaultSize={defaultLayout[0]}
 			maxSize={25}
-			// collapsible={isCollapsed}
-			// onResize={() => {
-			// 	setIsCollapsed(false);
-			// 	document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
-			// }}
-			// onCollapse={() => {
-			// 	setIsCollapsed(true);
-			// 	document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(true)}`;
-			// }}
+			collapsible
+			onCollapse={() => {
+				setIsCollapsed(true);
+				document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(true)}`;
+			}}
+			onResize={() => {
+				setIsCollapsed(false);
+				document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
+			}}
+			className={cn(isCollapsed && 'min-w-[50px] transition-all duration-300 ease-in-out')}
 		>
 			<ScrollArea className='flex flex-col min-h-0 h-full border-r'>
-				<aside className='flex flex-col gap-3 py-1.5 '>
-					<section className='flex flex-col w-full border-b py-3 px-1.5'>
-						{links.map((link) => (
-							<Link
-								key={link.href}
-								href={link.href}
-								className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'justify-start')}
-								aria-label={link.name}
-							>
-								<link.icon className='size-3.5 mr-1.5' />
-
-								<span>{link.name}</span>
-							</Link>
-						))}
-					</section>
-
-					<TaskList />
-
-					<section className='space-y-1.5 px-1.5'>
-						<h2 className='text-xs text-muted-foreground px-3 font-medium'>Workers</h2>
-
-						<div className='grid justify-start space-y-1.5'>
-							{activities.map((activity) => {
-								const filteredWorkers = workers.filter((w) => w.activitySid === activity.sid);
-								return (
-									<Popover>
-										<PopoverTrigger asChild>
-											<Button
-												variant='ghost'
-												className='justify-start'
-											>
-												<Circle className='stroke-none fill-green-500 h-5 w-5 mr-1.5' />
-												<span>
-													{activity.friendlyName} ({filteredWorkers.length})
-												</span>
-											</Button>
-										</PopoverTrigger>
-
-										<PopoverContent
-											side='right'
-											align='start'
-											sideOffset={12}
-											className='space-y-3'
+				<div
+					data-collapsed={isCollapsed}
+					className='group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2'
+				>
+					<nav className='grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
+						{links.map((link, index) =>
+							isCollapsed ? (
+								<Tooltip
+									key={index}
+									delayDuration={0}
+								>
+									<TooltipTrigger asChild>
+										<Link
+											href={link.href}
+											className={cn(
+												buttonVariants({ variant: 'ghost', size: 'icon' }),
+												'h-9 w-9'
+												// link.variant === 'default' &&
+												// 	'dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white'
+											)}
 										>
-											<header>
-												<h3 className='text-sm font-medium'>{activity.friendlyName}</h3>
-											</header>
+											<link.icon className='h-3.5 w-3.5' />
+											<span className='sr-only'>{link.name}</span>
+										</Link>
+									</TooltipTrigger>
 
-											<Input
-												placeholder='Search here...'
-												className='h-auto text-xs'
-											/>
+									<TooltipContent
+										side='right'
+										className='flex items-center gap-3'
+									>
+										{link.name}
+										{/* {link.name && <span className='ml-auto text-muted-foreground'>{link.name}</span>} */}
+									</TooltipContent>
+								</Tooltip>
+							) : (
+								<Link
+									key={index}
+									href={link.href}
+									className={cn(
+										buttonVariants({ variant: 'ghost', size: 'sm' }),
+										// link.variant === 'default' &&
+										// 	'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
+										'justify-start'
+									)}
+								>
+									<link.icon className='mr-2 h-4 w-4' />
+									{link.name}
+									{/* {link.name && (
+										<span
+											className={cn(
+												'ml-auto'
+												// link.variant === 'default' && 'text-background dark:text-white'
+											)}
+										>
+											{link.name}
+										</span>
+									)} */}
+								</Link>
+							)
+						)}
+					</nav>
 
-											<section>
-												{filteredWorkers.map((worker) => (
-													<Button
-														variant='ghost'
-														size='sm'
-														className='w-full justify-start'
-													>
-														<Avatar className='w-7 h-7 mr-1.5'>
-															<AvatarFallback>NB</AvatarFallback>
-															<AvatarImage src={session?.user?.image ?? undefined} />
-														</Avatar>
+					<Separator />
 
-														<span>{worker.friendlyName}</span>
-													</Button>
-												))}
-											</section>
-										</PopoverContent>
-									</Popover>
-								);
-								// return (
-								// 	<>
-								// 		{filteredWorkers.length > 0 && (
-								// 			<div
-								// 				key={activity.sid}
-								// 				className='border border-green-500 rounded-lg p-1.5 space-y-1.5'
-								// 			>
-								// 				<h3 className='text-xs text-muted-foreground flex items-center gap-1.5 font-medium'>
-								// 					{activity.friendlyName}
-								// 				</h3>
-
-								// 				{filteredWorkers.map((worker) => (
-								// 					<div
-								// 						key={worker.sid}
-								// 						className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), '')}
-								// 					>
-								// 						<Avatar className='w-5 h-5'>
-								// 							<AvatarFallback className='text-[10px]'>NB</AvatarFallback>
-								// 						</Avatar>
-
-								// 						<span>{worker.friendlyName}</span>
-								// 					</div>
-								// 				))}
-								// 			</div>
-								// 		)}
-								// 	</>
-								// );
-							})}
-						</div>
-					</section>
-
-					{/* <section className='space-y-1.5 px-1.5'>
-						<h2>Calendar</h2>
-
-						<CalendarList />
-					</section> */}
-				</aside>
+					<TaskList isCollapsed={isCollapsed} />
+				</div>
 			</ScrollArea>
 		</ResizablePanel>
 	);

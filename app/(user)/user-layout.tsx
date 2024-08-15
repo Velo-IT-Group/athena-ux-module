@@ -16,13 +16,13 @@ const UserLayout = ({ token, children }: Props) => {
 	return (
 		<RecoilProvider>
 			<NotificationProvider>
-				<JabraProvider>
-					<TwilioProvider authToken={token}>
-						<DeviceProvider authToken={token}>
-							<WorkerProvider authToken={token}>{children}</WorkerProvider>
-						</DeviceProvider>
-					</TwilioProvider>
-				</JabraProvider>
+				{/* <JabraProvider> */}
+				<TwilioProvider authToken={token}>
+					<DeviceProvider authToken={token}>
+						<WorkerProvider authToken={token}>{children}</WorkerProvider>
+					</DeviceProvider>
+				</TwilioProvider>
+				{/* </JabraProvider> */}
 			</NotificationProvider>
 		</RecoilProvider>
 	);

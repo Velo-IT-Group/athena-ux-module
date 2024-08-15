@@ -24,11 +24,12 @@ import type {
 } from '@/types/manage';
 
 export const getCompany = async (id: number, conditions?: Conditions<Company>): Promise<Company> => {
-	let params = conditions ? generateParams(conditions) : undefined;
-
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}${`?${params}`}`, {
-		headers: baseHeaders,
-	});
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
 	return await response.json();
 };
 
@@ -117,6 +118,7 @@ export const getContactCommunications = async (
 };
 
 export const getContacts = async (conditions?: Conditions<Contact>): Promise<Contact[]> => {
+	console.log(generateParams(conditions));
 	try {
 		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${generateParams(conditions)}`, {
 			headers: baseHeaders,
@@ -209,6 +211,59 @@ export const getTickets = async (
 
 	return {
 		tickets: await response.json(),
+		count,
+	};
+};
+
+export const getAllTickets = async (
+	conditions?: Conditions<ServiceTicket>
+): Promise<{ tickets: ServiceTicket[]; count: number }> => {
+	let tickets: ServiceTicket[] = [];
+
+	const responseCount = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/count${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	const { count } = await responseCount.json();
+
+	const pageCount = Math.ceil(count / 1000);
+
+	if (pageCount > 1) {
+		const arrayCount = Array(pageCount).fill(null);
+
+		console.log(pageCount, arrayCount);
+
+		const [...allResponses] = await Promise.all(
+			arrayCount.map((_, index) =>
+				fetch(
+					`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams({
+						...conditions,
+						page: index + 1,
+						pageSize: 1000,
+					})}`,
+					{
+						headers: baseHeaders,
+					}
+				)
+			)
+		);
+
+		const [...data] = await Promise.all(allResponses.flatMap((response) => response.json()));
+		const items: ServiceTicket[] = data.flatMap((item) => item);
+		// console.log(items);
+		tickets = items;
+	} else {
+		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
+			headers: baseHeaders,
+		});
+		tickets = [...tickets, await response.json()];
+	}
+
+	return {
+		tickets,
 		count,
 	};
 };

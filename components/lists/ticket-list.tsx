@@ -26,7 +26,7 @@ const TicketList = async ({ type, defaultValue, params, hidePagination = false }
 				<DataTable
 					data={tickets}
 					columns={columns}
-					facetedFilters={[{ accessoryKey: 'board', items: boards }]}
+					// facetedFilters={[{ accessoryKey: 'board', items: boards }]}
 					count={count}
 					meta={{ filterKey: 'summary' }}
 					hidePagination={hidePagination}

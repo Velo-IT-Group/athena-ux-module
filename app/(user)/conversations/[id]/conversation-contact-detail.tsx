@@ -33,7 +33,7 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 	const [contact, contacts, types] = await Promise.all([
 		getContact(contactId ?? 0),
 		getContacts({
-			conditions: companyId ? [{ parameter: { 'company/id': companyId } }, { parameter: { inactiveFlag: false } }] : [],
+			conditions: [{ parameter: { inactiveFlag: false } }, { parameter: { 'company/id': companyId! } }],
 			childConditions: [{ parameter: { 'types/id': 17 } }],
 			pageSize: 1000,
 			orderBy: { key: 'firstName' },

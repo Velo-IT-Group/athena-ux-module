@@ -1,5 +1,7 @@
 'use server';
 import { Twilio } from 'twilio';
+import { ConferenceContextUpdateOptions } from 'twilio/lib/rest/api/v2010/account/conference';
+import { ParticipantContextUpdateOptions } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 
 const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
 	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
@@ -28,4 +30,20 @@ export const getConferenceParticipants = async (conferenceSid: string) => {
 	const conference = await client.conferences(conferenceSid).fetch();
 	console.log('participants', conference.participants());
 	return conference.participants();
+};
+
+export const updateConference = async (conferenceSid: string, params: ConferenceContextUpdateOptions) => {
+	const conference = await client.conferences(conferenceSid).update(params);
+
+	return conference;
+};
+
+export const updateConferenceParticipants = async (
+	conferenceSid: string,
+	participant: string,
+	params: ParticipantContextUpdateOptions
+) => {
+	const conference = await client.conferences(conferenceSid).participants(participant).update(params);
+
+	return conference;
 };

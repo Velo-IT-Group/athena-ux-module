@@ -29,11 +29,11 @@ export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
 		<SessionProvider>
 			<TooltipProvider>
 				<Popover>
-					<Card className='shadow-sm w-80 dark'>
+					<Card className='shadow-sm w-[356px] dark'>
 						<ActiveCallHeader attributes={attributes} />
 
 						<ActiveCallParticipants
-							conferenceSid=''
+							conferenceSid={conferenceSid}
 							customerName={attributes.name ?? attributes.from}
 						/>
 

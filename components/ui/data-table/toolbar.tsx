@@ -23,26 +23,25 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
-	const pathname = usePathname();
+	// const pathname = usePathname();
 
-	console.log(pathname);
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
-					<Search
-						baseUrl={pathname}
-						placeholder='Filter...'
-						className='w-[150px] lg:w-[250px]'
-					/>
-					// <Input
+					// <Search
+					// 	baseUrl={pathname}
 					// 	placeholder='Filter...'
-					// 	value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
-					// 	onChange={(event) =>
-					// 		table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
-					// 	}
-					// 	className='h-8 w-[150px] lg:w-[250px]'
+					// 	className='w-[150px] lg:w-[250px]'
 					// />
+					<Input
+						placeholder='Filter...'
+						value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
+						onChange={(event) =>
+							table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
+						}
+						className='h-8 w-[150px] lg:w-[250px]'
+					/>
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => (
@@ -52,7 +51,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 								column={table.getColumn(accessoryKey as string)}
 								title={accessoryKey.toString()}
 								options={items.map(({ name, id }) => {
-									return { label: name, value: String(id) };
+									return { label: name, value: id };
 								})}
 							/>
 						)}

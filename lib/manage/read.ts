@@ -33,17 +33,30 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 	return await response.json();
 };
 
-export const getCompanies = async (conditions?: Conditions<Company>): Promise<Company[]> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies${generateParams(conditions)}`, {
-		headers: baseHeaders,
-		method: 'GET',
-	});
+export const getCompanies = async (
+	conditions?: Conditions<Company>
+): Promise<{ companies: Company[]; count: number }> => {
+	const [response, countResponse] = await Promise.all([
+		fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies${generateParams(conditions)}`, {
+			headers: baseHeaders,
+			method: 'GET',
+		}),
+		fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/count${generateParams(conditions)}`, {
+			headers: baseHeaders,
+			method: 'GET',
+		}),
+	]);
 
-	if (!response.ok) {
-		console.error(response.statusText);
+	if (!response.ok || !countResponse.ok) {
+		console.error(response.statusText ?? countResponse.statusText);
 	}
 
-	return await response.json();
+	const { count } = await countResponse.json();
+
+	return {
+		companies: await response.json(),
+		count,
+	};
 };
 
 export const getCompanySites = async (id: number, conditions?: Conditions<Site>): Promise<Site[]> => {

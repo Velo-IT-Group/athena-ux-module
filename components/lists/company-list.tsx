@@ -5,11 +5,15 @@ import { Combobox } from '../ui/combobox';
 import { getCompanies } from '@/lib/manage/read';
 import { Button } from '../ui/button';
 import { Building } from 'lucide-react';
+import { DataTable } from '../ui/data-table';
+import { columns } from '../table-columns/company';
+import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<Company>;
+	facetedFilters?: FacetedFilter<Company>[];
 };
 
 const CompanyList = async ({
@@ -21,11 +25,21 @@ const CompanyList = async ({
 		orderBy: { key: 'name' },
 		pageSize: 1000,
 	},
+	facetedFilters,
 }: Props) => {
-	const companies = await getCompanies(params);
+	const { companies, count } = await getCompanies(params);
 
 	return (
 		<>
+			{type === 'table' && (
+				<DataTable
+					data={companies}
+					columns={columns}
+					meta={{ filterKey: 'name' }}
+					facetedFilters={facetedFilters}
+					count={count}
+				/>
+			)}
 			{type === 'combobox' && (
 				<Combobox
 					items={

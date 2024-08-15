@@ -1,22 +1,17 @@
-import { getBoards, getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
+import { getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
-import { Globe, MapPin, NotebookPen, Phone, PlusCircle, Tag, User } from 'lucide-react';
+import { Globe, MapPin, NotebookPen, Phone, PlusCircle, User } from 'lucide-react';
 import { Suspense } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import parsePhoneNumber from 'libphonenumber-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { groupBy } from 'lodash';
-import Tiptap from '@/components/tip-tap';
-import AsyncSelector from '@/components/async-selector';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 
@@ -25,29 +20,10 @@ type Props = {
 };
 
 const Page = async ({ params }: Props) => {
-	const [company, notes, sites, applications, servers] = await Promise.all([
+	const [company, notes, sites] = await Promise.all([
 		getCompany(Number(params.id)),
 		getCompanyNotes(Number(params.id), { conditions: [{ parameter: { 'type/id': 3 }, comparator: '!=' }] }),
 		getCompanySites(Number(params.id)),
-		getConfigurations({
-			fields: ['id', 'name', 'type', 'notes'],
-			conditions: [
-				{ parameter: { 'company/id': Number(params.id) } },
-				{ parameter: { 'status/id': 2 } },
-				{ parameter: { 'type/id': 191 } },
-			],
-			childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
-			orderBy: { key: 'name' },
-		}),
-		getConfigurations({
-			fields: ['id', 'name', 'type', 'notes'],
-			conditions: [
-				{ parameter: { 'company/id': Number(params.id) } },
-				{ parameter: { 'status/id': 2 } },
-				{ parameter: { 'type/id': 'in (211, 212, 219)' } },
-			],
-			orderBy: { key: 'name' },
-		}),
 	]);
 
 	return (
@@ -72,8 +48,6 @@ const Page = async ({ params }: Props) => {
 						/>
 
 						<h2>SOP Exceptions</h2>
-
-						{/* <Tiptap /> */}
 
 						<Separator />
 
@@ -275,12 +249,6 @@ const Page = async ({ params }: Props) => {
 
 											<PopoverContent></PopoverContent>
 										</Popover>
-										{/* <Suspense>
-											<ContactSelector
-												contact={company.defaultContact}
-												company={company}
-											/>
-										</Suspense> */}
 									</div>
 								</div>
 

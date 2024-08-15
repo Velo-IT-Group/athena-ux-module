@@ -18,12 +18,14 @@ const MemberSelector = ({ ticketId, member }: Props) => {
 	const [selectedMember, setSelectedMember] = useState<SystemMember | undefined>();
 
 	useEffect(() => {
-		getSystemMembers({ orderBy: { key: 'firstName' }, conditions: [{ inactiveFlag: false }], pageSize: 1000 }).then(
-			(data) => {
-				setMembers(data);
-				setSelectedMember(data.find((d) => d.id === member?.id));
-			}
-		);
+		getSystemMembers({
+			orderBy: { key: 'firstName' },
+			conditions: [{ parameter: { inactiveFlag: false } }],
+			pageSize: 1000,
+		}).then((data) => {
+			setMembers(data);
+			setSelectedMember(data.find((d) => d.id === member?.id));
+		});
 	}, []);
 
 	return (
@@ -43,7 +45,7 @@ const MemberSelector = ({ ticketId, member }: Props) => {
 				let firstName = e.toString().split('-')[1].split(' ')[0];
 				let lastName = e.toString().split('-')[1].split(' ')[1];
 
-				setSelectedMember({ id, firstName, lastName, identifier: '' });
+				setSelectedMember(members.find((member) => member.id === id));
 				try {
 					toast.info(id);
 					await updateTicket(ticketId, [{ op: 'replace', path: 'owner/id', value: id }]);

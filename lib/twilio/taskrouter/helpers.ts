@@ -105,14 +105,6 @@ export const getWorkflows = async () => {
 	return client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workflows.list();
 };
 
-export const getWorkerReservations = async () => {
-	const session = await auth();
-
-	return await client.taskrouter.v1
-		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-		.workers(session!.user.workerSid)
-		.reservations.list({ limit: 20, reservationStatus: ['pending', 'accepted'] });
-};
 export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
 	const session = await auth();
 

@@ -72,7 +72,7 @@ const Page = async ({ params }: Props) => {
 						label='Default Task Queue'
 						name='assignmentCallbackUrl'
 					>
-						<Select defaultValue={workflow.configuration?.default_task_queue ?? 'None'}>
+						<Select defaultValue={'None'}>
 							<SelectTrigger>
 								<SelectValue placeholder='Select a task queue...' />
 							</SelectTrigger>
@@ -116,6 +116,7 @@ const Page = async ({ params }: Props) => {
 									<DataTable
 										columns={columns}
 										data={filter.targets}
+										count={filter.targets.length}
 										hidePagination
 									/>
 								</AccordionContent>

@@ -13,7 +13,7 @@ const CommandCompaniesList = (props: Props) => {
 	const router = useRouter();
 
 	useEffect(() => {
-		getCompanies().then(setCompanies);
+		getCompanies().then(({ companies }) => setCompanies(companies));
 	}, []);
 
 	return (

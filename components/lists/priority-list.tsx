@@ -25,7 +25,7 @@ const PriorityList = async ({ type, defaultValue, params = { orderBy: { key: 'so
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={async (e) => {}}
+					setValue={() => {}}
 					placeholder='Filter statuses...'
 					side='left'
 					align='start'
@@ -38,6 +38,7 @@ const PriorityList = async ({ type, defaultValue, params = { orderBy: { key: 'so
 					>
 						<Circle
 							className='mr-1.5'
+							// @ts-ignore
 							style={{ color: defaultValue?.color?.toLowerCase() }}
 						/>
 						<span className='text-xs text-muted-foreground'>

@@ -34,8 +34,9 @@ const ReservationAcceptButton = ({ attributes, reservationSid, taskSid, to, from
 					toast.custom(
 						() => (
 							<ActiveCall
+								taskSid={taskSid}
 								attributes={attributes}
-								conferenceSid={conference?.sid ?? ''}
+								conferenceSid={conference?.conference?.sid ?? ''}
 							/>
 						),
 						{

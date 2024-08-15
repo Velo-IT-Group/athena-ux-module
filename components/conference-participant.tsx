@@ -14,7 +14,7 @@ type Props = {
 };
 
 const ConferenceParticipant = ({ task, participant }: Props) => {
-	const [hold, setHold] = useState(participant);
+	const [hold, setHold] = useState(false);
 
 	return (
 		<Button

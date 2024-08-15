@@ -32,7 +32,7 @@ const MemberList = async ({
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={async (e) => {}}
+					setValue={() => {}}
 					placeholder='Filter members...'
 					side='left'
 					align='start'

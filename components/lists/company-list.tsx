@@ -48,7 +48,7 @@ const CompanyList = async ({
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={async (e) => {}}
+					setValue={() => {}}
 					placeholder='Filter companies...'
 					side='left'
 					align='start'

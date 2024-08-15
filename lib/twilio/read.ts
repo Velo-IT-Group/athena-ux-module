@@ -16,29 +16,6 @@ export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promi
 	}
 };
 
-export const getConference = async (sid: string, callSid: string) => {
-	const conference = await getConferenceByName('conf_' + sid);
-
-	if (!conference) return;
-
-	const participants = await getConferenceParticipants(conference.sid);
-
-	const list = participants.filter((participant) => {
-		if (callSid !== participant.callSid) {
-			return participant;
-		}
-	});
-
-	if (list.length !== 0) {
-		callSid = list[0].callSid;
-	}
-
-	return {
-		conferenceSid: conference.sid,
-		callSid,
-	};
-};
-
 export const call = async (CallSid: string, callerId: string, phone: string) => {
 	let name = 'conf_' + CallSid;
 

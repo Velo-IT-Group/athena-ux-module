@@ -8,7 +8,7 @@ import { Task } from 'twilio-taskrouter';
 interface TwilioProviderProps {
 	currentWorkspace: string | undefined;
 	setCurrentWorkspace: Dispatch<React.SetStateAction<string | undefined>>;
-	activeCall: MutableRefObject<CustomCall | undefined>;
+	// activeCall: MutableRefObject<CustomCall | undefined>;
 	// setActiveCall: Dispatch<React.SetStateAction<CustomCall | undefined>>;
 	token: string;
 }
@@ -16,7 +16,7 @@ interface TwilioProviderProps {
 const initialValues: TwilioProviderProps = {
 	currentWorkspace: '',
 	setCurrentWorkspace: () => undefined,
-	activeCall: { current: undefined },
+	// activeCall: { current: undefined },
 	// setActiveCall: () => undefined,
 	token: '',
 };

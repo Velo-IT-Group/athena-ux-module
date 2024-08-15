@@ -15,7 +15,6 @@ import {
 	BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import ChildTickets from './child-tickets';
-import Tiptap from '@/components/tip-tap';
 
 type Props = {
 	params: { id: string };
@@ -58,14 +57,12 @@ export default async function Page({ params }: Props) {
 						</Suspense>
 					)}
 
-					<Tiptap content={initalNote?.text} />
-
-					{/* <Textarea
+					<Textarea
 						placeholder='Add a comment...'
 						className='border-none shadow-none resize-none'
 						defaultValue={initalNote?.text}
 						minRows={3}
-					/> */}
+					/>
 
 					{ticket.hasChildTicket ? (
 						<Suspense>

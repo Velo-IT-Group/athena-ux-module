@@ -1,7 +1,5 @@
 'use client';
 import React from 'react';
-import ActiveCallHeader from '@/components/active-call/active-call-header';
-import ActiveCallParticipants from '@/components/active-call/active-call-participants';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Combobox, ComboBoxItem } from '@/components/ui/combobox';
@@ -64,9 +62,9 @@ const ToolbarCalls = ({ workers }: Props) => {
 								sideOffset={4}
 							>
 								<Card className='shadow-none'>
-									<ActiveCallHeader attributes={attributes} />
+									{/* <ActiveCallHeader attributes={attributes} />
 
-									<ActiveCallParticipants conferenceSid={attributes?.conference.sid} />
+									<ActiveCallParticipants conferenceSid={attributes?.conference.sid} /> */}
 
 									{/* <ActiveCallFooter /> */}
 								</Card>

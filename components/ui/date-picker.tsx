@@ -37,7 +37,6 @@ const DatePicker = ({ date, setDate, name }: Props) => {
 						mode='single'
 						selected={date ?? new Date()}
 						onSelect={(e) => (e ? setDate && setDate(e) : undefined)}
-						initialFocus
 					/>
 				</PopoverContent>
 			</Popover>

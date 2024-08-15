@@ -59,7 +59,6 @@ export function DateRangePicker({ className, from, to }: Props) {
 					align='start'
 				>
 					<Calendar
-						initialFocus
 						mode='range'
 						defaultMonth={date?.from}
 						selected={date}

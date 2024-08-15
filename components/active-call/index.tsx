@@ -37,7 +37,10 @@ export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
 							customerName={attributes.name ?? attributes.from}
 						/>
 
-						<ActiveCallFooter />
+						<ActiveCallFooter
+							conferenceSid={conferenceSid}
+							participants={attributes?.conference?.participants ?? {}}
+						/>
 					</Card>
 
 					<PopoverContent

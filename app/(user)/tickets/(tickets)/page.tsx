@@ -1,7 +1,12 @@
 import TicketList from '@/components/lists/ticket-list';
+import TicketFormStepper from '@/components/forms/ticket-form/stepper';
+import { Button } from '@/components/ui/button';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
-import { getBoards, getPriorities, getSystemMembers } from '@/lib/manage/read';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { getBoards, getCompanies, getPriorities, getSystemMembers } from '@/lib/manage/read';
+import { Plus } from 'lucide-react';
 import { Suspense } from 'react';
+import TicketForm from '@/components/forms/ticket-form';
 
 type Props = {
 	searchParams: {
@@ -10,7 +15,7 @@ type Props = {
 };
 
 const Page = async ({ searchParams }: Props) => {
-	const [boards, priorities, members] = await Promise.all([
+	const [boards, priorities, members, { companies }] = await Promise.all([
 		getBoards({
 			conditions: [
 				{ parameter: { inactiveFlag: false } },
@@ -28,12 +33,36 @@ const Page = async ({ searchParams }: Props) => {
 			orderBy: { key: 'firstName' },
 			pageSize: 1000,
 		}),
+		getCompanies({
+			conditions: [{ parameter: { 'status/id': 1 } }],
+			childConditions: [{ parameter: { 'types/id': 1 } }],
+			orderBy: { key: 'name', order: 'asc' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
 	]);
 
 	return (
 		<main className='p-3 space-y-3'>
 			<header className='flex items-center gap-3'>
 				<h1 className='text-lg font-semibold'>Tickets</h1>
+
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button>
+							<Plus className='mr-1.5' />
+							<span>Create ticket</span>
+						</Button>
+					</DialogTrigger>
+
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Create Ticket</DialogTitle>
+						</DialogHeader>
+
+						<TicketForm companies={companies} />
+					</DialogContent>
+				</Dialog>
 			</header>
 
 			<section>

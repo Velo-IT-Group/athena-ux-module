@@ -9,8 +9,6 @@ import { DataTableViewOptions } from './view-options';
 
 import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/components/async-selector';
-import { usePathname } from 'next/navigation';
-import Search from '@/components/search';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
@@ -23,17 +21,11 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
-	// const pathname = usePathname();
 
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
-					// <Search
-					// 	baseUrl={pathname}
-					// 	placeholder='Filter...'
-					// 	className='w-[150px] lg:w-[250px]'
-					// />
 					<Input
 						placeholder='Filter...'
 						value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}

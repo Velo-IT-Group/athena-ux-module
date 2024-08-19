@@ -157,7 +157,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 					<Separator />
 
-					{/* <TaskList isCollapsed={isCollapsed} /> */}
+					<TaskList isCollapsed={isCollapsed} />
 				</div>
 			</ScrollArea>
 		</ResizablePanel>

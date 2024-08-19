@@ -10,6 +10,9 @@ import { columns } from '../table-columns/contact';
 import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
+	id: number;
+	serviceType: 'ticket';
+	path: string;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<Contact>;
@@ -19,13 +22,12 @@ type Props = {
 };
 
 const ContactList = async ({
+	id,
+	path,
+	serviceType,
 	type,
 	defaultValue,
-	params = {
-		childConditions: [{ parameter: { 'types/id': 17 } }],
-		pageSize: 1000,
-		orderBy: { key: 'firstName' },
-	},
+	params,
 	children,
 	hidePagination,
 	facetedFilters,
@@ -46,13 +48,15 @@ const ContactList = async ({
 			)}
 			{type === 'combobox' && (
 				<Combobox
+					id={id}
+					path={path}
+					type={serviceType}
 					items={
 						contacts?.map(({ id, firstName, lastName }) => {
-							return { label: `${firstName} ${lastName}`, value: `${id}-${firstName} ${lastName}` };
+							return { label: `${firstName} ${lastName ?? ''}`, value: `${id}-${firstName} ${lastName}` };
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={() => {}}
 					placeholder='Filter contacts...'
 					side='left'
 					align='start'

@@ -7,18 +7,22 @@ import { Button } from '../ui/button';
 import { Circle } from 'lucide-react';
 
 type Props = {
+	ticketId: number;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<Priority>;
 };
 
-const PriorityList = async ({ type, defaultValue, params = { orderBy: { key: 'sortOrder' } } }: Props) => {
+const PriorityList = async ({ ticketId, type, defaultValue, params = { orderBy: { key: 'sortOrder' } } }: Props) => {
 	const priorities = await getPriorities(params);
 
 	return (
 		<>
 			{type === 'combobox' && (
 				<Combobox
+					id={ticketId}
+					path='priority/id'
+					type='ticket'
 					items={
 						priorities?.map(({ id, name }) => {
 							return { label: name, value: `${id}-${name}` };

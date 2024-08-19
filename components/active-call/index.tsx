@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 import ActiveCallParticipants from './participants';
+import { useTask } from './context';
 
 type Props = {
 	taskSid: string;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
+	const { reservation, task } = useTask();
 	useEffect(() => {
 		getConferenceParticipants(conferenceSid)
 			.then((e) => {
@@ -28,29 +30,13 @@ export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
 	return (
 		<SessionProvider>
 			<TooltipProvider>
-				<Popover>
-					<Card className='shadow-sm w-[356px] dark'>
-						<ActiveCallHeader attributes={attributes} />
+				<Card className='shadow-sm w-[356px] dark'>
+					<ActiveCallHeader />
 
-						<ActiveCallParticipants
-							conferenceSid={conferenceSid}
-							customerName={attributes.name ?? attributes.from}
-						/>
+					<ActiveCallParticipants />
 
-						<ActiveCallFooter
-							conferenceSid={conferenceSid}
-							participants={attributes?.conference?.participants ?? {}}
-						/>
-					</Card>
-
-					<PopoverContent
-						side='left'
-						className='dark'
-						avoidCollisions
-					>
-						<Dialpad />
-					</PopoverContent>
-				</Popover>
+					<ActiveCallFooter />
+				</Card>
 			</TooltipProvider>
 		</SessionProvider>
 	);

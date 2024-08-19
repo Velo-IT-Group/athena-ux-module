@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { PopoverTriggerProps } from '@radix-ui/react-popover';
+import { updateTicket } from '@/lib/manage/update';
+import { toast } from 'sonner';
 
 export type ComboBoxItem = {
 	label: string | React.ReactNode;
@@ -15,29 +17,48 @@ export type ComboBoxItem = {
 };
 
 type Props = {
+	id: number;
 	items: ComboBoxItem[];
 	placeholder: string;
+	type: 'ticket';
+	path: string;
 	children?: React.ReactNode;
 	align?: 'center' | 'end' | 'start';
 	side?: 'top' | 'right' | 'bottom' | 'left';
 	value?: string;
-	setValue?: React.Dispatch<React.SetStateAction<string>>;
 	popoverTriggerProps?: PopoverTriggerProps;
 	className?: string;
 };
 
 export function Combobox({
+	id,
 	items,
 	placeholder,
+	type,
+	path,
 	children,
 	align = 'start',
 	side = 'bottom',
 	value = '',
-	setValue,
 	popoverTriggerProps,
 	className,
 }: Props) {
 	const [open, setOpen] = useState(false);
+
+	const handleSelect = async (newValue: any) => {
+		console.log(type, id, path, value, newValue);
+		try {
+			switch (type) {
+				case 'ticket':
+					await updateTicket(id, [{ op: value ? 'replace' : newValue ? 'add' : 'remove', path, value: newValue }]);
+					break;
+				default:
+					break;
+			}
+		} catch (error) {
+			toast.error(`${error?.message}`);
+		}
+	};
 
 	return (
 		<Popover
@@ -70,14 +91,17 @@ export function Combobox({
 			>
 				<Command>
 					<CommandInput placeholder={placeholder} />
-					<CommandEmpty>No framework found.</CommandEmpty>
+					<CommandEmpty>Nothing found.</CommandEmpty>
 					<CommandList>
 						{items.map((item) => (
 							<CommandItem
 								key={item.value}
 								value={item.value}
 								onSelect={(currentValue) => {
-									setValue?.(value && currentValue === value ? '' : currentValue);
+									console.log(currentValue);
+									const id = currentValue.split('-')[0];
+									console.log(id);
+									handleSelect(Number(id));
 									setOpen(false);
 								}}
 							>

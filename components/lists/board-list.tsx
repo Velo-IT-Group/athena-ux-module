@@ -7,18 +7,27 @@ import { Button } from '../ui/button';
 import { Box } from 'lucide-react';
 
 type Props = {
+	ticketId: number;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<Board>;
 };
 
-const BoardList = async ({ type, defaultValue, params = { orderBy: { key: 'name' }, pageSize: 1000 } }: Props) => {
+const BoardList = async ({
+	ticketId,
+	type,
+	defaultValue,
+	params = { orderBy: { key: 'name' }, pageSize: 1000 },
+}: Props) => {
 	const boards = await getBoards(params);
 
 	return (
 		<>
 			{type === 'combobox' && (
 				<Combobox
+					id={ticketId}
+					path='board/id'
+					type='ticket'
 					items={boards.map((board) => {
 						return { label: board?.name, value: `${board?.id}-${board?.name}` };
 					})}

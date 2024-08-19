@@ -3,23 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { CardContent } from '../ui/card';
 import ParticipantListItem from './participant-list-item';
 import { useSession } from 'next-auth/react';
+import { useTask } from './context';
 
-type Props = {
-	conferenceSid: string;
-	customerName: string;
-};
-
-const ActiveCallParticipants = ({ conferenceSid, customerName }: Props) => {
+const ActiveCallParticipants = () => {
+	const { task, setTask } = useTask();
 	const { data } = useSession();
-	console.log(data);
 	const [participants, setParticipants] = useState<Record<string, string>>({});
 
 	useEffect(() => {
 		setParticipants({
 			worker: data?.user?.name ?? 'You',
-			customer: customerName,
+			customer: task?.attributes.name ?? task?.attributes.from,
 		});
-	}, [customerName, data]);
+	}, [data, task]);
 
 	const entries = Object.entries(participants);
 

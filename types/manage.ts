@@ -6,6 +6,15 @@ export const referenceTypeSchema = z.object({
 	name: z.string(),
 });
 
+export const customFieldSchema = z.object({
+	id: z.number().optional(),
+	caption: z.string().optional(),
+	type: z.string().optional(),
+	entryMethod: z.string().optional(),
+	numberOfDecimals: z.number().optional(),
+	value: z.object({}),
+});
+
 const auditTypeSchema = z.enum([
 	'Attachment',
 	'Combined Tickets',
@@ -39,6 +48,51 @@ export const auditTrailEntrySchema = z.object({
 	auditType: auditTypeSchema,
 	auditSubType: z.string(),
 	auditSource: z.string(),
+});
+
+export const boardStatusSchema = z.object({
+	id: z.number(),
+	name: z.string().max(50),
+	board: referenceTypeSchema.optional(),
+	sortOrder: z.number().optional().nullable(),
+	displayOnBoard: z.boolean().optional().nullable(),
+	inactive: z.boolean().optional().nullable(),
+	closedStatus: z.boolean().optional().nullable(),
+	timeEntryNotAllowed: z.boolean().optional().nullable(),
+	roundRobinCatchall: z.boolean().optional().nullable(),
+	defaultFlag: z.boolean().optional().nullable(),
+	escalationStatus: z.string().optional().nullable(),
+	customerPortalDescription: z.string().optional().nullable(),
+	customerPortalFlag: z.boolean().optional().nullable(),
+	emailTemplate: referenceTypeSchema.optional().nullable(),
+	statusIndicator: referenceTypeSchema.optional().nullable(),
+	customStatusIndicatorName: z.string().optional().nullable(),
+	saveTimeAsNote: z.boolean().optional().nullable(),
+});
+
+export const boardTypeSchema = z.object({
+	id: z.number(),
+	name: z.string().max(50),
+	category: z.enum(['Reactive', 'Proactive']).nullable(),
+	defaultFlag: z.boolean().nullable(),
+	inactiveFlag: z.boolean().nullable(),
+	requestForChangeFlag: z.boolean().nullable(),
+	integrationXref: z.string().nullable(),
+	skillCategory: referenceTypeSchema.nullable(),
+	skill: referenceTypeSchema.nullable(),
+	board: referenceTypeSchema.nullable(),
+	location: referenceTypeSchema.nullable(),
+	department: referenceTypeSchema.nullable(),
+});
+
+export const boardSubTypeSchema = z.object({
+	id: z.number(),
+	name: z.string().max(50),
+	inactiveFlag: z.boolean().nullable(),
+	typeAssociationIds: z.array(z.number()),
+	addAllTypesFlag: z.boolean().nullable(),
+	removeAllTypesFlag: z.boolean().nullable(),
+	board: referenceTypeSchema,
 });
 
 export const communicationItemSchema = z.object({
@@ -86,15 +140,6 @@ export const contactSchema = z.object({
 	communicationItems: z.array(communicationItemSchema).optional(),
 	types: z.array(referenceTypeSchema).optional(),
 	ignoreDuplicates: z.boolean().optional(),
-});
-
-export const customFieldSchema = z.object({
-	id: z.number().optional(),
-	caption: z.string().optional(),
-	type: z.string().optional(),
-	entryMethod: z.string().optional(),
-	numberOfDecimals: z.number().optional(),
-	value: z.object({}),
 });
 
 export const serviceTicketSchema = z.object({
@@ -502,6 +547,9 @@ export const serviceTicketTaskSchema = z.object({
 
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
+export type BoardStatus = z.infer<typeof boardStatusSchema>;
+export type BoardType = z.infer<typeof boardTypeSchema>;
+export type BoardSubType = z.infer<typeof boardTypeSchema>;
 export type CustomField = z.infer<typeof customFieldSchema>;
 export type CommunicationItem = z.infer<typeof communicationItemSchema>;
 export type CommunicationType = z.infer<typeof communicationTypeSchema>;
@@ -765,25 +813,6 @@ export interface Note {
 	flagged: boolean;
 	enteredBy: string;
 	company: ReferenceType;
-}
-export interface BoardStatus {
-	id: number;
-	name: string;
-	board: ReferenceType;
-	sortOrder: number;
-	displayOnBoard: boolean;
-	inactive: boolean;
-	closedStatus: boolean;
-	timeEntryNotAllowed: boolean;
-	roundRobinCatchall: boolean;
-	defaultFlag: boolean;
-	escalationStatus: string;
-	customerPortalDescription: string;
-	customerPortalFlag: boolean;
-	emailTemplate: ReferenceType;
-	statusIndicator: ReferenceType;
-	customStatusIndicatorName: string;
-	saveTimeAsNote: boolean;
 }
 
 export interface Priority {

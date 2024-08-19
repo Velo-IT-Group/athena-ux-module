@@ -7,12 +7,16 @@ import { Button } from '../ui/button';
 import { CircleUser } from 'lucide-react';
 
 type Props = {
+	id: number;
+	path: string;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
 	params?: Conditions<SystemMember>;
 };
 
 const MemberList = async ({
+	id,
+	path,
 	type,
 	defaultValue,
 	params = {
@@ -22,17 +26,20 @@ const MemberList = async ({
 	},
 }: Props) => {
 	const members = await getSystemMembers(params);
+
 	return (
 		<>
 			{type === 'combobox' && (
 				<Combobox
+					id={id}
+					path={path}
+					type='ticket'
 					items={
 						members?.map(({ id, firstName, lastName }) => {
-							return { label: `${firstName} ${lastName}`, value: `${id}-${firstName} ${lastName}` };
+							return { label: `${firstName} ${lastName ?? ''}`, value: `${id}-${firstName} ${lastName ?? ''}` };
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={() => {}}
 					placeholder='Filter members...'
 					side='left'
 					align='start'

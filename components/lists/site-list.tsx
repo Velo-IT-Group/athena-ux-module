@@ -1,62 +1,51 @@
-import { Company, ReferenceType } from '@/types/manage';
+import { Company, ReferenceType, Site } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
 import { Combobox } from '../ui/combobox';
-import { getCompanies } from '@/lib/manage/read';
+import { getCompanySites } from '@/lib/manage/read';
 import { Button } from '../ui/button';
 import { Building } from 'lucide-react';
-import { DataTable } from '../ui/data-table';
-import { columns } from '../table-columns/company';
 import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
 	id: number;
+	companyId: number;
 	path: string;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType;
-	params?: Conditions<Company>;
-	facetedFilters?: FacetedFilter<Company>[];
+	params?: Conditions<Site>;
+	facetedFilters?: FacetedFilter<Site>[];
 };
 
-const CompanyList = async ({
+const SiteList = async ({
 	id,
+	companyId,
 	path,
 	type,
 	defaultValue,
 	params = {
-		conditions: [{ parameter: { 'status/id': 1 } }],
-		childConditions: [{ parameter: { 'types/id': 1 } }],
-		orderBy: { key: 'name' },
 		pageSize: 1000,
+		fields: ['id', 'name'],
 	},
 	facetedFilters,
 }: Props) => {
-	const { companies, count } = await getCompanies(params);
+	const sites = await getCompanySites(companyId, params);
 
 	return (
 		<>
-			{type === 'table' && (
-				<DataTable
-					data={companies}
-					columns={columns}
-					meta={{ filterKey: 'name' }}
-					facetedFilters={facetedFilters}
-					count={count}
-				/>
-			)}
 			{type === 'combobox' && (
 				<Combobox
 					id={id}
 					path={path}
 					type='ticket'
 					items={
-						companies?.map(({ id, name }) => {
+						sites?.map(({ id, name }) => {
 							return { label: name, value: `${id}-${name}` };
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
 					// setValue={() => {}}
-					placeholder='Filter companies...'
+					placeholder='Filter sites...'
 					side='left'
 					align='start'
 				>
@@ -67,7 +56,7 @@ const CompanyList = async ({
 						className='flex'
 					>
 						<Building className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add company'}</span>
+						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add site'}</span>
 					</Button>
 				</Combobox>
 			)}
@@ -75,4 +64,4 @@ const CompanyList = async ({
 	);
 };
 
-export default CompanyList;
+export default SiteList;

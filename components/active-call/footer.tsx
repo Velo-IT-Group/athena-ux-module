@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useTransition } from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
@@ -16,7 +16,7 @@ import {
 	Settings,
 	UserPlus,
 } from 'lucide-react';
-import { PopoverTrigger } from '../ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -25,18 +25,16 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { useRecoilValue } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
 import { useDevice } from '@/providers/device-provider';
-import { updateConference, updateConferenceParticipants } from '@/lib/twilio/conference/helpers';
+import { useTask } from './context';
+import { Dialpad } from '../dialpad';
+import { updateConference } from '@/lib/twilio/conference/helpers';
+import { updateConferenceAction } from './actions';
 
-type Props = {
-	conferenceSid: string;
-	participants: Record<string, any>;
-};
-
-const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
+const ActiveCallFooter = () => {
+	const { task } = useTask();
 	const { activeCall, muted, setMuted } = useDevice();
+	const [isPending, startTransition] = useTransition();
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
@@ -80,25 +78,34 @@ const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
 					</TooltipContent>
 				</Tooltip>
 
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<PopoverTrigger asChild>
-							<Button
-								variant='secondary'
-								size='icon'
-							>
-								<Grip className='h-3.5 w-3.5' />
-							</Button>
-						</PopoverTrigger>
-					</TooltipTrigger>
+				<Popover>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<PopoverTrigger asChild>
+								<Button
+									variant='secondary'
+									size='icon'
+								>
+									<Grip className='h-3.5 w-3.5' />
+								</Button>
+							</PopoverTrigger>
+						</TooltipTrigger>
 
-					<TooltipContent
-						side='top'
-						align='center'
+						<TooltipContent
+							side='top'
+							align='center'
+						>
+							<span>Show Keypad</span>
+						</TooltipContent>
+					</Tooltip>
+
+					<PopoverContent
+						side='left'
+						className='dark'
 					>
-						<span>Show Keypad</span>
-					</TooltipContent>
-				</Tooltip>
+						<Dialpad />
+					</PopoverContent>
+				</Popover>
 
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -106,7 +113,7 @@ const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
 							variant='secondary'
 							size='icon'
 							onClick={async () => {
-								const allParticipants = await updateConferenceParticipants(conferenceSid, '', { hold: true });
+								await task?.hold(task.attributes.workerSid, true);
 							}}
 						>
 							<Pause className='h-3.5 w-3.5' />
@@ -135,7 +142,6 @@ const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
 						side='top'
 						align='end'
 						className='w-48 dark'
-						avoidCollisions
 					>
 						<DropdownMenuGroup>
 							<DropdownMenuItem>
@@ -200,7 +206,15 @@ const ActiveCallFooter = ({ conferenceSid, participants }: Props) => {
 					<Button
 						variant='destructive'
 						size='icon'
-						onClick={() => activeCall?.disconnect()}
+						onClick={() => {
+							startTransition(async () => {
+								activeCall?.disconnect();
+								await updateConferenceAction(task?.attributes.conference.sid, {
+									status: 'completed',
+								});
+								await task?.wrapUp({ reason: 'Call ended' });
+							});
+						}}
 					>
 						<Phone className='rotate-[135deg]' />
 					</Button>

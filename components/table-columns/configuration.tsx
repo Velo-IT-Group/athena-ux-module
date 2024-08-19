@@ -62,7 +62,7 @@ export const columns: ColumnDef<Configuration>[] = [
 		),
 		cell: ({ row }) => {
 			const status = row.getValue('status') as ReferenceType;
-			return <span>{status.name}</span>;
+			return <span>{status?.name}</span>;
 		},
 		enableSorting: false,
 		enableHiding: false,
@@ -77,20 +77,17 @@ export const columns: ColumnDef<Configuration>[] = [
 		),
 		cell: ({ row }) => {
 			const site = row.getValue('site') as ReferenceType;
-			return <span>{site.name}</span>;
+			return <span>{site?.name}</span>;
 		},
 		enableSorting: false,
 		enableHiding: false,
-	},
-	{
-		accessorKey: 'deviceIdentifier',
-		header: 'deviceIdentifier',
-		cell: ({ row }) => {
-			const site = row.getValue('site') as ReferenceType;
-			return <span>{row.getValue('deviceIdentifier')}</span>;
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			if (!referenceRow) return false;
+
+			return value.includes(String(referenceRow.id));
 		},
-		enableSorting: false,
-		enableHiding: false,
 	},
 	{
 		accessorKey: 'contact',
@@ -105,9 +102,16 @@ export const columns: ColumnDef<Configuration>[] = [
 			return (
 				<div className='flex items-center space-x-2'>
 					<User className='mr-1.5' />
-					<span className='truncate font-medium'>{contact.name}</span>
+					<span className='truncate font-medium'>{contact?.name}</span>
 				</div>
 			);
+		},
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			if (!referenceRow) return false;
+
+			return value.includes(String(referenceRow.id));
 		},
 	},
 	{

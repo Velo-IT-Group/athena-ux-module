@@ -4,6 +4,8 @@ import type {
 	AuditTrailEntry,
 	Board,
 	BoardStatus,
+	BoardSubType,
+	BoardType,
 	CommunicationItem,
 	CommunicationType,
 	Company,
@@ -66,11 +68,13 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 			headers: baseHeaders,
 		}
 	);
+
+	console.log(response.statusText);
+
 	return await response.json();
 };
 
 export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
-	console.log(generateParams(conditions));
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
 		{
@@ -152,7 +156,6 @@ export const getAllContacts = async (
 	conditions?: Conditions<Contact>
 ): Promise<{ contacts: Contact[]; count: number }> => {
 	let contacts: Contact[] = [];
-	console.log(generateParams(conditions));
 	const responseCount = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/count${generateParams(conditions)}`,
 		{
@@ -164,8 +167,6 @@ export const getAllContacts = async (
 
 	const pageCount = Math.ceil(count / 1000);
 
-	console.log(count, pageCount);
-
 	try {
 		if (pageCount > 1) {
 			const arrayCount = Array(pageCount).fill(null);
@@ -173,7 +174,7 @@ export const getAllContacts = async (
 			const [...allResponses] = await Promise.all(
 				arrayCount.map((_, index) =>
 					fetch(
-						`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts${generateParams({
+						`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${generateParams({
 							...conditions,
 							page: index + 1,
 							pageSize: 1000,
@@ -193,12 +194,15 @@ export const getAllContacts = async (
 				headers: baseHeaders,
 			});
 
-			if (response.status !== 200) {
+			if (!response.ok) {
 				console.error(response.statusText);
 				throw Error('Could not fetch contacts...');
 			}
 
-			return await response.json();
+			return {
+				contacts: await response.json(),
+				count,
+			};
 		}
 	} catch (error) {
 		console.error(error);
@@ -222,6 +226,73 @@ export const getConfiguration = async (id: number, conditions?: Conditions<Confi
 	if (response.status !== 200) throw Error(`Could not fetch configuration for ${id}...`);
 
 	return await response.json();
+};
+
+export const getAllConfigurations = async (
+	conditions?: Conditions<Configuration>
+): Promise<{ configurations: Configuration[]; count: number }> => {
+	let configurations: Configuration[] = [];
+
+	const responseCount = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/count${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	const { count } = await responseCount.json();
+
+	const pageCount = Math.ceil(count / 1000);
+
+	try {
+		if (pageCount > 1) {
+			const arrayCount = Array(pageCount).fill(null);
+
+			const [...allResponses] = await Promise.all(
+				arrayCount.map((_, index) =>
+					fetch(
+						`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams({
+							...conditions,
+							page: index + 1,
+							pageSize: 1000,
+						})}`,
+						{
+							headers: baseHeaders,
+						}
+					)
+				)
+			);
+
+			const [...data] = await Promise.all(allResponses.flatMap((response) => response.json()));
+			const items: Configuration[] = data.flatMap((item) => item);
+			configurations = items;
+		} else {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams(conditions)}`,
+				{
+					headers: baseHeaders,
+				}
+			);
+
+			if (!response.ok) {
+				console.error(response.statusText);
+				throw Error('Could not fetch configurations...');
+			}
+
+			return {
+				configurations: await response.json(),
+				count,
+			};
+		}
+	} catch (error) {
+		console.error(error);
+		return { configurations: [], count: 0 };
+	}
+
+	return {
+		configurations,
+		count,
+	};
 };
 
 export const getConfigurations = async (
@@ -262,15 +333,12 @@ export const getTasks = async (
 		}
 	);
 
-	console.log(response.statusText);
-
 	return await response.json();
 };
 
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ tickets: ServiceTicket[]; count: number }> => {
-	console.log(generateParams(conditions));
 	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
@@ -350,6 +418,20 @@ export const getTicket = async (id: number, conditions?: Conditions<ServiceTicke
 	return await response.json();
 };
 
+export const getTicketConfigurations = async (
+	id: number,
+	conditions?: Conditions<Configuration>
+): Promise<Configuration[]> => {
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/configurations${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	return await response.json();
+};
+
 export const getTicketNotes = async (id: number, conditions?: Conditions<Note>): Promise<TicketNote[]> => {
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/notes/${generateParams(conditions)}`,
@@ -377,7 +459,6 @@ export const getSystemMembers = async (conditions?: Conditions<SystemMember>): P
 };
 
 export const getStatuses = async (id: number, conditions?: Conditions<BoardStatus>): Promise<BoardStatus[]> => {
-	console.log(id);
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/statuses/${generateParams(conditions)}`,
 		{
@@ -388,6 +469,38 @@ export const getStatuses = async (id: number, conditions?: Conditions<BoardStatu
 	if (!response.ok) {
 		console.error(response.statusText);
 		throw Error('Error fetching service board statuses...', { cause: response.statusText });
+	}
+
+	return await response.json();
+};
+
+export const getBoardTypes = async (id: number, conditions?: Conditions<BoardType>): Promise<BoardType[]> => {
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/types/${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	if (!response.ok) {
+		console.error(response.statusText);
+		throw Error('Error fetching service board types...', { cause: response.statusText });
+	}
+
+	return await response.json();
+};
+
+export const getBoardSubTypes = async (id: number, conditions?: Conditions<BoardSubType>): Promise<BoardSubType[]> => {
+	const response = await fetch(
+		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/subTypes${generateParams(conditions)}`,
+		{
+			headers: baseHeaders,
+		}
+	);
+
+	if (!response.ok) {
+		console.error(response.statusText);
+		throw Error('Error fetching service board subtypes...', { cause: response.statusText });
 	}
 
 	return await response.json();
@@ -480,8 +593,6 @@ export const getHoliday = async (
 			headers: baseHeaders,
 		}
 	);
-
-	console.log(response);
 
 	// if (!response.ok) throw Error('Error fetching holiday...');
 

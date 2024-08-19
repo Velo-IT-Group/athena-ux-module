@@ -170,26 +170,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		if (!device.calls.length) return;
 	}, [device.calls]);
 
-	// useEffect(() => {
-	// 	if (!currentCallControl) return;
-	// 	currentCallControl.muteState?.subscribe((muteState) => {
-	// 		console.log(`Mute state emitted: ${muteState}`);
-	// 		// setDeviceState((prev) => ({ ...prev, muteState }));
-	// 	});
-
-	// 	currentCallControl.ringState?.subscribe((ringState) => {
-	// 		console.log(ringState);
-	// 	});
-
-	// 	currentCallControl?.callActive?.subscribe((callActive) => {
-	// 		console.log(`Call state emitted: ${callActive}`);
-
-	// 		setDeviceState((prev) => ({ ...prev, callActive }));
-	// 		// state.deviceState.callActive = callActive;
-	// 		// uiUpdateState();
-	// 	});
-	// }, [currentCallControl]);
-
 	return (
 		<Provider
 			value={{

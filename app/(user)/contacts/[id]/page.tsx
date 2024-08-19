@@ -1,19 +1,22 @@
 import TicketList from '@/components/lists/ticket-list';
+import PhoneNumberButton from '@/components/phone-number-button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { linksConfig } from '@/config/links';
 import { getBoards, getContact, getPriorities, getSystemMembers } from '@/lib/manage/read';
 import { NavItemWithChildren } from '@/types/nav';
-import { Building2, Cable, Download, Mail, MapPin, Phone, Plus, SquareArrowDown, Tag, Timer } from 'lucide-react';
+import { Building2, Cable, Mail, MapPin, Phone, Plus, Tag, Timer } from 'lucide-react';
 import React, { Suspense } from 'react';
-import parsePhoneNumber from 'libphonenumber-js';
 
 type Props = {
 	params: { id: number };
+};
+
+type NavItemWithAddAction = NavItemWithChildren & {
+	title: string | React.ReactNode;
+	addAction?: boolean;
+	items: NavItemWithAddAction[];
 };
 
 const Page = async ({ params }: Props) => {
@@ -38,7 +41,7 @@ const Page = async ({ params }: Props) => {
 		}),
 	]);
 
-	const details: NavItemWithChildren[] = [
+	const details: NavItemWithAddAction[] = [
 		{
 			title: 'Phone Number',
 			icon: Phone,
@@ -46,9 +49,10 @@ const Page = async ({ params }: Props) => {
 				contact?.communicationItems
 					?.filter((item) => item.communicationType === 'Phone')
 					.map((item) => {
-						const number = parsePhoneNumber(item.value ?? '', 'US');
-
-						return { title: number?.format('NATIONAL') ?? '', items: [] };
+						return {
+							title: <PhoneNumberButton phoneNumber={item.value} />,
+							items: [],
+						};
 					}) ?? [],
 			addAction: true,
 		},
@@ -66,7 +70,8 @@ const Page = async ({ params }: Props) => {
 		{
 			title: 'Location',
 			icon: MapPin,
-			items: [],
+			items: [{ title: contact?.site?.name ?? '', items: [] }],
+			addAction: true,
 		},
 		{
 			title: 'Response Time',
@@ -115,13 +120,13 @@ const Page = async ({ params }: Props) => {
 							key={detail.title}
 							className='space-y-3'
 						>
-							<h4 className='text-xs text-muted-foreground flex items-center'>
+							<h4 className='text-xs text-muted-foreground flex items-center group'>
 								{detail.icon && <detail.icon className='mr-1.5 inline-block' />} {detail.title}
 								{detail.addAction && (
 									<Button
 										variant='ghost'
 										size='smIcon'
-										className='ml-auto'
+										className='ml-auto opacity-0 group-hover:opacity-100 transition-opacity'
 									>
 										<Plus />
 									</Button>
@@ -130,7 +135,7 @@ const Page = async ({ params }: Props) => {
 
 							<div className='flex flex-col items-start gap-1.5'>
 								{detail.items.map((item) => (
-									<Badge>{item.title}</Badge>
+									<div key={item.title}>{item.title}</div>
 								))}
 							</div>
 						</section>

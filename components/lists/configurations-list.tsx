@@ -1,4 +1,4 @@
-import { getConfigurations } from '@/lib/manage/read';
+import { getAllConfigurations, getConfigurations } from '@/lib/manage/read';
 import { Configuration, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';
@@ -9,15 +9,19 @@ import { Cable, X } from 'lucide-react';
 import { Button, buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
+	id: number;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType | Configuration[];
+	facetedFilters?: FacetedFilter<Configuration>[];
 	params?: Conditions<Configuration>;
 };
 
-const ConfigurationsList = async ({ type, defaultValue, params }: Props) => {
-	const { configurations, count } = await getConfigurations(params);
+const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, params }: Props) => {
+	const { configurations, count } = await getAllConfigurations({ ...params, pageSize: 1000 });
+
 	return (
 		<>
 			{type === 'table' && (
@@ -25,10 +29,15 @@ const ConfigurationsList = async ({ type, defaultValue, params }: Props) => {
 					data={configurations}
 					columns={columns}
 					count={count}
+					meta={{ filterKey: 'name' }}
+					facetedFilters={facetedFilters}
 				/>
 			)}
 			{type === 'combobox' && (
 				<Combobox
+					id={id}
+					path='configuration/id'
+					type='ticket'
 					items={configurations.map(({ id, name }) => {
 						return { label: name, value: `${id}-${name}` };
 					})}
@@ -36,7 +45,6 @@ const ConfigurationsList = async ({ type, defaultValue, params }: Props) => {
 					align='end'
 					side='left'
 					value={String(defaultValue ?? '')}
-					// setValue={() => {}}
 				>
 					<div className='grid place-items-start'>
 						{defaultValue && typeof defaultValue === 'object' && Array.isArray(defaultValue) ? (

@@ -39,7 +39,7 @@ const Timer = ({ startTime, taskSid }: Props) => {
 		return () => clearInterval(interval);
 	}, [startTime, taskSid]);
 	return (
-		<span className='text-xs tabular-nums'>
+		<span className='text-xs text-muted-foreground tabular-nums'>
 			{String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
 		</span>
 	);

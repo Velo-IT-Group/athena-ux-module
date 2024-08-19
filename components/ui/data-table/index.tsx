@@ -73,7 +73,7 @@ export function DataTable<TData, TValue>({
 	});
 
 	return (
-		<div className='space-y-3 pt-[4px] pl-[4px] overflow-x-scroll'>
+		<div className='space-y-3 pt-[4px] pl-[4px] overflow-x-auto overflow-visible'>
 			<DataTableToolbar
 				table={table}
 				facetedFilters={facetedFilters}

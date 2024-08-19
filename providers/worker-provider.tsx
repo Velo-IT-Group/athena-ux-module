@@ -11,6 +11,7 @@ import { activityState, deviceEligibleAtom, reservationsListState } from '@/atom
 import { toast } from 'sonner';
 import TaskWrapup from '@/components/task/wrapup';
 import { useDevice } from './device-provider';
+import { useTask } from '@/components/active-call/context';
 
 interface WorkerProviderProps {
 	worker: Worker | undefined;
@@ -42,6 +43,7 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 	const [reservations, setReservations] = useState<Reservation[]>(initialValues.reservations);
 	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
 	const { currentCallControl } = useDevice();
+	const { setTask, setReservation } = useTask();
 
 	const worker = new Worker(authToken, { closeExistingSessions: true });
 
@@ -54,19 +56,14 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 		ress.forEach(async (res) => {
 			switch (res.status) {
 				case 'wrapping':
-					toast.custom(
-						() => (
-							<TaskWrapup
-								taskSid={res.task.sid}
-								dateUpdated={res.dateUpdated}
-							/>
-						),
-						{
-							important: true,
-							duration: res.timeout * 1000,
-							id: res.task.sid,
-						}
-					);
+					setReservation(res);
+					setTask(res.task);
+					console.log(res.sid);
+					toast.custom(() => <TaskWrapup />, {
+						important: true,
+						duration: res.timeout * 1000,
+						id: res.task.sid,
+					});
 					break;
 				default:
 					setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);

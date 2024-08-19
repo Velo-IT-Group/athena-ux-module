@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CardHeader, CardTitle } from '../ui/card';
 import { Rocket, SquareArrowOutUpRight, X } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -8,30 +8,32 @@ import WorkerSelector from '@/app/(user)/worker-selector';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { toast } from 'sonner';
 import Timer from '../timer';
+import { useTask } from './context';
 
-const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
-	const [seconds, setSeconds] = useState(0);
-	const [minutes, setMinutes] = useState(0);
-	const [hours, setHours] = useState(0);
+const ActiveCallHeader = () => {
+	const { task } = useTask();
 	const intialDate = new Date();
+
+	let searchParams = new URLSearchParams();
+	if (task?.attributes.contactId) {
+		searchParams.set('contactId', task.attributes.contactId);
+	}
+	if (task?.attributes.companyId) {
+		searchParams.set('companyId', task.attributes.companyId);
+	}
 
 	return (
 		<CardHeader className='flex-row items-center justify-between p-3 gap-3 border-b space-y-0'>
 			<CardTitle className='space-x-1.5 flex items-center'>
 				<Rocket className='inline-block text-yellow-400' />
 
-				<span className='text-sm font-normal'>Customer support</span>
+				<span className='text-sm font-normal'>{task?.queueName}</span>
 
 				<Timer startTime={intialDate} />
-
-				<span className='text-xs text-muted-foreground tabular-nums'>
-					{hours > 0 && `${String(hours).padStart(2, '0')}:`}
-					{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-				</span>
 			</CardTitle>
 
 			<div className='flex items-center gap-1.5'>
-				<Link href={`/?contactId=${attributes?.contactId}&companyId=${attributes?.companyId}`}>
+				<Link href={`/?${searchParams.toString()}`}>
 					<Button
 						variant='ghost'
 						size='icon'
@@ -49,7 +51,7 @@ const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
 							variant='ghost'
 							size='smIcon'
 							className='p-0'
-							onClick={() => toast.dismiss(attributes.conference)}
+							onClick={() => toast.dismiss(task?.sid)}
 						>
 							<X />
 						</Button>

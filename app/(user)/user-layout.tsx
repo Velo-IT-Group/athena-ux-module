@@ -5,6 +5,7 @@ import { TwilioProvider } from '@/providers/twilio-provider';
 import { DeviceProvider } from '@/providers/device-provider';
 import { WorkerProvider } from '@/providers/worker-provider';
 import { NotificationProvider } from '@/providers/notification-provider';
+import { TaskContext } from '@/components/active-call/context';
 
 type Props = {
 	token: string;
@@ -16,9 +17,11 @@ const UserLayout = ({ token, children }: Props) => {
 		<RecoilProvider>
 			<NotificationProvider>
 				<TwilioProvider authToken={token}>
-					<DeviceProvider authToken={token}>
-						<WorkerProvider authToken={token}>{children}</WorkerProvider>
-					</DeviceProvider>
+					<TaskContext>
+						<DeviceProvider authToken={token}>
+							<WorkerProvider authToken={token}>{children}</WorkerProvider>
+						</DeviceProvider>
+					</TaskContext>
 				</TwilioProvider>
 			</NotificationProvider>
 		</RecoilProvider>

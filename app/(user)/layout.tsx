@@ -14,6 +14,7 @@ import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TaskContext } from '@/components/active-call/context';
 
 type Props = {
 	children: ReactNode;
@@ -82,7 +83,9 @@ const Layout = async ({ children }: Props) => {
 
 						<Separator />
 
-						<ScrollArea className='h-[calc(100vh-48px)]'>{children}</ScrollArea>
+						<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
+							<div className='h-full grow'>{children}</div>
+						</ScrollArea>
 					</ResizablePanel>
 				</ResizablePanelGroup>
 

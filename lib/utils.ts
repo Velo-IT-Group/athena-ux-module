@@ -25,6 +25,7 @@ export const parsePhoneNumber = (
 	return {
 		isValid: number ? number.isValid() : false,
 		formattedNumber: number?.format(format, formatOptions),
+		options: number,
 	};
 };
 

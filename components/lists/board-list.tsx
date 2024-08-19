@@ -26,7 +26,7 @@ const BoardList = async ({ type, defaultValue, params = { orderBy: { key: 'name'
 					align='start'
 					placeholder='Select a board...'
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					setValue={() => {}}
+					// setValue={() => {}}
 				>
 					<Button
 						size='sm'

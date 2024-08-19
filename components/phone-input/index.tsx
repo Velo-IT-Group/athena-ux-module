@@ -183,7 +183,7 @@ export function PhoneInput({
 												/>
 												<img
 													src={`/flags/${country.iso2.toLowerCase()}.svg`}
-													className='relative top-0.5 mr-2 w-4 h-3 object-cover'
+													className='relative top-0.5 mr-2 w-3.5 h-3 object-cover'
 													aria-labelledby={country.name}
 													title={country.name}
 													alt={country.name}

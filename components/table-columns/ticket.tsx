@@ -1,8 +1,5 @@
 'use client';
-
 import { ColumnDef } from '@tanstack/react-table';
-
-import { Checkbox } from '@/components/ui/checkbox';
 import type { ReferenceType, ServiceTicket } from '@/types/manage';
 import { DataTableColumnHeader } from '../ui/data-table/column-header';
 import { DataTableRowActions } from '../ui/data-table/row-actions';
@@ -12,27 +9,6 @@ import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
 
 export const columns: ColumnDef<ServiceTicket>[] = [
-	{
-		id: 'select',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-				className='translate-y-[2px]'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-				className='translate-y-[2px]'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
 	{
 		accessorKey: 'id',
 		header: ({ column }) => (
@@ -85,7 +61,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex w-[100px] items-center'>
-					{/* {status.icon && <status.icon className='mr-2 h-4 w-4 text-muted-foreground' />} */}
+					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{board.name}</span>
 				</div>
 			);
@@ -110,7 +86,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex w-[100px] items-center'>
-					{/* {status.icon && <status.icon className='mr-2 h-4 w-4 text-muted-foreground' />} */}
+					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{status.name}</span>
 				</div>
 			);
@@ -138,7 +114,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex items-center'>
-					{/* {status.icon && <status.icon className='mr-2 h-4 w-4 text-muted-foreground' />} */}
+					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{sla}</span>
 				</div>
 			);
@@ -166,7 +142,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex items-center'>
-					{/* {priority.icon && <priority.icon className='mr-2 h-4 w-4 text-muted-foreground' />} */}
+					{/* {priority.icon && <priority.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{priority.name}</span>
 				</div>
 			);
@@ -196,7 +172,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex items-center'>
-					{/* {priority.icon && <priority.icon className='mr-2 h-4 w-4 text-muted-foreground' />} */}
+					{/* {priority.icon && <priority.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{owner?.name}</span>
 				</div>
 			);

@@ -1,5 +1,6 @@
 'use server';
 import { auth } from '@/auth';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath, unstable_cache } from 'next/cache';
 import { Twilio, jwt } from 'twilio';
 import { ActivityListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/activity';
@@ -106,11 +107,14 @@ export const getWorkflows = async () => {
 };
 
 export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
-	const session = await auth();
+	const supabase = createClient();
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
 
 	return await client.taskrouter.v1
 		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
-		.workers(session!.user.workerSid)
+		.workers(session!.user.user_metadata.workerSid)
 		.reservations(id)
 		.update(update);
 };

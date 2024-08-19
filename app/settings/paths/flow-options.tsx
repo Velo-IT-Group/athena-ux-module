@@ -32,7 +32,7 @@ const FlowOptions = ({ flow }: { flow: FlowInstance }) => {
 						variant='secondary'
 						className='px-2 shadow-none'
 					>
-						<ChevronDownIcon className='h-4 w-4 text-secondary-foreground' />
+						<ChevronDownIcon className='h-3.5 w-3.5 text-secondary-foreground' />
 					</Button>
 				</DropdownMenuTrigger>
 
@@ -46,19 +46,19 @@ const FlowOptions = ({ flow }: { flow: FlowInstance }) => {
 
 					<DropdownMenuItem asChild>
 						<Link href={`/settings/paths/${flow.sid}`}>
-							<Eye className='mr-2 h-4 w-4' /> Preview
+							<Eye className='mr-2 h-3.5 w-3.5' /> Preview
 						</Link>
 					</DropdownMenuItem>
 
 					<DropdownMenuItem>
-						<Copy className='mr-2 h-4 w-4' /> Duplicate
+						<Copy className='mr-2 h-3.5 w-3.5' /> Duplicate
 					</DropdownMenuItem>
 
 					<DropdownMenuSeparator />
 
 					<DialogTrigger asChild>
 						<DropdownMenuItem className='text-red-600 focus:text-red-600 focus:bg-red-50'>
-							<TrashIcon className='mr-2 h-4 w-4' /> Delete
+							<TrashIcon className='mr-2 h-3.5 w-3.5' /> Delete
 						</DropdownMenuItem>
 					</DialogTrigger>
 				</DropdownMenuContent>

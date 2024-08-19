@@ -33,16 +33,16 @@ const BoardSelector = ({ ticketId, board }: Props) => {
 			align='start'
 			placeholder='Select a board...'
 			value={`${selectedBoard?.id}-${selectedBoard?.name}`}
-			setValue={async (e) => {
-				const id = e.toString().split('-')[0];
-				setSelectedBoard(boards.find((b) => b.id === Number(id)));
-				if (!board) return;
-				try {
-					await updateTicket(ticketId, [{ op: 'replace', path: 'board/id', value: Number(id) }]);
-				} catch (error) {
-					toast.error(error as string);
-				}
-			}}
+			// setValue={async (e) => {
+			// 	const id = e.toString().split('-')[0];
+			// 	setSelectedBoard(boards.find((b) => b.id === Number(id)));
+			// 	if (!board) return;
+			// 	try {
+			// 		await updateTicket(ticketId, [{ op: 'replace', path: 'board/id', value: Number(id) }]);
+			// 	} catch (error) {
+			// 		toast.error(error as string);
+			// 	}
+			// }}
 		>
 			<Button
 				size='sm'

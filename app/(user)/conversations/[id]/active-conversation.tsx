@@ -5,7 +5,6 @@ import { getAllCalls } from '@/lib/twilio/read';
 import { CommunicationItem } from '@/types/manage';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
-import { auth } from '@/auth';
 import ActivityList from '@/components/lists/activity-list';
 import { Suspense } from 'react';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
@@ -14,6 +13,7 @@ import { groupBy } from 'lodash';
 import { relativeDate } from '@/utils/date';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { getBoards, getPriorities, getSystemMembers } from '@/lib/manage/read';
+import { createClient } from '@/utils/supabase/server';
 
 type Props = {
 	contactId?: number;
@@ -23,8 +23,16 @@ type Props = {
 };
 
 const ConversationDetails = async ({ contactId: userId, companyId, className, communicationItems }: Props) => {
-	const [session, boards, priorities, members] = await Promise.all([
-		auth(),
+	const supabase = createClient();
+	const [
+		{
+			data: { session },
+		},
+		boards,
+		priorities,
+		members,
+	] = await Promise.all([
+		supabase.auth.getSession(),
 		getBoards({
 			conditions: [
 				{ parameter: { inactiveFlag: false } },
@@ -53,7 +61,7 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 	);
 
 	const groupedCalls = groupBy(
-		calls.sort((a, b) => {
+		calls?.sort((a, b) => {
 			if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
 			if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
 			return 0;
@@ -142,7 +150,10 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 				<TabsContent value={tabs[2]}>
 					<ConfigurationsList
 						type='table'
-						params={{ conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [] }}
+						params={{
+							conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+							fields: ['id', 'name', 'site', 'company', 'status', 'contact', 'deviceIdentifier'],
+						}}
 					/>
 				</TabsContent>
 

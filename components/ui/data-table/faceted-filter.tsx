@@ -41,15 +41,15 @@ export function DataTableFacetedFilter<TData, TValue>({
 				<Button
 					variant='outline'
 					size='sm'
-					className='h-8 border-dashed capitalize'
+					className='h-9 border-dashed capitalize'
 				>
-					<CirclePlus className='mr-2 h-4 w-4' />
+					<CirclePlus className='mr-2 h-3.5 w-3.5' />
 					{title}
 					{selectedValues?.size > 0 && (
 						<>
 							<Separator
 								orientation='vertical'
-								className='mx-2 h-4'
+								className='mx-2 h-3.5'
 							/>
 							<Badge
 								variant='secondary'
@@ -109,16 +109,16 @@ export function DataTableFacetedFilter<TData, TValue>({
 									>
 										<div
 											className={cn(
-												'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+												'mr-2 flex h-3.5 w-3.5 items-center justify-center rounded-sm border border-primary',
 												isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible'
 											)}
 										>
-											<Check className={cn('h-4 w-4')} />
+											<Check className={cn('h-3.5 w-3.5')} />
 										</div>
-										{option.icon && <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />}
+										{option.icon && <option.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />}
 										<span>{option.label}</span>
 										{facets?.get(option.value) && (
-											<span className='ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs'>
+											<span className='ml-auto flex h-3.5 w-3.5 items-center justify-center font-mono text-xs'>
 												{facets.get(option.value)}
 											</span>
 										)}

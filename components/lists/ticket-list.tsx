@@ -39,7 +39,7 @@ const TicketList = async ({ type, defaultValue, params, hidePagination = false, 
 					})}
 					placeholder='Select a ticket...'
 					value={String(defaultValue)}
-					setValue={() => {}}
+					// setValue={() => {}}
 				/>
 			)}
 

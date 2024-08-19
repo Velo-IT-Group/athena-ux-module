@@ -25,10 +25,10 @@ const WorkerSelector = ({ children }: Props) => {
 			items={workers.map((w) => {
 				return { label: w.friendlyName, value: w.friendlyName };
 			})}
-			setValue={(e) => {
-				const w = workers.find((workContext) => workContext.friendlyName === e.toString());
-				setWorker(w);
-			}}
+			// setValue={(e) => {
+			// 	const w = workers.find((workContext) => workContext.friendlyName === e.toString());
+			// 	setWorker(w);
+			// }}
 			value={worker?.friendlyName ?? ''}
 			side='top'
 			align='end'

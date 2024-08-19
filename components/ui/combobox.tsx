@@ -20,8 +20,8 @@ type Props = {
 	children?: React.ReactNode;
 	align?: 'center' | 'end' | 'start';
 	side?: 'top' | 'right' | 'bottom' | 'left';
-	value: string;
-	setValue: React.Dispatch<React.SetStateAction<string>>;
+	value?: string;
+	setValue?: React.Dispatch<React.SetStateAction<string>>;
 	popoverTriggerProps?: PopoverTriggerProps;
 	className?: string;
 };
@@ -56,7 +56,7 @@ export function Combobox({
 						className='justify-between'
 					>
 						{value ? items.find((item) => item.value === value)?.label : placeholder}
-						<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+						<ChevronsUpDown className='ml-2 h-3.5 w-3.5 shrink-0 opacity-50' />
 					</Button>
 				) : (
 					children
@@ -77,11 +77,11 @@ export function Combobox({
 								key={item.value}
 								value={item.value}
 								onSelect={(currentValue) => {
-									setValue(value && currentValue === value ? '' : currentValue);
+									setValue?.(value && currentValue === value ? '' : currentValue);
 									setOpen(false);
 								}}
 							>
-								<Check className={cn('mr-2 h-4 w-4', value === item.value ? 'opacity-100' : 'opacity-0')} />
+								<Check className={cn('mr-2 h-3.5 w-3.5', value === item.value ? 'opacity-100' : 'opacity-0')} />
 								{item.label}
 							</CommandItem>
 						))}

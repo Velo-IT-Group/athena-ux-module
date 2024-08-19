@@ -109,7 +109,7 @@ const DeviceDropdownMenuSub = (props: Props) => {
 											}}
 										>
 											<Check
-												className={cn('mr-2 h-4 w-4', mediaDevice?.groupId === '' ? 'opacity-100' : 'opacity-0')}
+												className={cn('mr-2 h-3.5 w-3.5', mediaDevice?.groupId === '' ? 'opacity-100' : 'opacity-0')}
 											/>
 											{mediaDevice.label}
 										</CommandItem>
@@ -133,7 +133,7 @@ const DeviceDropdownMenuSub = (props: Props) => {
 									>
 										<Check
 											className={cn(
-												'mr-2 h-4 w-4',
+												'mr-2 h-3.5 w-3.5',
 												mediaDevice?.groupId === device.audio?.inputDevice?.groupId ? 'opacity-100' : 'opacity-0'
 											)}
 										/>

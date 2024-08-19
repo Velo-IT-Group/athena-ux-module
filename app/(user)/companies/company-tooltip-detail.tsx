@@ -40,7 +40,7 @@ const CompanyTooltipDetail = ({ name, phoneNumber }: Props) => {
 
 			<Separator
 				orientation='vertical'
-				className='h-4'
+				className='h-3.5'
 			/>
 
 			{phoneNumber && (
@@ -69,7 +69,7 @@ const CompanyTooltipDetail = ({ name, phoneNumber }: Props) => {
 
 			<Separator
 				orientation='vertical'
-				className='h-4'
+				className='h-3.5'
 			/>
 
 			<Button

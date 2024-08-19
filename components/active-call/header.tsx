@@ -35,7 +35,7 @@ const ActiveCallHeader = ({ attributes }: { attributes: any }) => {
 					<Button
 						variant='ghost'
 						size='icon'
-						className='p-0 w-8 h-8'
+						className='p-0 w-9 h-9'
 					>
 						<SquareArrowOutUpRight className='text-muted-foreground' />
 					</Button>

@@ -36,7 +36,7 @@ const ConfigurationsList = async ({ type, defaultValue, params }: Props) => {
 					align='end'
 					side='left'
 					value={String(defaultValue ?? '')}
-					setValue={() => {}}
+					// setValue={() => {}}
 				>
 					<div className='grid place-items-start'>
 						{defaultValue && typeof defaultValue === 'object' && Array.isArray(defaultValue) ? (

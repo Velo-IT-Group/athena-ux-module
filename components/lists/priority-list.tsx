@@ -25,7 +25,7 @@ const PriorityList = async ({ type, defaultValue, params = { orderBy: { key: 'so
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					setValue={() => {}}
+					// setValue={() => {}}
 					placeholder='Filter statuses...'
 					side='left'
 					align='start'

@@ -31,17 +31,17 @@ const StatusSelector = ({ ticketId, board, status }: Props) => {
 				}) ?? []
 			}
 			value={`${selectedStatus?.id}-${selectedStatus?.name}`}
-			setValue={async (e) => {
-				let id = Number(e.toString().split('-')[0]);
-				let name = e.toString().split('-')[1];
-				setSelectedStatus({ id, name });
-				if (!board) return;
-				try {
-					await updateTicket(ticketId, [{ op: 'replace', path: 'status/id', value: Number(id) }]);
-				} catch (error) {
-					toast.error(error as string);
-				}
-			}}
+			// setValue={async (e) => {
+			// 	let id = Number(e.toString().split('-')[0]);
+			// 	let name = e.toString().split('-')[1];
+			// 	setSelectedStatus({ id, name });
+			// 	if (!board) return;
+			// 	try {
+			// 		await updateTicket(ticketId, [{ op: 'replace', path: 'status/id', value: Number(id) }]);
+			// 	} catch (error) {
+			// 		toast.error(error as string);
+			// 	}
+			// }}
 			placeholder='Filter statuses...'
 			side='left'
 			align='start'

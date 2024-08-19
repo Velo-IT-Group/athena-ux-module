@@ -31,35 +31,34 @@ const Page = async ({ searchParams }: Props) => {
 	]);
 
 	return (
-		<main className='p-3 space-y-3'>
-			<header className='flex items-center gap-3'>
-				<h1 className='text-lg font-semibold'>Tickets</h1>
+		<main className='grid h-full w-full gap-3 p-3'>
+			<header>
+				<h1>Tickets</h1>
 			</header>
 
-			<section>
-				<Suspense fallback={<TableSkeleton />}>
-					<TicketList
-						type='table'
-						params={{
-							conditions: [
-								{ parameter: { closedFlag: false } },
-								{ parameter: { parentTicketId: null }, comparator: '=' },
-							],
-							fields: ['id', 'summary', 'board', 'status', 'slaStatus', 'priority', 'owner'],
-						}}
-						facetedFilters={[
-							{ accessoryKey: 'board', items: boards },
-							{ accessoryKey: 'priority', items: priorities },
-							{
-								accessoryKey: 'owner',
-								items: members.map((member) => {
-									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
-								}),
-							},
-						]}
-					/>
-				</Suspense>
-			</section>
+			<Suspense fallback={<TableSkeleton />}>
+				<TicketList
+					type='table'
+					params={{
+						conditions: [
+							{ parameter: { closedFlag: false } },
+							{ parameter: { parentTicketId: null }, comparator: '=' },
+						],
+						fields: ['id', 'summary', 'board', 'status', 'slaStatus', 'priority', 'owner'],
+					}}
+					facetedFilters={[
+						{ accessoryKey: 'board', items: boards },
+						{ accessoryKey: 'priority', items: priorities },
+						{
+							accessoryKey: 'owner',
+							items: members.map((member) => {
+								return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+							}),
+						},
+					]}
+				/>
+			</Suspense>
+			<section></section>
 		</main>
 	);
 };

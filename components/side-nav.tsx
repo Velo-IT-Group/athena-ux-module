@@ -11,6 +11,9 @@ import { collapsedState } from '@/atoms/sidebarStateAtom';
 import { useEffect } from 'react';
 import TaskList from './lists/task-list';
 import { Separator } from './ui/separator';
+import { usePathname } from 'next/navigation';
+import { ModuleSwitcher } from './module-switcher';
+import { linksConfig } from '@/config/links';
 
 type Props = {
 	isDefaultCollapsed: boolean;
@@ -58,6 +61,7 @@ const links: NavLink[] = [
 
 const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) => {
 	const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
+	const pathname = usePathname();
 
 	useEffect(() => {
 		setIsCollapsed(isDefaultCollapsed);
@@ -65,7 +69,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 	return (
 		<ResizablePanel
-			minSize={10}
+			minSize={12}
 			defaultSize={defaultLayout[0]}
 			maxSize={25}
 			collapsible
@@ -77,14 +81,23 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 				setIsCollapsed(false);
 				document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(false)}`;
 			}}
-			className={cn(isCollapsed && 'min-w-[50px] transition-all duration-300 ease-in-out')}
+			className={cn(isCollapsed && 'min-w-[48px] transition-all duration-300 ease-in-out')}
 		>
-			<ScrollArea className='flex flex-col min-h-0 h-full border-r'>
+			<ScrollArea className='flex flex-col h-screen'>
 				<div
 					data-collapsed={isCollapsed}
-					className='group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2'
+					className='group flex flex-col'
 				>
-					<nav className='grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
+					<div className={cn('flex h-12 items-center justify-center py-0.5', isCollapsed ? 'h-12' : 'px-1.5')}>
+						<ModuleSwitcher
+							isCollapsed={isCollapsed}
+							links={linksConfig.modules}
+						/>
+					</div>
+
+					<Separator />
+
+					<nav className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
 						{links.map((link, index) =>
 							isCollapsed ? (
 								<Tooltip
@@ -95,7 +108,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 										<Link
 											href={link.href}
 											className={cn(
-												buttonVariants({ variant: 'ghost', size: 'icon' }),
+												buttonVariants({ variant: pathname === link.href ? 'default' : 'ghost', size: 'icon' }),
 												'h-9 w-9'
 												// link.variant === 'default' &&
 												// 	'dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white'
@@ -119,13 +132,13 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 									key={index}
 									href={link.href}
 									className={cn(
-										buttonVariants({ variant: 'ghost', size: 'sm' }),
+										buttonVariants({ variant: pathname === link.href ? 'default' : 'ghost', size: 'sm' }),
 										// link.variant === 'default' &&
 										// 	'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
 										'justify-start'
 									)}
 								>
-									<link.icon className='mr-2 h-4 w-4' />
+									<link.icon className='mr-1.5 h-3.5 w-3.5' />
 									{link.name}
 									{/* {link.name && (
 										<span
@@ -144,7 +157,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 					<Separator />
 
-					<TaskList isCollapsed={isCollapsed} />
+					{/* <TaskList isCollapsed={isCollapsed} /> */}
 				</div>
 			</ScrollArea>
 		</ResizablePanel>

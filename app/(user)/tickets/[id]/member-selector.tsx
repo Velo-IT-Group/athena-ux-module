@@ -40,19 +40,19 @@ const MemberSelector = ({ ticketId, member }: Props) => {
 			align='start'
 			placeholder='Select a member...'
 			value={`${selectedMember?.id}-${selectedMember?.firstName} ${selectedMember?.lastName ?? ''}`}
-			setValue={async (e) => {
-				let id = Number(e.toString().split('-')[0]);
-				let firstName = e.toString().split('-')[1].split(' ')[0];
-				let lastName = e.toString().split('-')[1].split(' ')[1];
+			// setValue={async (e) => {
+			// 	let id = Number(e.toString().split('-')[0]);
+			// 	let firstName = e.toString().split('-')[1].split(' ')[0];
+			// 	let lastName = e.toString().split('-')[1].split(' ')[1];
 
-				setSelectedMember(members.find((member) => member.id === id));
-				try {
-					toast.info(id);
-					await updateTicket(ticketId, [{ op: 'replace', path: 'owner/id', value: id }]);
-				} catch (error) {
-					toast.error(JSON.stringify(error) as string);
-				}
-			}}
+			// 	setSelectedMember(members.find((member) => member.id === id));
+			// 	try {
+			// 		toast.info(id);
+			// 		await updateTicket(ticketId, [{ op: 'replace', path: 'owner/id', value: id }]);
+			// 	} catch (error) {
+			// 		toast.error(JSON.stringify(error) as string);
+			// 	}
+			// }}
 		>
 			<Button
 				size='sm'

@@ -30,9 +30,9 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant='ghost'
-					className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
+					className='flex h-9 w-9 p-0 data-[state=open]:bg-muted'
 				>
-					<Ellipsis className='h-4 w-4' />
+					<Ellipsis className='h-3.5 w-3.5' />
 					<span className='sr-only'>Open menu</span>
 				</Button>
 			</DropdownMenuTrigger>

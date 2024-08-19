@@ -1,6 +1,4 @@
 import Image from 'next/image';
-import { getAllCalls } from '@/lib/twilio/read';
-import { getPhoneNumbers } from '@/lib/twilio/phoneNumbers';
 import { auth } from '@/auth';
 import { CommandMenu } from './command-menu';
 import UserInfo from './user-info';
@@ -8,32 +6,27 @@ import { Popover, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
-import { Suspense } from 'react';
-import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
+import { createClient } from '@/utils/supabase/server';
 
 const Navbar = async () => {
-	const [numbers, calls, session, activities] = await Promise.all([
-		getPhoneNumbers(),
-		getAllCalls('client:nblack_40velomethod_2Ecom'),
-		auth(),
-		getActivies(),
-	]);
+	const supabase = createClient();
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
 
 	return (
-		<nav className='flex items-center justify-between border-b px-3 py-0.5 h-12'>
+		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
 			<div className='flex items-center gap-3'>
 				<Image
 					src='/velo-logo-black.svg'
 					alt='Velo logo logo'
-					width={50}
-					height={50}
+					width={48}
+					height={48}
 					className='object-contain'
 				/>
 			</div>
 
-			<Suspense>
-				<CommandMenu />
-			</Suspense>
+			<CommandMenu />
 
 			<div className='flex items-center'>
 				{/* <HistorySelector calls={calls} /> */}

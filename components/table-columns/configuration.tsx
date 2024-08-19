@@ -83,6 +83,16 @@ export const columns: ColumnDef<Configuration>[] = [
 		enableHiding: false,
 	},
 	{
+		accessorKey: 'deviceIdentifier',
+		header: 'deviceIdentifier',
+		cell: ({ row }) => {
+			const site = row.getValue('site') as ReferenceType;
+			return <span>{row.getValue('deviceIdentifier')}</span>;
+		},
+		enableSorting: false,
+		enableHiding: false,
+	},
+	{
 		accessorKey: 'contact',
 		header: ({ column }) => (
 			<DataTableColumnHeader

@@ -42,10 +42,10 @@ const ContactSelector = ({ company, contact }: Props) => {
 			align='start'
 			placeholder='Select a contact...'
 			value={`${selectedContact?.id}-${selectedContact?.firstName} ${selectedContact?.lastName}`}
-			setValue={(e) => {
-				let id = e.toString().split('-')[0];
-				setSelectedContact(contacts.find((d) => d.id === Number(id)));
-			}}
+			// setValue={(e) => {
+			// 	let id = e.toString().split('-')[0];
+			// 	setSelectedContact(contacts.find((d) => d.id === Number(id)));
+			// }}
 		>
 			<Button
 				size='sm'

@@ -38,7 +38,7 @@ export function DateRangePicker({ className, from, to }: Props) {
 						variant={'outline'}
 						className={cn('w-64 justify-start text-left font-normal', !date && 'text-muted-foreground')}
 					>
-						<CalendarIcon className='mr-2 h-4 w-4' />
+						<CalendarIcon className='mr-2 h-3.5 w-3.5' />
 
 						{date?.from ? (
 							date.to ? (

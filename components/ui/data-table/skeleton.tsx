@@ -16,7 +16,7 @@ const TableSkeleton = (props: Props) => {
 						{blankColumns.map((_, index) => {
 							return (
 								<TableHead key={index}>
-									<Skeleton className='h-12 w-full' />
+									<Skeleton className='h-3.5 w-full' />
 								</TableHead>
 							);
 						})}
@@ -27,7 +27,7 @@ const TableSkeleton = (props: Props) => {
 					{blankRows.map((_, index) => (
 						<TableRow key={index}>
 							{blankColumns.map((_, index) => (
-								<TableCell key={index}>{<Skeleton className='h-12 w-full' />}</TableCell>
+								<TableCell key={index}>{<Skeleton className='h-3.5 w-full' />}</TableCell>
 							))}
 						</TableRow>
 					))}

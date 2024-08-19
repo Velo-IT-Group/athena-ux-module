@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode } from 'react';
-import { JabraProvider } from '@/providers/jabra-provider';
 import RecoilProvider from '@/providers/recoil-provider';
 import { TwilioProvider } from '@/providers/twilio-provider';
 import { DeviceProvider } from '@/providers/device-provider';
@@ -16,13 +15,11 @@ const UserLayout = ({ token, children }: Props) => {
 	return (
 		<RecoilProvider>
 			<NotificationProvider>
-				{/* <JabraProvider> */}
 				<TwilioProvider authToken={token}>
 					<DeviceProvider authToken={token}>
 						<WorkerProvider authToken={token}>{children}</WorkerProvider>
 					</DeviceProvider>
 				</TwilioProvider>
-				{/* </JabraProvider> */}
 			</NotificationProvider>
 		</RecoilProvider>
 	);

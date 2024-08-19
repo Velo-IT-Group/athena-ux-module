@@ -4,16 +4,23 @@ import { Company } from '@/types/manage';
 import React, { useEffect, useState } from 'react';
 import { CommandItem } from '../ui/command';
 import { Building } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-type Props = {};
+type Props = {
+	router: AppRouterInstance;
+};
 
-const CommandCompaniesList = (props: Props) => {
+const CommandCompaniesList = ({ router }: Props) => {
 	const [companies, setCompanies] = useState<Company[]>([]);
-	const router = useRouter();
 
 	useEffect(() => {
-		getCompanies().then(({ companies }) => setCompanies(companies));
+		getCompanies({
+			conditions: [{ parameter: { 'status/id': 1 } }],
+			childConditions: [{ parameter: { 'types/id': 1 } }],
+			orderBy: { key: 'name', order: 'asc' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}).then(({ companies }) => setCompanies(companies));
 	}, []);
 
 	return (

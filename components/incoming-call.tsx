@@ -34,7 +34,7 @@ const IncomingTask = ({ reservation, task }: Props) => {
 					{/* <Button
 						variant='ghost'
 						size='icon'
-						className='p-0 w-8 h-8'
+						className='p-0 w-9 h-9'
 						onClick={() => toast.dismiss(attributes.call_sid)}
 					>
 					

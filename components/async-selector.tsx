@@ -58,16 +58,16 @@ const AsyncSelector = async <T extends Identifiable>({
 			})}
 			placeholder={placeholder}
 			value={`${selectedData?.id}-${selectedData?.name}`}
-			setValue={(e) => {
-				startTransition(async () => {
-					const id = e.toString().split('-')[0];
-					const selected = data.find((b) => b.id === Number(id));
-					setSelectedData(selected);
-					if (selected) {
-						await updateFunction(selected);
-					}
-				});
-			}}
+			// setValue={(e) => {
+			// 	startTransition(async () => {
+			// 		const id = e.toString().split('-')[0];
+			// 		const selected = data.find((b) => b.id === Number(id));
+			// 		setSelectedData(selected);
+			// 		if (selected) {
+			// 			await updateFunction(selected);
+			// 		}
+			// 	});
+			// }}
 			popoverTriggerProps={{ ...popoverProps }}
 		>
 			<Button

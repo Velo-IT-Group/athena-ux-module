@@ -1,8 +1,8 @@
 import Entra from 'next-auth/providers/microsoft-entra-id';
-import NextAuth, { type NextAuthConfig, type DefaultSession, type Account } from 'next-auth';
+import NextAuth, { type NextAuthConfig, type DefaultSession } from 'next-auth';
 import { findWorker } from './lib/twilio/taskrouter/helpers';
 import { createAccessToken } from './lib/twilio';
-import { getContacts, getSystemMember, getSystemMembers } from './lib/manage/read';
+import { getContacts, getSystemMembers } from './lib/manage/read';
 
 declare module 'next-auth' {
 	/**

@@ -32,7 +32,7 @@ const TaskWrapup = ({ taskSid, dateUpdated }: Props) => {
 						<Button
 							variant='ghost'
 							size='icon'
-							className='p-0 w-8 h-8'
+							className='p-0 w-9 h-9'
 							type='submit'
 						>
 							<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />

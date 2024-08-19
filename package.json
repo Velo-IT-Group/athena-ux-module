@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/supabase-adapter": "^1.4.2",
     "@gnaudio/jabra-js": "^4.2.2",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -28,6 +29,8 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@supabase/ssr": "^0.4.0",
+    "@supabase/supabase-js": "^2.45.1",
     "@tailwindcss/typography": "^0.5.13",
     "@tanstack/react-table": "^8.20.1",
     "@tiptap/extension-list-item": "^2.5.8",
@@ -44,6 +47,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.427.0",
     "next": "^14.2.5",

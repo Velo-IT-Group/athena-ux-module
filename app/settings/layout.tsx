@@ -1,48 +1,13 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { NavLink } from '@/components/side-nav';
-import { Home, ListEnd, Route, Workflow } from 'lucide-react';
-import Navbar from '@/components/navbar';
+import { linksConfig } from '@/config/links';
 
 type Props = {
 	children: ReactNode;
 };
-
-const links: NavLink[] = [
-	{
-		href: '/settings',
-		name: 'General',
-		icon: Home,
-	},
-	{
-		href: '/settings/paths',
-		name: 'Paths',
-		icon: Route,
-	},
-	{
-		href: '/settings/queues',
-		name: 'Queues',
-		icon: ListEnd,
-	},
-	{
-		href: '/settings/workflows',
-		name: 'Workflows',
-		icon: Workflow,
-	},
-	{
-		href: '/settings/schedule',
-		name: 'Schedule',
-		icon: Home,
-	},
-	{
-		href: '/settings/caller-ids',
-		name: 'Caller IDs',
-		icon: Home,
-	},
-];
 
 const Layout = (props: Props) => {
 	const headersList = headers();
@@ -61,19 +26,22 @@ const Layout = (props: Props) => {
 
 				<div className='mx-auto grid w-full items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]'>
 					<nav className='grid text-sm'>
-						{links.map((link) => (
-							<Link
-								key={link.href}
-								href={link.href}
-								className={cn(
-									buttonVariants({
-										variant: path === link.href ? 'secondary' : 'ghost',
-										className: 'font-semibold justify-start',
-									})
-								)}
-							>
-								{link.name}
-							</Link>
+						{linksConfig.settingsNav.map((section) => (
+							<section key={section.href}>
+								{section.items.map((link) => (
+									<Link
+										href={link.href ?? ''}
+										className={cn(
+											buttonVariants({
+												variant: path === link.href ? 'secondary' : 'ghost',
+												className: 'font-semibold justify-start',
+											})
+										)}
+									>
+										{link.title}
+									</Link>
+								))}
+							</section>
 						))}
 					</nav>
 

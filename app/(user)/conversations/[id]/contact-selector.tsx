@@ -73,7 +73,7 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 				>
 					{!minimal && 'Select a user...'}
 
-					<ChevronsUpDown className={cn('h-4 w-4 shrink-0 opacity-50', !minimal && 'ml-1.5')} />
+					<ChevronsUpDown className={cn('h-3.5 w-3.5 shrink-0 opacity-50', !minimal && 'ml-1.5')} />
 				</Button>
 			</PopoverTrigger>
 
@@ -105,7 +105,7 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 									revalidatePath('/');
 								}}
 							>
-								<Check className={cn('mr-2 h-4 w-4', contact?.id === c.id ? 'opacity-100' : 'opacity-0')} />
+								<Check className={cn('mr-2 h-3.5 w-3.5', contact?.id === c.id ? 'opacity-100' : 'opacity-0')} />
 								{c.firstName} {c.lastName}
 							</CommandItem>
 						))}

@@ -32,7 +32,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 						onChange={(event) =>
 							table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
 						}
-						className='h-8 w-[150px] lg:w-[250px]'
+						className='h-9 w-[150px] lg:w-[250px]'
 					/>
 				)}
 
@@ -54,10 +54,10 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 					<Button
 						variant='ghost'
 						onClick={() => table.resetColumnFilters()}
-						className='h-8 px-2 lg:px-3'
+						className='h-9 px-2 lg:px-3'
 					>
 						Reset
-						<X className='ml-2 h-4 w-4' />
+						<X className='ml-2 h-3.5 w-3.5' />
 					</Button>
 				)}
 			</div>

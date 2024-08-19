@@ -1,11 +1,19 @@
 import { auth } from '@/auth';
 import { isAValidPhoneNumber } from '@/lib/utils';
+import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
 
 export async function POST(request: Request) {
+	const supabase = createClient();
 	const twiml = new VoiceResponse();
-	const [session, data] = await Promise.all([auth(), request.formData()]);
+	const [
+		{
+			data: { session },
+		},
+
+		data,
+	] = await Promise.all([supabase.auth.getSession(), request.formData()]);
 	const toNumberOrClientName = data.get('To') as string;
 	const To = data.get('To') as string;
 	const callerId = '+18449402678';

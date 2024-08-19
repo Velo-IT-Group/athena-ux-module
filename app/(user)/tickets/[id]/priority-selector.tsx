@@ -35,17 +35,17 @@ const PrioritySelector = ({ ticketId, priority }: Props) => {
 				}) ?? []
 			}
 			value={`${selectedPriority?.id}-${selectedPriority?.name}`}
-			setValue={async (e) => {
-				let id = Number(e.toString().split('-')[0]);
+			// setValue={async (e) => {
+			// 	let id = Number(e.toString().split('-')[0]);
 
-				setSelectedPriority(priorities?.find((p) => p.id === id));
-				if (!priority) return;
-				try {
-					await updateTicket(ticketId, [{ op: 'replace', path: 'priority/id', value: Number(id) }]);
-				} catch (error) {
-					toast.error(error as string);
-				}
-			}}
+			// 	setSelectedPriority(priorities?.find((p) => p.id === id));
+			// 	if (!priority) return;
+			// 	try {
+			// 		await updateTicket(ticketId, [{ op: 'replace', path: 'priority/id', value: Number(id) }]);
+			// 	} catch (error) {
+			// 		toast.error(error as string);
+			// 	}
+			// }}
 			placeholder='Filter statuses...'
 			side='left'
 			align='start'

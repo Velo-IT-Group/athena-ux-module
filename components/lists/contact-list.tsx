@@ -52,7 +52,7 @@ const ContactList = async ({
 						}) ?? []
 					}
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					setValue={() => {}}
+					// setValue={() => {}}
 					placeholder='Filter contacts...'
 					side='left'
 					align='start'

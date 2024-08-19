@@ -16,16 +16,12 @@ import {
 	useReactTable,
 	TableMeta,
 	RowData,
-	PaginationState,
 } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { DataTablePagination } from './pagination';
 import { DataTableToolbar, FacetedFilter } from './toolbar';
-import { usePagination } from '@/hooks/usePagination';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 declare module '@tanstack/table-core' {
 	interface TableMeta<TData extends RowData> {
 		filterKey: keyof TData;
@@ -46,38 +42,12 @@ export function DataTable<TData, TValue>({
 	data,
 	meta,
 	facetedFilters,
-	count,
-	pageSize = 10,
 	hidePagination = false,
 }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	// const { limit, onPaginationChange, pagination } = usePagination();
-	// const router = useRouter();
-	// const searchParams = useSearchParams();
-	// const pathname = usePathname();
-
-	// const createQueryString = React.useCallback(
-	// 	(name: string, value: string) => {
-	// 		const params = new URLSearchParams(searchParams.toString());
-	// 		params.set(name, value);
-
-	// 		return params.toString();
-	// 	},
-	// 	[searchParams]
-	// );
-
-	// React.useEffect(() => {
-	// 	if (hidePagination) return;
-	// 	router.push(pathname + '?' + createQueryString('page', `${pagination.pageIndex + 1}`));
-	// }, [createQueryString, pagination.pageIndex, pathname, router, searchParams]);
-
-	// React.useEffect(() => {
-	// 	if (hidePagination) return;
-	// 	router.push(pathname + '?' + createQueryString('pageSize', `${pagination.pageSize}`));
-	// }, [pagination.pageSize]);
 
 	const table = useReactTable({
 		data,
@@ -87,10 +57,8 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			rowSelection,
 			columnFilters,
-			// pagination: !hidePagination ? pagination : undefined,
 		},
 		enableRowSelection: true,
-		// manualPagination: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
@@ -101,14 +69,11 @@ export function DataTable<TData, TValue>({
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
-		// onPaginationChange: !hidePagination ? onPaginationChange : undefined,
-		// rowCount: count,
-		// pageCount: count,
 		meta,
 	});
 
 	return (
-		<div className='space-y-3'>
+		<div className='space-y-3 pt-[4px] pl-[4px] overflow-x-scroll'>
 			<DataTableToolbar
 				table={table}
 				facetedFilters={facetedFilters}

@@ -1,5 +1,6 @@
 'use server';
 import { getTicket } from '@/lib/manage/read';
+import { createClient, createReportingClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { Twilio } from 'twilio';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
@@ -47,7 +48,15 @@ type EventType = ActivityEvent | ReservationEvent | TaskEvent | TaskQueueEvent;
 
 export async function POST(request: Request) {
 	revalidatePath('/');
+	const supabase = createReportingClient()
 	const data = await request.formData();
+	const object = Object.fromEntries(data);
+	console.log(object)
+	const {error} = await supabase.from('json_data').insert({
+		json_data: object
+	})
+
+	console.error(error)
 	const eventType = data.get('EventType') as EventType;
 	const workflowName = data.get('WorkflowName') as string;
 	const taskSid = data.get('TaskSid') as string;

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
 import parsePhoneNumber from 'libphonenumber-js';
-import CheckMark from '@/app/(user)/conversations/[id]/checkmark';
+import CheckMark from '@/app/(user)/checkmark';
 
 export const columns: ColumnDef<Contact>[] = [
 	{

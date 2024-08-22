@@ -1,5 +1,5 @@
-import ConversationContactDetail from './conversations/[id]/conversation-contact-detail';
-import ConversationDetails from './conversations/[id]/active-conversation';
+import ConversationContactDetail from './conversation-contact-detail';
+import ConversationDetails from './active-conversation';
 import { getTask } from '@/lib/twilio/taskrouter/helpers';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { getContactCommunications } from '@/lib/manage/read';

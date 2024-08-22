@@ -6,7 +6,7 @@ import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskr
 export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promise<WorkerInstance[]> => {
 	const client = createClient();
 	try {
-		return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers.list(options);
+		return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workers.list(options);
 	} catch (error) {
 		console.error(error);
 		return [];

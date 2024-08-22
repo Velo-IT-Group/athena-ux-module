@@ -54,10 +54,10 @@ const Layout = async ({ children }: Props) => {
 	}
 
 	const twilioToken = await createAccessToken(
-		process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID as string,
-		process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID as string,
-		process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET as string,
-		process.env.NEXT_PUBLIC_WORKSPACE_SID as string,
+		process.env.TWILIO_ACCOUNT_SID as string,
+		process.env.TWILIO_API_KEY_SID as string,
+		process.env.TWILIO_API_KEY_SECRET as string,
+		process.env.WORKSPACE_SID as string,
 		user.user_metadata.workerSid,
 		user.email
 	);

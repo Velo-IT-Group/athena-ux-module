@@ -7,7 +7,7 @@ export const createWorker = async (friendlyName: string, attributes: WorkerListI
 	const client = createClient();
 
 	return await client.taskrouter.v1
-		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
+		.workspaces(process.env.WORKSPACE_SID!)
 		.workers.create({ friendlyName, attributes: JSON.stringify(attributes) });
 };
 

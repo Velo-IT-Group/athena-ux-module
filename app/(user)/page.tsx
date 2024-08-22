@@ -40,8 +40,6 @@ export default async function Page({
 				communicationItems={contactCommunications}
 				className='p-6'
 			/>
-
-			{/* <ConversationCompanyDetail companyId={companyId ?? 250} /> */}
 		</main>
 	);
 }

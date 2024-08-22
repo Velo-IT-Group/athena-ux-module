@@ -6,7 +6,7 @@ import { getAllContacts } from '@/lib/manage/read';
 import { Button } from '../ui/button';
 import { User } from 'lucide-react';
 import { DataTable } from '../ui/data-table';
-import { columns } from '../table-columns/contact';
+import { columns, contactColumns } from '../table-columns/contact';
 import { FacetedFilter } from '../ui/data-table/toolbar';
 
 type Props = {
@@ -19,6 +19,7 @@ type Props = {
 	facetedFilters?: FacetedFilter<Contact>[];
 	hidePagination?: boolean;
 	children?: ReactNode;
+	columnDefs?: 'regular' | 'homepage';
 };
 
 const ContactList = async ({
@@ -31,6 +32,7 @@ const ContactList = async ({
 	children,
 	hidePagination,
 	facetedFilters,
+	columnDefs = 'regular',
 }: Props) => {
 	const { contacts, count } = await getAllContacts(params);
 
@@ -39,7 +41,7 @@ const ContactList = async ({
 			{type === 'table' && (
 				<DataTable
 					data={contacts}
-					columns={columns}
+					columns={columnDefs === 'homepage' ? contactColumns : columns}
 					facetedFilters={facetedFilters}
 					count={count}
 					meta={{ filterKey: 'firstName' }}

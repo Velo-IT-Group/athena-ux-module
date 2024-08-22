@@ -6,12 +6,9 @@ import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from './ui/labeled-input';
-import WorkerSelect from './worker-select';
 import { PhoneInput } from './phone-input';
 import { useWorker } from '@/providers/worker-provider';
 import { useDevice } from '@/providers/device-provider';
-import { useSetRecoilState } from 'recoil';
-import { callStateAtom } from '@/atoms/twilioStateAtom';
 import { toast } from 'sonner';
 
 type Props = {
@@ -19,10 +16,7 @@ type Props = {
 };
 
 const OutboundDialerContent = ({ numbers }: Props) => {
-	// const setActiveCall = useSetRecoilState(callStateAtom);
-
 	const { worker } = useWorker();
-	const { device } = useDevice();
 
 	return (
 		<PopoverContent align='end'>

@@ -12,11 +12,7 @@ type Props = {
 const Page = async ({ searchParams }: Props) => {
 	const [boards, priorities, members] = await Promise.all([
 		getBoards({
-			conditions: [
-				{ parameter: { inactiveFlag: false } },
-				{ parameter: { projectFlag: false } },
-				// { parameter: { 'workRole/id': ' (9, 5)' }, comparator: 'in' },
-			],
+			conditions: [{ parameter: { inactiveFlag: false } }, { parameter: { projectFlag: false } }],
 			orderBy: { key: 'name' },
 			fields: ['id', 'name'],
 			pageSize: 1000,
@@ -31,7 +27,7 @@ const Page = async ({ searchParams }: Props) => {
 	]);
 
 	return (
-		<main className='grid h-full w-full gap-3 p-3'>
+		<main className='p-3 space-y-3'>
 			<header>
 				<h1>Tickets</h1>
 			</header>
@@ -42,6 +38,7 @@ const Page = async ({ searchParams }: Props) => {
 					params={{
 						conditions: [
 							{ parameter: { closedFlag: false } },
+							// { parameter: { 'board/id': ' (22, 26, 30, 31)' }, comparator: 'in' },
 							{ parameter: { parentTicketId: null }, comparator: '=' },
 						],
 						fields: ['id', 'summary', 'board', 'status', 'slaStatus', 'priority', 'owner'],

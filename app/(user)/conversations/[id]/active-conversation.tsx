@@ -129,9 +129,10 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 								conditions: [
 									{ parameter: { 'company/id': companyId! } },
 									{ parameter: { 'contact/id': userId }, comparator: '!=' },
-									{ parameter: { closedFlag: false } },
+									// { parameter: { closedFlag: false } },
 								],
 								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+								pageSize: 1000,
 							}}
 							facetedFilters={[
 								{ accessoryKey: 'board', items: boards },
@@ -164,6 +165,7 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 							params={{
 								conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
 								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+								pageSize: 1000,
 							}}
 							facetedFilters={[
 								{ accessoryKey: 'board', items: boards },

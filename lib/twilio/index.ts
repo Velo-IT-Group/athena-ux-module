@@ -21,6 +21,7 @@ export const createAccessToken = async (
 	workerSid: string,
 	identity: string
 ) => {
+	console.log('creating access token', new Date().toISOString());
 	const taskRouterGrant = new TaskRouterGrant({
 		workerSid,
 		workspaceSid,

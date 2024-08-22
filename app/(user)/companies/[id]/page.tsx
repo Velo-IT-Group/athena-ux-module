@@ -1,8 +1,7 @@
-import { getCompany, getCompanyNotes, getCompanySites, getConfigurations } from '@/lib/manage/read';
+import { getCompany, getCompanyNotes, getCompanySites } from '@/lib/manage/read';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
 import { Globe, MapPin, NotebookPen, Phone, PlusCircle, User } from 'lucide-react';
 import { Suspense } from 'react';
@@ -27,253 +26,260 @@ const Page = async ({ params }: Props) => {
 	]);
 
 	return (
-		<main className='h-full bg-muted/15'>
-			<ResizablePanelGroup
-				direction='horizontal'
-				className='flex flex-col min-h-0'
-			>
-				<ResizablePanel className='min-h-0 flex flex-col'>
-					<ScrollArea className='flex flex-col min-h-0 max-w-3xl w-full mx-auto py-10 px-3'>
-						<Textarea
-							name='summary'
-							defaultValue={company.name}
-							className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
-						/>
+		<main className='grid grid-cols-[1fr_280px] items-start gap-3 h-full grow bg-muted/15'>
+			<ScrollArea className='grid min-h-0 h-full overflow-y-auto'>
+				<div className='max-w-3xl w-full mx-auto py-10 grid items-start'>
+					<Textarea
+						name='summary'
+						defaultValue={company.name}
+						className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
+					/>
 
-						<Textarea
-							placeholder='Add a description...'
-							className='border-none shadow-none resize-none'
-							defaultValue='Acadiana Bottling distributes Pepsi and Dr. Pepper products throughout the Acadiana region. They have about 70 full time office and sales workers depending on a laptop or desktop to complete tasks on a daily basis, and about 20 delivery drivers in the field depending on handheld devices, iPhones, and mobile printers to do their work throughout the day.'
-							minRows={2}
-						/>
+					<Textarea
+						placeholder='Add a description...'
+						className='border-none shadow-none resize-none'
+						defaultValue='Acadiana Bottling distributes Pepsi and Dr. Pepper products throughout the Acadiana region. They have about 70 full time office and sales workers depending on a laptop or desktop to complete tasks on a daily basis, and about 20 delivery drivers in the field depending on handheld devices, iPhones, and mobile printers to do their work throughout the day.'
+						minRows={2}
+					/>
 
-						<h2>SOP Exceptions</h2>
+					<h2>SOP Exceptions</h2>
 
-						<Separator />
+					<Separator />
 
-						<Accordion type='multiple'>
-							<AccordionItem value='sites'>
-								<AccordionTrigger className='flex items-center justify-between'>
-									<h4 className='font-medium text-sm'>Sites</h4>
-								</AccordionTrigger>
+					<Accordion type='multiple'>
+						<AccordionItem value='sites'>
+							<AccordionTrigger className='flex items-center justify-between'>
+								<h4 className='font-medium text-sm'>Sites</h4>
+							</AccordionTrigger>
 
-								<AccordionContent>
-									<div className='space-y-3'>
-										{sites.map((site) => (
-											<div
-												key={site.id}
-												className='flex items-center gap-3'
-											>
-												<MapPin />
-												<span>{site.name}</span>
+							<AccordionContent>
+								<div className='space-y-3'>
+									{sites.map((site) => (
+										<div
+											key={site.id}
+											className='flex items-center gap-3'
+										>
+											<MapPin />
+											<span>{site.name}</span>
+										</div>
+									))}
+								</div>
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value='notes'>
+							<AccordionTrigger className='gap-3'>
+								<h4 className='font-medium text-sm'>Notes</h4>
+								<Button
+									variant='ghost'
+									size='sm'
+									className='shrink-0 ml-auto h-5 w-5 p-0'
+								>
+									<PlusCircle />
+								</Button>
+							</AccordionTrigger>
+
+							<AccordionContent className='p-1'>
+								<div className='space-y-3'>
+									{notes.map((note) => (
+										<div
+											key={note.id}
+											className='flex gap-3'
+										>
+											<div className='py-3'>
+												<NotebookPen className='shrink-0' />
 											</div>
-										))}
-									</div>
-								</AccordionContent>
-							</AccordionItem>
 
-							<AccordionItem value='notes'>
-								<AccordionTrigger className='gap-3'>
-									<h4 className='font-medium text-sm'>Notes</h4>
-									<Button
-										variant='ghost'
-										size='sm'
-										className='shrink-0 ml-auto h-5 w-5 p-0'
+											<Textarea
+												className='w-full resize-none border-none shadow-none'
+												defaultValue={note.text}
+											/>
+										</div>
+									))}
+								</div>
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value='configurations'>
+							<AccordionTrigger className='gap-3'>
+								<h4 className='font-medium text-sm'>Configurations</h4>
+							</AccordionTrigger>
+
+							<AccordionContent className='p-1'>
+								<Tabs defaultValue='servers'>
+									<TabsList>
+										<TabsTrigger value='quickView'>Quick View</TabsTrigger>
+										<TabsTrigger value='servers'>Servers</TabsTrigger>
+										<TabsTrigger value='applications'>Applications</TabsTrigger>
+									</TabsList>
+
+									<TabsContent value='quickView'>
+										<Suspense fallback={<TableSkeleton />}>
+											<ConfigurationsList
+												type='table'
+												params={{
+													fields: ['id', 'name', 'type', 'notes', 'contact', 'status', 'site'],
+													conditions: [
+														{ parameter: { 'company/id': Number(params.id) } },
+														{ parameter: { 'status/id': 2 } },
+														{ parameter: { 'type/id': 191 } },
+													],
+													childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
+													orderBy: { key: 'name' },
+												}}
+											/>
+										</Suspense>
+									</TabsContent>
+
+									<TabsContent value='servers'>
+										<Suspense fallback={<TableSkeleton />}>
+											<ConfigurationsList
+												type='table'
+												params={{
+													fields: ['id', 'name', 'contact', 'status', 'site'],
+													conditions: [
+														{ parameter: { 'company/id': Number(params.id) } },
+														{ parameter: { 'status/id': 2 } },
+														{ parameter: { 'type/id': 191 } },
+													],
+													childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
+													orderBy: { key: 'name' },
+												}}
+											/>
+										</Suspense>
+									</TabsContent>
+
+									<TabsContent value='applications'>
+										<Suspense fallback={<TableSkeleton />}>
+											<ConfigurationsList
+												type='table'
+												params={{
+													fields: ['id', 'name', 'type', 'notes', 'contact', 'status', 'site'],
+													conditions: [
+														{ parameter: { 'company/id': Number(params.id) } },
+														{ parameter: { 'status/id': 2 } },
+														{ parameter: { 'type/id': 'in (211, 212, 219)' } },
+													],
+													orderBy: { key: 'name' },
+												}}
+											/>
+										</Suspense>
+									</TabsContent>
+								</Tabs>
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
+				</div>
+			</ScrollArea>
+
+			<div className='border-l h-full'>
+				<div className='pb-6 pt-2.5 pr-1.5 space-y-6 min-h-[calc(100vh-49px)]'>
+					<section className='grid px-3'>
+						<div className='grid grid-cols-4 items-center h-9'>
+							<Label className='text-nowrap text-xs font-normal'>Stoplight</Label>
+
+							<div className='col-span-3'>
+								{company?.types?.some((type) => type.id === 57) && (
+									<Badge
+										className='mx-1.5 rounded-md'
+										variant='success'
 									>
-										<PlusCircle />
-									</Button>
-								</AccordionTrigger>
+										Green
+									</Badge>
+								)}
+								{company?.types?.some((type) => type.id === 56) && (
+									<Badge
+										className='mx-1.5 rounded-md'
+										variant='destructive'
+									>
+										Red
+									</Badge>
+								)}
+								{company?.types?.some((type) => type.id === 55) && (
+									<Badge
+										className='mx-1.5 rounded-md'
+										variant={'caution'}
+									>
+										Yellow
+									</Badge>
+								)}
+							</div>
+						</div>
 
-								<AccordionContent className='p-1'>
-									<div className='space-y-3'>
-										{notes.map((note) => (
-											<div
-												key={note.id}
-												className='flex gap-3'
-											>
-												<div className='py-3'>
-													<NotebookPen className='shrink-0' />
-												</div>
+						<div className='grid grid-cols-4 items-center h-9'>
+							<Label className='text-nowrap text-xs font-normal'>Site</Label>
 
-												<Textarea
-													className='w-full resize-none border-none shadow-none'
-													defaultValue={note.text}
-												/>
-											</div>
-										))}
-									</div>
-								</AccordionContent>
-							</AccordionItem>
+							<div className='col-span-3'>
+								<Button
+									variant='ghost'
+									size='sm'
+									className='flex'
+								>
+									<MapPin className='mr-1.5' />
+									<span className='text-xs text-muted-foreground'>{company.site?.name}</span>
+								</Button>
+							</div>
+						</div>
 
-							<AccordionItem value='configurations'>
-								<AccordionTrigger className='gap-3'>
-									<h4 className='font-medium text-sm'>Configurations</h4>
-								</AccordionTrigger>
+						<div className='grid grid-cols-4 items-center h-9'>
+							<Label className='text-nowrap text-xs font-normal'>Phone</Label>
 
-								<AccordionContent className='p-1'>
-									<Tabs defaultValue='servers'>
-										<TabsList>
-											<TabsTrigger value='quickView'>Quick View</TabsTrigger>
-											<TabsTrigger value='servers'>Servers</TabsTrigger>
-											<TabsTrigger value='applications'>Applications</TabsTrigger>
-										</TabsList>
+							<div className='col-span-3'>
+								<Button
+									variant='ghost'
+									size='sm'
+									className='flex'
+								>
+									<Phone className='mr-1.5' />
+									<span className='text-xs text-muted-foreground'>
+										{parsePhoneNumber(company.phoneNumber, 'US')?.formatNational()}
+									</span>
+								</Button>
+							</div>
+						</div>
 
-										<TabsContent value='quickView'>
-											<Suspense fallback={<TableSkeleton />}>
-												<ConfigurationsList
-													type='table'
-													params={{
-														fields: ['id', 'name', 'type', 'notes', 'contact', 'status', 'site'],
-														conditions: [
-															{ parameter: { 'company/id': Number(params.id) } },
-															{ parameter: { 'status/id': 2 } },
-															{ parameter: { 'type/id': 191 } },
-														],
-														childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
-														orderBy: { key: 'name' },
-													}}
-												/>
-											</Suspense>
-										</TabsContent>
-
-										<TabsContent value='servers'>
-											<Suspense fallback={<TableSkeleton />}>
-												<ConfigurationsList
-													type='table'
-													params={{
-														fields: ['id', 'name', 'contact', 'status', 'site'],
-														conditions: [
-															{ parameter: { 'company/id': Number(params.id) } },
-															{ parameter: { 'status/id': 2 } },
-															{ parameter: { 'type/id': 191 } },
-														],
-														childConditions: [{ parameter: { 'questions/questionId': '1597' } }],
-														orderBy: { key: 'name' },
-													}}
-												/>
-											</Suspense>
-										</TabsContent>
-
-										<TabsContent value='applications'>
-											<Suspense fallback={<TableSkeleton />}>
-												<ConfigurationsList
-													type='table'
-													params={{
-														fields: ['id', 'name', 'type', 'notes', 'contact', 'status', 'site'],
-														conditions: [
-															{ parameter: { 'company/id': Number(params.id) } },
-															{ parameter: { 'status/id': 2 } },
-															{ parameter: { 'type/id': 'in (211, 212, 219)' } },
-														],
-														orderBy: { key: 'name' },
-													}}
-												/>
-											</Suspense>
-										</TabsContent>
-									</Tabs>
-								</AccordionContent>
-							</AccordionItem>
-						</Accordion>
-					</ScrollArea>
-				</ResizablePanel>
-
-				<ResizableHandle />
-
-				<ResizablePanel
-					minSize={24}
-					defaultSize={27}
-					maxSize={45}
-				>
-					<div className='h-full'>
-						<div className='py-6 space-y-6'>
-							<section className='grid px-3'>
-								<div className='grid grid-cols-4 items-center h-9'>
-									<Label className='text-nowrap text-xs font-normal'>Stoplight</Label>
-
-									<div className='col-span-3'>
-										<Badge
-											className='mx-1.5'
-											variant={'caution'}
-										>
-											Yellow
-										</Badge>
-									</div>
-								</div>
-
-								<div className='grid grid-cols-4 items-center h-9'>
-									<Label className='text-nowrap text-xs font-normal'>Site</Label>
-
-									<div className='col-span-3'>
+						<div className='grid grid-cols-4 items-center h-9'>
+							<Label className='text-nowrap text-xs font-normal'>Contact</Label>
+							<div className='col-span-3'>
+								<Popover>
+									<PopoverTrigger asChild>
 										<Button
 											variant='ghost'
 											size='sm'
 											className='flex'
 										>
-											<MapPin className='mr-1.5' />
-											<span className='text-xs text-muted-foreground'>{company.site?.name}</span>
+											<User className='mr-1.5' />
+											<span className='text-xs text-muted-foreground'>{company.defaultContact?.name}</span>
 										</Button>
-									</div>
-								</div>
+									</PopoverTrigger>
 
-								<div className='grid grid-cols-4 items-center h-9'>
-									<Label className='text-nowrap text-xs font-normal'>Phone</Label>
+									<PopoverContent></PopoverContent>
+								</Popover>
+							</div>
+						</div>
 
-									<div className='col-span-3'>
-										<Button
-											variant='ghost'
-											size='sm'
-											className='flex'
-										>
-											<Phone className='mr-1.5' />
-											<span className='text-xs text-muted-foreground'>
-												{parsePhoneNumber(company.phoneNumber, 'US')?.formatNational()}
-											</span>
-										</Button>
-									</div>
-								</div>
+						<div className='grid grid-cols-4 items-center h-9'>
+							<Label className='text-nowrap text-xs font-normal'>Territory</Label>
 
-								<div className='grid grid-cols-4 items-center h-9'>
-									<Label className='text-nowrap text-xs font-normal'>Contact</Label>
-									<div className='col-span-3'>
-										<Popover>
-											<PopoverTrigger asChild>
-												<Button
-													variant='ghost'
-													size='sm'
-													className='flex'
-												>
-													<User className='mr-1.5' />
-													<span className='text-xs text-muted-foreground'>{company.defaultContact?.name}</span>
-												</Button>
-											</PopoverTrigger>
+							<div className='col-span-3'>
+								<Button
+									variant='ghost'
+									size='sm'
+									className='flex'
+								>
+									<Globe className='mr-1.5' />
+									<span className='text-xs text-muted-foreground'>Team B</span>
+								</Button>
+							</div>
+						</div>
+					</section>
 
-											<PopoverContent></PopoverContent>
-										</Popover>
-									</div>
-								</div>
+					<Separator />
 
-								<div className='grid grid-cols-4 items-center h-9'>
-									<Label className='text-nowrap text-xs font-normal'>Territory</Label>
+					<section>
+						<h4 className='text-xs text-muted-foreground font-medium px-3'>Attachments</h4>
 
-									<div className='col-span-3'>
-										<Button
-											variant='ghost'
-											size='sm'
-											className='flex'
-										>
-											<Globe className='mr-1.5' />
-											<span className='text-xs text-muted-foreground'>Team B</span>
-										</Button>
-									</div>
-								</div>
-							</section>
-
-							<Separator />
-
-							<section>
-								<h4 className='text-xs text-muted-foreground font-medium px-3'>Attachments</h4>
-
-								{/* {attachments
+						{/* {attachments
 									?.filter((attachment) => attachment.documentType.id === 7)
 									.map((attachment) => (
 										<Tooltip>
@@ -303,11 +309,9 @@ const Page = async ({ params }: Props) => {
 											</TooltipContent>
 										</Tooltip>
 									))} */}
-							</section>
-						</div>
-					</div>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+					</section>
+				</div>
+			</div>
 		</main>
 	);
 };

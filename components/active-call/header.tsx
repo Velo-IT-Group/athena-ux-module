@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { CardHeader, CardTitle } from '../ui/card';
 import { Rocket, SquareArrowOutUpRight, X } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button, buttonVariants } from '../ui/button';
 import Link from 'next/link';
 import WorkerSelector from '@/app/(user)/worker-selector';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
@@ -33,17 +33,18 @@ const ActiveCallHeader = () => {
 			</CardTitle>
 
 			<div className='flex items-center gap-1.5'>
-				<Link href={`/?${searchParams.toString()}`}>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='p-0 w-9 h-9'
-					>
-						<SquareArrowOutUpRight className='text-muted-foreground' />
-					</Button>
+				<Link
+					href={`/?${searchParams.toString()}`}
+					className={buttonVariants({
+						variant: 'ghost',
+						size: 'icon',
+						className: 'p-0 w-9 h-9',
+					})}
+				>
+					<SquareArrowOutUpRight className='text-muted-foreground' />
 				</Link>
 
-				<WorkerSelector />
+				{/* <WorkerSelector /> */}
 
 				<Tooltip>
 					<TooltipTrigger asChild>

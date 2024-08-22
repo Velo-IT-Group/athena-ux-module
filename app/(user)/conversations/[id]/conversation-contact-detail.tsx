@@ -2,10 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getCommunicationTypes, getContact, getContactCommunications, getContacts } from '@/lib/manage/read';
-import { Building, Building2, Ellipsis, Laptop, Mail, Phone, Plus } from 'lucide-react';
+import { getCommunicationTypes, getCompanies, getContact } from '@/lib/manage/read';
+import { Building, ChevronsUpDown, Ellipsis, Laptop, Mail, Phone, Plus } from 'lucide-react';
 import React, { Suspense } from 'react';
-import ContactSelector from './contact-selector';
 import { groupBy } from 'lodash';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,14 +13,16 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import LabeledInput from '@/components/ui/labeled-input';
-import DatePicker from '@/components/ui/date-picker';
 import { Skeleton } from '@/components/ui/skeleton';
 import ContactList from '@/components/lists/contact-list';
 import ContactProfileForm from '../contact-profile-form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CommunicationItemForm from '@/components/forms/communication-item-form';
+import TableSkeleton from '@/components/ui/data-table/skeleton';
+import { columns } from '@/components/table-columns/contact';
+import { Checkbox } from '@/components/ui/checkbox';
+import CheckMark from './checkmark';
 
 type Props = {
 	contactId?: number;
@@ -30,15 +31,16 @@ type Props = {
 };
 
 const ConversationContactDetail = async ({ contactId, companyId, attributes }: Props) => {
-	const [contact, contacts, types] = await Promise.all([
+	const [contact, types, { companies }] = await Promise.all([
 		getContact(contactId ?? 0),
-		getContacts({
-			conditions: [{ parameter: { inactiveFlag: false } }, { parameter: { 'company/id': companyId! } }],
-			childConditions: [{ parameter: { 'types/id': 17 } }],
-			pageSize: 1000,
-			orderBy: { key: 'firstName' },
-		}),
 		getCommunicationTypes(),
+		getCompanies({
+			conditions: [{ parameter: { 'status/id': 1 } }],
+			childConditions: [{ parameter: { 'types/id': 1 } }],
+			orderBy: { key: 'name', order: 'asc' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
 	]);
 
 	const groupedCommunications = groupBy(contact?.communicationItems, 'communicationType');
@@ -48,12 +50,49 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 		<Suspense fallback={<Skeleton className='h-96 w-full' />}>
 			<aside className='flex flex-col items-center gap-3 p-3 bg-background border-r'>
 				<Avatar className='w-20 h-20'>
-					<AvatarFallback>{contactId ? `${contact?.firstName} ${contact?.lastName}` : 'UU'}</AvatarFallback>
-					<AvatarImage src='https://uploads-ssl.webflow.com/61d87d426829a9bac65eeb9e/654d2b113b66e71152acc84c_Nick_Headshot_Fall2023.jpg'></AvatarImage>
+					<AvatarFallback className='text-2xl font-semibold'>
+						{contact ? `${contact?.firstName?.[0]}${contact?.lastName?.[0]}` : 'UU'}
+					</AvatarFallback>
+					{/* <AvatarImage src='https://uploads-ssl.webflow.com/61d87d426829a9bac65eeb9e/654d2b113b66e71152acc84c_Nick_Headshot_Fall2023.jpg'></AvatarImage> */}
 				</Avatar>
 
-				<Suspense>
-					<ContactList type='combobox'>
+				<Dialog>
+					<DialogTrigger asChild>
+						<Button
+							variant='ghost'
+							size='sm'
+							className=''
+						>
+							<h2 className='text-2xl font-semibold group flex items-center gap-1.5'>
+								<span>
+									{contact?.firstName} {contact?.lastName}
+								</span>
+
+								<ChevronsUpDown className='h-3.5 w-3.5 shrink-0' />
+							</h2>
+						</Button>
+					</DialogTrigger>
+
+					<DialogContent className='max-w-none sm:max-w-none w-[calc(100vw-24px)] h-[calc(100vh-24px)] flex flex-col py-[3rem]'>
+						<Suspense fallback={<TableSkeleton />}>
+							<ContactList
+								type='table'
+								id={1}
+								path='contact/id'
+								serviceType='ticket'
+								params={{
+									orderBy: { key: 'firstName' },
+									conditions: [{ parameter: { inactiveFlag: false } }],
+									childConditions: [{ parameter: { 'types/id': 17 } }, { parameter: { 'types/id': 21 } }],
+									fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
+								}}
+								facetedFilters={[{ accessoryKey: 'company', items: companies }]}
+								columnDefs='homepage'
+							/>
+						</Suspense>
+					</DialogContent>
+				</Dialog>
+				{/* <ContactList type='combobox'>
 						{contactId && (
 							<h2 className='text-2xl font-semibold group flex items-center gap-0.5 -mr-4'>
 								<span>
@@ -67,8 +106,7 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 								/>
 							</h2>
 						)}
-					</ContactList>
-				</Suspense>
+					</ContactList> */}
 
 				<div className='flex items-center gap-1.5 text-muted-foreground'>
 					<Building />

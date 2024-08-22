@@ -1,11 +1,10 @@
 'use client';
 import { ReactNode } from 'react';
-import RecoilProvider from '@/providers/recoil-provider';
-import { TwilioProvider } from '@/providers/twilio-provider';
 import { DeviceProvider } from '@/providers/device-provider';
 import { WorkerProvider } from '@/providers/worker-provider';
 import { NotificationProvider } from '@/providers/notification-provider';
 import { TaskContext } from '@/components/active-call/context';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 type Props = {
 	token: string;
@@ -14,17 +13,15 @@ type Props = {
 
 const UserLayout = ({ token, children }: Props) => {
 	return (
-		<RecoilProvider>
+		<TooltipProvider>
 			<NotificationProvider>
-				<TwilioProvider authToken={token}>
-					<TaskContext>
-						<DeviceProvider authToken={token}>
-							<WorkerProvider authToken={token}>{children}</WorkerProvider>
-						</DeviceProvider>
-					</TaskContext>
-				</TwilioProvider>
+				<TaskContext>
+					<DeviceProvider authToken={token}>
+						<WorkerProvider authToken={token}>{children}</WorkerProvider>
+					</DeviceProvider>
+				</TaskContext>
 			</NotificationProvider>
-		</RecoilProvider>
+		</TooltipProvider>
 	);
 };
 

@@ -44,6 +44,10 @@ export function DataTable<TData, TValue>({
 	facetedFilters,
 	hidePagination = false,
 }: DataTableProps<TData, TValue>) {
+	const [pagination, setPagination] = React.useState({
+		pageIndex: 0, //initial page index
+		pageSize: 20, //default page size
+	});
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -57,10 +61,12 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			rowSelection,
 			columnFilters,
+			pagination,
 		},
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
+		onPaginationChange: setPagination,
 		onColumnFiltersChange: setColumnFilters,
 		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),

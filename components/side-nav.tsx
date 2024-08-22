@@ -6,14 +6,14 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { useRecoilState } from 'recoil';
-import { collapsedState } from '@/atoms/sidebarStateAtom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TaskList from './lists/task-list';
 import { Separator } from './ui/separator';
 import { usePathname } from 'next/navigation';
 import { ModuleSwitcher } from './module-switcher';
 import { linksConfig } from '@/config/links';
+import { useWorker } from '@/providers/worker-provider';
+import SidebarActivityList from './sidebar-activity-list';
 
 type Props = {
 	isDefaultCollapsed: boolean;
@@ -60,11 +60,12 @@ const links: NavLink[] = [
 ];
 
 const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) => {
-	const [isCollapsed, setIsCollapsed] = useRecoilState(collapsedState);
+	const [isCollapsed, setIsCollapsed] = useState(isDefaultCollapsed);
 	const pathname = usePathname();
+	const { worker } = useWorker();
 
 	useEffect(() => {
-		setIsCollapsed(isDefaultCollapsed);
+		// setIsCollapsed(isDefaultCollapsed);
 	}, []);
 
 	return (
@@ -86,7 +87,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 			<ScrollArea className='flex flex-col h-screen'>
 				<div
 					data-collapsed={isCollapsed}
-					className='group flex flex-col'
+					className='group flex flex-col space-y-1.5'
 				>
 					<div className={cn('flex h-12 items-center justify-center py-0.5', isCollapsed ? 'h-12' : 'px-1.5')}>
 						<ModuleSwitcher
@@ -155,9 +156,11 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 						)}
 					</nav>
 
+					<TaskList isCollapsed={isCollapsed} />
+
 					<Separator />
 
-					<TaskList isCollapsed={isCollapsed} />
+					<SidebarActivityList />
 				</div>
 			</ScrollArea>
 		</ResizablePanel>

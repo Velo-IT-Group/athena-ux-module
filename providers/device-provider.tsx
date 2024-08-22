@@ -1,10 +1,8 @@
 'use client';
-import { useContext, createContext, useEffect, Dispatch, SetStateAction, useState, useRef, act } from 'react';
+import { useContext, createContext, useEffect, Dispatch, SetStateAction, useState, useRef, act, useMemo } from 'react';
 import { Device, type Call } from '@twilio/voice-sdk';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
-import { useSetRecoilState } from 'recoil';
-import { deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 import { initalizeJabra } from '@/lib/jabra';
 import { CallControlFactory, ICallControl, SignalType } from '@gnaudio/jabra-js';
 import { toast } from 'sonner';
@@ -52,16 +50,20 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const device = new Device(authToken, {
-		disableAudioContextSounds: true,
-		enableImprovedSignalingErrorPrecision: true,
-		// logLevel: 1,
-	});
+	const device = useMemo(
+		() =>
+			new Device(authToken, {
+				disableAudioContextSounds: true,
+				enableImprovedSignalingErrorPrecision: true,
+				// logLevel: 1,
+			}),
+		[]
+	);
+
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
 	const [muted, setMuted] = useState(false);
 	const [activeCall, setActiveCall] = useState<Call | undefined>(initialValues.activeCall);
-	const setDeviceRegistration = useSetRecoilState(deviceEligibleAtom);
 
 	useEffect(() => {
 		if (!device) return;
@@ -74,7 +76,7 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 		device.on('registered', async (d) => {
 			console.log('Twilio.Device Ready to make and receive calls!');
-			setDeviceRegistration(true);
+			// setDeviceRegistration(true);
 
 			// setActiveCall((prev) => {
 			// 	return { ...prev, call };
@@ -83,7 +85,7 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 		device.on('error', (error) => {
 			console.error(error);
-			setDeviceRegistration(false);
+			// setDeviceRegistration(false);
 		});
 
 		device.on('incoming', (call: Call) => {
@@ -93,7 +95,6 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.on('accept', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
-				currentCallControl?.ring(false);
 				currentCallControl?.offHook(true);
 				console.log(c);
 			});

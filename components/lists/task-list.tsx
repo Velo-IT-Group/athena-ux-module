@@ -1,10 +1,12 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { useWorker } from '@/providers/worker-provider';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import IncomingTask from '../incoming-call';
-import type { Reservation, Task } from 'twilio-taskrouter';
+import type { Reservation, Task, Worker } from 'twilio-taskrouter';
 import TaskWrapup from '../task/wrapup';
-import { toast } from 'sonner';
+import { toast, useSonner } from 'sonner';
 import { useRecoilValue } from 'recoil';
 import { deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 import { useDevice } from '@/providers/device-provider';
@@ -12,6 +14,7 @@ import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { ActiveCall } from '../active-call';
 import { SignalType } from '@gnaudio/jabra-js';
 import { useTask } from '../active-call/context';
+import { Separator } from '../ui/separator';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -19,35 +22,50 @@ type Props = {
 };
 
 const TaskList = ({ isCollapsed, className }: Props) => {
-	const deviceRegistration = useRecoilValue(deviceEligibleAtom);
-	const { device } = useDevice();
-	const { reservations: defaultReservations, worker } = useWorker();
+	const { toasts } = useSonner();
+	const { device, activeCall } = useDevice();
+	const { worker } = useWorker();
 	const [reservations, setReservations] = useState<Reservation[]>([]);
 	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const [taskAttributes, setTaskAttributes] = useState<any[]>([]);
 	const [tasks, setTasks] = useState<Task[]>([]);
-	const { currentCallControl } = useDevice();
+	const { currentCallControl, setMuted } = useDevice();
 	const { setReservation, setTask } = useTask();
 
-	useEffect(() => {
-		if (!defaultReservations || !deviceRegistration) return;
-		setReservations(defaultReservations);
-	}, [defaultReservations, deviceRegistration]);
+	const onWorkerReady = async (w: Worker) => {
+		console.log('Worker Ready', w.sid);
+		// setActivity(w.activity);
+		// 	// setActivityList(w.activities);
+		const ress = Array.from(w.reservations.values());
+		console.log(ress);
+		setReservations(ress);
+
+		ress.forEach(async (res) => {
+			switch (res.status) {
+				case 'wrapping':
+					setReservation(res);
+					setTask(res.task);
+					console.log(res.sid);
+					toast.custom(() => <TaskWrapup />, {
+						important: true,
+						duration: res.timeout * 1000,
+						id: res.task.sid,
+					});
+					break;
+				default:
+					setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);
+					if (res.task.taskChannelUniqueName === 'voice') {
+						// currentCallControl?.signalIncomingCall();
+					}
+					break;
+			}
+		});
+	};
 
 	const onReservationCreated = async (r: Reservation) => {
-		if (!deviceRegistration) {
-			try {
-				return await r.reject();
-			} catch (error) {
-				return console.error(error);
-			}
-		}
-
+		console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 		try {
-			console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 			setReservations((prev) => [...prev.filter((res) => res.sid !== r.sid), r]);
-			setReservation(r);
-			setTask(r.task);
 			setActiveReservation(r);
 
 			if (r.task.attributes.direction === 'outboundDial') {
@@ -80,7 +98,14 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			}
 
 			r.on('accepted', async (reservation) => {
+				console.log('Call accepted');
 				// setActiveCall({ ...activeCall, task: reservation.task });
+				try {
+					currentCallControl?.ring(false);
+				} catch (error) {
+					console.error(error);
+				}
+
 				setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid), reservation]);
 				setTasks((prev) => [...prev.filter((res) => res.sid !== reservation.task.sid), reservation.task]);
 
@@ -111,22 +136,12 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 						id: reservation.task.sid,
 					}
 				);
-
-				if (!reservation?.task?.attributes.conference) {
-					setTimeout(async () => {
-						const task = await reservation?.task?.fetchLatestVersion();
-						console.log(task);
-						setTask(task);
-					}, 2000);
-				}
 			});
 
 			r.on('rejected', async (reservation) => {
 				try {
 					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
 					currentCallControl?.ring(false);
-					setReservation(undefined);
-					setTask(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -137,16 +152,14 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
 					currentCallControl?.ring(false);
 					toast.dismiss(reservation.task.sid);
-					setReservation(undefined);
-					setTask(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
 			});
 
 			r.on('wrapup', async (reservation) => {
+				console.log('Wrapping up');
 				setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
-
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
 				toast.custom(() => <TaskWrapup />, { id: reservation.task.sid });
@@ -157,8 +170,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
 				toast.dismiss(reservation.task.sid);
-				setReservation(undefined);
-				setTask(undefined);
 			});
 
 			r.on('timeout', async (reservation) => {
@@ -166,8 +177,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
 					currentCallControl?.ring(false);
 					toast.dismiss(reservation.task.sid);
-					setReservation(undefined);
-					setTask(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
 				}
@@ -207,32 +216,35 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	}, [currentCallControl, activeReservation]);
 
 	useEffect(() => {
-		if (!worker) return;
+		if (worker === undefined) return;
+		worker?.on('ready', onWorkerReady);
 
-		worker.on('reservationFailed', (r: Reservation) => {
-			console.error('failed res', r);
-		});
+		worker?.on('reservationCreated', onReservationCreated);
 
-		worker.on('reservationCreated', onReservationCreated);
-
-		if (!device) return;
+		return () => {
+			worker?.off('ready', onWorkerReady);
+			worker?.off('reservationCreated', onReservationCreated);
+		};
 	}, [worker]);
 
 	return (
 		<>
 			{reservations.length > 0 && (
-				<section className='space-y-1.5 px-1.5'>
-					{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
+				<>
+					<Separator />
 
-					{reservations.map((reservation) => (
-						<IncomingTask
-							key={reservation.sid}
-							reservation={reservation}
-							task={reservation.task}
-							isCollapsed={isCollapsed}
-						/>
-					))}
-				</section>
+					<section className='space-y-1.5 px-1.5'>
+						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
+
+						{reservations.map((reservation, index) => (
+							<IncomingTask
+								key={reservation.sid}
+								reservation={reservation}
+								task={reservation.task}
+							/>
+						))}
+					</section>
+				</>
 			)}
 		</>
 	);

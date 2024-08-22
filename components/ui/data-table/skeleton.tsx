@@ -5,8 +5,8 @@ import { Skeleton } from '../skeleton';
 type Props = {};
 
 const TableSkeleton = (props: Props) => {
-	let blankColumns = new Array(5).fill(null);
-	let blankRows = new Array(9).fill(null);
+	let blankColumns = new Array(7).fill(null);
+	let blankRows = new Array(15).fill(null);
 
 	return (
 		<div className='rounded-md border'>

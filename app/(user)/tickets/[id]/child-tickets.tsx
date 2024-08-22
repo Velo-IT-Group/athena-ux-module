@@ -13,6 +13,7 @@ type Props = {
 const ChildTickets = async ({ ticketId }: Props) => {
 	const tasks = await getTasks(ticketId, { conditions: [{ parameter: { childTicketId: 0 }, comparator: '>' }] });
 	const completedTasks = tasks.filter((task) => task.closedFlag).length;
+	console.log(tasks.length, completedTasks);
 
 	return (
 		<Accordion type='multiple'>

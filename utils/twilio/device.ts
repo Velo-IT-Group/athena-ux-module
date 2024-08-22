@@ -1,5 +1,4 @@
 import { Call, Device } from '@twilio/voice-sdk';
-import { SetterOrUpdater } from 'recoil';
 import { toast } from 'sonner';
 
 export const selectOutputDevice = async (id: string, device: Device) => {
@@ -23,18 +22,18 @@ export const selectInputDevice = async (id: string, device: Device) => {
 	}
 };
 
-export const handleWarnings = (connection: Call, setError: SetterOrUpdater<string>) => {
+export const handleWarnings = (connection: Call) => {
 	console.log('Phone: register connection handler');
 
 	connection.on('warning', (name, data) => {
 		if (name === 'low-mos') {
-			setError('low-mos');
+			// setError('low-mos');
 		}
 	});
 
 	connection.on('warning-cleared', function (name) {
 		if (name === 'low-mos') {
-			setError('low-mos');
+			// setError('low-mos');
 		}
 	});
 };

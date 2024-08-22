@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import ActivityList from '@/components/lists/activity-list';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { relativeDate } from '@/utils/date';
+import NoteItem from '@/components/note-item';
 
 export default async function ActivityFeed({ id }: { id: number }) {
 	const [entries, notes] = await Promise.all([
@@ -63,50 +64,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								className='space-y-3'
 							>
 								{notes.map((note) => (
-									<Card>
-										<CardHeader className='flex flex-row items-center gap-1.5 p-3 space-y-0 group'>
-											<CardTitle className='text-sm flex items-center gap-1.5'>
-												<Avatar className='h-5 w-5'>
-													<AvatarFallback className='text-[9px] uppercase'>
-														{note?.createdBy && note?.createdBy[0]}
-														{note?.createdBy && note?.createdBy[1]}
-													</AvatarFallback>
-												</Avatar>
-
-												<span>{note.createdBy}</span>
-											</CardTitle>
-
-											<CardDescription className='text-xs'>
-												{relativeDate(note?.dateCreated ? new Date(note?.dateCreated) : new Date())}
-											</CardDescription>
-
-											<div className='opacity-0 transition-opacity group-hover:opacity-100 flex items-center gap-1.5 ml-auto'>
-												<Button
-													variant='ghost'
-													size='sm'
-												>
-													<SmilePlus />
-												</Button>
-
-												<Button
-													variant='ghost'
-													size='sm'
-												>
-													<Reply />
-												</Button>
-
-												<Button
-													variant='ghost'
-													size='sm'
-												>
-													<Ellipsis />
-												</Button>
-											</div>
-										</CardHeader>
-										<CardContent className='p-3 pt-0'>
-											<p>{note.text}</p>
-										</CardContent>
-									</Card>
+									<NoteItem
+										key={note.id}
+										note={note}
+									/>
 								))}
 							</TabsContent>
 
@@ -115,11 +76,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								className='space-y-3'
 							>
 								{discussionNotes.map((note) => (
-									<Card>
-										<CardContent className='p-3'>
-											<p className='text-wrap line-clamp-5'>{note.text}</p>
-										</CardContent>
-									</Card>
+									<NoteItem
+										key={note.id}
+										note={note}
+									/>
 								))}
 							</TabsContent>
 
@@ -128,11 +88,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								className='space-y-3'
 							>
 								{internalNotes.map((note) => (
-									<Card>
-										<CardContent className='p-3'>
-											<p>{note.text}</p>
-										</CardContent>
-									</Card>
+									<NoteItem
+										key={note.id}
+										note={note}
+									/>
 								))}
 							</TabsContent>
 
@@ -141,11 +100,10 @@ export default async function ActivityFeed({ id }: { id: number }) {
 								className='space-y-3'
 							>
 								{resolutionNotes.map((note) => (
-									<Card>
-										<CardContent className='p-3'>
-											<p>{note.text}</p>
-										</CardContent>
-									</Card>
+									<NoteItem
+										key={note.id}
+										note={note}
+									/>
 								))}
 							</TabsContent>
 						</Tabs>
@@ -153,7 +111,7 @@ export default async function ActivityFeed({ id }: { id: number }) {
 				</AccordionItem>
 			</Accordion>
 
-			<form
+			{/* <form
 				action={async (data: FormData) => {
 					'use server';
 					try {
@@ -211,7 +169,7 @@ export default async function ActivityFeed({ id }: { id: number }) {
 						</Button>
 					</CardFooter>
 				</Card>
-			</form>
+			</form> */}
 		</div>
 	);
 }

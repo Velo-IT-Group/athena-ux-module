@@ -48,7 +48,8 @@ export default async function Page({ params }: Props) {
 					<Textarea
 						name='summary'
 						defaultValue={ticket.summary}
-						className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none'
+						className='border-none text-2xl font-semibold focus-visible:ring-0 shadow-none resize-none pointer-events-none'
+						readOnly
 					/>
 
 					{ticket.parentTicketId && (
@@ -59,8 +60,9 @@ export default async function Page({ params }: Props) {
 
 					<Textarea
 						placeholder='Add a comment...'
-						className='border-none shadow-none resize-none'
+						className='border-none shadow-none resize-none pointer-events-none'
 						defaultValue={initalNote?.text}
+						readOnly
 						minRows={3}
 					/>
 

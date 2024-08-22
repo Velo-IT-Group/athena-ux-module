@@ -15,7 +15,6 @@ import { LogOut } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
-import { useRecoilValue } from 'recoil';
 import { activityState } from '@/atoms/twilioStateAtom';
 import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
 import type { Session } from '@supabase/supabase-js';
@@ -30,7 +29,6 @@ type Props = {
 const UserInfo = ({ session }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
-	const currentActivity = useRecoilValue(activityState);
 
 	useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -74,8 +72,8 @@ const UserInfo = ({ session }: Props) => {
 
 						<div
 							className={cn(
-								'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5',
-								currentActivity?.available ? 'bg-green-500' : 'bg-red-500'
+								'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5'
+								// currentActivity?.available ? 'bg-green-500' : 'bg-red-500'
 							)}
 						/>
 					</div>

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { Reservation, Task } from 'twilio-taskrouter';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Popover, PopoverTrigger } from './ui/popover';
+import { PopoverContent } from './ui/popover-dialog';
 
 type Props = {
 	reservation: Reservation;

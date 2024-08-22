@@ -25,7 +25,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 				#{row.getValue('id')}
 			</Link>
 		),
-		enableSorting: false,
+		enableSorting: true,
 		enableHiding: false,
 	},
 	{
@@ -70,7 +70,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			// console.log(value, id, row);
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(String(referenceRow.id));
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
 	},
 	{
@@ -94,7 +94,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(String(referenceRow.id));
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
 	},
 	{
@@ -122,7 +122,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(String(referenceRow.id));
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
 	},
 	{
@@ -150,7 +150,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
-			return value.includes(String(referenceRow.id));
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
 	},
 	{
@@ -183,7 +183,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			if (!referenceRow) return false;
 
-			return value.includes(String(referenceRow.id));
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
 	},
 	{

@@ -16,7 +16,7 @@ import {
 	Settings,
 	UserPlus,
 } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Popover, PopoverTrigger } from '../ui/popover';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -30,6 +30,7 @@ import { useTask } from './context';
 import { Dialpad } from '../dialpad';
 import { updateConference } from '@/lib/twilio/conference/helpers';
 import { updateConferenceAction } from './actions';
+import { PopoverContent } from '../ui/popover-dialog';
 
 const ActiveCallFooter = () => {
 	const { task } = useTask();

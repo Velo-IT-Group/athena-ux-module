@@ -1,12 +1,12 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { PhoneIncoming, PhoneOutgoing } from 'lucide-react';
+import { Activity, Building, Cable, PhoneIncoming, PhoneOutgoing, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { getAllCalls } from '@/lib/twilio/read';
 import { CommunicationItem } from '@/types/manage';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
 import ActivityList from '@/components/lists/activity-list';
-import { Suspense } from 'react';
+import { ReactNode, Suspense } from 'react';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
@@ -69,24 +69,42 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 		({ endTime }) => relativeDate(endTime)
 	);
 
-	const tabs = ['Overview', 'Company', 'Configurations', 'Tickets'];
+	const tabs: string[] = ['<,></', 'Company', 'Configurations', 'Tickets'];
 
 	return (
 		<div className={cn('w-full overflow-x-hidden', className)}>
 			<Tabs defaultValue={tabs[3]}>
 				<TabsList className='w-full'>
-					{tabs.map((tab) => (
-						<TabsTrigger
-							className='w-full'
-							value={tab}
-							key={tab}
-						>
-							{tab}
-						</TabsTrigger>
-					))}
+					<TabsTrigger
+						className='w-full'
+						value='Activity'
+					>
+						<Activity className='mr-1.5' /> Activity
+					</TabsTrigger>
+
+					<TabsTrigger
+						className='w-full'
+						value='Company'
+					>
+						<Building className='mr-1.5' /> Company
+					</TabsTrigger>
+
+					<TabsTrigger
+						className='w-full'
+						value='Configurations'
+					>
+						<Cable className='mr-1.5' /> Configurations
+					</TabsTrigger>
+
+					<TabsTrigger
+						className='w-full'
+						value='Tickets'
+					>
+						<Tag className='mr-1.5' /> Tickets
+					</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value={tabs[0]}>
+				<TabsContent value='Activity'>
 					<Accordion type='multiple'>
 						{Object.entries(groupedCalls).map(([date, calls]) => (
 							<AccordionItem value={date}>

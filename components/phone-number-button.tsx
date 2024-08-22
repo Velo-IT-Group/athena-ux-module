@@ -5,12 +5,14 @@ import { Button } from './ui/button';
 import { useWorker } from '@/providers/worker-provider';
 import { RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { Badge } from './ui/badge';
 
 type Props = {
 	phoneNumber: string;
+	className?: string;
 };
 
-const PhoneNumberButton = ({ phoneNumber }: Props) => {
+const PhoneNumberButton = ({ phoneNumber, className }: Props) => {
 	const [isPending, startTransition] = useTransition();
 	const { worker } = useWorker();
 	const parsedPhoneNumber = parsePhoneNumber(phoneNumber);
@@ -19,8 +21,9 @@ const PhoneNumberButton = ({ phoneNumber }: Props) => {
 		<>
 			{parsedPhoneNumber.options && (
 				<Button
-					variant='secondary'
+					variant={null}
 					size='sm'
+					className={className}
 					onClick={() => {
 						startTransition(async () => {
 							if (!parsedPhoneNumber.options?.formatInternational) return;
@@ -43,8 +46,13 @@ const PhoneNumberButton = ({ phoneNumber }: Props) => {
 						});
 					}}
 				>
-					{parsedPhoneNumber.formattedNumber}
-					{isPending && <RefreshCcw className='w-4 h-4 ml-2 animate-spin' />}
+					<Badge
+						variant='outline'
+						className='bg-blue-100 text-blue-800 hover:bg-blue-100/60 dark:bg-blue-900 dark:text-blue-300'
+					>
+						{parsedPhoneNumber.formattedNumber}
+						{isPending && <RefreshCcw className='w-4 h-4 ml-2 animate-spin' />}
+					</Badge>
 				</Button>
 			)}
 		</>

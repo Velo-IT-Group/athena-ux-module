@@ -8,6 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { faker } from '@faker-js/faker';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function generateTestUsers(count: number) {
 	const users = [];
@@ -32,14 +34,35 @@ const SidebarActivityList = (props: Props) => {
 	const activities = Array.from(worker?.activities.values() ?? []);
 	const testUsers = generateTestUsers(10);
 
+	const activityColors: Record<string, string> = {
+		Available: 'bg-green-500',
+		Unavailable: 'bg-red-500',
+		Offline: 'bg-gray-500',
+	};
+
 	return (
-		<div className='flex flex-col gap-1.5'>
+		<div className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
 			{activities?.map((activity) => (
 				<Popover key={activity.sid}>
 					<PopoverTrigger asChild>
-						<Button>
-							<Circle />
+						{/* <Tooltip delayDuration={0}>
+							<TooltipTrigger asChild> */}
+						<Button
+							variant='ghost'
+							size='smIcon'
+							className='h-9 w-9'
+						>
+							<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
 						</Button>
+						{/* </TooltipTrigger>
+
+							<TooltipContent
+								side='right'
+								className='flex items-center gap-3'
+							>
+								{activity.name}
+							</TooltipContent>
+						</Tooltip> */}
 					</PopoverTrigger>
 
 					<PopoverContent

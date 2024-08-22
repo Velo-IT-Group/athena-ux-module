@@ -6,7 +6,7 @@ import TableSkeleton from '@/components/ui/data-table/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getBoards, getContact, getPriorities, getSystemMembers } from '@/lib/manage/read';
 import { NavItemWithChildren } from '@/types/nav';
-import { Building2, Cable, Mail, MapPin, Phone, Plus, Tag, Timer } from 'lucide-react';
+import { Activity, Building2, Cable, Mail, MapPin, Phone, Plus, Tag, Timer } from 'lucide-react';
 import React, { Suspense } from 'react';
 
 type Props = {
@@ -50,7 +50,12 @@ const Page = async ({ params }: Props) => {
 					?.filter((item) => item.communicationType === 'Phone')
 					.map((item) => {
 						return {
-							title: <PhoneNumberButton phoneNumber={item.value} />,
+							title: (
+								<PhoneNumberButton
+									phoneNumber={item.value}
+									className='px-0'
+								/>
+							),
 							items: [],
 						};
 					}) ?? [],
@@ -87,59 +92,59 @@ const Page = async ({ params }: Props) => {
 	];
 
 	return (
-		<main className='grid p-3'>
-			<header className='flex items-center justify-end'>
+		<main className='h-full p-3 space-y-3'>
+			<header className='flex justify-between'>
+				<div className='flex items-center gap-3'>
+					<Avatar className='h-16 w-16'>
+						<AvatarFallback className='text-2xl font-semibold'>
+							{contact?.firstName?.[0]}
+							{contact?.lastName?.[0]}
+						</AvatarFallback>
+					</Avatar>
+
+					<div>
+						<h1>
+							{contact?.firstName} {contact?.lastName}
+						</h1>
+						<p>{contact?.company?.name}</p>
+					</div>
+				</div>
 				<div>
 					<Button>Add new ticket</Button>
 				</div>
 			</header>
 
-			<section className='flex item-center gap-3'>
-				<Avatar className='h-16 w-16'>
-					<AvatarFallback className='text-2xl font-semibold'>
-						{contact?.firstName?.[0]}
-						{contact?.lastName?.[0]}
-					</AvatarFallback>
-				</Avatar>
+			<section className='grid grid-cols-[1fr_4fr] items-start gap-3'>
+				<div className='grid items-start space-y-1.5'>
+					<h3 className='text-sm text-muted-foreground'>Customer Details</h3>
 
-				<div>
-					<h1>
-						{contact?.firstName} {contact?.lastName}
-					</h1>
+					<div className='flex flex-col gap-6 bg-muted p-3 rounded-lg'>
+						{details.map((detail) => (
+							<section
+								key={detail.title}
+								className='space-y-3'
+							>
+								<h4 className='text-xs text-muted-foreground flex items-center group'>
+									{detail.icon && <detail.icon className='mr-1.5 inline-block' />} {detail.title}
+									{detail.addAction && (
+										<Button
+											variant='ghost'
+											size='smIcon'
+											className='ml-auto opacity-0 group-hover:opacity-100 transition-opacity'
+										>
+											<Plus />
+										</Button>
+									)}
+								</h4>
 
-					<p>{contact?.company?.name}</p>
-				</div>
-			</section>
-
-			<section className='grid grid-cols-[240px_1fr] gap-3'>
-				<div className='flex flex-col gap-6'>
-					<h3>Customer Details</h3>
-
-					{details.map((detail) => (
-						<section
-							key={detail.title}
-							className='space-y-3'
-						>
-							<h4 className='text-xs text-muted-foreground flex items-center group'>
-								{detail.icon && <detail.icon className='mr-1.5 inline-block' />} {detail.title}
-								{detail.addAction && (
-									<Button
-										variant='ghost'
-										size='smIcon'
-										className='ml-auto opacity-0 group-hover:opacity-100 transition-opacity'
-									>
-										<Plus />
-									</Button>
-								)}
-							</h4>
-
-							<div className='flex flex-col items-start gap-1.5'>
-								{detail.items.map((item) => (
-									<div key={item.title}>{item.title}</div>
-								))}
-							</div>
-						</section>
-					))}
+								<div className='flex flex-col items-start gap-1.5'>
+									{detail.items.map((item) => (
+										<div key={item.title}>{item.title}</div>
+									))}
+								</div>
+							</section>
+						))}
+					</div>
 				</div>
 
 				<div>
@@ -151,6 +156,10 @@ const Page = async ({ params }: Props) => {
 
 							<TabsTrigger value='configurations'>
 								<Cable className='mr-1.5' /> Configurations
+							</TabsTrigger>
+
+							<TabsTrigger value='activity'>
+								<Activity className='mr-1.5' /> Activity
 							</TabsTrigger>
 						</TabsList>
 

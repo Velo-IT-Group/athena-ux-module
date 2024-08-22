@@ -42,7 +42,7 @@ type TaskQueueEvent =
 type EventType = ActivityEvent | ReservationEvent | TaskEvent | TaskQueueEvent;
 
 export async function POST(request: Request) {
-	const client = createClient();
+	const client = await createClient();
 	revalidatePath('/');
 	const data = await request.formData();
 	const eventType = data.get('EventType') as EventType;

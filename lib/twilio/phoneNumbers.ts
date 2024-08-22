@@ -2,7 +2,7 @@
 import { createClient } from '@/utils/twilio';
 
 export const getPhoneNumbers = async () => {
-	const client = createClient();
+	const client = await createClient();
 	// client.outgoingCallerIds.list({ limit: 100 });
 	const phoneNumbers = await client.incomingPhoneNumbers.list({
 		limit: 100,

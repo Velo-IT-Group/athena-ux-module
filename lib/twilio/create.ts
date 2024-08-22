@@ -4,7 +4,7 @@ import { createTask } from './taskrouter/helpers';
 import { createClient } from '@/utils/twilio';
 
 export const createWorker = async (friendlyName: string, attributes: WorkerListInstanceCreateOptions) => {
-	const client = createClient();
+	const client = await createClient();
 
 	return await client.taskrouter.v1
 		.workspaces(process.env.WORKSPACE_SID!)
@@ -12,7 +12,7 @@ export const createWorker = async (friendlyName: string, attributes: WorkerListI
 };
 
 export const createCallback = async (attributes: Object) => {
-	const client = createClient();
+	const client = await createClient();
 	const taskAttributes = {
 		...attributes,
 		title: 'Callback request',

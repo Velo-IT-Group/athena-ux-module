@@ -5,7 +5,7 @@ import { ReservationContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/w
 import { WorkerContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 
 export const updateWorker = async (workerSid: string, options: WorkerContextUpdateOptions) => {
-	const client = createClient();
+	const client = await createClient();
 	try {
 		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workers(workerSid).update(options);
 
@@ -16,7 +16,7 @@ export const updateWorker = async (workerSid: string, options: WorkerContextUpda
 };
 
 export const updateTask = async (workerSid: string, options: TaskContextUpdateOptions) => {
-	const client = createClient();
+	const client = await createClient();
 	try {
 		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(workerSid).update(options);
 
@@ -33,7 +33,7 @@ export const resToConference = async (
 		instruction: 'conference',
 	}
 ) => {
-	const client = createClient();
+	const client = await createClient();
 	const reservation = await client.taskrouter.v1
 		.workspaces(process.env.WORKSPACE_SID!)
 		.tasks(taskSid)

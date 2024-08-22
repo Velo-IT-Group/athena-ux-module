@@ -4,7 +4,7 @@ import { createClient } from '@/utils/twilio';
 import { type NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-	const client = createClient();
+	const client = await createClient();
 	const formData = await request.formData();
 	const from = formData.get('from') as string;
 	console.log(from);

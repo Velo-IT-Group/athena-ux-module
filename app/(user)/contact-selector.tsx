@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getContacts } from '@/lib/manage/read';
-import { useTaskContext } from './task-context';
+import { useTaskContext } from '../../providers/task-context';
 import { Contact } from '@/types/manage';
 import { updateTask } from '@/lib/twilio/taskrouter/helpers';
 import { revalidatePath } from 'next/cache';

@@ -170,7 +170,8 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 					<ConfigurationsList
 						type='table'
 						params={{
-							conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+							// conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+							conditions: [{ parameter: { 'company/id': 250 } }],
 							fields: ['id', 'name', 'site', 'company', 'status', 'contact', 'deviceIdentifier'],
 						}}
 					/>

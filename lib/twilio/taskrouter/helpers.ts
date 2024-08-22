@@ -16,7 +16,7 @@ import { WorkflowListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/works
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
 export const createTask = async (workflowSid: string, attributes: Object) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	const payload = {
 		workflowSid,
 		attributes: JSON.stringify(attributes),
@@ -28,12 +28,12 @@ export const createTask = async (workflowSid: string, attributes: Object) => {
 };
 
 export const getTask = async (taskSid: string, params?: TaskListInstanceOptions) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(taskSid).fetch();
 };
 
 export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	const task = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(taskSid).update(options);
 
 	revalidatePath('/conversations');
@@ -42,20 +42,20 @@ export const updateTask = async (taskSid: string, options: TaskContextUpdateOpti
 };
 
 export const findWorker = async (friendlyName: string) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	const workers = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workers.list({ friendlyName });
 
 	return workers[0];
 };
 
 export const getEvents = async () => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).events.list({ limit: 20 });
 };
 
-export const getOngoingTasks = () => {
-	const client = createTwilioClient();
-	return client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks.list({
+export const getOngoingTasks = async () => {
+	const client = await createTwilioClient();
+	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks.list({
 		assignmentStatus: ['pending', 'assigned', 'reserved'],
 		// evaluateTaskAttributes: "name='" + name + "'",
 	});
@@ -100,12 +100,12 @@ export const createWorkerCapabilityToken = (sid: string) => {
 };
 
 export const getWorkflows = async () => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workflows.list();
 };
 
 export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	const supabase = createClient();
 	const {
 		data: { session },
@@ -119,31 +119,31 @@ export const updateWorkerReservation = async (id: string, update: ReservationCon
 };
 
 export const listWorkflows = async (option: WorkflowListInstanceOptions = {}) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workflows.list(option);
 };
 
 export const fetchWorkflow = async (sid: string) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workflows(sid).fetch();
 };
 
 export const listQueues = async (option: TaskQueueListInstanceOptions = {}) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).taskQueues.list(option);
 };
 
 export const fetchQueue = async (sid: string) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).taskQueues(sid).fetch();
 };
 
 export const listActivities = async (option: ActivityListInstanceOptions = {}) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).activities.list(option);
 };
 
 export const fetchActivity = async (sid: string) => {
-	const client = createTwilioClient();
+	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).activities(sid).fetch();
 };

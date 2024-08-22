@@ -1,6 +1,4 @@
 import Image from 'next/image';
-import { auth } from '@/auth';
-import { CommandMenu } from './command-menu';
 import UserInfo from './user-info';
 import { Popover, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
@@ -26,11 +24,7 @@ const Navbar = async () => {
 				/>
 			</div>
 
-			<CommandMenu />
-
 			<div className='flex items-center'>
-				{/* <HistorySelector calls={calls} /> */}
-
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button

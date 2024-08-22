@@ -44,8 +44,6 @@ const ActiveCallHeader = () => {
 					<SquareArrowOutUpRight className='text-muted-foreground' />
 				</Link>
 
-				{/* <WorkerSelector /> */}
-
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<Button

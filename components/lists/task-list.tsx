@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useWorker } from '@/providers/worker-provider';
-import IncomingTask from '../incoming-call';
+import IncomingTask from '../incoming-task';
 import type { Reservation, Task, Worker } from 'twilio-taskrouter';
 import TaskWrapup from '../task/wrapup';
 import { toast } from 'sonner';

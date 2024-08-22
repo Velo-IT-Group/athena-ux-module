@@ -154,6 +154,7 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 
 				<TabsContent value={tabs[2].name}>
 					<ConfigurationsList
+						id={0}
 						type='table'
 						params={{
 							// conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],

@@ -6,7 +6,6 @@ import { TooltipProvider } from '../ui/tooltip';
 import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
 import { useEffect } from 'react';
-import { SessionProvider } from 'next-auth/react';
 import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 import ActiveCallParticipants from './participants';
 import { useTask } from './context';
@@ -18,7 +17,6 @@ type Props = {
 };
 
 export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
-	const { reservation, task } = useTask();
 	useEffect(() => {
 		getConferenceParticipants(conferenceSid)
 			.then((e) => {
@@ -28,16 +26,14 @@ export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
 	}, [conferenceSid]);
 
 	return (
-		<SessionProvider>
-			<TooltipProvider>
-				<Card className='shadow-sm w-[356px] dark'>
-					<ActiveCallHeader />
+		<TooltipProvider>
+			<Card className='shadow-sm w-[356px] dark'>
+				<ActiveCallHeader />
 
-					<ActiveCallParticipants />
+				<ActiveCallParticipants />
 
-					<ActiveCallFooter />
-				</Card>
-			</TooltipProvider>
-		</SessionProvider>
+				<ActiveCallFooter />
+			</Card>
+		</TooltipProvider>
 	);
 }

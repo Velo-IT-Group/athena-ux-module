@@ -1,14 +1,11 @@
 'use server';
-import { Twilio } from 'twilio';
+import { createClient } from '@/utils/twilio';
 import { TaskContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { ReservationContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/task/reservation';
 import { WorkerContextUpdateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
-
 export const updateWorker = async (workerSid: string, options: WorkerContextUpdateOptions) => {
+	const client = createClient();
 	try {
 		const worker = await client.taskrouter.v1
 			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
@@ -22,6 +19,7 @@ export const updateWorker = async (workerSid: string, options: WorkerContextUpda
 };
 
 export const updateTask = async (workerSid: string, options: TaskContextUpdateOptions) => {
+	const client = createClient();
 	try {
 		const worker = await client.taskrouter.v1
 			.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
@@ -41,6 +39,7 @@ export const resToConference = async (
 		instruction: 'conference',
 	}
 ) => {
+	const client = createClient();
 	const reservation = await client.taskrouter.v1
 		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
 		.tasks(taskSid)

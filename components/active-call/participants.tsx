@@ -2,20 +2,23 @@
 import React, { useEffect, useState } from 'react';
 import { CardContent } from '../ui/card';
 import ParticipantListItem from './participant-list-item';
-import { useSession } from 'next-auth/react';
 import { useTask } from './context';
+import { createClient } from '@/utils/supabase/client';
 
 const ActiveCallParticipants = () => {
-	const { task, setTask } = useTask();
-	const { data } = useSession();
+	const { task } = useTask();
+	const supabase = createClient();
+
 	const [participants, setParticipants] = useState<Record<string, string>>({});
 
 	useEffect(() => {
-		setParticipants({
-			worker: data?.user?.name ?? 'You',
-			customer: task?.attributes.name ?? task?.attributes.from,
+		supabase.auth.getUser().then(({ data }) => {
+			setParticipants({
+				worker: data?.user?.user_metadata?.name ?? 'You',
+				customer: task?.attributes.name ?? task?.attributes.from,
+			});
 		});
-	}, [data, task]);
+	}, [task]);
 
 	const entries = Object.entries(participants);
 

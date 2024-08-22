@@ -20,6 +20,7 @@ const BoardStatusList = async ({ type, id, defaultValue, params }: Props) => {
 	return (
 		<>
 			{type === 'combobox' && (
+				// @ts-ignore
 				<Combobox
 					items={statuses.map((status) => {
 						return { label: status?.name, value: `${status?.id}-${status?.name}` };

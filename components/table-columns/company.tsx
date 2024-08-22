@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
 import { Tooltip, TooltipTrigger } from '../ui/tooltip';
-import CompanyTooltipDetail from '@/app/(user)/companies/company-tooltip-detail';
 import parsePhoneNumber from 'libphonenumber-js';
 
 // 'id', 'identifier', 'name', 'phoneNumber', 'territory'
@@ -56,10 +55,10 @@ export const columns: ColumnDef<Company>[] = [
 					</Link>
 				</TooltipTrigger>
 
-				<CompanyTooltipDetail
+				{/* <CompanyTooltipDetail
 					name={row.original.name}
 					phoneNumber={row.original.phoneNumber}
-				/>
+				/> */}
 			</Tooltip>
 			// <Link
 			// 	href={`/tickets/${row.getValue('identifier')}`}

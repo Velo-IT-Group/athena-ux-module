@@ -26,12 +26,9 @@ import type {
 } from '@/types/manage';
 
 export const getCompany = async (id: number, conditions?: Conditions<Company>): Promise<Company> => {
-	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}${generateParams(conditions)}`,
-		{
-			headers: baseHeaders,
-		}
-	);
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${id}${generateParams(conditions)}`, {
+		headers: baseHeaders,
+	});
 	return await response.json();
 };
 
@@ -39,11 +36,11 @@ export const getCompanies = async (
 	conditions?: Conditions<Company>
 ): Promise<{ companies: Company[]; count: number }> => {
 	const [response, countResponse] = await Promise.all([
-		fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies${generateParams(conditions)}`, {
+		fetch(`${process.env.CONNECT_WISE_URL}/company/companies${generateParams(conditions)}`, {
 			headers: baseHeaders,
 			method: 'GET',
 		}),
-		fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/count${generateParams(conditions)}`, {
+		fetch(`${process.env.CONNECT_WISE_URL}/company/companies/count${generateParams(conditions)}`, {
 			headers: baseHeaders,
 			method: 'GET',
 		}),
@@ -63,7 +60,7 @@ export const getCompanies = async (
 
 export const getCompanySites = async (id: number, conditions?: Conditions<Site>): Promise<Site[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/sites${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/company/companies/${id}/sites${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -76,7 +73,7 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 
 export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -87,7 +84,7 @@ export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>)
 export const getContact = async (id: number, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}/${generateParams(conditions)}`,
+			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/${generateParams(conditions)}`,
 			{ headers: baseHeaders }
 		);
 
@@ -104,7 +101,7 @@ export const getCommunicationTypes = async (
 ): Promise<CommunicationType[] | undefined> => {
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/communicationTypes${generateParams(conditions)}`,
+			`${process.env.CONNECT_WISE_URL}/company/communicationTypes${generateParams(conditions)}`,
 			{ headers: baseHeaders }
 		);
 
@@ -122,7 +119,7 @@ export const getContactCommunications = async (
 ): Promise<CommunicationItem[] | undefined> => {
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}/communications${generateParams(conditions)}`,
+			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications${generateParams(conditions)}`,
 			{ headers: baseHeaders }
 		);
 
@@ -136,7 +133,7 @@ export const getContactCommunications = async (
 
 export const getContacts = async (conditions?: Conditions<Contact>): Promise<Contact[]> => {
 	try {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${generateParams(conditions)}`, {
+		const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${generateParams(conditions)}`, {
 			headers: baseHeaders,
 		});
 
@@ -157,7 +154,7 @@ export const getAllContacts = async (
 ): Promise<{ contacts: Contact[]; count: number }> => {
 	let contacts: Contact[] = [];
 	const responseCount = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/count${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/company/contacts/count${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -174,7 +171,7 @@ export const getAllContacts = async (
 			const [...allResponses] = await Promise.all(
 				arrayCount.map((_, index) =>
 					fetch(
-						`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${generateParams({
+						`${process.env.CONNECT_WISE_URL}/company/contacts/${generateParams({
 							...conditions,
 							page: index + 1,
 							pageSize: 1000,
@@ -190,7 +187,7 @@ export const getAllContacts = async (
 			const items: Contact[] = data.flatMap((item) => item);
 			contacts = items;
 		} else {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts${generateParams(conditions)}`, {
+			const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts${generateParams(conditions)}`, {
 				headers: baseHeaders,
 			});
 
@@ -217,7 +214,7 @@ export const getAllContacts = async (
 
 export const getConfiguration = async (id: number, conditions?: Conditions<Configuration>): Promise<Configuration> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/${id}/${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/company/configurations/${id}/${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -234,7 +231,7 @@ export const getAllConfigurations = async (
 	let configurations: Configuration[] = [];
 
 	const responseCount = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/count${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/company/configurations/count${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -251,7 +248,7 @@ export const getAllConfigurations = async (
 			const [...allResponses] = await Promise.all(
 				arrayCount.map((_, index) =>
 					fetch(
-						`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams({
+						`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams({
 							...conditions,
 							page: index + 1,
 							pageSize: 1000,
@@ -268,7 +265,7 @@ export const getAllConfigurations = async (
 			configurations = items;
 		} else {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams(conditions)}`,
+				`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams(conditions)}`,
 				{
 					headers: baseHeaders,
 				}
@@ -300,10 +297,10 @@ export const getConfigurations = async (
 ): Promise<{ configurations: Configuration[]; count: number }> => {
 	try {
 		const [configResponse, countResponse] = await Promise.all([
-			fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations${generateParams(conditions)}`, {
+			fetch(`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams(conditions)}`, {
 				headers: baseHeaders,
 			}),
-			fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/configurations/count${generateParams(conditions)}`, {
+			fetch(`${process.env.CONNECT_WISE_URL}/company/configurations/count${generateParams(conditions)}`, {
 				headers: baseHeaders,
 			}),
 		]);
@@ -327,7 +324,7 @@ export const getTasks = async (
 	conditions?: Conditions<ServiceTicketTask>
 ): Promise<ServiceTicketTask[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/tasks${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/tasks${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -339,12 +336,12 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ tickets: ServiceTicket[]; count: number }> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 
 	const responseCount = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/count${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/tickets/count${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -364,7 +361,7 @@ export const getAllTickets = async (
 	let tickets: ServiceTicket[] = [];
 
 	const responseCount = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/count${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/tickets/count${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -380,7 +377,7 @@ export const getAllTickets = async (
 		const [...allResponses] = await Promise.all(
 			arrayCount.map((_, index) =>
 				fetch(
-					`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams({
+					`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams({
 						...conditions,
 						page: index + 1,
 						pageSize: 1000,
@@ -396,7 +393,7 @@ export const getAllTickets = async (
 		const items: ServiceTicket[] = data.flatMap((item) => item);
 		tickets = items;
 	} else {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets${generateParams(conditions)}`, {
+		const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions)}`, {
 			headers: baseHeaders,
 		});
 		return { tickets: await response.json(), count };
@@ -409,12 +406,9 @@ export const getAllTickets = async (
 };
 
 export const getTicket = async (id: number, conditions?: Conditions<ServiceTicket>): Promise<ServiceTicket> => {
-	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/${generateParams(conditions)}`,
-		{
-			headers: baseHeaders,
-		}
-	);
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/${generateParams(conditions)}`, {
+		headers: baseHeaders,
+	});
 	return await response.json();
 };
 
@@ -423,7 +417,7 @@ export const getTicketConfigurations = async (
 	conditions?: Conditions<Configuration>
 ): Promise<Configuration[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/configurations${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/configurations${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -434,7 +428,7 @@ export const getTicketConfigurations = async (
 
 export const getTicketNotes = async (id: number, conditions?: Conditions<Note>): Promise<TicketNote[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/notes/${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/notes/${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -443,7 +437,7 @@ export const getTicketNotes = async (id: number, conditions?: Conditions<Note>):
 };
 
 export const getSystemMember = async (id: number, conditions?: Conditions<SystemMember>): Promise<SystemMember> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/members/${id}/${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/system/members/${id}/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 
@@ -451,7 +445,7 @@ export const getSystemMember = async (id: number, conditions?: Conditions<System
 };
 
 export const getSystemMembers = async (conditions?: Conditions<SystemMember>): Promise<SystemMember[]> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/members/${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/system/members/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 
@@ -460,7 +454,7 @@ export const getSystemMembers = async (conditions?: Conditions<SystemMember>): P
 
 export const getStatuses = async (id: number, conditions?: Conditions<BoardStatus>): Promise<BoardStatus[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/statuses/${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/boards/${id}/statuses/${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -476,7 +470,7 @@ export const getStatuses = async (id: number, conditions?: Conditions<BoardStatu
 
 export const getBoardTypes = async (id: number, conditions?: Conditions<BoardType>): Promise<BoardType[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/types/${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/boards/${id}/types/${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -492,7 +486,7 @@ export const getBoardTypes = async (id: number, conditions?: Conditions<BoardTyp
 
 export const getBoardSubTypes = async (id: number, conditions?: Conditions<BoardSubType>): Promise<BoardSubType[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${id}/subTypes${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/service/boards/${id}/subTypes${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -507,7 +501,7 @@ export const getBoardSubTypes = async (id: number, conditions?: Conditions<Board
 };
 
 export const getPriorities = async (conditions?: Conditions<Priority>): Promise<Priority[]> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/priorities/${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/priorities/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 
@@ -519,7 +513,7 @@ export const getPriorities = async (conditions?: Conditions<Priority>): Promise<
 };
 
 export const getBoards = async (conditions?: Conditions<Board>): Promise<Board[]> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/boards/${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/boards/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 
@@ -536,7 +530,7 @@ export const getAuditTrail = async (
 	conditions?: Conditions<AuditTrailEntry>
 ): Promise<AuditTrailEntry[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/system/audittrail?type=${type}&id=${id}${generateParams(conditions)?.replace(
+		`${process.env.CONNECT_WISE_URL}/system/audittrail?type=${type}&id=${id}${generateParams(conditions)?.replace(
 			'?',
 			'&'
 		)}`,
@@ -556,7 +550,7 @@ export const getDocuments = async (
 	conditions?: Conditions<Document>
 ): Promise<Document[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/system/documents?recordType=${recordType}&recordId=${id}${generateParams(
+		`${process.env.CONNECT_WISE_URL}/system/documents?recordType=${recordType}&recordId=${id}${generateParams(
 			conditions
 		)?.replace('?', '&')}`,
 		{
@@ -569,26 +563,13 @@ export const getDocuments = async (
 	return await response.json();
 };
 
-export const getSchedule = async (id: number = 1, conditions?: Conditions<Schedule>): Promise<Schedule> => {
-	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/system/schedules/${id}/${generateParams(conditions)}`,
-		{
-			headers: baseHeaders,
-		}
-	);
-
-	// if (!response.ok) throw Error(`Error fetching schedule... ${response.statusText}`);
-
-	return await response.json();
-};
-
 export const getHoliday = async (
 	id: number = 13,
 	date: string = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date()),
 	conditions?: Conditions<Holiday>
 ): Promise<Holiday[]> => {
 	const response = await fetch(
-		`${process.env.NEXT_PUBLIC_CW_URL}/schedule/holidayLists/${id}/holidays${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/schedule/holidayLists/${id}/holidays${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
@@ -600,7 +581,7 @@ export const getHoliday = async (
 };
 
 export const getLocations = async (conditions?: Conditions<Location>): Promise<Location[]> => {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/system/locations${generateParams(conditions)}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/system/locations${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 	return await response.json();

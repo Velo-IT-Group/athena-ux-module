@@ -13,7 +13,7 @@ export const createTicketNote = async (id: number, body: TicketNote) => {
 	const headers = new Headers(baseHeaders);
 	headers.set('access-control-allow-origin', '*');
 
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}/notes`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/notes`, {
 		headers,
 		method: 'post',
 		body: JSON.stringify(body),
@@ -32,7 +32,7 @@ export const createContactCommunication = async (id: number, body: Communication
 	const headers = new Headers(baseHeaders);
 	headers.set('access-control-allow-origin', '*');
 
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/company/contacts/${id}/communications`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications`, {
 		headers,
 		method: 'post',
 		body: JSON.stringify(body),

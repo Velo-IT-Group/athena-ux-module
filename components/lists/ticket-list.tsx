@@ -33,6 +33,7 @@ const TicketList = async ({ type, defaultValue, params, hidePagination = false, 
 			)}
 
 			{type === 'combobox' && (
+				// @ts-ignore
 				<Combobox
 					items={tickets.map((ticket) => {
 						return { label: ticket.summary, value: `${ticket.id}-${ticket.summary}` };

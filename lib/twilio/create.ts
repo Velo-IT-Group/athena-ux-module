@@ -1,20 +1,18 @@
-import { Twilio, jwt } from 'twilio';
+'use server';
 import { WorkerListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { createTask } from './taskrouter/helpers';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
-
-const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
+import { createClient } from '@/utils/twilio';
 
 export const createWorker = async (friendlyName: string, attributes: WorkerListInstanceCreateOptions) => {
+	const client = createClient();
+
 	return await client.taskrouter.v1
 		.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!)
 		.workers.create({ friendlyName, attributes: JSON.stringify(attributes) });
 };
 
 export const createCallback = async (attributes: Object) => {
+	const client = createClient();
 	const taskAttributes = {
 		...attributes,
 		title: 'Callback request',

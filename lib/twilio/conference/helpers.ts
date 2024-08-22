@@ -1,13 +1,10 @@
 'use server';
-import { Twilio } from 'twilio';
 import { ConferenceContextUpdateOptions } from 'twilio/lib/rest/api/v2010/account/conference';
 import { ParticipantContextUpdateOptions } from 'twilio/lib/rest/api/v2010/account/conference/participant';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
+import { createClient } from '@/utils/twilio';
 
 export const getConferenceByName = async (friendlyName: string) => {
+	const client = createClient();
 	const conferences = await client.conferences.list({ friendlyName });
 
 	if (conferences.length === 0) return;
@@ -26,16 +23,16 @@ export const getConferenceByName = async (friendlyName: string) => {
 };
 
 export const getConferenceParticipants = async (conferenceSid: string) => {
-	const participants = await client.conferences(conferenceSid).participants.list();
+	const client = createClient();
 	const conference = await client.conferences(conferenceSid).fetch();
 	console.log('participants', conference.participants());
 	return conference.participants();
 };
 
 export const updateConference = async (conferenceSid: string, params: ConferenceContextUpdateOptions) => {
-	const conference = await client.conferences(conferenceSid).update(params);
+	const client = createClient();
 
-	return conference;
+	return await client.conferences(conferenceSid).update(params);
 };
 
 export const updateConferenceParticipants = async (
@@ -43,7 +40,7 @@ export const updateConferenceParticipants = async (
 	participant: string,
 	params: ParticipantContextUpdateOptions
 ) => {
-	const conference = await client.conferences(conferenceSid).participants(participant).update(params);
+	const client = createClient();
 
-	return conference;
+	return await client.conferences(conferenceSid).participants(participant).update(params);
 };

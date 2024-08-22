@@ -1,13 +1,10 @@
 'use server';
 import { getCompanies, getCompany, getContacts } from '@/lib/manage/read';
+import { createClient } from '@/utils/twilio';
 import { type NextRequest } from 'next/server';
-import { Twilio } from 'twilio';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
 
 export async function POST(request: NextRequest) {
+	const client = createClient();
 	const formData = await request.formData();
 	const from = formData.get('from') as string;
 	console.log(from);
@@ -78,9 +75,12 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		return {
-			territoryName: 'TeamA',
-		};
+		return Response.json(
+			{
+				territoryName: 'TeamA',
+			},
+			{ status: 200 }
+		);
 	}
 
 	const user = firstContact;

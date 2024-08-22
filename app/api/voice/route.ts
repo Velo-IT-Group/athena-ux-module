@@ -1,4 +1,3 @@
-import { auth } from '@/auth';
 import { isAValidPhoneNumber } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { DataTableViewOptions } from './view-options';
 
 import { DataTableFacetedFilter } from './faceted-filter';
-import { Identifiable } from '@/components/async-selector';
+import { Identifiable } from '@/types';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;

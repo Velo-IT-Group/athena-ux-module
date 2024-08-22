@@ -1,13 +1,9 @@
 'use server';
 import { getTicket } from '@/lib/manage/read';
+import { createClient } from '@/utils/twilio';
 import { revalidatePath } from 'next/cache';
-import { Twilio } from 'twilio';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
 
 type ActivityEvent = 'activity.created' | 'activity.updated' | 'activity.deleted';
 type ReservationEvent =
@@ -46,6 +42,7 @@ type TaskQueueEvent =
 type EventType = ActivityEvent | ReservationEvent | TaskEvent | TaskQueueEvent;
 
 export async function POST(request: Request) {
+	const client = createClient();
 	revalidatePath('/');
 	const data = await request.formData();
 	const eventType = data.get('EventType') as EventType;

@@ -25,6 +25,9 @@ const WorkerSelector = ({ children }: Props) => {
 			items={workers.map((w) => {
 				return { label: w.friendlyName, value: w.friendlyName };
 			})}
+			id={0}
+			type='ticket'
+			path='/'
 			// setValue={(e) => {
 			// 	const w = workers.find((workContext) => workContext.friendlyName === e.toString());
 			// 	setWorker(w);

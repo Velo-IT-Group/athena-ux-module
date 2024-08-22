@@ -1,11 +1,8 @@
 'use server';
-import { Twilio } from 'twilio';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
+import { createClient } from '@/utils/twilio';
 
 export const getPhoneNumbers = async () => {
+	const client = createClient();
 	// client.outgoingCallerIds.list({ limit: 100 });
 	const phoneNumbers = await client.incomingPhoneNumbers.list({
 		limit: 100,

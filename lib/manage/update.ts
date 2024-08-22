@@ -9,12 +9,12 @@ export type PathOperation = {
 };
 
 export const updateTicket = async (id: number, operation: PathOperation[]) => {
-	console.log(id, operation, `${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}`);
+	console.log(id, operation, `${process.env.CONNECT_WISE_URL}/service/tickets/${id}`);
 	const headers = new Headers(baseHeaders);
 	headers.set('access-control-allow-origin', '*');
 
 	// console.log(headers);
-	const response = await fetch(`${process.env.NEXT_PUBLIC_CW_URL}/service/tickets/${id}`, {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}`, {
 		headers,
 		method: 'patch',
 		body: JSON.stringify(operation),

@@ -56,7 +56,7 @@ export function Combobox({
 					break;
 			}
 		} catch (error) {
-			toast.error(`${error?.message}`);
+			toast.error(`${JSON.stringify(error)}`);
 		}
 	};
 

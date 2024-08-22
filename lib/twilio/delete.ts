@@ -1,10 +1,8 @@
-import { Twilio } from 'twilio';
-
-const client = new Twilio(process.env.NEXT_PUBLIC_TWILIO_API_KEY_SID, process.env.NEXT_PUBLIC_TWILIO_API_KEY_SECRET, {
-	accountSid: process.env.NEXT_PUBLIC_TWILIO_ACCOUNT_SID,
-});
+'use server';
+import { createClient } from '@/utils/twilio';
 
 export const deleteWorker = async (id: string) => {
+	const client = createClient();
 	try {
 		return await client.taskrouter.v1.workspaces(process.env.NEXT_PUBLIC_WORKSPACE_SID!).workers(id).remove();
 	} catch (error) {

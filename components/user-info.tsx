@@ -15,7 +15,6 @@ import { LogOut } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
-import { activityState } from '@/atoms/twilioStateAtom';
 import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
 import type { Session } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';

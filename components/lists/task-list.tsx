@@ -1,14 +1,10 @@
 'use client';
-import React, { useContext, useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { useWorker } from '@/providers/worker-provider';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import IncomingTask from '../incoming-call';
 import type { Reservation, Task, Worker } from 'twilio-taskrouter';
 import TaskWrapup from '../task/wrapup';
 import { toast, useSonner } from 'sonner';
-import { useRecoilValue } from 'recoil';
-import { deviceEligibleAtom } from '@/atoms/twilioStateAtom';
 import { useDevice } from '@/providers/device-provider';
 import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { ActiveCall } from '../active-call';
@@ -22,8 +18,6 @@ type Props = {
 };
 
 const TaskList = ({ isCollapsed, className }: Props) => {
-	const { toasts } = useSonner();
-	const { device, activeCall } = useDevice();
 	const { worker } = useWorker();
 	const [reservations, setReservations] = useState<Reservation[]>([]);
 	const [activeReservation, setActiveReservation] = useState<Reservation>();

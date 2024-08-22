@@ -1,16 +1,15 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useWorker } from '@/providers/worker-provider';
 import IncomingTask from '../incoming-call';
 import type { Reservation, Task, Worker } from 'twilio-taskrouter';
 import TaskWrapup from '../task/wrapup';
-import { toast, useSonner } from 'sonner';
+import { toast } from 'sonner';
 import { useDevice } from '@/providers/device-provider';
-import { getConferenceByName } from '@/lib/twilio/conference/helpers';
 import { ActiveCall } from '../active-call';
 import { SignalType } from '@gnaudio/jabra-js';
-import { useTask } from '../active-call/context';
 import { Separator } from '../ui/separator';
+import useReservations from '@/hooks/useReservations';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -19,48 +18,13 @@ type Props = {
 
 const TaskList = ({ isCollapsed, className }: Props) => {
 	const { worker } = useWorker();
-	const [reservations, setReservations] = useState<Reservation[]>([]);
-	const [activeReservation, setActiveReservation] = useState<Reservation>();
-	const [taskAttributes, setTaskAttributes] = useState<any[]>([]);
-	const [tasks, setTasks] = useState<Task[]>([]);
-	const { currentCallControl, setMuted } = useDevice();
-	const { setReservation, setTask } = useTask();
-
-	const onWorkerReady = async (w: Worker) => {
-		console.log('Worker Ready', w.sid);
-		// setActivity(w.activity);
-		// 	// setActivityList(w.activities);
-		const ress = Array.from(w.reservations.values());
-		console.log(ress);
-		setReservations(ress);
-
-		ress.forEach(async (res) => {
-			switch (res.status) {
-				case 'wrapping':
-					setReservation(res);
-					setTask(res.task);
-					console.log(res.sid);
-					toast.custom(() => <TaskWrapup />, {
-						important: true,
-						duration: res.timeout * 1000,
-						id: res.task.sid,
-					});
-					break;
-				default:
-					setReservations((prev) => [...prev.filter((r) => r.sid !== res.sid), res]);
-					if (res.task.taskChannelUniqueName === 'voice') {
-						// currentCallControl?.signalIncomingCall();
-					}
-					break;
-			}
-		});
-	};
+	const { currentCallControl } = useDevice();
+	const { reservations, addReservation, removeReservation } = useReservations();
 
 	const onReservationCreated = async (r: Reservation) => {
 		console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 		try {
-			setReservations((prev) => [...prev.filter((res) => res.sid !== r.sid), r]);
-			setActiveReservation(r);
+			await addReservation(r);
 
 			if (r.task.attributes.direction === 'outboundDial') {
 				const res = await r.conference({ beep: false });
@@ -93,27 +57,10 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('accepted', async (reservation) => {
 				console.log('Call accepted');
-				// setActiveCall({ ...activeCall, task: reservation.task });
 				try {
 					currentCallControl?.ring(false);
 				} catch (error) {
 					console.error(error);
-				}
-
-				setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid), reservation]);
-				setTasks((prev) => [...prev.filter((res) => res.sid !== reservation.task.sid), reservation.task]);
-
-				if (!reservation.task.attributes.conference) {
-					const conferenceInfo = await getConferenceByName(reservation.task.sid);
-					setTaskAttributes((prev) => [
-						...prev.filter((item) => item.call_sid !== reservation.task.attributes.call_sid),
-						{ ...reservation.task.attributes, conferenceInfo },
-					]);
-				} else {
-					setTaskAttributes((prev) => [
-						...prev.filter((item) => item.call_sid !== reservation.task.attributes.call_sid),
-						reservation.task.attributes,
-					]);
 				}
 
 				toast.custom(
@@ -134,7 +81,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('rejected', async (reservation) => {
 				try {
-					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
+					removeReservation(reservation);
 					currentCallControl?.ring(false);
 				} catch (error) {
 					console.error('No call pending', error);
@@ -143,7 +90,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('canceled', async (reservation) => {
 				try {
-					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
+					removeReservation(reservation);
 					currentCallControl?.ring(false);
 					toast.dismiss(reservation.task.sid);
 				} catch (error) {
@@ -153,14 +100,14 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('wrapup', async (reservation) => {
 				console.log('Wrapping up');
-				setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
+				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
 				toast.custom(() => <TaskWrapup />, { id: reservation.task.sid });
 			});
 
 			r.on('completed', async (reservation) => {
-				setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid), reservation]);
+				addReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
 				toast.dismiss(reservation.task.sid);
@@ -168,7 +115,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('timeout', async (reservation) => {
 				try {
-					setReservations((prev) => [...prev.filter((r) => r.sid !== reservation.sid)]);
+					removeReservation(reservation);
 					currentCallControl?.ring(false);
 					toast.dismiss(reservation.task.sid);
 				} catch (error) {
@@ -180,34 +127,48 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		}
 	};
 
+	const onWorkerReady = async (w: Worker) => {
+		console.log('Worker Ready', w.sid);
+		// setActivity(w.activity);
+		// 	// setActivityList(w.activities);
+		const reservations = Array.from(w.reservations.values());
+
+		reservations.forEach((reservation) => {
+			addReservation(reservation);
+		});
+	};
+
+	// useEffect(() => {
+	// 	if (!worker) return;
+	// }, [worker]);
+
 	useEffect(() => {
 		if (!currentCallControl) return;
 		currentCallControl?.deviceSignals.subscribe(async (d) => {
-			if (d.type === SignalType.HOOK_SWITCH && activeReservation) {
+			if (d.type === SignalType.HOOK_SWITCH) {
 				// console.log(first)
-				const reservation = await activeReservation.conference({
-					beep: false,
-					endConferenceOnExit: true,
-					endConferenceOnCustomerExit: true,
-				});
-
-				toast.custom(
-					() => (
-						<ActiveCall
-							taskSid={reservation.task.sid}
-							attributes={reservation.task.attributes}
-							conferenceSid={reservation.task.attributes?.conference?.sid ?? ''}
-						/>
-					),
-					{
-						duration: Infinity,
-						dismissible: false,
-						id: reservation.task.sid,
-					}
-				);
+				// const reservation = await activeReservation.conference({
+				// 	beep: false,
+				// 	endConferenceOnExit: true,
+				// 	endConferenceOnCustomerExit: true,
+				// });
+				// toast.custom(
+				// 	() => (
+				// 		<ActiveCall
+				// 			taskSid={reservation.task.sid}
+				// 			attributes={reservation.task.attributes}
+				// 			conferenceSid={reservation.task.attributes?.conference?.sid ?? ''}
+				// 		/>
+				// 	),
+				// 	{
+				// 		duration: Infinity,
+				// 		dismissible: false,
+				// 		id: reservation.task.sid,
+				// 	}
+				// );
 			}
 		});
-	}, [currentCallControl, activeReservation]);
+	}, [currentCallControl]);
 
 	useEffect(() => {
 		if (worker === undefined) return;

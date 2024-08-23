@@ -47,9 +47,9 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 						<FavIcon />
 					</div>
 
-					<Separator />
+					{/* <Separator /> */}
 
-					<nav className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
+					{/* <nav className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
 						{linksConfig.sidebarNav.map((link, index) =>
 							isCollapsed ? (
 								<Tooltip
@@ -90,13 +90,15 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 								</Link>
 							)
 						)}
-					</nav>
+					</nav> */}
 
-					<TaskList isCollapsed={isCollapsed} />
+					<div className='space-y-1.5'>
+						<TaskList isCollapsed={isCollapsed} />
 
-					<Separator />
+						<Separator />
 
-					<SidebarActivityList />
+						<SidebarActivityList />
+					</div>
 				</div>
 			</ScrollArea>
 		</ResizablePanel>

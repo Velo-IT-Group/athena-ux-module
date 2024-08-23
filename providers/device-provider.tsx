@@ -160,16 +160,11 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		if (!currentCallControl) return;
 
 		currentCallControl.deviceSignals.subscribe((signal) => {
-			console.log(signal);
 			if (signal.type === SignalType.PHONE_MUTE) {
 				setMuted(signal.value);
 			}
 		});
 	}, [currentCallControl]);
-
-	useEffect(() => {
-		if (!device.calls.length) return;
-	}, [device.calls]);
 
 	return (
 		<Provider

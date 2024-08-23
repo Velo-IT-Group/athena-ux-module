@@ -1,39 +1,31 @@
 'use client';
 import { Card } from '@/components/ui/card';
-import { Popover, PopoverContent } from '@/components/ui/popover';
-import { Dialpad } from '../dialpad';
-import { TooltipProvider } from '../ui/tooltip';
 import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
-import { useEffect } from 'react';
-import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 import ActiveCallParticipants from './participants';
-import { useTask } from './context';
+import { Task } from 'twilio-taskrouter';
+import useTask from '@/hooks/useTask';
 
 type Props = {
-	taskSid: string;
-	attributes: any;
-	conferenceSid: string;
+	task: Task;
 };
 
-export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
-	useEffect(() => {
-		getConferenceParticipants(conferenceSid)
-			.then((e) => {
-				console.log(e);
-			})
-			.catch((e) => console.error(e));
-	}, [conferenceSid]);
+export function ActiveCall({ task: defaultTask }: Props) {
+	const { task, attributes, conference, endConference, searchParams } = useTask(defaultTask);
 
 	return (
-		<TooltipProvider>
-			<Card className='shadow-sm w-[356px] dark'>
-				<ActiveCallHeader />
+		<Card>
+			<ActiveCallHeader
+				task={task}
+				searchParams={searchParams}
+			/>
 
-				<ActiveCallParticipants />
+			<ActiveCallParticipants participants={conference.participants} />
 
-				<ActiveCallFooter />
-			</Card>
-		</TooltipProvider>
+			<ActiveCallFooter
+				task={task}
+				endConference={endConference}
+			/>
+		</Card>
 	);
 }

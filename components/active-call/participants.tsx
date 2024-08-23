@@ -1,25 +1,14 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CardContent } from '../ui/card';
 import ParticipantListItem from './participant-list-item';
-import { useTask } from './context';
-import { createClient } from '@/utils/supabase/client';
+import { ConferenceParticpant } from '@/hooks/useTask';
 
-const ActiveCallParticipants = () => {
-	const { task } = useTask();
-	const supabase = createClient();
+type Props = {
+	participants: ConferenceParticpant;
+};
 
-	const [participants, setParticipants] = useState<Record<string, string>>({});
-
-	useEffect(() => {
-		supabase.auth.getUser().then(({ data }) => {
-			setParticipants({
-				worker: data?.user?.user_metadata?.name ?? 'You',
-				customer: task?.attributes.name ?? task?.attributes.from,
-			});
-		});
-	}, [task]);
-
+const ActiveCallParticipants = ({ participants }: Props) => {
 	const entries = Object.entries(participants);
 
 	return (
@@ -27,8 +16,8 @@ const ActiveCallParticipants = () => {
 			{entries.map(([key, value]) => (
 				<ParticipantListItem
 					key={key}
-					name={value}
-					sid={key}
+					name={value.name}
+					sid={value.sid}
 					isYou={key === 'worker'}
 				/>
 			))}

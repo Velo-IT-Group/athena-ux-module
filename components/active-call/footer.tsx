@@ -25,15 +25,17 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { useDevice } from '@/providers/device-provider';
-import { useTask } from './context';
 import { Dialpad } from '../dialpad';
-import { updateConference } from '@/lib/twilio/conference/helpers';
-import { updateConferenceAction } from './actions';
 import { PopoverContent } from '../ui/popover-dialog';
+import { useDevice } from '@/providers/device-provider';
+import { Task } from 'twilio-taskrouter';
 
-const ActiveCallFooter = () => {
-	const { task } = useTask();
+type Props = {
+	task: Task;
+	endConference: () => Promise<void>;
+};
+
+const ActiveCallFooter = ({ task, endConference }: Props) => {
 	const { activeCall, muted, setMuted } = useDevice();
 	const [isPending, startTransition] = useTransition();
 
@@ -209,11 +211,7 @@ const ActiveCallFooter = () => {
 						size='icon'
 						onClick={() => {
 							startTransition(async () => {
-								activeCall?.disconnect();
-								await updateConferenceAction(task?.attributes.conference.sid, {
-									status: 'completed',
-								});
-								await task?.wrapUp({ reason: 'Call ended' });
+								await endConference();
 							});
 						}}
 					>

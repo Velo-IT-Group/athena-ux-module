@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 
 const useTimer = (date?: Date) => {
-	const [seconds, setSeconds] = useState(date?.getSeconds() || 0);
-	const [minutes, setMinutes] = useState(date?.getMinutes() || 0);
-	const [hours, setHours] = useState(date?.getHours() || 0);
+	const [seconds, setSeconds] = useState(date?.getSeconds() ?? 0);
+	const [minutes, setMinutes] = useState(date?.getMinutes() ?? 0);
+	const [hours, setHours] = useState(date?.getHours() ?? 0);
 
 	useEffect(() => {
 		const startTime = date || new Date();

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useWorker } from '@/providers/worker-provider';
 import { Circle, Phone } from 'lucide-react';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -10,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import useActivities from '@/hooks/useActivities';
 
 function generateTestUsers(count: number) {
 	const users = [];
@@ -30,8 +30,8 @@ function generateTestUsers(count: number) {
 type Props = {};
 
 const SidebarActivityList = (props: Props) => {
-	const { worker } = useWorker();
-	const activities = Array.from(worker?.activities.values() ?? []);
+	const { activities, currentActivity, updateActivity } = useActivities();
+
 	const testUsers = generateTestUsers(10);
 
 	const activityColors: Record<string, string> = {
@@ -44,26 +44,21 @@ const SidebarActivityList = (props: Props) => {
 		<div className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
 			{activities?.map((activity) => (
 				<Popover key={activity.sid}>
-					<PopoverTrigger asChild>
-						{/* <Tooltip delayDuration={0}>
-							<TooltipTrigger asChild> */}
-						<Button
-							variant='ghost'
-							size='smIcon'
-							className='h-9 w-9'
-						>
-							<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
-						</Button>
-						{/* </TooltipTrigger>
+					<Tooltip delayDuration={0}>
+						<TooltipTrigger asChild>
+							<PopoverTrigger asChild>
+								<Button
+									variant='ghost'
+									size='icon'
+									className='h-9 w-9'
+								>
+									<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
+								</Button>
+							</PopoverTrigger>
+						</TooltipTrigger>
 
-							<TooltipContent
-								side='right'
-								className='flex items-center gap-3'
-							>
-								{activity.name}
-							</TooltipContent>
-						</Tooltip> */}
-					</PopoverTrigger>
+						<TooltipContent side='right'>{activity.name}</TooltipContent>
+					</Tooltip>
 
 					<PopoverContent
 						side='right'

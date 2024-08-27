@@ -3,7 +3,7 @@ import { getCompanies, getCompany, getContacts } from '@/lib/manage/read';
 import { createClient } from '@/utils/twilio';
 import { type NextRequest } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
 	const client = await createClient();
 	const formData = await request.formData();
 	const from = formData.get('from') as string;

@@ -563,19 +563,31 @@ export const getDocuments = async (
 	return await response.json();
 };
 
-export const getHoliday = async (
-	id: number = 13,
-	date: string = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date()),
-	conditions?: Conditions<Holiday>
-): Promise<Holiday[]> => {
+export const getSchedule = async (id: number = 2, conditions?: Conditions<Schedule>): Promise<Schedule> => {
 	const response = await fetch(
-		`${process.env.CONNECT_WISE_URL}/schedule/holidayLists/${id}/holidays${generateParams(conditions)}`,
+		`${process.env.CONNECT_WISE_URL}/schedule/calendars/${id}${generateParams(conditions)}`,
 		{
 			headers: baseHeaders,
 		}
 	);
 
-	// if (!response.ok) throw Error('Error fetching holiday...');
+	if (!response.ok) throw Error('Error fetching schedule...');
+
+	return await response.json();
+};
+
+export const getHoliday = async (
+	id: number = 13,
+	date: string = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date()),
+	conditions?: Conditions<Holiday>
+): Promise<Holiday[]> => {
+	console.log(date);
+	const params = generateParams(conditions ? conditions : { conditions: [{ parameter: { date: `[${date}]` } }] });
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/schedule/holidayLists/${id}/holidays${params ?? ''}`, {
+		headers: baseHeaders,
+	});
+
+	if (!response.ok) throw Error('Error fetching holiday...');
 
 	return await response.json();
 };

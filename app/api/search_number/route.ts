@@ -4,10 +4,19 @@ import { createClient } from '@/utils/twilio';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
+	const searchParams = request.nextUrl.searchParams;
+	const from = searchParams.get('from');
+
+	if (!from) {
+		return Response.json(
+			{
+				error: 'No phone number found',
+			},
+			{ status: 400, statusText: 'No phone number found' }
+		);
+	}
+
 	const client = await createClient();
-	const formData = await request.formData();
-	const from = formData.get('from') as string;
-	console.log(from);
 	const { nationalFormat } = await client.lookups.v2.phoneNumbers(from).fetch();
 
 	if (!nationalFormat)

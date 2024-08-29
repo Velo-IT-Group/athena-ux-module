@@ -3,6 +3,13 @@ import { getCompanies, getCompany, getContacts } from '@/lib/manage/read';
 import { createClient } from '@/utils/twilio';
 import { type NextRequest } from 'next/server';
 
+type ReturnType = {
+	userId?: number;
+	companyId?: number;
+	name: string;
+	territoryName: string;
+};
+
 export async function GET(request: NextRequest) {
 	const searchParams = request.nextUrl.searchParams;
 	const from = searchParams.get('from');
@@ -49,24 +56,50 @@ export async function GET(request: NextRequest) {
 		}),
 	]);
 
-	const firstContact = contacts[0];
+	if (!contacts.length && !companies.length) {
+		return Response.json(
+			{
+				name: nationalFormat,
+				territoryName: 'TeamA',
+			} as ReturnType,
+			{ status: 200 }
+		);
+	}
+
+	if (!contacts.length && companies.length === 1) {
+		return Response.json(
+			{
+				companyId: companies[0].id,
+				name: companies[0].name,
+				territoryName: companies[0].territory?.name.split(' ').join('') ?? 'TeamA',
+			} as ReturnType,
+			{ status: 200 }
+		);
+	}
 
 	if (contacts.length > 1) {
+		const firstContact = contacts[0];
 		// Check to see if every contact has the same first name, last name, and a different company
 		// This tells the system that this user has multiple contacts with multiple companies
 		// If that's the case then return just the users name
 		if (
 			contacts.every(
 				(contact) =>
-					contact.firstName === firstContact.firstName &&
-					contact.lastName === firstContact.lastName &&
-					contact.company?.id === firstContact.company?.id
+					(contact.firstName === firstContact.firstName &&
+						contact.lastName === firstContact.lastName &&
+						contact.company?.id === firstContact.company?.id) ||
+					contact.company?.id !== firstContact.company?.id
 			)
 		) {
+			const company = await getCompany(firstContact.company?.id!, { fields: ['id', 'name', 'territory'] });
+
 			return Response.json(
 				{
-					user: firstContact,
-				},
+					userId: firstContact.id,
+					// companyId: firstContact.company?.id,
+					name: firstContact.firstName + ' ' + firstContact.lastName,
+					territoryName: company?.territory?.name.split(' ').join('') ?? 'TeamA',
+				} as ReturnType,
 				{ status: 200 }
 			);
 		}
@@ -75,24 +108,27 @@ export async function GET(request: NextRequest) {
 		// If that's the case then return just the company
 		if (contacts.every((contact) => contact.company?.id === firstContact.company?.id)) {
 			const company = await getCompany(firstContact.company?.id!, { fields: ['id', 'name', 'territory'] });
+
 			return Response.json(
 				{
-					company,
+					companyId: firstContact.company?.id,
+					name: company?.name,
 					territoryName: company?.territory?.name.split(' ').join('') ?? 'TeamA',
-				},
+				} as ReturnType,
 				{ status: 200 }
 			);
 		}
 
 		return Response.json(
 			{
+				name: nationalFormat,
 				territoryName: 'TeamA',
-			},
+			} as ReturnType,
 			{ status: 200 }
 		);
 	}
 
-	const user = firstContact;
+	const user = contacts[0];
 
 	const company =
 		user && user.company
@@ -104,10 +140,11 @@ export async function GET(request: NextRequest) {
 
 	return Response.json(
 		{
-			user,
-			company,
+			userId: user.id,
+			companyId: company?.id,
+			name: user.firstName + ' ' + user.lastName,
 			territoryName,
-		},
+		} as ReturnType,
 		{ status: 200 }
 	);
 }

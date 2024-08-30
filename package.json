@@ -7,7 +7,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"typeGen": "bunx supabase gen types typescript --project-id 'qqfkxhqzsbqgydssvfss' --schema reporting > types/supabase.ts"
+		"typeGen": "bunx supabase gen types typescript --project-id 'qqfkxhqzsbqgydssvfss' --schema public,reporting > types/supabase.ts"
 	},
 	"dependencies": {
 		"@auth/supabase-adapter": "^1.4.2",

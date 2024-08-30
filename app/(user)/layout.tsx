@@ -13,6 +13,7 @@ import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ReactQueryProvider from '@/providers/react-query';
 
 type Props = {
 	children: ReactNode;
@@ -63,31 +64,33 @@ const Layout = async ({ children }: Props) => {
 	);
 
 	return (
-		<UserLayout token={twilioToken}>
-			<ResizablePanelGroup
-				direction='horizontal'
-				onLayout={onLayoutChange}
-			>
-				<SideNav
-					isDefaultCollapsed={defaultCollapsed ?? true}
-					defaultLayout={defaultLayout ?? [15, 32, 48]}
-				/>
+		<ReactQueryProvider>
+			<UserLayout token={twilioToken}>
+				<ResizablePanelGroup
+					direction='horizontal'
+					onLayout={onLayoutChange}
+				>
+					<SideNav
+						isDefaultCollapsed={defaultCollapsed ?? true}
+						defaultLayout={defaultLayout ?? [15, 32, 48]}
+					/>
 
-				<ResizableHandle />
+					<ResizableHandle />
 
-				<ResizablePanel>
-					<Navbar />
+					<ResizablePanel>
+						<Navbar />
 
-					<Separator />
+						<Separator />
 
-					<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
-						<div className='h-full grow'>{children}</div>
-					</ScrollArea>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+						<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
+							<div className='h-full grow'>{children}</div>
+						</ScrollArea>
+					</ResizablePanel>
+				</ResizablePanelGroup>
 
-			<Toaster />
-		</UserLayout>
+				<Toaster />
+			</UserLayout>
+		</ReactQueryProvider>
 	);
 };
 

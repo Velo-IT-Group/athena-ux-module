@@ -24,9 +24,7 @@ export const getConferenceByName = async (friendlyName: string) => {
 
 export const getConferenceParticipants = async (conferenceSid: string) => {
 	const client = await createClient();
-	const conference = await client.conferences(conferenceSid).fetch();
-	console.log('participants', conference.participants());
-	return conference.participants();
+	return await client.conferences(conferenceSid).participants.list();
 };
 
 export const updateConference = async (conferenceSid: string, params: ConferenceContextUpdateOptions) => {
@@ -43,4 +41,10 @@ export const updateConferenceParticipants = async (
 	const client = await createClient();
 
 	return await client.conferences(conferenceSid).participants(participant).update(params);
+};
+
+export const removeConferenceParticipant = async (conferenceSid: string, participant: string) => {
+	const client = await createClient();
+
+	return await client.conferences(conferenceSid).participants(participant).remove();
 };

@@ -26,13 +26,13 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 	const supabase = createClient();
 	const [
 		{
-			data: { session },
+			data: { user },
 		},
 		boards,
 		priorities,
 		members,
 	] = await Promise.all([
-		supabase.auth.getSession(),
+		supabase.auth.getUser(),
 		getBoards({
 			conditions: [
 				{ parameter: { inactiveFlag: false } },
@@ -109,11 +109,7 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 													icon: isInbound ? PhoneIncoming : PhoneOutgoing,
 													date: call.endTime,
 													text: `${
-														isInbound
-															? call.fromFormatted
-															: session?.user?.email === call.toFormatted
-															? 'You'
-															: call.toFormatted
+														isInbound ? call.fromFormatted : user?.email === call.toFormatted ? 'You' : call.toFormatted
 													}
 												called ${isInbound ? call.toFormatted : call.fromFormatted}`,
 												};

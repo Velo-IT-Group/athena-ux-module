@@ -28,12 +28,12 @@ export default async function Page({
 		<main className='grid grid-cols-[1fr_3fr] h-full w-full'>
 			<ConversationContactDetail
 				companyId={companyId ?? 250}
-				contactId={contactId ?? session?.user?.user_metadata?.contactId ?? 10}
+				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
 				attributes={attributes}
 			/>
 
 			<ConversationDetails
-				contactId={contactId ?? session?.user?.user_metadata?.contactId ?? 10}
+				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
 				companyId={companyId ?? 250}
 				communicationItems={contactCommunications}
 				className='p-6'

@@ -136,16 +136,47 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		};
 	}, [worker]);
 
+	const testReservations: Reservation[] = [
+		{
+			sid: '1',
+			status: 'accepted',
+			task: {
+				sid: '1',
+				taskChannelUniqueName: 'voice',
+				queueName: 'Test Queue',
+				dateUpdated: new Date(),
+				attributes: {
+					direction: 'inbound',
+					from: '+12345678901',
+					name: 'Test Task',
+					conference: {
+						sid: '',
+						participants: {
+							worker: {
+								sid: '1',
+								friendlyName: 'Test Worker',
+							},
+							customer: {
+								sid: '2',
+								friendlyName: 'Test Customer',
+							},
+						},
+					},
+				},
+			},
+		},
+	];
+
 	return (
 		<>
-			{reservations.length > 0 && (
+			{testReservations.length > 0 && (
 				<>
 					<Separator />
 
 					<section className='space-y-1.5 px-1.5'>
 						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
-						{reservations.map((reservation) => (
+						{testReservations.map((reservation) => (
 							<TaskNotification
 								key={reservation.sid}
 								reservation={reservation}

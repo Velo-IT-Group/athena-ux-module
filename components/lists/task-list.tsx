@@ -1,11 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useWorker } from '@/providers/worker-provider';
-import type { Reservation, Task, Worker } from 'twilio-taskrouter';
-import TaskWrapup from '../task/wrapup';
-import { toast } from 'sonner';
+import type { Reservation, Worker } from 'twilio-taskrouter';
 import { useDevice } from '@/providers/device-provider';
-import { ActiveCall } from '../active-call';
 import { SignalType } from '@gnaudio/jabra-js';
 import { Separator } from '../ui/separator';
 import useReservations from '@/hooks/useReservations';
@@ -28,24 +25,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			addReservation(r);
 			setActiveReservation(r);
 			if (r.task.attributes.direction === 'outboundDial') {
-				const res = await r.conference({ beep: false });
-				// console.log(res.task);
-				// toast.custom(
-				// 	() => (
-				// 		<ActiveCall
-				// 			taskSid={r.task.sid}
-				// 			attributes={r.task.attributes}
-				// 			conferenceSid={r.task.attributes?.conference?.sid ?? ''}
-				// 		/>
-				// 	),
-				// 	{
-				// 		duration: Infinity,
-				// 		dismissible: false,
-				// 		important: true,
-				// 		id: r.task.sid,
-				// 	}
-				// );
-				// setActiveCall({ ...activeCall, task: res.task });
+				await r.conference({ beep: false });
 			}
 
 			console.log(activeReservation);
@@ -65,21 +45,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				} catch (error) {
 					console.error(error);
 				}
-
-				// toast.custom(
-				// 	() => (
-				// 		<ActiveCall
-				// 			taskSid={reservation.task.sid}
-				// 			attributes={reservation.task.attributes}
-				// 			conferenceSid={reservation.task.attributes?.conference?.sid ?? ''}
-				// 		/>
-				// 	),
-				// 	{
-				// 		duration: Infinity,
-				// 		dismissible: false,
-				// 		id: reservation.task.sid,
-				// 	}
-				// );
 			});
 
 			r.on('rejected', async (reservation) => {
@@ -145,10 +110,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		});
 	};
 
-	// useEffect(() => {
-	// 	if (!worker) return;
-	// }, [worker]);
-
 	useEffect(() => {
 		if (!currentCallControl || !activeReservation) return;
 		currentCallControl?.deviceSignals.subscribe(async (d) => {
@@ -159,21 +120,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					endConferenceOnExit: true,
 					endConferenceOnCustomerExit: true,
 				});
-
-				// toast.custom(
-				// 	() => (
-				// 		<ActiveCall
-				// 			taskSid={reservation.task.sid}
-				// 			attributes={reservation.task.attributes}
-				// 			conferenceSid={reservation.task.attributes?.conference?.sid ?? ''}
-				// 		/>
-				// 	),
-				// 	{
-				// 		duration: Infinity,
-				// 		dismissible: false,
-				// 		id: reservation.task.sid,
-				// 	}
-				// );
 			}
 		});
 	}, [currentCallControl, activeReservation]);
@@ -199,11 +145,12 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					<section className='space-y-1.5 px-1.5'>
 						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
-						{reservations.map((reservation, index) => (
+						{reservations.map((reservation) => (
 							<TaskNotification
 								key={reservation.sid}
 								reservation={reservation}
 								task={reservation.task}
+								isCollapsed={isCollapsed}
 							/>
 						))}
 					</section>

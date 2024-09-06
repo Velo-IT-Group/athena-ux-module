@@ -29,6 +29,9 @@ import { Dialpad } from '../dialpad';
 import { PopoverContent } from '../ui/popover-dialog';
 import { useDevice } from '@/providers/device-provider';
 import { Task } from 'twilio-taskrouter';
+import { useMutation } from '@tanstack/react-query';
+import { updateConference } from '@/lib/twilio/conference/helpers';
+import WorkerSelector from '@/app/(user)/worker-selector';
 
 type Props = {
 	task: Task;
@@ -63,21 +66,21 @@ const ActiveCallFooter = ({ task, endConference }: Props) => {
 			<div className='flex items-center gap-1.5'>
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button
-							className='text-red-500 w-9 flex flex-col'
-							variant='secondary'
-							size='icon'
-						>
-							<Circle className='w-3 h-3 fill-red-500 text-red-500 animate-pulse' />
-							<span className='text-xs'>Rec</span>
-						</Button>
+						<WorkerSelector>
+							<Button
+								variant='secondary'
+								size='icon'
+							>
+								<PhoneForwarded />
+							</Button>
+						</WorkerSelector>
 					</TooltipTrigger>
 
 					<TooltipContent
 						side='top'
 						align='center'
 					>
-						<span>Stop Recording</span>
+						<span>Transfer Call</span>
 					</TooltipContent>
 				</Tooltip>
 

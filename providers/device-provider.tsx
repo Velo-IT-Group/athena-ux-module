@@ -95,12 +95,14 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.on('accept', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
+				setActiveCall(call);
 				currentCallControl?.offHook(true);
 				console.log(c);
 			});
 
 			call.on('disconnect', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((call) => call.parameters.CallSid !== c.parameters.CallSid)]);
+				setActiveCall(undefined);
 				currentCallControl?.offHook(false);
 			});
 		});

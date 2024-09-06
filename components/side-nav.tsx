@@ -97,7 +97,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 						<Separator />
 
-						<SidebarActivityList />
+						<SidebarActivityList isCollapsed={isCollapsed} />
 					</div>
 				</div>
 			</ScrollArea>

@@ -9,10 +9,10 @@ import { createClient } from '@/utils/supabase/server';
 const Page = async () => {
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 
-	if (session) {
+	if (user) {
 		await supabase.auth.signOut();
 	}
 

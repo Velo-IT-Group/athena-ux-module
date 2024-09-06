@@ -16,16 +16,16 @@ import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
 import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
-import type { Session } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
 type Props = {
-	session: Session | null;
+	user: User | null;
 };
 
-const UserInfo = ({ session }: Props) => {
+const UserInfo = ({ user }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
 
@@ -51,7 +51,7 @@ const UserInfo = ({ session }: Props) => {
 						/>
 					</div>
 
-					<span>{session?.user.user_metadata.full_name}</span>
+					<span>{user?.user_metadata?.full_name}</span>
 				</Button>
 			</DropdownMenuTrigger>
 

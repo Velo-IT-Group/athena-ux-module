@@ -9,8 +9,8 @@ import { createClient } from '@/utils/supabase/server';
 const Navbar = async () => {
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	return (
 		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
@@ -38,7 +38,7 @@ const Navbar = async () => {
 					<OutboundDialerContent numbers={[]} />
 				</Popover>
 
-				<UserInfo session={session} />
+				<UserInfo user={user} />
 			</div>
 		</nav>
 	);

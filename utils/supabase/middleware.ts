@@ -29,9 +29,27 @@ export async function updateSession(request: NextRequest) {
 	// supabase.auth.getUser(). A simple mistake could make it very hard to debug
 	// issues with users being randomly logged out.
 
-	// const {
-	// 	data: { user },
-	// } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (user) {
+		const twilioToken = await fetch('http://localhost:3000/api/twilio/token', {
+			method: 'POST',
+			body: JSON.stringify({
+				email: user.email,
+				workerSid: user.user_metadata.workerSid,
+			}),
+		});
+
+		if (!twilioToken.ok) {
+			// const token = await twilioToken.json();
+			// supabaseResponse.cookies.set('twilio_token', token);
+		}
+
+		const { token } = await twilioToken.json();
+		supabaseResponse.cookies.set('twilio_token', token);
+	}
 
 	// if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {
 	// 	// no user, potentially respond by redirecting the user to the login page

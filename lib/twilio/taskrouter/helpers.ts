@@ -108,12 +108,12 @@ export const updateWorkerReservation = async (id: string, update: ReservationCon
 	const client = await createTwilioClient();
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	return await client.taskrouter.v1
 		.workspaces(process.env.WORKSPACE_SID!)
-		.workers(session!.user.user_metadata.workerSid)
+		.workers(user?.user_metadata?.workerSid)
 		.reservations(id)
 		.update(update);
 };

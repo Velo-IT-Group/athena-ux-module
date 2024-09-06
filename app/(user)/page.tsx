@@ -16,15 +16,13 @@ export default async function Page({
 }) {
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 	const task: TaskInstance | undefined = searchParams.taskSid ? await getTask(searchParams.taskSid) : undefined;
 	const attributes = task ? JSON.parse(task?.attributes) : {};
 	const companyId = searchParams.companyId ? parseInt(searchParams.companyId) : undefined;
 	const contactId = searchParams.contactId ? parseInt(searchParams.contactId) : undefined;
-	const contactCommunications = await getContactCommunications(
-		contactId ?? session?.user?.user_metadata?.contactId ?? 0
-	);
+	const contactCommunications = await getContactCommunications(contactId ?? user?.user_metadata?.contactId ?? 0);
 
 	return (
 		<main className='grid grid-cols-[1fr_3fr] h-full w-full'>

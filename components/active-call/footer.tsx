@@ -66,7 +66,7 @@ const ActiveCallFooter = ({ task, endConference }: Props) => {
 			<div className='flex items-center gap-1.5'>
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<WorkerSelector>
+						<WorkerSelector task={task}>
 							<Button
 								variant='secondary'
 								size='icon'

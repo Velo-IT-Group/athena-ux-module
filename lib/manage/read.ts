@@ -114,9 +114,10 @@ export const getCommunicationTypes = async (
 };
 
 export const getContactCommunications = async (
-	id: number,
+	id?: number,
 	conditions?: Conditions<CommunicationItem>
 ): Promise<CommunicationItem[] | undefined> => {
+	if (!id) return [];
 	try {
 		const response = await fetch(
 			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications${generateParams(conditions)}`,

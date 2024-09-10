@@ -44,7 +44,7 @@ const Layout = async ({ children }: Props) => {
 
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, contacts] = await Promise.all([
-			findWorker(user?.email),
+			findWorker(user?.email ?? ''),
 			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
 			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
 		]);

@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 import { X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
@@ -37,7 +38,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => (
-					<>
+					<React.Fragment key={table.getColumn(accessoryKey as string)?.id}>
 						{table.getColumn(accessoryKey as string) && (
 							<DataTableFacetedFilter
 								column={table.getColumn(accessoryKey as string)}
@@ -47,7 +48,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 								})}
 							/>
 						)}
-					</>
+					</React.Fragment>
 				))}
 
 				{isFiltered && (

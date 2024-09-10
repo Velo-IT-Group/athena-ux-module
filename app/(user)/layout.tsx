@@ -33,31 +33,26 @@ const Layout = async ({ children }: Props) => {
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
-	console.log(session?.user);
 	if (!user || !user.email) {
-		console.log(user);
-		// redirect('/login');
+		redirect('/login');
 	}
 
-	// if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
-	// 	const [worker, members, contacts] = await Promise.all([
-	// 		findWorker(user?.email ?? ''),
-	// 		getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
-	// 		getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
-	// 	]);
+	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
+		const [worker, members, contacts] = await Promise.all([
+			findWorker(user?.email ?? ''),
+			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
+			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
+		]);
 
-	// 	await supabase.auth.updateUser({
-	// 		data: {
-	// 			...user?.user_metadata,
-	// 			workerSid: worker.sid,
-	// 			referenceId: members?.[0]?.id ?? 310,
-	// 			contactId: contacts?.[0]?.id ?? 32569,
-	// 		},
-	// 	});
-	// }
+		await supabase.auth.updateUser({
+			data: {
+				...user?.user_metadata,
+				workerSid: worker.sid,
+				referenceId: members?.[0]?.id ?? 310,
+				contactId: contacts?.[0]?.id ?? 32569,
+			},
+		});
+	}
 
 	const twilioToken = await createAccessToken(
 		process.env.TWILIO_ACCOUNT_SID as string,

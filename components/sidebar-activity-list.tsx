@@ -10,29 +10,50 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '.
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import useActivities from '@/hooks/useActivities';
+import { useQuery } from '@tanstack/react-query';
+import { SyncClient } from 'twilio-sync';
+import { useTwilio } from '@/providers/twilio-provider';
+import { useWorker } from '@/providers/worker-provider';
+import { Activity, Workspace } from 'twilio-taskrouter';
 
-function generateTestUsers(count: number) {
-	const users = [];
-	for (let i = 0; i < count; i++) {
-		const isOnCall = faker.datatype.boolean();
-		const user = {
-			id: i + 1,
-			name: faker.internet.userName(),
-			imageUrl: faker.image.avatar(), // Generates a random avatar URL
-			isOnCall: isOnCall,
-			onCallWith: isOnCall ? faker.internet.userName() : null,
-		};
-		users.push(user);
-	}
-	return users;
-}
+type Props = {
+	isCollapsed: boolean;
+};
 
-type Props = {};
+const SidebarActivityList = ({ isCollapsed }: Props) => {
+	const { worker } = useWorker();
+	const { token, currentWorkspace } = useTwilio();
+	const workspace = new Workspace(token, {}, currentWorkspace);
+	const client = new SyncClient(token);
+	const { data: workers } = useQuery({
+		queryKey: ['workers'],
+		queryFn: async () => {
+			return await workspace.fetchWorkers();
+		},
+	});
+	const { data: tasks } = useQuery({
+		queryKey: ['tasks'],
+		queryFn: async () => {
+			const response = await fetch(
+				`https://taskrouter.twilio.com/v1/Workspaces/${currentWorkspace}/Tasks?PageSize=20`,
+				{
+					headers: {
+						Authorization: `Basic ${btoa(`${process.env.TWILIO_API_KEY_SID}:${process.env.TWILIO_API_KEY_SECRET}`)}`,
+					},
+					next: {
+						tags: ['tasks'],
+					},
+				}
+			);
+			const data = await response.json();
+			console.log(data);
+			return data.tasks;
+		},
+	});
 
-const SidebarActivityList = (props: Props) => {
-	const { activities, currentActivity, updateActivity } = useActivities();
-
-	const testUsers = generateTestUsers(10);
+	console.log(tasks);
+	const [activities, setActivities] = useState<Activity[]>([]);
+	const { currentActivity, updateActivity } = useActivities();
 
 	const activityColors: Record<string, string> = {
 		Available: 'bg-green-500',

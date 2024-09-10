@@ -50,16 +50,22 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const device = new Device(authToken, {
-		disableAudioContextSounds: true,
-		enableImprovedSignalingErrorPrecision: true,
-		// logLevel: 1,
-	});
-
+	const [device, setDevice] = useState<Device>();
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
 	const [muted, setMuted] = useState(false);
 	const [activeCall, setActiveCall] = useState<Call | undefined>(initialValues.activeCall);
+
+	useEffect(() => {
+		if (!authToken || !window) return;
+		setDevice(
+			new Device(authToken, {
+				disableAudioContextSounds: true,
+				enableImprovedSignalingErrorPrecision: true,
+				// logLevel: 1,
+			})
+		);
+	}, [authToken]);
 
 	useEffect(() => {
 		if (!device) return;

@@ -1,5 +1,5 @@
 'use client';
-import React, { useTransition } from 'react';
+import React from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
@@ -29,18 +29,19 @@ import { Dialpad } from '../dialpad';
 import { PopoverContent } from '../ui/popover-dialog';
 import { useDevice } from '@/providers/device-provider';
 import { Task } from 'twilio-taskrouter';
-import { useMutation } from '@tanstack/react-query';
-import { updateConference } from '@/lib/twilio/conference/helpers';
 import WorkerSelector from '@/app/(user)/worker-selector';
+import useConference from '@/hooks/useConference';
 
 type Props = {
 	task: Task;
-	endConference: () => Promise<void>;
 };
 
-const ActiveCallFooter = ({ task, endConference }: Props) => {
-	const { activeCall, muted, setMuted } = useDevice();
-	const [isPending, startTransition] = useTransition();
+const ActiveCallFooter = ({ task }: Props) => {
+	const { endConference } = useConference({
+		sid: task.attributes.conference.sid,
+		participants: task.attributes.conference.participants,
+	});
+	const { muted, setMuted } = useDevice();
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
@@ -212,11 +213,7 @@ const ActiveCallFooter = ({ task, endConference }: Props) => {
 					<Button
 						variant='destructive'
 						size='icon'
-						onClick={() => {
-							startTransition(async () => {
-								await endConference();
-							});
-						}}
+						onClick={() => endConference}
 					>
 						<Phone className='rotate-[135deg]' />
 					</Button>

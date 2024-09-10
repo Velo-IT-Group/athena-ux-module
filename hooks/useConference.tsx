@@ -2,6 +2,7 @@ import {
 	getConferenceByName,
 	getConferenceParticipants,
 	removeConferenceParticipant,
+	updateConference,
 	updateConferenceParticipants,
 } from '@/lib/twilio/conference/helpers';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -57,7 +58,19 @@ const useConference = ({ sid, participants }: ConferenceAttributes) => {
 		},
 	});
 
-	return { conference, conferenceParticipants, muteParticipant, holdParticipant, removeParticipant, isLoading };
+	const { mutate: endConference } = useMutation({
+		mutationFn: () => updateConference(sid, { status: 'completed' }),
+	});
+
+	return {
+		conference,
+		conferenceParticipants,
+		muteParticipant,
+		holdParticipant,
+		removeParticipant,
+		isLoading,
+		endConference,
+	};
 };
 
 export default useConference;

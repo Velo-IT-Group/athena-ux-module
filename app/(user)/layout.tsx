@@ -33,23 +33,28 @@ const Layout = async ({ children }: Props) => {
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
+	const {
+		data: { session },
+	} = await supabase.auth.getSession();
+	console.log(session?.user);
 	if (!user || !user.email) {
-		redirect('/login');
+		console.log(user);
+		// redirect('/login');
 	}
 
-	if (!user.user_metadata.workerSid) {
+	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, contacts] = await Promise.all([
-			findWorker(user.email),
-			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user.email}'` } }] }),
-			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user.email}'` } }] }),
+			findWorker(user?.email),
+			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
+			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
 		]);
 
 		await supabase.auth.updateUser({
 			data: {
-				...user.user_metadata,
+				...user?.user_metadata,
 				workerSid: worker.sid,
-				referenceId: members[0].id,
-				contactId: contacts[0].id,
+				referenceId: members?.[0]?.id ?? 310,
+				contactId: contacts?.[0]?.id ?? 32569,
 			},
 		});
 	}
@@ -59,8 +64,8 @@ const Layout = async ({ children }: Props) => {
 		process.env.TWILIO_API_KEY_SID as string,
 		process.env.TWILIO_API_KEY_SECRET as string,
 		process.env.WORKSPACE_SID as string,
-		user.user_metadata.workerSid,
-		user.email
+		user?.user_metadata.workerSid ?? '',
+		user?.email ?? 'nicholas.black98@icloud.com'
 	);
 
 	return (

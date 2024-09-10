@@ -1,6 +1,8 @@
 'use server';
+import { getContacts, getSystemMembers } from '@/lib/manage/read';
+import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 
 const getURL = () => {
 	let url =
@@ -36,12 +38,25 @@ export const signInWithPassword = async (data: FormData) => {
 	const email = data.get('email') as string;
 	const password = data.get('password') as string;
 
-	console.log(email, password);
-
 	try {
-		const response = await supabase.auth.signInWithPassword({ email, password });
-		if (response.error) throw Error(response.error.message);
-		redirect(`${getURL()}/`);
+		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+		if (error) throw Error(error.message);
+		const { user } = data;
+		const [worker, members, contacts] = await Promise.all([
+			findWorker(user?.email ?? ''),
+			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
+			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
+		]);
+
+		await supabase.auth.updateUser({
+			data: {
+				...data?.user?.user_metadata,
+				workerSid: worker.sid,
+				referenceId: members?.[0]?.id ?? 310,
+				contactId: contacts?.[0]?.id ?? 32569,
+			},
+		});
+		return redirect(`/`, RedirectType.replace);
 	} catch (error) {
 		console.error(error as string);
 	}

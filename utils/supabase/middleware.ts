@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
 	} = await supabase.auth.getUser();
 
 	if (user) {
-		const twilioToken = await fetch('http://localhost:3000/api/twilio/token', {
+		const twilioToken = await fetch(`${request.nextUrl.origin}/api/twilio/token`, {
 			method: 'POST',
 			body: JSON.stringify({
 				email: user.email,
@@ -51,11 +51,15 @@ export async function updateSession(request: NextRequest) {
 		supabaseResponse.cookies.set('twilio_token', token);
 	}
 
-	// if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {
-	// 	// no user, potentially respond by redirecting the user to the login page
-	// 	const url = request.nextUrl.clone();
-	// 	url.pathname = '/login';
-	// 	return NextResponse.redirect(url);
+	console.log(user);
+
+	// if (!user) {
+	// 	if (!request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {
+	// 		// no user, potentially respond by redirecting the user to the login page
+	// 		const url = request.nextUrl.clone();
+	// 		url.pathname = '/login';
+	// 		return NextResponse.redirect(url);
+	// 	}
 	// }
 
 	// IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

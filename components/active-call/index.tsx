@@ -4,28 +4,22 @@ import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
 import ActiveCallParticipants from './participants';
 import { Task } from 'twilio-taskrouter';
-import useTask from '@/hooks/useTask';
 
 type Props = {
 	task: Task;
 };
 
-export function ActiveCall({ task: defaultTask }: Props) {
-	const { task, attributes, conference, endConference, searchParams } = useTask(defaultTask);
-
+export function ActiveCall({ task }: Props) {
 	return (
 		<Card>
 			<ActiveCallHeader
 				task={task}
-				searchParams={searchParams}
+				searchParams={new URLSearchParams()}
 			/>
 
-			<ActiveCallParticipants participants={conference.participants} />
+			<ActiveCallParticipants participants={task.attributes.conference.participants} />
 
-			<ActiveCallFooter
-				task={task}
-				endConference={endConference}
-			/>
+			<ActiveCallFooter task={task} />
 		</Card>
 	);
 }

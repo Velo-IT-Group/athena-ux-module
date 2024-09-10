@@ -16,7 +16,7 @@ export const createAccessToken = async (
 	const taskRouterGrant = new TaskRouterGrant({
 		workerSid,
 		workspaceSid,
-		role: 'worker',
+		role: 'supervisor',
 	});
 
 	const voiceGrant = new VoiceGrant({

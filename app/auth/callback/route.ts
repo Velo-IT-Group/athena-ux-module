@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 				// we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
 				return NextResponse.redirect(`${origin}${next}`);
 			} else if (forwardedHost) {
-				return NextResponse.redirect(`https://${process.env.VERCEL_URL ?? forwardedHost}${next}`);
+				return NextResponse.redirect(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
 			}

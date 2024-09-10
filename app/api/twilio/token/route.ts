@@ -15,5 +15,7 @@ export async function POST(request: NextRequest) {
 		email
 	);
 
+	console.log(token);
+
 	return Response.json({ token });
 }

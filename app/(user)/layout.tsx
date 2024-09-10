@@ -34,7 +34,7 @@ const Layout = async ({ children }: Props) => {
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
 	if (!user || !user.email) {
-		redirect('/login');
+		return <span>...</span>;
 	}
 
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
@@ -58,9 +58,9 @@ const Layout = async ({ children }: Props) => {
 		process.env.TWILIO_ACCOUNT_SID as string,
 		process.env.TWILIO_API_KEY_SID as string,
 		process.env.TWILIO_API_KEY_SECRET as string,
-		process.env.WORKSPACE_SID as string,
+		process.env.TWILIO_WORKSPACE_SID as string,
 		user?.user_metadata.workerSid ?? '',
-		user?.email ?? 'nicholas.black98@icloud.com'
+		user?.email
 	);
 
 	return (

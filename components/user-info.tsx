@@ -74,7 +74,7 @@ const UserInfo = ({ user }: Props) => {
 					<DropdownMenuItem
 						onSelect={async () => {
 							await supabase.auth.signOut();
-							push('/login');
+							// push('/login');
 						}}
 					>
 						<LogOut className='mr-2 h-3.5 w-3.5' />

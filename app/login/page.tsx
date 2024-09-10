@@ -9,14 +9,14 @@ import { redirect } from 'next/navigation';
 import { toast } from 'sonner';
 
 const Page = async () => {
-	const supabase = createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	// const supabase = createClient();
+	// const {
+	// 	data: { user },
+	// } = await supabase.auth.getUser();
 
-	if (user) {
-		await supabase.auth.signOut();
-	}
+	// if (user) {
+	// 	await supabase.auth.signOut();
+	// }
 
 	return (
 		<div className='grid place-items-center w-screen h-screen bg-muted/50'>

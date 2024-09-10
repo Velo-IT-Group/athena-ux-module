@@ -39,22 +39,28 @@ export const signInWithPassword = async (data: FormData) => {
 	const password = data.get('password') as string;
 
 	try {
-		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+		const {
+			data: { user },
+			error,
+		} = await supabase.auth.signInWithPassword({ email, password });
 		if (error) throw Error(error.message);
-		const { user } = data;
 		const [worker, members, contacts] = await Promise.all([
 			findWorker(user?.email ?? ''),
 			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
 			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
 		]);
 
+		const data = {
+			...user?.user_metadata,
+			workerSid: worker?.sid,
+			referenceId: members?.[0]?.id ?? 310,
+			contactId: contacts?.[0]?.id ?? 32569,
+		};
+
+		console.log(data, worker, members, contacts);
+
 		await supabase.auth.updateUser({
-			data: {
-				...data?.user?.user_metadata,
-				workerSid: worker?.sid,
-				referenceId: members?.[0]?.id ?? 310,
-				contactId: contacts?.[0]?.id ?? 32569,
-			},
+			data,
 		});
 	} catch (error) {
 		console.error(error as string);

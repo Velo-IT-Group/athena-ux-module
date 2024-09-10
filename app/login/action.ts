@@ -56,8 +56,9 @@ export const signInWithPassword = async (data: FormData) => {
 				contactId: contacts?.[0]?.id ?? 32569,
 			},
 		});
-		return redirect(`/`, RedirectType.replace);
 	} catch (error) {
 		console.error(error as string);
+	} finally {
+		redirect(`/`, RedirectType.replace);
 	}
 };

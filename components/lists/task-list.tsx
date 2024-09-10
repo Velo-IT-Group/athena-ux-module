@@ -136,37 +136,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		};
 	}, [worker]);
 
-	const testReservations: Reservation[] = [
-		{
-			sid: '1',
-			status: 'accepted',
-			task: {
-				sid: '1',
-				taskChannelUniqueName: 'voice',
-				queueName: 'Test Queue',
-				dateUpdated: new Date(),
-				attributes: {
-					direction: 'inbound',
-					from: '+12345678901',
-					name: 'Test Task',
-					conference: {
-						sid: '',
-						participants: {
-							worker: {
-								sid: '1',
-								friendlyName: 'Test Worker',
-							},
-							customer: {
-								sid: '2',
-								friendlyName: 'Test Customer',
-							},
-						},
-					},
-				},
-			},
-		},
-	];
-
 	return (
 		<>
 			{reservations.length > 0 && (

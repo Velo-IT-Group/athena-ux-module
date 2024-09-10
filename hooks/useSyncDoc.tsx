@@ -50,9 +50,9 @@ export const useSyncDocs = () => {
 		const docToUpdate = `Agent-Assistance`;
 		let agentAssistanceArray: Array<any> = [];
 		const doc = await getSyncDoc(docToUpdate);
-		if (doc?.data?.agentAssistance) {
-			agentAssistanceArray = [...doc.data.agentAssistance];
-		}
+		// if (doc?.data?.agentAssistance) {
+		// 	agentAssistanceArray = [...doc.data.agentAssistance];
+		// }
 		if (updateStatus === 'add') {
 			agentAssistanceArray.push({
 				conference: conferenceSID,
@@ -87,9 +87,9 @@ export const useSyncDocs = () => {
 			const docToUpdate = `syncDoc.${agentWorkerSID}`;
 			let supervisorsArray: Array<any> = [];
 			const doc = await getSyncDoc(docToUpdate);
-			if (doc?.data.supervisors) {
-				supervisorsArray = [...doc.data.supervisors];
-			}
+			// if (doc?.data.supervisors) {
+			// 	supervisorsArray = [...doc.data.supervisors];
+			// }
 			if (updateStatus === 'add') {
 				supervisorsArray.push({
 					conference: conferenceSID,

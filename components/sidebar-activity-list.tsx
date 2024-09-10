@@ -2,11 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { Circle } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { Circle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { faker } from '@faker-js/faker';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command';
 import { cn } from '@/lib/utils';
@@ -72,28 +69,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	useEffect(() => {
 		if (!token) return;
-		client.map('MP1e3faac1170162288e048012702a2c2a').then((map) => {
-			map.getItems({ limit: 1, order: 'desc' }).then(({ items }) => {
-				// setCumulativeStatsVoice((items[0].data as any)?.['cumulativeStats_voice']);
-			});
-
-			map.on('itemUpdated', (data) => {
-				// console.log(data);
-			});
-		});
-	}, [token]);
-
-	const workerArray = Array.from(workers?.values() ?? []);
-
-	useEffect(() => {
-		if (!worker) return;
-		worker.on('ready', () => {
-			setActivities(Array.from(worker.activities.values()));
-		});
-	}, [worker]);
-
-	useEffect(() => {
-		if (!token) return;
 		client.map('').then((map) => {
 			map.getItems({ limit: 1, order: 'desc' }).then(({ items }) => {
 				// setCumulativeStatsVoice((items[0].data as any)?.['cumulativeStats_voice']);
@@ -116,8 +91,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 							<PopoverTrigger asChild>
 								<Button
 									variant='ghost'
-									size={isCollapsed ? 'icon' : 'sm'}
-									className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
 									size={isCollapsed ? 'icon' : 'sm'}
 									className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
 								>

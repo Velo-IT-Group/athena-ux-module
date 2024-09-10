@@ -78,7 +78,7 @@ const Layout = async ({ children }: Props) => {
 					<ResizableHandle />
 
 					<ResizablePanel>
-						{/* <Navbar /> */}
+						<Navbar />
 
 						<Separator />
 

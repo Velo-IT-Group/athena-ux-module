@@ -169,14 +169,14 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 	return (
 		<>
-			{testReservations.length > 0 && (
+			{reservations.length > 0 && (
 				<>
 					<Separator />
 
 					<section className='space-y-1.5 px-1.5'>
 						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
-						{testReservations.map((reservation) => (
+						{reservations.map((reservation) => (
 							<TaskNotification
 								key={reservation.sid}
 								reservation={reservation}

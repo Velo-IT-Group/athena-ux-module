@@ -4,10 +4,17 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
-import { Worker, Workspace } from 'twilio-taskrouter';
+import { Task, Worker, Workspace } from 'twilio-taskrouter';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import {
+	Command,
+	CommandEmpty,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
+} from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getSystemMembers } from '@/lib/manage/read';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,10 +22,11 @@ import Image from 'next/image';
 import { isLastDayOfMonth } from 'date-fns';
 
 type Props = {
+	task?: Task;
 	children?: ReactNode;
 };
 
-const WorkerSelector = ({ children }: Props) => {
+const WorkerSelector = ({ task, children }: Props) => {
 	const { token, currentWorkspace } = useTwilio();
 	const workspace = new Workspace(token, {}, currentWorkspace);
 	const { data } = useQuery({
@@ -44,7 +52,6 @@ const WorkerSelector = ({ children }: Props) => {
 	});
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState<WorkerInstance>();
-	console.log(members, isMembersLoading, error);
 	const workers = Array.from(data?.values() ?? []);
 	return (
 		<Popover
@@ -89,6 +96,33 @@ const WorkerSelector = ({ children }: Props) => {
 						</CommandList>
 					) : (
 						<CommandList>
+							<CommandItem
+								value='WK8581b96b9e41195dfbaa64498ba1a088'
+								className='flex items-center justify-between gap-3'
+								onSelect={async (value) => {
+									await task?.transfer(value, {});
+								}}
+							>
+								<span>Nicholas Black</span>
+
+								<div className='flex items-center gap-3'>
+									<Button
+										size='smIcon'
+										variant='ghost'
+									>
+										<Image
+											src='/velo-favicon.svg'
+											alt='Athena'
+											className='object-contain h-4 w-4'
+											width={16}
+											height={16}
+										/>
+									</Button>
+								</div>
+							</CommandItem>
+
+							<CommandSeparator />
+
 							{members?.map((item) => (
 								<CommandItem
 									key={item.id}

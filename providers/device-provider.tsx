@@ -50,15 +50,11 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const device = useMemo(
-		() =>
-			new Device(authToken, {
-				disableAudioContextSounds: true,
-				enableImprovedSignalingErrorPrecision: true,
-				// logLevel: 1,
-			}),
-		[]
-	);
+	const device = new Device(authToken, {
+		disableAudioContextSounds: true,
+		enableImprovedSignalingErrorPrecision: true,
+		// logLevel: 1,
+	});
 
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);

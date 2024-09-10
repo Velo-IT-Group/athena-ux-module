@@ -44,6 +44,7 @@ export async function updateSession(request: NextRequest) {
 		});
 
 		if (!twilioToken.ok) {
+			return supabaseResponse;
 			// const token = await twilioToken.json();
 			// supabaseResponse.cookies.set('twilio_token', token);
 		}
@@ -51,8 +52,6 @@ export async function updateSession(request: NextRequest) {
 		const { token } = await twilioToken.json();
 		supabaseResponse.cookies.set('twilio_token', token);
 	}
-
-	console.log(user);
 
 	// if (!user) {
 	// 	if (!request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/auth')) {

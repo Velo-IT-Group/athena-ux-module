@@ -1,18 +1,16 @@
 'use client';
 import { useContext, useState, createContext, useEffect } from 'react';
-import { CustomTaskAttributes } from '@/types/twilio';
-import { TaskAttributes } from 'twilio/lib/twiml/VoiceResponse';
 import { UseMutateFunction, useMutation, UseMutationResult, useQuery } from '@tanstack/react-query';
-import useTask, { ConferenceAttributes, ConferenceParticpant } from '@/hooks/useTask';
+import { ConferenceAttributes, ConferenceParticpant } from '@/hooks/useTask';
 import { type Task, TransferOptions } from 'twilio-taskrouter';
 import { toast } from 'sonner';
-import useConference from '@/hooks/useConference';
 import { useWorker } from './worker-provider';
 import { parsePhoneNumber } from '@/lib/utils';
 import { getConferenceParticipants, updateConference } from '@/lib/twilio/conference/helpers';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 
 interface Props {
+	attributes: Record<string, any> | undefined;
 	conference: ConferenceAttributes | undefined;
 	conferenceParticipants: ConferenceParticpant | undefined;
 	endConference: UseMutateFunction<ConferenceInstance, Error, void, unknown> | undefined;
@@ -33,6 +31,7 @@ interface Props {
 }
 
 const initialValues: Props = {
+	attributes: undefined,
 	conference: undefined,
 	conferenceParticipants: undefined,
 	endConference: undefined,
@@ -141,11 +140,12 @@ export const TwilioTaskContext = ({ children }: WithChildProps) => {
 	return (
 		<Provider
 			value={{
-				task,
-				setTask,
+				attributes,
 				conference,
 				conferenceParticipants,
 				endConference,
+				setTask,
+				task,
 				transferTask,
 				wrapUpTask,
 				// muteParticipant,

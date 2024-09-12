@@ -8,7 +8,7 @@ import { DataTableViewOptions } from './view-options';
 
 import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
-import Search from '@/components/Search';
+import Search from '@/components/search';
 import { usePathname } from 'next/navigation';
 
 export interface FacetedFilter<TData> {
@@ -34,14 +34,6 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 						queryParam={table.options?.meta?.filterKey as string}
 						className='h-9 w-[150px] lg:w-[250px] overflow-hidden'
 					/>
-					// <Input
-					// 	placeholder='Filter...'
-					// 	value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
-					// 	onChange={(event) =>
-					// 		table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
-					// 	}
-					// 	className='h-9 w-[150px] lg:w-[250px]'
-					// />
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => (

@@ -4,11 +4,12 @@ import { X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DataTableViewOptions } from './view-options';
 
 import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
+import Search from '@/components/Search';
+import { usePathname } from 'next/navigation';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
@@ -20,20 +21,27 @@ interface DataTableToolbarProps<TData> {
 }
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
+	const pathname = usePathname();
 	const isFiltered = table.getState().columnFilters.length > 0;
 
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
-					<Input
+					<Search
+						baseUrl={pathname}
 						placeholder='Filter...'
-						value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
-						onChange={(event) =>
-							table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
-						}
-						className='h-9 w-[150px] lg:w-[250px]'
+						queryParam={table.options?.meta?.filterKey as string}
+						className='h-9 w-[150px] lg:w-[250px] overflow-hidden'
 					/>
+					// <Input
+					// 	placeholder='Filter...'
+					// 	value={(table.getColumn(table.options?.meta?.filterKey as string)?.getFilterValue() as string) ?? ''}
+					// 	onChange={(event) =>
+					// 		table.getColumn(table.options?.meta?.filterKey as string)?.setFilterValue(event.target.value)
+					// 	}
+					// 	className='h-9 w-[150px] lg:w-[250px]'
+					// />
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => (

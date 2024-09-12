@@ -20,9 +20,18 @@ type Props = {
 	companyId?: number;
 	className?: string;
 	communicationItems?: CommunicationItem[];
+	searchParams: { [key: string]: string | string[] | undefined };
 };
 
-const ConversationDetails = async ({ contactId: userId, companyId, className, communicationItems }: Props) => {
+const ConversationDetails = async ({
+	contactId: userId,
+	companyId,
+	className,
+	communicationItems,
+	searchParams,
+}: Props) => {
+	const headers = new Headers();
+	console.log(headers);
 	const supabase = createClient();
 	const [
 		{
@@ -127,12 +136,13 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 							type='table'
 							params={{
 								conditions: [
+									{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
 									{ parameter: { 'company/id': companyId! } },
 									{ parameter: { 'contact/id': userId }, comparator: '!=' },
 									// { parameter: { closedFlag: false } },
 								],
 								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-								pageSize: 1000,
+								// pageSize: 1000,
 							}}
 							facetedFilters={[
 								{ accessoryKey: 'board', items: boards },
@@ -154,6 +164,7 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 						type='table'
 						params={{
 							// conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+
 							conditions: [{ parameter: { 'company/id': 250 } }],
 							fields: ['id', 'name', 'site', 'company', 'status', 'contact', 'deviceIdentifier'],
 						}}
@@ -165,9 +176,14 @@ const ConversationDetails = async ({ contactId: userId, companyId, className, co
 						<TicketList
 							type='table'
 							params={{
-								conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
+								conditions: userId
+									? [
+											{ parameter: { 'contact/id': userId } },
+											{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
+									  ]
+									: [],
 								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-								pageSize: 1000,
+								// pageSize: 1000,
 							}}
 							facetedFilters={[
 								{ accessoryKey: 'board', items: boards },

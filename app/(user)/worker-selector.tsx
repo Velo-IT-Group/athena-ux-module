@@ -1,43 +1,41 @@
 'use client';
 import { ReactNode, useState } from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown, PhoneForwarded } from 'lucide-react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
-import { Task, Worker, Workspace } from 'twilio-taskrouter';
+import { Workspace } from 'twilio-taskrouter';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
+	CommandGroup,
 	CommandInput,
 	CommandItem,
 	CommandList,
 	CommandSeparator,
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
 import { getSystemMembers } from '@/lib/manage/read';
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
-import { isLastDayOfMonth } from 'date-fns';
+import { useWorker } from '@/providers/worker-provider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Props = {
-	task?: Task;
+	actionFn?: (isWorker: boolean, id: string | number) => void;
 	children?: ReactNode;
 };
 
-const WorkerSelector = ({ task, children }: Props) => {
+const WorkerSelector = ({ actionFn, children }: Props) => {
 	const { token, currentWorkspace } = useTwilio();
+	const { worker: currentWorker } = useWorker();
 	const workspace = new Workspace(token, {}, currentWorkspace);
-	const { data } = useQuery({
+	const { data, isLoading: isWorkersLoading } = useQuery({
 		queryKey: ['workers'],
-		queryFn: () => workspace.fetchWorkers(),
+		queryFn: () => workspace.fetchWorkers({ ActivityName: 'Available' }),
+		refetchInterval: 1000,
 	});
-	const {
-		data: members,
-		isLoading: isMembersLoading,
-		error,
-	} = useQuery({
+	const { data: members, isLoading: isMembersLoading } = useQuery({
 		queryKey: ['members'],
 		queryFn: () =>
 			getSystemMembers({
@@ -45,7 +43,7 @@ const WorkerSelector = ({ task, children }: Props) => {
 					{ parameter: { inactiveFlag: false } },
 					{ parameter: { officePhone: `'${null}'` }, comparator: '!=' },
 				],
-				fields: ['id', 'firstName', 'lastName', 'officeEmail'],
+				fields: ['id', 'firstName', 'lastName', 'officePhone'],
 				orderBy: { key: 'firstName' },
 				pageSize: 1000,
 			}),
@@ -81,97 +79,108 @@ const WorkerSelector = ({ task, children }: Props) => {
 				avoidCollisions
 			>
 				<Command>
-					<CommandInput placeholder={'Filter workers'} />
+					<CommandInput placeholder='Filter directory...' />
 					<CommandEmpty>Nothing found.</CommandEmpty>
-					{isMembersLoading ? (
-						<CommandList>
-							{new Array(12).fill(null)?.map((_, index) => (
-								<CommandItem
-									key={index}
-									value={String(index)}
-								>
-									<Skeleton className='h-5 w-full' />
-								</CommandItem>
-							))}
-						</CommandList>
-					) : (
-						<CommandList>
-							<CommandItem
-								value='WK8581b96b9e41195dfbaa64498ba1a088'
-								className='flex items-center justify-between gap-3'
-								onSelect={async (value) => {
-									await task?.transfer(value, {});
-								}}
-							>
-								<span>Nicholas Black</span>
-
-								<div className='flex items-center gap-3'>
-									<Button
-										size='smIcon'
-										variant='ghost'
-									>
-										<Image
-											src='/velo-favicon.svg'
-											alt='Athena'
-											className='object-contain h-4 w-4'
-											width={16}
-											height={16}
-										/>
-									</Button>
-								</div>
-							</CommandItem>
-
-							<CommandSeparator />
-
-							{members?.map((item) => (
-								<CommandItem
-									key={item.id}
-									value={`${item.id}-${item.firstName} ${item.lastName ?? ''}`}
-									onSelect={(currentValue) => {
-										console.log(currentValue);
-										const id = currentValue.split('-')[0];
-										console.log(id);
-										setOpen(false);
-									}}
-									className='flex items-center justify-between gap-3'
-								>
-									<span>
-										{item.firstName} {item.lastName ?? ''}
-									</span>
-
-									<div className='flex items-center gap-3'>
-										{workers.some((worker) => worker.attributes.email === item.officeEmail) && (
-											<Button
-												size='smIcon'
-												variant='ghost'
-											>
-												<Image
-													src='/velo-favicon.svg'
-													alt='Athena'
-													className='object-contain h-4 w-4'
-													width={16}
-													height={16}
-												/>
-											</Button>
-										)}
-
-										<Button
-											size='smIcon'
-											variant='ghost'
+					<CommandList>
+						<CommandGroup heading='Workers'>
+							{isWorkersLoading ? (
+								<>
+									{new Array(12).fill(null)?.map((_, index) => (
+										<CommandItem
+											key={index}
+											value={String(index)}
 										>
-											<Image
-												src='/teamsLogo.svg'
-												alt='Microsoft Teams Logo'
-												className='object-contain h-4 w-4'
-												width={16}
-												height={16}
-											/>
-										</Button>
-									</div>
-								</CommandItem>
-							))}
-						</CommandList>
-					)}
+											<Skeleton className='h-5 w-full' />
+										</CommandItem>
+									))}
+								</>
+							) : (
+								<>
+									{workers?.map((worker) => {
+										return (
+											<CommandItem
+												key={worker.sid}
+												value={`${worker.sid}-${worker.attributes.full_name}`}
+												onSelect={(currentValue) => {
+													const id = currentValue.split('-')[0];
+													actionFn && actionFn(true, id);
+													setOpen(false);
+												}}
+												className='flex items-center justify-between gap-3'
+												disabled={worker.sid === currentWorker?.sid}
+											>
+												<Tooltip>
+													<span>{worker.attributes.full_name ?? worker.sid}</span>
+
+													<TooltipTrigger asChild>
+														<Button
+															size='smIcon'
+															variant='ghost'
+														>
+															<PhoneForwarded />
+														</Button>
+													</TooltipTrigger>
+
+													<TooltipContent
+														side='top'
+														align='center'
+													>
+														Transfer
+													</TooltipContent>
+												</Tooltip>
+											</CommandItem>
+										);
+									})}
+								</>
+							)}
+						</CommandGroup>
+
+						<CommandSeparator />
+
+						<CommandGroup heading='External'>
+							{isMembersLoading ? (
+								<>
+									{new Array(12).fill(null)?.map((_, index) => (
+										<CommandItem
+											key={index}
+											value={String(index)}
+										>
+											<Skeleton className='h-5 w-full' />
+										</CommandItem>
+									))}
+								</>
+							) : (
+								<>
+									{members?.map((item) => {
+										return (
+											<CommandItem
+												key={item.id}
+												value={`${item.officePhone}-${item.firstName} ${item.lastName ?? ''}`}
+												onSelect={(currentValue) => {
+													const id = currentValue.split('-')[0];
+													console.log(currentValue);
+													actionFn && actionFn(false, id);
+													setOpen(false);
+												}}
+												className='flex items-center justify-between gap-3'
+											>
+												<span>
+													{item.firstName} {item.lastName ?? ''}
+												</span>
+
+												<Button
+													size='smIcon'
+													variant='ghost'
+												>
+													<PhoneForwarded />
+												</Button>
+											</CommandItem>
+										);
+									})}
+								</>
+							)}
+						</CommandGroup>
+					</CommandList>
 				</Command>
 			</PopoverContent>
 		</Popover>

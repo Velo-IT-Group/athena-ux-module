@@ -8,6 +8,7 @@ import { ActiveCall } from './active-call';
 import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
 import { toast } from 'sonner';
+import { useTaskContext } from '@/providers/task-context';
 
 type Props = {
 	reservation: Reservation;
@@ -19,6 +20,8 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
+	const { setTask } = useTaskContext();
+	setTask(task);
 
 	if (timer.minutes >= 3 && reservation.status === 'wrapping') {
 		console.log('dismissing', timer, reservation.status);

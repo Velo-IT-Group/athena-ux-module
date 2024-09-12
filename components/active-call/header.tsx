@@ -7,14 +7,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import Timer from '../timer';
 import useTimer from '@/hooks/useTimer';
 import { PopoverClose } from '@radix-ui/react-popover';
-import { Task } from 'twilio-taskrouter';
 
 type Props = {
-	task: Task;
+	queueName: string;
 	searchParams: URLSearchParams;
 };
 
-const ActiveCallHeader = ({ task, searchParams }: Props) => {
+const ActiveCallHeader = ({ queueName, searchParams }: Props) => {
 	const timer = useTimer(new Date());
 
 	return (
@@ -22,7 +21,7 @@ const ActiveCallHeader = ({ task, searchParams }: Props) => {
 			<CardTitle className='space-x-1.5 flex items-center'>
 				<Rocket className='inline-block text-yellow-400' />
 
-				<span className='text-sm font-normal'>{task?.queueName}</span>
+				<span className='text-sm font-normal'>{queueName}</span>
 
 				<Timer timer={timer} />
 			</CardTitle>

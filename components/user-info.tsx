@@ -55,7 +55,11 @@ const UserInfo = ({ user }: Props) => {
 				</Button>
 			</DropdownMenuTrigger>
 
-			<DropdownMenuContent className='w-72'>
+			<DropdownMenuContent
+				className='w-72'
+				align='end'
+				forceMount
+			>
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 

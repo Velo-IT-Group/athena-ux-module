@@ -1,8 +1,7 @@
-import type { Database as DB, Tables } from '@/types/supabase';
-import { Tables } from '@/types/supabase';
+import type { Database as DB } from '@/types/supabase';
 
 declare global {
 	type Database = DB;
 
-	type Conversation = Tables<'conversations'>;
+	type Conversation = Database['reporting']['Tables']['conversations']['Row'];
 }

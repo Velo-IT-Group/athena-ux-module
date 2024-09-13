@@ -22,7 +22,7 @@ type Props = {
 
 const ConversationContactDetail = async ({ contactId, companyId, attributes }: Props) => {
 	const [contact, types, { companies }] = await Promise.all([
-		getContact(contactId ?? 0),
+		getContact(contactId ?? 32569),
 		getCommunicationTypes(),
 		getCompanies({
 			conditions: [{ parameter: { 'status/id': 1 } }],

@@ -1,35 +1,35 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CardContent } from '../ui/card';
 import ParticipantListItem from './participant-list-item';
-import { useTask } from './context';
-import { createClient } from '@/utils/supabase/client';
+import { ConferenceParticpant } from '@/hooks/useTask';
+import { useQuery } from '@tanstack/react-query';
+import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 
-const ActiveCallParticipants = () => {
-	const { task } = useTask();
-	const supabase = createClient();
+type Props = {
+	sid: string;
+	participants: ConferenceParticpant;
+};
 
-	const [participants, setParticipants] = useState<Record<string, string>>({});
-
-	useEffect(() => {
-		supabase.auth.getUser().then(({ data }) => {
-			setParticipants({
-				worker: data?.user?.user_metadata?.name ?? 'You',
-				customer: task?.attributes.name ?? task?.attributes.from,
-			});
-		});
-	}, [task]);
-
+const ActiveCallParticipants = ({ sid, participants }: Props) => {
 	const entries = Object.entries(participants);
+	const { data, error, isLoading } = useQuery({
+		queryKey: ['queryParticipants', sid],
+		queryFn: () => getConferenceParticipants(sid),
+	});
+
+	// console.log(data);
 
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
 			{entries.map(([key, value]) => (
 				<ParticipantListItem
 					key={key}
-					name={value}
-					sid={key}
+					conferenceSid={sid}
+					name={value.name}
+					sid={value.sid}
 					isYou={key === 'worker'}
+					showRemoval={entries.length > 2}
 				/>
 			))}
 		</CardContent>

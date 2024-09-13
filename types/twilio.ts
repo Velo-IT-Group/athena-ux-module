@@ -8,6 +8,37 @@ export const filtersSchema = z.object({
 	filter_friendly_name: z.string(),
 });
 
+export const createPartipantParamsSchema = z.object({
+	From: z.string(),
+	To: z.string(),
+	Label: z.string(),
+	EarlyMedia: z.boolean(),
+	Beep: z.string(),
+	Muted: z.boolean(),
+	StatusCallback: z.string(),
+	StatusCallbackMethod: z.string(),
+	StatusCallbackEvent: z.string(),
+	Record: z.boolean(),
+	Trim: z.string(),
+	TimeLimit: z.number(),
+	CallToken: z.string(),
+	MachineDetection: z.string(),
+	MachineDetectionTimeout: z.number(),
+	MachineDetectionSpeechThreshold: z.number(),
+	MachineDetectionSpeechEndThreshold: z.number(),
+	MachineDetectionSilenceTimeout: z.number(),
+	AmdStatusCallback: z.string(),
+	AmdStatusCallbackMethod: z.string(),
+	MachineDetectionEngine: z.string(),
+	MachineDetectionMinWordLength: z.number(),
+	MachineDetectionMaxWordLength: z.number(),
+	MachineDetectionWordsSilence: z.number(),
+	MachineDetectionMaxNumOfWords: z.number(),
+	MachineDetectionSilenceThreshold: z.number(),
+});
+
+export type CreateParticipantParams = z.infer<typeof createPartipantParamsSchema>;
+
 export const workflowConfigurationSchema = z.object({
 	task_routing: z.object({
 		filters: z.array(filtersSchema),

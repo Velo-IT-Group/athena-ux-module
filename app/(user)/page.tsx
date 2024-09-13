@@ -8,37 +8,34 @@ import { createClient } from '@/utils/supabase/server';
 export default async function Page({
 	searchParams,
 }: {
-	searchParams: {
-		taskSid?: string;
-		companyId?: string;
-		contactId?: string;
-	};
+	searchParams: { [key: string]: string | string[] | undefined };
 }) {
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
-	const task: TaskInstance | undefined = searchParams.taskSid ? await getTask(searchParams.taskSid) : undefined;
+		data: { user },
+	} = await supabase.auth.getUser();
+	const task: TaskInstance | undefined = searchParams.taskSid
+		? await getTask(searchParams.taskSid as string)
+		: undefined;
 	const attributes = task ? JSON.parse(task?.attributes) : {};
-	const companyId = searchParams.companyId ? parseInt(searchParams.companyId) : undefined;
-	const contactId = searchParams.contactId ? parseInt(searchParams.contactId) : undefined;
-	const contactCommunications = await getContactCommunications(
-		contactId ?? session?.user?.user_metadata?.contactId ?? 0
-	);
+	const companyId = searchParams.companyId ? parseInt(searchParams.companyId as string) : undefined;
+	const contactId = searchParams.contactId ? parseInt(searchParams.contactId as string) : undefined;
+	const contactCommunications = await getContactCommunications(contactId ?? user?.user_metadata?.contactId ?? 0);
 
 	return (
 		<main className='grid grid-cols-[1fr_3fr] h-full w-full'>
 			<ConversationContactDetail
 				companyId={companyId ?? 250}
-				contactId={contactId ?? session?.user?.user_metadata?.contactId ?? 10}
+				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
 				attributes={attributes}
 			/>
 
 			<ConversationDetails
-				contactId={contactId ?? session?.user?.user_metadata?.contactId ?? 10}
+				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
 				companyId={companyId ?? 250}
 				communicationItems={contactCommunications}
 				className='p-6'
+				searchParams={searchParams}
 			/>
 		</main>
 	);

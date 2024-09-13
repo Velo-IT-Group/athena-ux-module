@@ -1,39 +1,53 @@
 'use client';
 import { Card } from '@/components/ui/card';
-import { Popover, PopoverContent } from '@/components/ui/popover';
-import { Dialpad } from '../dialpad';
-import { TooltipProvider } from '../ui/tooltip';
 import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
-import { useEffect } from 'react';
-import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 import ActiveCallParticipants from './participants';
-import { useTask } from './context';
+import { Task, Workspace } from 'twilio-taskrouter';
+import useTask from '@/hooks/useTask';
+import useConference from '@/hooks/useConference';
+import { useEffect } from 'react';
 
 type Props = {
-	taskSid: string;
-	attributes: any;
-	conferenceSid: string;
+	task: Task;
 };
 
-export function ActiveCall({ taskSid, attributes, conferenceSid }: Props) {
+export function ActiveCall({ task }: Props) {
+	const { transferTask, conference } = useTask(task);
+	const { addConferenceParticipantMutation, conferenceParticipants, endConference, setConferenceParticipants } =
+		useConference({
+			conference,
+			task,
+		});
+
 	useEffect(() => {
-		getConferenceParticipants(conferenceSid)
-			.then((e) => {
-				console.log(e);
-			})
-			.catch((e) => console.error(e));
-	}, [conferenceSid]);
+		// if (!conference) return;
+		const part = conference.participants;
+		setConferenceParticipants((prev) => {
+			return { ...prev, ...part };
+		});
+	}, [conference.participants]);
+
+	// const confP = { ...conference.participants, ...conferenceParticipants };
 
 	return (
-		<TooltipProvider>
-			<Card className='shadow-sm w-[356px] dark'>
-				<ActiveCallHeader />
+		<Card>
+			<ActiveCallHeader
+				queueName={task.queueName}
+				searchParams={new URLSearchParams()}
+			/>
 
-				<ActiveCallParticipants />
+			<ActiveCallParticipants
+				sid={conference.sid}
+				participants={conferenceParticipants ?? {}}
+			/>
 
-				<ActiveCallFooter />
-			</Card>
-		</TooltipProvider>
+			<ActiveCallFooter
+				task={task}
+				endConference={endConference}
+				transferTask={transferTask}
+				addConferenceParticipantMutation={addConferenceParticipantMutation}
+			/>
+		</Card>
 	);
 }

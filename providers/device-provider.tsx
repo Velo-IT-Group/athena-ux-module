@@ -50,20 +50,22 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const device = useMemo(
-		() =>
-			new Device(authToken, {
-				disableAudioContextSounds: true,
-				enableImprovedSignalingErrorPrecision: true,
-				// logLevel: 1,
-			}),
-		[]
-	);
-
+	const [device, setDevice] = useState<Device>();
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
 	const [muted, setMuted] = useState(false);
 	const [activeCall, setActiveCall] = useState<Call | undefined>(initialValues.activeCall);
+
+	useEffect(() => {
+		if (!authToken || !window) return;
+		setDevice(
+			new Device(authToken, {
+				disableAudioContextSounds: true,
+				enableImprovedSignalingErrorPrecision: true,
+				// logLevel: 1,
+			})
+		);
+	}, [authToken]);
 
 	useEffect(() => {
 		if (!device) return;
@@ -95,12 +97,14 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.on('accept', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
+				setActiveCall(call);
 				currentCallControl?.offHook(true);
 				console.log(c);
 			});
 
 			call.on('disconnect', (c: Call) => {
 				setActiveCalls((prev) => [...prev.filter((call) => call.parameters.CallSid !== c.parameters.CallSid)]);
+				setActiveCall(undefined);
 				currentCallControl?.offHook(false);
 			});
 		});
@@ -160,16 +164,11 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		if (!currentCallControl) return;
 
 		currentCallControl.deviceSignals.subscribe((signal) => {
-			console.log(signal);
 			if (signal.type === SignalType.PHONE_MUTE) {
 				setMuted(signal.value);
 			}
 		});
 	}, [currentCallControl]);
-
-	useEffect(() => {
-		if (!device.calls.length) return;
-	}, [device.calls]);
 
 	return (
 		<Provider

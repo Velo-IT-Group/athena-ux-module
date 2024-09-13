@@ -29,7 +29,7 @@ export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildP
 	const values = {
 		currentWorkspace,
 		setCurrentWorkspace,
-		token: tokenRef.current,
+		token: authToken,
 	};
 
 	return <Provider value={values}>{children}</Provider>;

@@ -8,11 +8,11 @@ export async function POST(request: Request) {
 	const twiml = new VoiceResponse();
 	const [
 		{
-			data: { session },
+			data: { user },
 		},
 
 		data,
-	] = await Promise.all([supabase.auth.getSession(), request.formData()]);
+	] = await Promise.all([supabase.auth.getUser(), request.formData()]);
 	const toNumberOrClientName = data.get('To') as string;
 	const To = data.get('To') as string;
 	const callerId = '+18449402678';
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 		let dial = twiml.dial({ callerId: data.get('Caller') as string, answerOnBridge: true });
 
 		// This will connect the caller with your Twilio.Device/client
-		dial.client(session?.user.email ?? '');
+		dial.client(user?.email ?? '');
 	} else if (To) {
 		// This is an outgoing call
 

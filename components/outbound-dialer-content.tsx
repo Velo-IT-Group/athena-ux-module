@@ -1,5 +1,5 @@
 'use client';
-import React, { Suspense } from 'react';
+import React, { Suspense, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Phone } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -10,95 +10,90 @@ import { PhoneInput } from './phone-input';
 import { useWorker } from '@/providers/worker-provider';
 import { useDevice } from '@/providers/device-provider';
 import { toast } from 'sonner';
+import { Form, FormField } from './ui/form';
+import { useForm } from 'react-hook-form';
+import { CreateParticipantParams, createPartipantParamsSchema } from '@/types/twilio';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 type Props = {
+	showNumbers?: boolean;
 	numbers: { phoneNumber: string; friendlyName: string }[];
+	onSubmit?: (data: FormData) => void;
 };
 
-const OutboundDialerContent = ({ numbers }: Props) => {
-	const { worker } = useWorker();
+const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props) => {
+	const form = useForm<CreateParticipantParams>({
+		resolver: zodResolver(createPartipantParamsSchema),
+	});
 
 	return (
-		<PopoverContent align='end'>
+		<Form {...form}>
 			<form
-				onSubmit={async (e) => {
+				// action={(e: FormData) => {
+				// 	console.log('submitting');
+				// }}
+				onSubmit={(e) => {
 					e.preventDefault();
-					var data = new FormData(e.currentTarget);
-
-					console.log(data);
-
-					if (!worker) return;
-					const to = data.get('phoneNumber') as string;
-					const from = data.get('from') as string;
-					const workflowSid = data.get('from') as string;
-					const taskQueueSid = data.get('from') as string;
-					console.log(data);
-
-					try {
-						// await device?.connect({
-						// 	params: { To: '+19015988651', From: '+18449402678', agent: 'nblack@velomethod.com' },
-						// });
-						await worker.createTask(
-							'+19015988651',
-							'+18449402678',
-							'WW497b90bc1703176f6845c09c8bf4fa8a',
-							'WQee659e96340b3899ad1fad7578fe6515',
-							{
-								attributes: {
-									direction: 'outboundDial',
-								},
-							}
-						);
-						// setActiveCall((prev) => {
-						// 	return { ...prev, call };
-						// });
-					} catch (error) {
-						toast.error("Can't create call" + JSON.stringify(error));
-					}
+					const data = new FormData(e.currentTarget);
+					onSubmit?.(data);
+					// console.log(new FormData(e.target));
+					// console.log(e.formData);
 				}}
 				className='space-y-3'
 			>
-				<PhoneInput name='phoneNumber' />
+				<FormField
+					control={form.control}
+					name='To'
+					render={({ field }) => <PhoneInput {...field} />}
+				/>
 
-				<Separator />
+				{/* <Separator /> */}
 
-				<LabeledInput
-					label='Caller ID'
-					name='from'
-					id='from'
+				{/* {showNumbers && (
+					<>
+						<LabeledInput
+							label='Caller ID'
+							name='from'
+							id='from'
+						>
+							<Select
+								name='from'
+								defaultValue={numbers.length ? numbers[0].phoneNumber : undefined}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder='Select caller id...' />
+								</SelectTrigger>
+
+								<SelectContent>
+									{numbers?.map((number) => (
+										<SelectItem
+											key={number.phoneNumber}
+											value={number.phoneNumber}
+										>
+											{number.friendlyName}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</LabeledInput>
+
+						<Separator />
+					</>
+				)} */}
+
+				{/* <LabeledInput label='Agent'>
+				<Suspense><WorkerSelect /></Suspense>
+			</LabeledInput> */}
+
+				{/* <Button
+					className='w-full space-x-1.5'
+					type='submit'
 				>
-					<Select
-						name='from'
-						defaultValue={numbers.length ? numbers[0].phoneNumber : undefined}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder='Select caller id...' />
-						</SelectTrigger>
-
-						<SelectContent>
-							{numbers?.map((number) => (
-								<SelectItem
-									key={number.phoneNumber}
-									value={number.phoneNumber}
-								>
-									{number.friendlyName}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</LabeledInput>
-
-				<Separator />
-
-				<LabeledInput label='Agent'>
-					<Suspense>{/* <WorkerSelect /> */}</Suspense>
-				</LabeledInput>
-
-				<Button className='w-full space-x-1.5'>
 					<Phone className='w-3.5 h-3.5' /> <span>Call</span>
-				</Button>
+				</Button> */}
+				<Button type='submit'>Submit</Button>
 			</form>
-		</PopoverContent>
+		</Form>
 	);
 };
 

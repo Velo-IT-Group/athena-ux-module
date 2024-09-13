@@ -3,22 +3,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import LabeledInput from '@/components/ui/labeled-input';
 import Image from 'next/image';
-import { signInWithAzure } from './action';
+import { signInWithAzure, signInWithPassword } from './action';
 import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import { toast } from 'sonner';
 
 const Page = async () => {
-	const supabase = createClient();
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+	// const supabase = createClient();
+	// const {
+	// 	data: { user },
+	// } = await supabase.auth.getUser();
 
-	if (session) {
-		await supabase.auth.signOut();
-	}
+	// if (user) {
+	// 	await supabase.auth.signOut();
+	// }
 
 	return (
 		<div className='grid place-items-center w-screen h-screen bg-muted/50'>
-			<form className='flex flex-col justify-center items-center gap-3 pb-28'>
+			<form
+				className='flex flex-col justify-center items-center gap-3 pb-28'
+				action={signInWithPassword}
+			>
 				<Image
 					src='/velo-logo-black.svg'
 					alt='Velo logo'
@@ -41,9 +46,30 @@ const Page = async () => {
 							placeholder='m@example.com'
 							required
 						/>
+
+						<LabeledInput
+							label='Password'
+							name='password'
+							type='password'
+							placeholder='••••••••••••'
+						/>
 					</CardContent>
 
-					<CardFooter>
+					<CardFooter className='grid gap-1.5'>
+						<Button
+							variant='outline'
+							className='text-card-foreground w-full'
+						>
+							<Image
+								src='/velo-favicon.svg'
+								alt='Microsoft logo'
+								height={12}
+								width={12}
+								className='inline-block mr-1.5 rounded-sm'
+							/>
+							Login
+						</Button>
+
 						<Button
 							variant='outline'
 							className='text-card-foreground w-full'

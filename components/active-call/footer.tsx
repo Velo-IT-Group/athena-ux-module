@@ -1,5 +1,5 @@
 'use client';
-import React, { useTransition } from 'react';
+import React from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
@@ -16,7 +16,7 @@ import {
 	Settings,
 	UserPlus,
 } from 'lucide-react';
-import { Popover, PopoverTrigger } from '../ui/popover';
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -25,17 +25,34 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { useDevice } from '@/providers/device-provider';
-import { useTask } from './context';
 import { Dialpad } from '../dialpad';
-import { updateConference } from '@/lib/twilio/conference/helpers';
-import { updateConferenceAction } from './actions';
-import { PopoverContent } from '../ui/popover-dialog';
+// import { PopoverContent } from '../ui/popover-dialog';
+import { useDevice } from '@/providers/device-provider';
+import { Task, TransferOptions } from 'twilio-taskrouter';
+import WorkerSelector from '@/app/(user)/worker-selector';
+import { UseMutateFunction, UseMutationResult } from '@tanstack/react-query';
+import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
+import { CreateParticipantParams } from '@/lib/twilio/conference/helpers';
+import { parsePhoneNumber } from '@/lib/utils';
+import OutboundDialerContent from '../outbound-dialer-content';
 
-const ActiveCallFooter = () => {
-	const { task } = useTask();
-	const { activeCall, muted, setMuted } = useDevice();
-	const [isPending, startTransition] = useTransition();
+type Props = {
+	task: Task;
+	endConference: UseMutateFunction<ConferenceInstance, Error, void, unknown>;
+	transferTask: UseMutationResult<
+		Task,
+		Error,
+		{
+			to: string;
+			options: TransferOptions;
+		},
+		unknown
+	>;
+	addConferenceParticipantMutation: UseMutationResult<any, Error, CreateParticipantParams, unknown>;
+};
+
+const ActiveCallFooter = ({ task, addConferenceParticipantMutation, endConference, transferTask }: Props) => {
+	const { muted, setMuted } = useDevice();
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
@@ -61,21 +78,32 @@ const ActiveCallFooter = () => {
 			<div className='flex items-center gap-1.5'>
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<Button
-							className='text-red-500 w-9 flex flex-col'
-							variant='secondary'
-							size='icon'
+						<WorkerSelector
+							actionFn={(isWorker, id) => {
+								if (isWorker) {
+									transferTask.mutate({ to: id as string, options: {} });
+								} else {
+									addConferenceParticipantMutation.mutate({
+										From: task.attributes.to,
+										To: parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '',
+									});
+								}
+							}}
 						>
-							<Circle className='w-3 h-3 fill-red-500 text-red-500 animate-pulse' />
-							<span className='text-xs'>Rec</span>
-						</Button>
+							<Button
+								variant='secondary'
+								size='icon'
+							>
+								<PhoneForwarded />
+							</Button>
+						</WorkerSelector>
 					</TooltipTrigger>
 
 					<TooltipContent
 						side='top'
 						align='center'
 					>
-						<span>Stop Recording</span>
+						<span>Transfer Call</span>
 					</TooltipContent>
 				</Tooltip>
 
@@ -104,7 +132,15 @@ const ActiveCallFooter = () => {
 						side='left'
 						className='dark'
 					>
-						<Dialpad />
+						<OutboundDialerContent
+							numbers={[]}
+							onSubmit={(data) => {
+								addConferenceParticipantMutation.mutate({
+									From: task.attributes.to,
+									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
+								});
+							}}
+						/>
 					</PopoverContent>
 				</Popover>
 
@@ -114,7 +150,7 @@ const ActiveCallFooter = () => {
 							variant='secondary'
 							size='icon'
 							onClick={async () => {
-								await task?.hold(task.attributes.workerSid, true);
+								// await task?.hold(task.attributes.workerSid, true);
 							}}
 						>
 							<Pause className='h-3.5 w-3.5' />
@@ -207,15 +243,7 @@ const ActiveCallFooter = () => {
 					<Button
 						variant='destructive'
 						size='icon'
-						onClick={() => {
-							startTransition(async () => {
-								activeCall?.disconnect();
-								await updateConferenceAction(task?.attributes.conference.sid, {
-									status: 'completed',
-								});
-								await task?.wrapUp({ reason: 'Call ended' });
-							});
-						}}
+						onClick={() => endConference()}
 					>
 						<Phone className='rotate-[135deg]' />
 					</Button>

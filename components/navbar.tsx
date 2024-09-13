@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import UserInfo from './user-info';
-import { Popover, PopoverTrigger } from './ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
@@ -9,8 +9,8 @@ import { createClient } from '@/utils/supabase/server';
 const Navbar = async () => {
 	const supabase = createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	return (
 		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
@@ -35,10 +35,15 @@ const Navbar = async () => {
 						</Button>
 					</PopoverTrigger>
 
-					<OutboundDialerContent numbers={[]} />
+					<PopoverContent align='end'>
+						<OutboundDialerContent
+							numbers={[]}
+							// onSubmit={() => {}}
+						/>
+					</PopoverContent>
 				</Popover>
 
-				<UserInfo session={session} />
+				<UserInfo user={user} />
 			</div>
 		</nav>
 	);

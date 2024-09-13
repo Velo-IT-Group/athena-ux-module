@@ -13,6 +13,7 @@ import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import ReactQueryProvider from '@/providers/react-query';
 
 type Props = {
 	children: ReactNode;
@@ -32,19 +33,23 @@ const Layout = async ({ children }: Props) => {
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
-	if (!user?.user_metadata.workerSid) {
+	if (!user || !user.email) {
+		return <span>...</span>;
+	}
+
+	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, contacts] = await Promise.all([
 			findWorker(user?.email ?? ''),
-			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email ?? ''}'` } }] }),
-			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email ?? ''}'` } }] }),
+			getSystemMembers({ conditions: [{ parameter: { officeEmail: `'${user?.email}'` } }] }),
+			getContacts({ childConditions: [{ parameter: { 'communicationItems/value': `'${user?.email}'` } }] }),
 		]);
 
 		await supabase.auth.updateUser({
 			data: {
 				...user?.user_metadata,
 				workerSid: worker.sid,
-				referenceId: members[0].id,
-				contactId: contacts[0].id,
+				referenceId: members?.[0]?.id ?? 310,
+				contactId: contacts?.[0]?.id ?? 32569,
 			},
 		});
 	}
@@ -53,37 +58,39 @@ const Layout = async ({ children }: Props) => {
 		process.env.TWILIO_ACCOUNT_SID as string,
 		process.env.TWILIO_API_KEY_SID as string,
 		process.env.TWILIO_API_KEY_SECRET as string,
-		process.env.WORKSPACE_SID as string,
-		user?.user_metadata.workerSid,
-		user?.email ?? ''
+		process.env.TWILIO_WORKSPACE_SID as string,
+		user?.user_metadata.workerSid ?? '',
+		user?.email
 	);
 
 	return (
-		<UserLayout token={twilioToken}>
-			<ResizablePanelGroup
-				direction='horizontal'
-				onLayout={onLayoutChange}
-			>
-				<SideNav
-					isDefaultCollapsed={defaultCollapsed ?? true}
-					defaultLayout={defaultLayout ?? [15, 32, 48]}
-				/>
+		<ReactQueryProvider>
+			<UserLayout token={twilioToken}>
+				<ResizablePanelGroup
+					direction='horizontal'
+					onLayout={onLayoutChange}
+				>
+					<SideNav
+						isDefaultCollapsed={defaultCollapsed ?? true}
+						defaultLayout={defaultLayout ?? [15, 32, 48]}
+					/>
 
-				<ResizableHandle />
+					<ResizableHandle />
 
-				<ResizablePanel>
-					<Navbar />
+					<ResizablePanel>
+						<Navbar />
 
-					<Separator />
+						<Separator />
 
-					<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
-						<div className='h-full grow'>{children}</div>
-					</ScrollArea>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+						<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
+							<div className='h-full grow'>{children}</div>
+						</ScrollArea>
+					</ResizablePanel>
+				</ResizablePanelGroup>
 
-			<Toaster />
-		</UserLayout>
+				<Toaster />
+			</UserLayout>
+		</ReactQueryProvider>
 	);
 };
 

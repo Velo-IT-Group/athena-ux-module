@@ -16,44 +16,18 @@ import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
 import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
-import type { Session } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
 type Props = {
-	session: Session | null;
+	user: User | null;
 };
 
-const UserInfo = ({ session }: Props) => {
+const UserInfo = ({ user }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
-
-	useEffect(() => {
-		const down = (e: KeyboardEvent) => {
-			if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === '/') {
-				if (
-					(e.target instanceof HTMLElement && e.target.isContentEditable) ||
-					e.target instanceof HTMLInputElement ||
-					e.target instanceof HTMLTextAreaElement ||
-					e.target instanceof HTMLSelectElement
-				) {
-					return;
-				}
-
-				e.preventDefault();
-				// setOpen((open) => !open);
-			}
-		};
-
-		document.addEventListener('keydown', down);
-		return () => document.removeEventListener('keydown', down);
-	}, []);
-
-	const runCommand = useCallback((command: () => unknown) => {
-		// setOpen(false);
-		command();
-	}, []);
 
 	return (
 		<DropdownMenu>
@@ -77,7 +51,7 @@ const UserInfo = ({ session }: Props) => {
 						/>
 					</div>
 
-					<span>{session?.user.user_metadata.full_name}</span>
+					<span>{user?.user_metadata?.full_name}</span>
 				</Button>
 			</DropdownMenuTrigger>
 
@@ -100,7 +74,7 @@ const UserInfo = ({ session }: Props) => {
 					<DropdownMenuItem
 						onSelect={async () => {
 							await supabase.auth.signOut();
-							push('/login');
+							// push('/login');
 						}}
 					>
 						<LogOut className='mr-2 h-3.5 w-3.5' />

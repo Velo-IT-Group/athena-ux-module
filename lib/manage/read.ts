@@ -114,9 +114,10 @@ export const getCommunicationTypes = async (
 };
 
 export const getContactCommunications = async (
-	id: number,
+	id?: number,
 	conditions?: Conditions<CommunicationItem>
 ): Promise<CommunicationItem[] | undefined> => {
+	if (!id) return [];
 	try {
 		const response = await fetch(
 			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications${generateParams(conditions)}`,
@@ -336,22 +337,19 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ tickets: ServiceTicket[]; count: number }> => {
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions)}`, {
-		headers: baseHeaders,
-	});
-
-	const responseCount = await fetch(
-		`${process.env.CONNECT_WISE_URL}/service/tickets/count${generateParams(conditions)}`,
-		{
+	console.log(conditions);
+	const [ticketResponse, countResponse] = await Promise.all([
+		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions)}`, {
 			headers: baseHeaders,
-		}
-	);
-
-	const { count } = await responseCount.json();
+		}),
+		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/count${generateParams(conditions)}`, {
+			headers: baseHeaders,
+		}),
+	]);
 
 	return {
-		tickets: await response.json(),
-		count,
+		tickets: await ticketResponse.json(),
+		count: (await countResponse.json()).count,
 	};
 };
 

@@ -5,6 +5,7 @@ import { WorkerProvider } from '@/providers/worker-provider';
 import { NotificationProvider } from '@/providers/notification-provider';
 import { TaskContext } from '@/components/active-call/context';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { TwilioProvider } from '@/providers/twilio-provider';
 
 type Props = {
 	token: string;
@@ -16,9 +17,11 @@ const UserLayout = ({ token, children }: Props) => {
 		<TooltipProvider>
 			<NotificationProvider>
 				<TaskContext>
-					<DeviceProvider authToken={token}>
-						<WorkerProvider authToken={token}>{children}</WorkerProvider>
-					</DeviceProvider>
+					<TwilioProvider authToken={token}>
+						<DeviceProvider authToken={token}>
+							<WorkerProvider authToken={token}>{children}</WorkerProvider>
+						</DeviceProvider>
+					</TwilioProvider>
 				</TaskContext>
 			</NotificationProvider>
 		</TooltipProvider>

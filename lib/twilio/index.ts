@@ -1,8 +1,9 @@
 'use server';
 import { jwt } from 'twilio';
-import { VoiceGrant } from 'twilio/lib/jwt/AccessToken';
 const AccessToken = jwt.AccessToken;
+const VoiceGrant = AccessToken.VoiceGrant;
 const TaskRouterGrant = AccessToken.TaskRouterGrant;
+const SyncGrant = AccessToken.SyncGrant;
 
 export const createAccessToken = async (
 	accountSid: string,
@@ -16,12 +17,16 @@ export const createAccessToken = async (
 	const taskRouterGrant = new TaskRouterGrant({
 		workerSid,
 		workspaceSid,
-		role: 'worker',
+		role: 'supervisor',
 	});
 
 	const voiceGrant = new VoiceGrant({
 		outgoingApplicationSid: process.env.TWILIO_APPLICATION_SID,
 		incomingAllow: true, // Optional: add to allow incoming calls
+	});
+
+	const syncGrant = new SyncGrant({
+		serviceSid: process.env.TWILIO_SYNC_SID,
 	});
 
 	const accessToken = new AccessToken(accountSid, signingKeySid, signingKeySecret, {
@@ -30,8 +35,7 @@ export const createAccessToken = async (
 
 	accessToken.addGrant(taskRouterGrant);
 	accessToken.addGrant(voiceGrant);
-
-	// (accessToken.toJwt() as unknown as Promise<string>).then((t:string) => {token = t})
+	accessToken.addGrant(syncGrant);
 
 	return accessToken.toJwt();
 };

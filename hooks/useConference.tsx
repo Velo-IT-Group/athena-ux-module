@@ -7,7 +7,7 @@ import {
 	updateConference,
 	updateConferenceParticipants,
 } from '@/lib/twilio/conference/helpers';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { ConferenceAttributes, ConferenceParticpant } from './useTask';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
@@ -23,6 +23,7 @@ type Props = {
 };
 
 const useConference = ({ conference, task }: Props) => {
+	const queryClient = useQueryClient();
 	const { worker } = useWorker();
 	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>();
 
@@ -83,6 +84,7 @@ const useConference = ({ conference, task }: Props) => {
 	});
 
 	const updateConferenceParticipantsState = (participants: ConferenceParticpant) => {
+		queryClient.invalidateQueries({ queryKey: ['participants', conference.sid] });
 		setConferenceParticipants((prev) => {
 			return {
 				...prev,
@@ -96,6 +98,14 @@ const useConference = ({ conference, task }: Props) => {
 				},
 			};
 		});
+
+		task.setAttributes({
+			...task.attributes,
+			conference: {
+				...task.attributes.conference,
+				conferenceParticipants,
+			},
+		});
 	};
 
 	const addConferenceParticipantMutation = useMutation({
@@ -105,6 +115,7 @@ const useConference = ({ conference, task }: Props) => {
 			return await createConferenceParticipant(conference.sid, params);
 		},
 		onSuccess(data, variables, context) {
+			queryClient.invalidateQueries({ queryKey: ['participants', conference.sid] });
 			setConferenceParticipants((prev) => {
 				return {
 					...prev,
@@ -113,6 +124,14 @@ const useConference = ({ conference, task }: Props) => {
 						name: parsePhoneNumber(variables.To).formattedNumber,
 					},
 				};
+			});
+
+			task.setAttributes({
+				...task.attributes,
+				conference: {
+					...task.attributes.conference,
+					conferenceParticipants,
+				},
 			});
 		},
 	});

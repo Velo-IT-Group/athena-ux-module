@@ -7,7 +7,7 @@ import {
 	updateConference,
 	updateConferenceParticipants,
 } from '@/lib/twilio/conference/helpers';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { ConferenceAttributes, ConferenceParticpant } from './useTask';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
@@ -23,6 +23,7 @@ type Props = {
 };
 
 const useConference = ({ conference, task }: Props) => {
+	const queryClient = useQueryClient();
 	const { worker } = useWorker();
 	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>();
 
@@ -82,6 +83,31 @@ const useConference = ({ conference, task }: Props) => {
 		mutationFn: () => updateConference(conference.sid, { status: 'completed' }),
 	});
 
+	const updateConferenceParticipantsState = (participants: ConferenceParticpant) => {
+		queryClient.invalidateQueries({ queryKey: ['participants', conference.sid] });
+		setConferenceParticipants((prev) => {
+			return {
+				...prev,
+				worker: {
+					sid: worker?.sid,
+					name: worker?.attributes.full_name,
+				},
+				customer: {
+					sid: task.attributes.conference.participants.customer,
+					name: task.attributes.name ? task.attributes.name : parsePhoneNumber(task.attributes.from).formattedNumber,
+				},
+			};
+		});
+
+		task.setAttributes({
+			...task.attributes,
+			conference: {
+				...task.attributes.conference,
+				conferenceParticipants,
+			},
+		});
+	};
+
 	const addConferenceParticipantMutation = useMutation({
 		mutationFn: async (params: CreateParticipantParams) => {
 			// const { formattedNumber } = parsePhoneNumber(params.To, 'US', 'E.164');
@@ -89,6 +115,7 @@ const useConference = ({ conference, task }: Props) => {
 			return await createConferenceParticipant(conference.sid, params);
 		},
 		onSuccess(data, variables, context) {
+			queryClient.invalidateQueries({ queryKey: ['participants', conference.sid] });
 			setConferenceParticipants((prev) => {
 				return {
 					...prev,
@@ -97,6 +124,14 @@ const useConference = ({ conference, task }: Props) => {
 						name: parsePhoneNumber(variables.To).formattedNumber,
 					},
 				};
+			});
+
+			task.setAttributes({
+				...task.attributes,
+				conference: {
+					...task.attributes.conference,
+					conferenceParticipants,
+				},
 			});
 		},
 	});
@@ -112,6 +147,7 @@ const useConference = ({ conference, task }: Props) => {
 		endConference,
 		setConferenceParticipants,
 		queryParticipants,
+		updateConferenceParticipantsState,
 	};
 };
 

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
 	getConferenceParticipant,
 	removeConferenceParticipant,
@@ -14,29 +14,35 @@ type Props = {
 };
 
 const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
+	const queryClient = useQueryClient();
+
 	const [isMuted, setIsMuted] = useState(false);
+	const [isCoaching, setIsCoaching] = useState(false);
 	const [isOnHold, setIsOnHold] = useState(false);
+	const [status, setStatus] = useState('');
 
 	const getParticipant = useQuery({
 		queryKey: ['participant', conferenceSid, participantSid],
 		queryFn: () => getConferenceParticipant(conferenceSid, participantSid),
 	});
 
-	// setIsOnHold(data?.hold ?? false);
-	// setIsMuted(data?.muted ?? false);
-
 	const toggleParticipantMute = useMutation({
 		mutationKey: ['toggleParticipantMute', conferenceSid, participantSid],
 		mutationFn: ({ label, muted }: { label?: string; muted: boolean }) =>
 			updateConferenceParticipants(conferenceSid, label ?? participantSid, { Muted: muted }),
 		onSuccess: (data, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
+
 			setIsMuted(data.muted);
 		},
 	});
 
 	const removeParticipant = useMutation({
 		mutationKey: ['toggleParticipantMute', conferenceSid, participantSid],
-		mutationFn: (muted: boolean) => removeConferenceParticipant(conferenceSid, participantSid),
+		mutationFn: () => removeConferenceParticipant(conferenceSid, participantSid),
+		onSuccess: (data, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
+		},
 	});
 
 	const toggleParticipantHoldState = useMutation({
@@ -44,6 +50,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 		mutationFn: ({ label, hold }: { label?: string; hold: boolean }) =>
 			updateConferenceParticipants(conferenceSid, label ?? participantSid, { Hold: hold }),
 		onSuccess: (data, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
 			setIsMuted(data.hold);
 		},
 		onError(error, variables, context) {
@@ -53,8 +60,14 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 
 	return {
 		isMuted,
+		isCoaching,
+		status,
 		isOnHold,
 		getParticipant,
+		setIsMuted,
+		setIsCoaching,
+		setStatus,
+		setIsOnHold,
 		toggleParticipantHoldState,
 		toggleParticipantMute,
 		removeParticipant,

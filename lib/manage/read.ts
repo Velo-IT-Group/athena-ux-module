@@ -337,7 +337,6 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ tickets: ServiceTicket[]; count: number }> => {
-	console.log(conditions);
 	const [ticketResponse, countResponse] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions)}`, {
 			headers: baseHeaders,

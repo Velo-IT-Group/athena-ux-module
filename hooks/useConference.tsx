@@ -111,7 +111,6 @@ const useConference = ({ conference, task }: Props) => {
 	const addConferenceParticipantMutation = useMutation({
 		mutationFn: async (params: CreateParticipantParams) => {
 			// const { formattedNumber } = parsePhoneNumber(params.To, 'US', 'E.164');
-			console.log(params);
 			return await createConferenceParticipant(conference.sid, params);
 		},
 		onSuccess(data, variables, context) {

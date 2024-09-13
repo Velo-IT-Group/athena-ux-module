@@ -7,8 +7,6 @@
 
 import { createClient } from 'npm:@supabase/supabase-js'
 
-console.log("Hello from Functions!")
-
 Deno.serve(async (req) => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -36,7 +34,7 @@ Deno.serve(async (req) => {
 			case 'com.twilio.taskrouter.reservation.wrapup':
 				const timestamp = new Date(payload.timestamp);
 				const dateCreated = new Date(payload.task_date_created);
-				const duration = Math.floor(timestamp.getTime() - dateCreated.getTime() / 1000);
+				const duration = Math.floor((timestamp.getTime() - dateCreated.getTime()) / 1000);
 				supabase
 					.from('conversations')
 					.update({
@@ -83,8 +81,6 @@ Deno.serve(async (req) => {
 				const isAbandoned =
 					attributes.conversations?.abandoned ||
 					(payload.task_assignment_status === 'canceled' && payload.task_canceled_reason === 'hangup');
-
-				console.log(payload);
 
 				supabase
 					.from('conversations')

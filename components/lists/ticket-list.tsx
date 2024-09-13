@@ -22,8 +22,6 @@ type Props = {
 const TicketList = async ({ type, defaultValue, params, hidePagination = false, facetedFilters }: Props) => {
 	const queryClient = getQueryClient();
 
-	console.log(params?.conditions);
-
 	// Note we are now using fetchQuery()
 	const { tickets, count } = await queryClient.fetchQuery({
 		queryKey: ['tickets', params],

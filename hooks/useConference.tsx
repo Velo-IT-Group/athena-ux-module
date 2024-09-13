@@ -82,6 +82,22 @@ const useConference = ({ conference, task }: Props) => {
 		mutationFn: () => updateConference(conference.sid, { status: 'completed' }),
 	});
 
+	const updateConferenceParticipantsState = (participants: ConferenceParticpant) => {
+		setConferenceParticipants((prev) => {
+			return {
+				...prev,
+				worker: {
+					sid: worker?.sid,
+					name: worker?.attributes.full_name,
+				},
+				customer: {
+					sid: task.attributes.conference.participants.customer,
+					name: task.attributes.name ? task.attributes.name : parsePhoneNumber(task.attributes.from).formattedNumber,
+				},
+			};
+		});
+	};
+
 	const addConferenceParticipantMutation = useMutation({
 		mutationFn: async (params: CreateParticipantParams) => {
 			// const { formattedNumber } = parsePhoneNumber(params.To, 'US', 'E.164');
@@ -112,6 +128,7 @@ const useConference = ({ conference, task }: Props) => {
 		endConference,
 		setConferenceParticipants,
 		queryParticipants,
+		updateConferenceParticipantsState,
 	};
 };
 

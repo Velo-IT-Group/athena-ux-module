@@ -53,18 +53,20 @@ const ParticipantListItem = ({ conferenceSid, sid, name, isYou, showRemoval }: P
 				<TooltipContent>{participant?.hold ? 'Remove From Hold' : 'Put On Hold'}</TooltipContent>
 			</Tooltip>
 
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant='ghost'
-						size='icon'
-					>
-						<CircleMinus />
-					</Button>
-				</TooltipTrigger>
+			{showRemoval && (
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							variant='ghost'
+							size='icon'
+						>
+							<CircleMinus />
+						</Button>
+					</TooltipTrigger>
 
-				<TooltipContent>Remove</TooltipContent>
-			</Tooltip>
+					<TooltipContent>Remove</TooltipContent>
+				</Tooltip>
+			)}
 		</div>
 	);
 };

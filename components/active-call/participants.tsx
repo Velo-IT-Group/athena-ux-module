@@ -13,12 +13,14 @@ type Props = {
 
 const ActiveCallParticipants = ({ sid, participants }: Props) => {
 	const entries = Object.entries(participants);
-	const { data, error, isLoading } = useQuery({
+
+	const { data } = useQuery({
 		queryKey: ['queryParticipants', sid],
 		queryFn: () => getConferenceParticipants(sid),
+		enabled: !!sid,
 	});
 
-	// console.log(data);
+	console.log(data?.participants);
 
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>

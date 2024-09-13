@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
 import { createClient } from '@/utils/supabase/server';
+import HistorySelector from '@/components/history-selector';
 
 const Navbar = async () => {
 	const supabase = createClient();
@@ -25,6 +26,8 @@ const Navbar = async () => {
 			</div>
 
 			<div className='flex items-center'>
+				<HistorySelector user={user} />
+
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -36,10 +39,7 @@ const Navbar = async () => {
 					</PopoverTrigger>
 
 					<PopoverContent align='end'>
-						<OutboundDialerContent
-							numbers={[]}
-							// onSubmit={() => {}}
-						/>
+						<OutboundDialerContent numbers={[]} />
 					</PopoverContent>
 				</Popover>
 

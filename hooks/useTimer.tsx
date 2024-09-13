@@ -2,14 +2,13 @@
 import { useEffect, useState } from 'react';
 
 const useTimer = (date?: Date) => {
-	const [seconds, setSeconds] = useState(date?.getSeconds() ?? 0);
-	const [minutes, setMinutes] = useState(date?.getMinutes() ?? 0);
-	const [hours, setHours] = useState(date?.getHours() ?? 0);
+	const [seconds, setSeconds] = useState(0);
+	const [minutes, setMinutes] = useState(0);
+	const [hours, setHours] = useState(0);
 
 	useEffect(() => {
-		const startTime = date || new Date();
-
 		const interval = setInterval(() => {
+			const startTime = date ?? new Date();
 			const time = Date.now() - startTime.getTime();
 
 			const m = Math.floor((time / 1000 / 60) % 60);

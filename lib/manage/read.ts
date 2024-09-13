@@ -81,7 +81,8 @@ export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>)
 	return await response.json();
 };
 
-export const getContact = async (id: number, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
+export const getContact = async (id?: number | null, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
+	if(!id) return;
 	try {
 		const response = await fetch(
 			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/${generateParams(conditions)}`,

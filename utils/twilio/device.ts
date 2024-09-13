@@ -38,4 +38,9 @@ export const handleWarnings = (connection: Call) => {
 	});
 };
 
-export const toggleHold = (connection: Call) => {};
+export const toggleHold = (connection: Call) => { };
+
+export const setSelectedDevice = (selectedDevice: MediaDeviceInfo, voiceClient: Device) => {
+	voiceClient?.audio?.speakerDevices.set(selectedDevice.deviceId);
+	voiceClient?.audio?.setInputDevice(selectedDevice.deviceId);
+  };

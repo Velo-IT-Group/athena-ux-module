@@ -1,21 +1,18 @@
-import { History, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
+import { History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
 	CommandGroup,
 	CommandInput,
-	CommandItem,
 	CommandList,
 	CommandSeparator,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { groupBy } from 'lodash';
-import { getAllCalls } from '@/lib/twilio/read';
-import getQueryClient from '@/app/getQueryClient';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/server';
-import { parsePhoneNumber } from '@/lib/utils';
+import HistoryListItem from '@/app/(user)/history-list-item';
 
 type Props = {
 	user: User | null;
@@ -23,27 +20,16 @@ type Props = {
 
 const HistorySelector = async ({ user }: Props) => {
 	const supabase = createClient();
-	const { data: calls, error } = await supabase
+	const { data: conversation } = await supabase
 		.schema('reporting')
 		.from('conversations')
-		.select()
-		.eq('agent', user?.email ?? '')
+		.select('id, date, direction, phone_number, talk_time, contact_id')
+		.eq('agent', user?.user_metadata.workerSid ?? '')
 		.order('date', { ascending: false });
-	console.log(calls);
-	const queryClient = getQueryClient();
 
-	// console.log(user?.email);
-	// Note we are now using fetchQuery()
-	// const calls = await queryClient.fetchQuery({
-	// 	queryKey: ['allCalls'],
-	// 	queryFn: () => getAllCalls(`client:${user?.email ?? ''}`),
-	// });
-
-	const groupedCalls = groupBy(calls, ({ date }) =>
+	const groupedCalls = groupBy(conversation, ({ date }) =>
 		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(date))
 	);
-
-	// console.log(groupedCalls);
 
 	return (
 		<Popover>
@@ -57,40 +43,22 @@ const HistorySelector = async ({ user }: Props) => {
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent className='min-w-72 p-0'>
+			<PopoverContent className='min-w-80 p-0'>
 				<Command>
 					<CommandInput placeholder='Filter calls...' />
 
 					<CommandEmpty>No call history found.</CommandEmpty>
 
 					<CommandList>
-						{Object?.entries(groupedCalls).map(([key, calls], index) => (
+						{Object?.entries(groupedCalls).map(([key, conversations], index) => (
 							<div key={`${key}-separator`}>
 								{index !== 0 && <CommandSeparator key={`${key}-seperator`} />}
 								<CommandGroup
 									key={key}
 									heading={key}
 								>
-									{calls?.map((call) => (
-										<CommandItem
-											key={call.id}
-											value={call.id}
-											// onSelect={(currentValue) => {
-											// 	// const call =
-											// 	// setValue(value && currentValue === value ? '' : currentValue);
-											// 	// setOpen(false);
-											// }}
-										>
-											{call.direction === 'outbound' ? (
-												<PhoneOutgoing className='mr-1.5 text-red-500' />
-											) : (
-												<PhoneIncoming className='mr-1.5 text-green-500' />
-											)}
-											<span className='text-muted-foreground'>
-												{parsePhoneNumber(call.phone_number ?? '').formattedNumber}{' '}
-												{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(new Date(call.date))}
-											</span>
-										</CommandItem>
+									{conversations?.map((conversation) => (
+										<HistoryListItem conversation={conversation as Conversation} />
 									))}
 								</CommandGroup>
 							</div>

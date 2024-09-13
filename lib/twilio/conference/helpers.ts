@@ -80,7 +80,9 @@ export const getConferenceByName = async (friendlyName: string) => {
 	};
 };
 
-export const getConferenceParticipants = async (conferenceSid: string) => {
+export const getConferenceParticipants = async (
+	conferenceSid: string
+): Promise<{ participants: ParticipantInstance[] }> => {
 	let headers = new Headers();
 	headers.set(
 		'Authorization',

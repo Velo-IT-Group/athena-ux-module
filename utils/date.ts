@@ -27,3 +27,8 @@ export function relativeDate(date: Date) {
 		return formatter.format(-Math.floor(diff / year), 'years');
 	}
 }
+
+export function addSeconds(date: Date, seconds: number) {
+  date.setSeconds(date.getSeconds() + seconds);
+  return date;
+}

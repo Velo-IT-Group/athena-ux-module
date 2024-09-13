@@ -3,8 +3,6 @@ import React from 'react';
 import { CardContent } from '../ui/card';
 import ParticipantListItem from './participant-list-item';
 import { ConferenceParticpant } from '@/hooks/useTask';
-import { useQuery } from '@tanstack/react-query';
-import { getConferenceParticipants } from '@/lib/twilio/conference/helpers';
 
 type Props = {
 	sid: string;
@@ -14,26 +12,20 @@ type Props = {
 const ActiveCallParticipants = ({ sid, participants }: Props) => {
 	const entries = Object.entries(participants);
 
-	const { data } = useQuery({
-		queryKey: ['queryParticipants', sid],
-		queryFn: () => getConferenceParticipants(sid),
-		enabled: !!sid,
-	});
-
-	console.log(data?.participants);
-
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
-			{entries.map(([key, value]) => (
-				<ParticipantListItem
-					key={key}
-					conferenceSid={sid}
-					name={value.name}
-					sid={value.sid}
-					isYou={key === 'worker'}
-					showRemoval={entries.length > 2}
-				/>
-			))}
+			{entries.map(([key, value]) => {
+				return (
+					<ParticipantListItem
+						key={key}
+						conferenceSid={sid}
+						name={value.name}
+						sid={value.sid}
+						isYou={key === 'worker'}
+						showRemoval={entries.length > 2}
+					/>
+				);
+			})}
 		</CardContent>
 	);
 };

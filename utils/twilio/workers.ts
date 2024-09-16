@@ -35,3 +35,22 @@ export const onWorkerReady = async (
 		}
 	});
 };
+
+export const changeOnCallEngineer = async (workerSid: string, token: string): Promise<boolean> => { 
+      const encodedParams = {
+        workerSid,
+        Token: token,
+      };
+ 
+     const res = await fetch('https://custom-flex-extensions-serverless-1420-dev.twil.io/features/on-call-engineer/flex/make-on-call-engineer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: JSON.stringify(encodedParams),
+	 })
+
+	if (!res.ok) {
+		throw new Error('Failed to change on call engineer');
+	}
+
+	return true
+};

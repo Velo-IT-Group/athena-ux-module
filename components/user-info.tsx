@@ -31,6 +31,9 @@ import {
 	AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { useWorker } from '../providers/worker-provider';
+import { useMutation } from '@tanstack/react-query';
+import { changeOnCallEngineer } from '../utils/twilio/workers';
+import { useTwilio } from '../providers/twilio-provider';
 
 type Props = {
 	user: User | null;
@@ -41,6 +44,20 @@ const UserInfo = ({ user }: Props) => {
 	const supabase = createClient();
 	const { worker } = useWorker();
 	const [isOpen, setIsOpen] = useState(false);
+	const [attributes, setAttributes] = useState<Record<string, any>>();
+	const { token } = useTwilio();
+
+	const { mutate } = useMutation({
+		mutationKey: ['changeOnCallEngineer'],
+		mutationFn: () => changeOnCallEngineer(worker?.sid ?? '', token),
+	});
+
+	useEffect(() => {
+		if (!worker?.attributes || Object.keys(worker.attributes).length === 0) return;
+		console.log(worker.attributes);
+		setAttributes(worker?.attributes);
+	}, [worker, worker?.attributes]);
+
 	return (
 		<AlertDialog>
 			<DropdownMenu>
@@ -85,9 +102,9 @@ const UserInfo = ({ user }: Props) => {
 						<DropdownMenuSeparator />
 
 						<AlertDialogTrigger asChild>
-							<DropdownMenuItem>
-								{worker?.attributes.on_call ? <Bell className='mr-1.5' /> : <BellOff className='mr-1.5' />}
-								<span>{worker?.attributes.on_call ? 'You are on call' : 'You are not on call'}</span>
+							<DropdownMenuItem disabled={attributes?.on_call}>
+								{attributes?.on_call ? <Bell className='mr-1.5' /> : <BellOff className='mr-1.5' />}
+								<span>{attributes?.on_call ? 'You are on call' : 'You are not on call'}</span>
 							</DropdownMenuItem>
 						</AlertDialogTrigger>
 
@@ -118,7 +135,7 @@ const UserInfo = ({ user }: Props) => {
 
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction>Yes, I want to go off call</AlertDialogAction>
+					<AlertDialogAction onClick={() => mutate()}>Yes, I want to go off call</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

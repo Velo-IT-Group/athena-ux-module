@@ -43,7 +43,10 @@ const HistorySelector = async ({ user }: Props) => {
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent className='min-w-80 p-0'>
+			<PopoverContent
+				className='min-w-80 p-0'
+				align='end'
+			>
 				<Command>
 					<CommandInput placeholder='Filter calls...' />
 

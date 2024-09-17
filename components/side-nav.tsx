@@ -6,6 +6,7 @@ import { ResizablePanel } from './ui/resizable';
 import TaskList from './lists/task-list';
 import { Separator } from './ui/separator';
 import FavIcon from './icons/favicon';
+import SidebarActivityList from './sidebar-activity-list';
 
 type Props = {
 	isDefaultCollapsed: boolean;
@@ -45,7 +46,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 						<Separator />
 
-						{/* <SidebarActivityList isCollapsed={isCollapsed} /> */}
+						<SidebarActivityList isCollapsed={isCollapsed} />
 					</div>
 				</div>
 			</ScrollArea>

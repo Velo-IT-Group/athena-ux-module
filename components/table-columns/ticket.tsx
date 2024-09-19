@@ -19,7 +19,11 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		),
 		cell: ({ row }) => (
 			<Link
-				href={`/tickets/${row.getValue('id')}`}
+				href={`https://manage.velomethod.com/v4_6_release/services/system_io/Service/fv_sr100_request.rails?service_recid=${row.getValue(
+					'id'
+				)}&companyName=velo`}
+				target='_blank'
+				// href={`/tickets/${row.getValue('id')}`}
 				className={cn(buttonVariants({ variant: 'link' }), 'w-[80px]')}
 			>
 				#{row.getValue('id')}

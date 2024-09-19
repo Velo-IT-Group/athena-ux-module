@@ -9,7 +9,7 @@ import { Combobox } from '@/components/ui/combobox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DataTableToolbar, FacetedFilter } from '@/components/ui/data-table/toolbar';
 import { TableDefinition } from '@/types';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 import { baseHeaders } from '@/lib/utils';
 import {
@@ -28,43 +28,41 @@ import {
 	TableMeta,
 	RowData,
 } from '@tanstack/react-table';
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
 import { DataTablePagination } from './ui/data-table/pagination';
 import { usePagination } from '@/hooks/usePagination';
 import { updateFilterCookie } from './cookie-filter-actions';
 
-type Props = {
-	initialData: { tickets: ServiceTicket[]; count: number };
+type Props<TData> = {
+	initialData: { data: ServiceTicket[]; count: number };
 	defaultParams?: Conditions<ServiceTicket>;
+	facetedFilters?: FacetedFilter<TData>[];
 	definition: TableDefinition;
 };
 
-const TicketTable = ({ initialData, defaultParams, definition }: Props) => {
+const TicketTable = <TData,>({ initialData, defaultParams, facetedFilters, definition }: Props<TData>) => {
 	const [params, setParams] = React.useState<Conditions<ServiceTicket>>(defaultParams ?? {});
 	const { pagination, onPaginationChange } = usePagination(definition, defaultParams ?? {});
 	const [rowSelection, setRowSelection] = React.useState({});
-	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+		priority: false,
+	});
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
-	const { data, isLoading, isFetching, isPending, error, refetch } = useQuery({
+	const { data, isLoading, isFetching, isPending, refetch } = useQuery({
 		queryKey: ['tickets', params],
-		queryFn: ({}) =>
-			getTickets({
-				...params,
-				page: pagination.pageIndex + 1,
-				pageSize: pagination.pageSize,
-				orderBy: { key: 'id', order: 'desc' },
-				// fields: Object.keys(columnVisibility),
-			}),
+		queryFn: ({ queryKey }) =>
+			getTickets({ ...queryKey, orderBy: { key: 'id', order: 'desc' } } as Conditions<ServiceTicket>),
 		initialData,
-		enabled: false,
+		placeholderData: keepPreviousData,
 	});
 
 	useEffect(() => {
 		refetch();
+		return () => {
+			updateFilterCookie(definition, { ...params, pageSize: pagination.pageSize, page: pagination.pageIndex });
+		};
 	}, [params, pagination]);
 
 	useEffect(() => {
@@ -74,14 +72,17 @@ const TicketTable = ({ initialData, defaultParams, definition }: Props) => {
 	}, []);
 
 	const table = useReactTable({
-		data: data.tickets,
+		data: data.data,
 		columns,
 		state: {
 			sorting,
 			columnVisibility,
 			rowSelection,
 			columnFilters,
-			pagination,
+			pagination: {
+				pageIndex: params.page ?? 0,
+				pageSize: params.pageSize ?? 10,
+			},
 		},
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
@@ -108,7 +109,7 @@ const TicketTable = ({ initialData, defaultParams, definition }: Props) => {
 		<div className='space-y-3 p-[4px] overflow-x-auto overflow-visible'>
 			<DataTableToolbar
 				table={table}
-				facetedFilters={[]}
+				facetedFilters={facetedFilters}
 			/>
 
 			<div className='rounded-md border'>

@@ -60,15 +60,19 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 
 	const client = getQueryClient();
 	const initalTickets = await client.fetchQuery({
-		queryKey: ['tickets'],
-		queryFn: () =>
+		queryKey: ['tickets', ticketFilter],
+		queryFn: ({ queryKey }) =>
 			getTickets({
-				...ticketFilter,
+				...queryKey,
 				page: ticketFilter.page ?? 1,
+				conditions: [{ parameter: { 'board/id': ` (${boards.map((b) => b.id).toString()})` }, comparator: 'in' }],
 				pageSize: ticketFilter.pageSize ?? 20,
 				orderBy: { key: 'id', order: 'desc' },
+				fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
 			}),
 	});
+
+	console.log(initalTickets);
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -182,15 +186,29 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 				</TabsContent>
 
 				<TabsContent value={tabs[3].name}>
-					{/* <TicketTable
+					<TicketTable
 						initialData={initalTickets}
 						defaultParams={{
 							...ticketFilter,
 							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
 						}}
+						facetedFilters={[
+							{ accessoryKey: 'board', items: boards },
+							{ accessoryKey: 'priority', items: priorities },
+							{
+								accessoryKey: 'contact',
+								items: [],
+							},
+							{
+								accessoryKey: 'owner',
+								items: members.map((member) => {
+									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+								}),
+							},
+						]}
 						definition={{ page: 'Dashboard', section: 'Tickets' }}
-					/> */}
-					<TicketList
+					/>
+					{/* <TicketList
 						type='table'
 						params={{ ...ticketFilter, fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'] }}
 						facetedFilters={[
@@ -208,7 +226,7 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 							},
 						]}
 						definition={{ page: 'Dashboard', section: 'Tickets' }}
-					/>
+					/> */}
 				</TabsContent>
 			</Tabs>
 		</div>

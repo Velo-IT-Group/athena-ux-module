@@ -50,16 +50,14 @@ const TicketList = ({ type, defaultValue, params, definition, hidePagination = f
 				<DataTable
 					initialData={[]}
 					columns={columns}
-					queryFn={getTickets(params)}
+					queryFn={() => getTickets(params)}
 					facetedFilters={facetedFilters}
-					count={0}
-					isLoading={false}
+					// count={0}
 					meta={{
 						filterKey: 'summary',
 						definition,
 						filterParams: params!,
 					}}
-					hidePagination={hidePagination}
 				/>
 			)}
 

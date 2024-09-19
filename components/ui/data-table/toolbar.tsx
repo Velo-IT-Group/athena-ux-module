@@ -50,7 +50,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 					/>
 				)}
 
-				{facetedFilters?.map(({ accessoryKey, items, queryFn }) => {
+				{facetedFilters?.map(({ accessoryKey, items }) => {
 					const column = table.getColumn(accessoryKey as string);
 					const defaultValueCondition = table.options?.meta?.filterParams?.conditions?.find(
 						// @ts-ignore
@@ -74,7 +74,6 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 									defaultValues={defaultValues}
 									addCondition={addCondition}
 									removeCondition={removeCondition}
-									queryFn={queryFn}
 								/>
 							)}
 						</React.Fragment>

@@ -35,14 +35,14 @@ declare module '@tanstack/table-core' {
 		filterParams: Conditions<TData>;
 	}
 }
+
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	initialData: TData[];
 	meta: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
 	hidePagination?: boolean;
-	count: number;
-	queryFn: QueryFunction<TData[]>;
+	queryFn: QueryFunction<{ data: TData[]; count: number }, [Conditions<TData>], Conditions<TData>>;
 	defaultVisibleColumns?: VisibilityState;
 }
 
@@ -50,7 +50,6 @@ export function DataTable<TData, TValue>({
 	columns,
 	initialData,
 	meta,
-	count,
 	facetedFilters,
 	hidePagination = false,
 	queryFn,
@@ -65,9 +64,8 @@ export function DataTable<TData, TValue>({
 
 	const { data, isLoading, isFetching, refetch } = useQuery({
 		queryKey: [params, pagination],
-		queryFn: queryFn,
-		initialData,
-		enabled: false,
+		queryFn: () => queryFn(params),
+		initialData: { data: initialData, count: 0 },
 	});
 
 	console.log(data);
@@ -83,7 +81,7 @@ export function DataTable<TData, TValue>({
 	}, []);
 
 	const table = useReactTable({
-		data,
+		data: data.data,
 		columns,
 		state: {
 			sorting,
@@ -101,7 +99,7 @@ export function DataTable<TData, TValue>({
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		manualPagination: true,
-		rowCount: count,
+		rowCount: data.count,
 		getPaginationRowModel: !hidePagination ? getPaginationRowModel() : undefined,
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
@@ -167,6 +165,49 @@ export function DataTable<TData, TValue>({
 					)}
 				</Table>
 			</div>
+
+			{/* <div className='flex items-center gap-3 fixed bottom-2 left-auto right-auto bg-secondary/50 backdrop-blur-md border rounded-lg p-3'>
+				<p className='flex items-center gap-1.5'>
+					<Badge className='rounded-sm grid place-items-center p-0 w-3.5'>
+						{table.getFilteredSelectedRowModel().rows.length}
+					</Badge>
+					<span> selected</span>
+				</p>
+
+				<Button
+					className='bg-background'
+					variant='outline'
+					size='sm'
+				>
+					<Grid2x2Plus className='mr-1.5' />
+					<span>Add to collection</span>
+				</Button>
+
+				<Button
+					className='bg-background'
+					variant='outline'
+					size='sm'
+				>
+					<Grid2X2 className='mr-1.5' />
+					<span>Create new collection</span>
+				</Button>
+
+				<Button
+					className='bg-background'
+					variant='outline'
+					size='sm'
+				>
+					<MailPlus className='mr-1.5' />
+					<span>Send email</span>
+				</Button>
+
+				<Button
+					variant='ghost'
+					size='icon'
+				>
+					<Ellipsis />
+				</Button>
+			</div> */}
 
 			{!hidePagination && <DataTablePagination table={table} />}
 		</div>

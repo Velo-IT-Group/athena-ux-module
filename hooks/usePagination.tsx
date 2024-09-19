@@ -1,11 +1,22 @@
-import { useState } from 'react';
+import { updateFilterCookie } from '@/components/cookie-filter-actions';
+import { TableDefinition } from '@/types';
+import { Conditions } from '@/utils/manage/params';
+import { useEffect, useState } from 'react';
 
-export function usePagination() {
+export function usePagination<T>(definition: TableDefinition, params: Conditions<T>) {
 	const [pagination, setPagination] = useState({
-		pageSize: 10,
-		pageIndex: 0,
+		pageSize: params.pageSize ?? 20,
+		pageIndex: params.page ?? 1,
 	});
+
 	const { pageSize, pageIndex } = pagination;
+
+	useEffect(() => {
+		// console.log(pageSize, pageIndex);
+		// return () => {
+		// 	console.log('running');
+		// };
+	}, [pagination]);
 
 	return {
 		limit: pageSize,

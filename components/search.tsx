@@ -1,51 +1,44 @@
 'use client';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useFormStatus } from 'react-dom';
 import { Button } from './ui/button';
 import { RefreshCcw, SearchIcon } from 'lucide-react';
+import { Comparison } from '@/utils/manage/params';
 
 type Props = {
-	baseUrl: string;
 	placeholder: string;
 	className?: string;
 	queryParam?: string;
+	defaultValue?: string;
+	addCondition: (newCondition: Comparison) => void;
+	removeCondition: (keyToRemove: string) => void;
 };
 
-const Search = ({ baseUrl, placeholder, className, queryParam = 'search' }: Props) => {
+const Search = ({
+	placeholder,
+	className,
+	queryParam = 'search',
+	defaultValue,
+	addCondition,
+	removeCondition,
+}: Props) => {
 	const { pending } = useFormStatus();
-	const [text, setText] = useState('');
+	const [text, setText] = useState(defaultValue?.replaceAll("'", ''));
 	const debounced = useDebouncedCallback((value) => {
 		setText(value);
 	}, 500);
-	// const [query] = useDebounce(text, 500);
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const pathname = usePathname();
-
-	// console.log(pathname);
-
-	const createQueryString = useCallback(
-		(name: string, value: string) => {
-			const params = new URLSearchParams(searchParams.toString());
-			params.set(name, value);
-
-			return params.toString();
-		},
-		[searchParams]
-	);
 
 	useEffect(() => {
 		if (!text) {
-			router.push(pathname);
+			removeCondition(queryParam);
 		} else {
 			console.log(text);
-			router.push(pathname + '?' + createQueryString(queryParam, text.trim()));
+			addCondition({ parameter: { [queryParam]: `'${text}'` }, comparator: 'contains' });
 		}
-	}, [baseUrl, createQueryString, pathname, router, text, queryParam]);
+	}, [text, queryParam]);
 
 	return (
 		<form
@@ -59,16 +52,16 @@ const Search = ({ baseUrl, placeholder, className, queryParam = 'search' }: Prop
 
 			<Input
 				placeholder={placeholder}
-				defaultValue={text}
+				value={text}
 				onChange={(event) => debounced(event.target.value)}
 				onKeyUp={(e) => {
 					if (e.key === 'Enter') {
 						debounced.cancel();
 						if (!text) {
-							router.push(`${baseUrl}`);
+							removeCondition(queryParam);
 						} else {
 							console.log(text);
-							router.push(pathname + '?' + createQueryString('search', text));
+							addCondition({ parameter: { [queryParam]: `'${text}'` }, comparator: 'contains' });
 						}
 					}
 				}}

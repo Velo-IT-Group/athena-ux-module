@@ -2,7 +2,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Activity, Building, Cable, PhoneIncoming, PhoneOutgoing, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { getAllCalls } from '@/lib/twilio/read';
-import { CommunicationItem } from '@/types/manage';
+import { CommunicationItem, ServiceTicket } from '@/types/manage';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
 import ActivityList from '@/components/lists/activity-list';
@@ -12,8 +12,11 @@ import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
 import { relativeDate } from '@/utils/date';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { getBoards, getPriorities, getSystemMembers } from '@/lib/manage/read';
+import { getBoards, getPriorities, getSystemMembers, getTickets } from '@/lib/manage/read';
 import { createClient } from '@/utils/supabase/server';
+import { Conditions } from '@/utils/manage/params';
+import TicketTable from '@/components/ticket-table';
+import getQueryClient from '../getQueryClient';
 
 type Props = {
 	contactId?: number;
@@ -21,17 +24,11 @@ type Props = {
 	className?: string;
 	communicationItems?: CommunicationItem[];
 	searchParams: { [key: string]: string | string[] | undefined };
+	ticketFilter: Conditions<ServiceTicket>;
 };
 
-const ConversationDetails = async ({
-	contactId: userId,
-	companyId,
-	className,
-	communicationItems,
-	searchParams,
-}: Props) => {
+const ConversationDetails = async ({ contactId: userId, className, communicationItems, ticketFilter }: Props) => {
 	const headers = new Headers();
-	console.log(headers);
 	const supabase = createClient();
 	const [
 		{
@@ -60,6 +57,18 @@ const ConversationDetails = async ({
 			pageSize: 1000,
 		}),
 	]);
+
+	const client = getQueryClient();
+	const initalTickets = await client.fetchQuery({
+		queryKey: ['tickets'],
+		queryFn: () =>
+			getTickets({
+				...ticketFilter,
+				page: ticketFilter.page ?? 1,
+				pageSize: ticketFilter.pageSize ?? 20,
+				orderBy: { key: 'id', order: 'desc' },
+			}),
+	});
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -131,31 +140,32 @@ const ConversationDetails = async ({
 				</TabsContent>
 
 				<TabsContent value={tabs[1].name}>
-					<Suspense fallback={<TableSkeleton />}>
-						<TicketList
-							type='table'
-							params={{
-								conditions: [
-									{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
-									{ parameter: { 'company/id': companyId! } },
-									{ parameter: { 'contact/id': userId }, comparator: '!=' },
-									// { parameter: { closedFlag: false } },
-								],
-								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-								// pageSize: 1000,
-							}}
-							facetedFilters={[
-								{ accessoryKey: 'board', items: boards },
-								{ accessoryKey: 'priority', items: priorities },
-								{
-									accessoryKey: 'owner',
-									items: members.map((member) => {
-										return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
-									}),
-								},
-							]}
-						/>
-					</Suspense>
+					{/* <Suspense fallback={<TableSkeleton />}>
+					</Suspense> */}
+					{/* <TicketList
+						type='table'
+						// params={{
+						// 	conditions: [
+						// 		{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
+						// 		{ parameter: { 'company/id': companyId! } },
+						// 		{ parameter: { 'contact/id': userId }, comparator: '!=' },
+						// 		// { parameter: { closedFlag: false } },
+						// 	],
+						// 	fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+						// 	// pageSize: 1000,
+						// }}
+						// facetedFilters={[
+						// 	{ accessoryKey: 'board', items: boards },
+						// 	{ accessoryKey: 'priority', items: priorities },
+						// 	{
+						// 		accessoryKey: 'owner',
+						// 		items: members.map((member) => {
+						// 			return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+						// 		}),
+						// 	},
+						// ]}
+						definition={{ page: 'Dashboard', section: 'Company' }}
+					/> */}
 				</TabsContent>
 
 				<TabsContent value={tabs[2].name}>
@@ -172,31 +182,33 @@ const ConversationDetails = async ({
 				</TabsContent>
 
 				<TabsContent value={tabs[3].name}>
-					<Suspense fallback={<TableSkeleton />}>
-						<TicketList
-							type='table'
-							params={{
-								conditions: userId
-									? [
-											{ parameter: { 'contact/id': userId } },
-											{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
-									  ]
-									: [],
-								fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-								// pageSize: 1000,
-							}}
-							facetedFilters={[
-								{ accessoryKey: 'board', items: boards },
-								{ accessoryKey: 'priority', items: priorities },
-								{
-									accessoryKey: 'owner',
-									items: members.map((member) => {
-										return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
-									}),
-								},
-							]}
-						/>
-					</Suspense>
+					{/* <TicketTable
+						initialData={initalTickets}
+						defaultParams={{
+							...ticketFilter,
+							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+						}}
+						definition={{ page: 'Dashboard', section: 'Tickets' }}
+					/> */}
+					<TicketList
+						type='table'
+						params={{ ...ticketFilter, fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'] }}
+						facetedFilters={[
+							{ accessoryKey: 'board', items: boards },
+							{ accessoryKey: 'priority', items: priorities },
+							{
+								accessoryKey: 'contact',
+								items: [],
+							},
+							{
+								accessoryKey: 'owner',
+								items: members.map((member) => {
+									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
+								}),
+							},
+						]}
+						definition={{ page: 'Dashboard', section: 'Tickets' }}
+					/>
 				</TabsContent>
 			</Tabs>
 		</div>

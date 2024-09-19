@@ -64,7 +64,14 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 					</DialogTrigger>
 
 					<DialogContent className='max-w-none sm:max-w-none w-[calc(100vw-24px)] h-[calc(100vh-24px)] flex flex-col py-[3rem]'>
-						<Suspense fallback={<TableSkeleton />}>
+						<Suspense
+							fallback={
+								<TableSkeleton
+									rows={12}
+									columns={12}
+								/>
+							}
+						>
 							<ContactList
 								type='table'
 								id={1}
@@ -76,7 +83,7 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 									childConditions: [{ parameter: { 'types/id': 17 } }, { parameter: { 'types/id': 21 } }],
 									fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
 								}}
-								facetedFilters={[{ accessoryKey: 'company', items: companies }]}
+								// facetedFilters={[{ accessoryKey: 'company', items: companies }]}
 								columnDefs='homepage'
 							/>
 						</Suspense>

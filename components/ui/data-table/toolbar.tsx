@@ -11,6 +11,8 @@ import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
 import Search from '@/components/search';
 import { usePathname } from 'next/navigation';
+import { useCookieFilter } from '@/hooks/useCookieFilter';
+import { QueryFunction } from '@tanstack/react-query';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
@@ -22,34 +24,62 @@ interface DataTableToolbarProps<TData> {
 }
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
-	const pathname = usePathname();
 	const isFiltered = table.getState().columnFilters.length > 0;
+	const { addCondition, removeCondition } = useCookieFilter(
+		table.options?.meta?.filterParams ?? {},
+		table.options?.meta?.definition ?? { page: '' }
+	);
+
+	const searchCondition = table.options.meta?.filterKey
+		? table.options?.meta?.filterParams?.conditions?.find(
+				(c) => Object.keys(c.parameter)[0] === table.options.meta?.filterKey
+		  )
+		: undefined;
 
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
 					<Search
-						baseUrl={pathname}
 						placeholder='Filter...'
 						queryParam={table.options?.meta?.filterKey as string}
+						defaultValue={searchCondition?.parameter[table.options?.meta?.filterKey as string] as string}
 						className='h-9 w-[150px] lg:w-[250px] overflow-hidden'
+						addCondition={addCondition}
+						removeCondition={removeCondition}
 					/>
 				)}
 
-				{facetedFilters?.map(({ accessoryKey, items }) => (
-					<React.Fragment key={table.getColumn(accessoryKey as string)?.id}>
-						{table.getColumn(accessoryKey as string) && (
-							<DataTableFacetedFilter
-								column={table.getColumn(accessoryKey as string)}
-								title={accessoryKey.toString()}
-								options={items.map(({ name, id }) => {
-									return { label: name, value: id };
-								})}
-							/>
-						)}
-					</React.Fragment>
-				))}
+				{facetedFilters?.map(({ accessoryKey, items, queryFn }) => {
+					const column = table.getColumn(accessoryKey as string);
+					const defaultValueCondition = table.options?.meta?.filterParams?.conditions?.find(
+						// @ts-ignore
+						(c) => Object.keys(c.parameter)[0] === column?.columnDef?.meta?.filterKey
+					);
+					const defaultValues = // @ts-ignore
+						(defaultValueCondition?.parameter[column?.columnDef?.meta?.filterKey as string] as string)
+							?.trim()
+							?.replace('(', '')
+							?.replace(')', '')
+							?.split(',');
+					return (
+						<React.Fragment key={column?.id}>
+							{column && (
+								<DataTableFacetedFilter
+									column={column}
+									title={accessoryKey.toString()}
+									options={items.map(({ name, id }) => {
+										return { label: name, value: id };
+									})}
+									defaultValues={defaultValues}
+									addCondition={addCondition}
+									removeCondition={removeCondition}
+									queryFn={queryFn}
+								/>
+							)}
+						</React.Fragment>
+					);
+				})}
 
 				{isFiltered && (
 					<Button

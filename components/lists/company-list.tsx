@@ -36,13 +36,14 @@ const CompanyList = async ({
 	return (
 		<>
 			{type === 'table' && (
-				<DataTable
-					data={companies}
-					columns={columns}
-					meta={{ filterKey: 'name' }}
-					facetedFilters={facetedFilters}
-					count={count}
-				/>
+				// <DataTable
+				// 	data={companies}
+				// 	columns={columns}
+				// 	meta={{ filterKey: 'name' }}
+				// 	facetedFilters={facetedFilters}
+				// 	count={count}
+				// />
+				<></>
 			)}
 			{type === 'combobox' && (
 				<Combobox

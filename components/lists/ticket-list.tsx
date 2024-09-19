@@ -1,15 +1,17 @@
-import { getAllTickets, getTickets } from '@/lib/manage/read';
+'use client';
+import { getTickets } from '@/lib/manage/read';
 import { ServiceTicket } from '@/types/manage';
-import { Conditions } from '@/utils/manage/params';
+import { Conditions, generateParams } from '@/utils/manage/params';
 import React from 'react';
 import { DataTable } from '../ui/data-table';
 import { columns } from '../table-columns/ticket';
 import { Combobox } from '../ui/combobox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FacetedFilter } from '../ui/data-table/toolbar';
-import { QueryClient } from '@tanstack/react-query';
-import getQueryClient from '@/app/getQueryClient';
-import { cookies } from 'next/headers';
+import { TableDefinition } from '@/types';
+import { useQuery } from '@tanstack/react-query';
+import TableSkeleton from '../ui/data-table/skeleton';
+import { baseHeaders } from '@/lib/utils';
 
 type Props = {
 	type: 'table' | 'combobox' | 'select';
@@ -17,40 +19,61 @@ type Props = {
 	params?: Conditions<ServiceTicket>;
 	hidePagination?: boolean;
 	facetedFilters?: FacetedFilter<ServiceTicket>[];
+	definition: TableDefinition;
 };
 
-const TicketList = async ({ type, defaultValue, params, hidePagination = false, facetedFilters }: Props) => {
-	const queryClient = getQueryClient();
-
+const TicketList = ({ type, defaultValue, params, definition, hidePagination = false, facetedFilters }: Props) => {
+	// const queryClient = getQueryClient();
 	// Note we are now using fetchQuery()
-	const { tickets, count } = await queryClient.fetchQuery({
-		queryKey: ['tickets', params],
-		queryFn: () => getTickets(params),
-	});
+	// const { data, isFetching } = useQuery({
+	// 	queryKey: ['tickets', params?.conditions, params?.page, params?.pageSize, params?.orderBy],
+	// 	queryFn: async () => {
+	// 		const [ticketResponse, countResponse] = await Promise.all([
+	// 			fetch(`${process.env.NEXT_PUBLIC_CONNECT_WISE_URL}/service/tickets${generateParams(params)}`, {
+	// 				headers: baseHeaders,
+	// 			}),
+	// 			fetch(`${process.env.NEXT_PUBLIC_CONNECT_WISE_URL}/service/tickets/count${generateParams(params)}`, {
+	// 				headers: baseHeaders,
+	// 			}),
+	// 		]);
+
+	// 		return {
+	// 			tickets: await ticketResponse.json(),
+	// 			count: (await countResponse.json()).count,
+	// 		};
+	// 	},
+	// });
 
 	return (
 		<>
 			{type === 'table' && (
 				<DataTable
-					data={tickets}
+					initialData={[]}
 					columns={columns}
+					queryFn={getTickets(params)}
 					facetedFilters={facetedFilters}
-					count={count}
-					meta={{ filterKey: 'summary' }}
+					count={0}
+					isLoading={false}
+					meta={{
+						filterKey: 'summary',
+						definition,
+						filterParams: params!,
+					}}
 					hidePagination={hidePagination}
 				/>
 			)}
 
 			{type === 'combobox' && (
 				// @ts-ignore
-				<Combobox
-					items={tickets.map((ticket) => {
-						return { label: ticket.summary, value: `${ticket.id}-${ticket.summary}` };
-					})}
-					placeholder='Select a ticket...'
-					value={String(defaultValue)}
-					// setValue={() => {}}
-				/>
+				// <Combobox
+				// 	items={data?.tickets.map((ticket) => {
+				// 		return { label: ticket.summary, value: `${ticket.id}-${ticket.summary}` };
+				// 	})}
+				// 	placeholder='Select a ticket...'
+				// 	value={String(defaultValue)}
+				// 	// setValue={() => {}}
+				// />
+				<></>
 			)}
 
 			{type === 'select' && (
@@ -61,7 +84,8 @@ const TicketList = async ({ type, defaultValue, params, hidePagination = false, 
 
 					<SelectContent>
 						<SelectGroup>
-							{tickets.map((ticket) => (
+							{/* @ts-ignore */}
+							{data?.tickets.map((ticket) => (
 								<SelectItem
 									key={ticket.id}
 									value={String(ticket.id)}

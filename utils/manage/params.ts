@@ -4,7 +4,7 @@ interface KeyValue {
 	[key: string]: number | string | boolean | null | undefined;
 }
 
-interface Comparison {
+export interface Comparison {
 	parameter: KeyValue;
 	comparator?: Comparator;
 }

@@ -72,6 +72,9 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
+		meta: {
+			filterKey: 'board/id',
+		},
 	},
 	{
 		accessorKey: 'status',
@@ -95,6 +98,9 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			const referenceRow = row.getValue(id) as ReferenceType;
 
 			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'status/id',
 		},
 	},
 	{
@@ -124,6 +130,9 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
 		},
+		meta: {
+			filterKey: 'slaStatus/id',
+		},
 	},
 	{
 		accessorKey: 'priority',
@@ -147,10 +156,14 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 				</div>
 			);
 		},
+		enableHiding: true,
 		filterFn: (row, id, value) => {
 			const referenceRow = row.getValue(id) as ReferenceType;
 
 			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'priority/id',
 		},
 	},
 	{
@@ -184,6 +197,9 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			if (!referenceRow) return false;
 
 			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'owner/id',
 		},
 	},
 	{

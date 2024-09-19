@@ -25,13 +25,14 @@ const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, para
 	return (
 		<>
 			{type === 'table' && (
-				<DataTable
-					data={configurations}
-					columns={columns}
-					count={count}
-					meta={{ filterKey: 'name' }}
-					facetedFilters={facetedFilters}
-				/>
+				// <DataTable
+				// 	data={configurations}
+				// 	columns={columns}
+				// 	count={count}
+				// 	meta={{ filterKey: 'name' }}
+				// 	facetedFilters={facetedFilters}
+				// />
+				<></>
 			)}
 			{type === 'combobox' && (
 				<Combobox

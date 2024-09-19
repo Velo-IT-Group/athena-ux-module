@@ -77,7 +77,10 @@ const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<
 	({ className, ...props }, ref) => (
 		<td
 			ref={ref}
-			className={cn('px-4 py-2 align-middle [&:has([role=checkbox])]:pr-0 whitespace-nowrap', className)}
+			className={cn(
+				'px-4 py-2 align-middle [&:has([role=checkbox])]:pr-0 whitespace-nowrap overflow-hidden',
+				className
+			)}
 			{...props}
 		/>
 	)

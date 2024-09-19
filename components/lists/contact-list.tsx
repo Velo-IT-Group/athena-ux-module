@@ -39,14 +39,15 @@ const ContactList = async ({
 	return (
 		<>
 			{type === 'table' && (
-				<DataTable
-					data={contacts}
-					columns={columnDefs === 'homepage' ? contactColumns : columns}
-					facetedFilters={facetedFilters}
-					count={count}
-					meta={{ filterKey: 'firstName' }}
-					hidePagination={hidePagination}
-				/>
+				// <DataTable
+				// 	data={contacts}
+				// 	columns={columnDefs === 'homepage' ? contactColumns : columns}
+				// 	facetedFilters={facetedFilters}
+				// 	count={count}
+				// 	meta={{ filterKey: 'firstName' }}
+				// 	hidePagination={hidePagination}
+				// />
+				<></>
 			)}
 			{type === 'combobox' && (
 				<Combobox

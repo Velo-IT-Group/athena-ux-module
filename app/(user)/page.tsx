@@ -4,6 +4,9 @@ import { getTask } from '@/lib/twilio/taskrouter/helpers';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { getContactCommunications } from '@/lib/manage/read';
 import { createClient } from '@/utils/supabase/server';
+import { cookies } from 'next/headers';
+import { Conditions } from '@/utils/manage/params';
+import { ServiceTicket } from '@/types/manage';
 
 export default async function Page({
 	searchParams,
@@ -14,6 +17,9 @@ export default async function Page({
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
+	const ticketFilterCookieKey = 'filter-dashboard-tickets';
+	const ticketFilterCookie = cookies().get(ticketFilterCookieKey);
+	const ticketFilter = (ticketFilterCookie ? JSON.parse(ticketFilterCookie.value) : {}) as Conditions<ServiceTicket>;
 	const task: TaskInstance | undefined = searchParams.taskSid
 		? await getTask(searchParams.taskSid as string)
 		: undefined;
@@ -22,13 +28,15 @@ export default async function Page({
 	const contactId = searchParams.contactId ? parseInt(searchParams.contactId as string) : undefined;
 	const contactCommunications = await getContactCommunications(contactId ?? user?.user_metadata?.contactId ?? 0);
 
+	// console.log(ticketFilter);
+
 	return (
-		<main className='grid grid-cols-[1fr_3fr] h-full w-full'>
-			<ConversationContactDetail
+		<main className='grid h-full w-full'>
+			{/* <ConversationContactDetail
 				companyId={companyId ?? 250}
 				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
 				attributes={attributes}
-			/>
+			/> */}
 
 			<ConversationDetails
 				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
@@ -36,6 +44,7 @@ export default async function Page({
 				communicationItems={contactCommunications}
 				className='p-6'
 				searchParams={searchParams}
+				ticketFilter={ticketFilter}
 			/>
 		</main>
 	);

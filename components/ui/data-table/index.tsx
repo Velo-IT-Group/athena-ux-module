@@ -22,36 +22,65 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import { DataTablePagination } from './pagination';
 import { DataTableToolbar, FacetedFilter } from './toolbar';
+import { usePagination } from '@/hooks/usePagination';
+import { TableDefinition } from '@/types';
+import { Conditions } from '@/utils/manage/params';
+import TableSkeleton from './skeleton';
+import { QueryFunction, useQuery } from '@tanstack/react-query';
+import { updateFilterCookie } from '@/components/cookie-filter-actions';
 declare module '@tanstack/table-core' {
 	interface TableMeta<TData extends RowData> {
 		filterKey: keyof TData;
+		definition: TableDefinition;
+		filterParams: Conditions<TData>;
 	}
 }
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-	meta?: TableMeta<TData>;
+	initialData: TData[];
+	meta: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
 	hidePagination?: boolean;
 	count: number;
-	pageSize?: number;
+	queryFn: QueryFunction<TData[]>;
+	defaultVisibleColumns?: VisibilityState;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
-	data,
+	initialData,
 	meta,
+	count,
 	facetedFilters,
 	hidePagination = false,
+	queryFn,
+	defaultVisibleColumns = {},
 }: DataTableProps<TData, TValue>) {
-	const [pagination, setPagination] = React.useState({
-		pageIndex: 0, //initial page index
-		pageSize: 20, //default page size
-	});
+	const [params, setParams] = React.useState<Conditions<TData>>(meta.filterParams ?? {});
+	const { pagination, onPaginationChange } = usePagination(meta.definition, meta.filterParams);
 	const [rowSelection, setRowSelection] = React.useState({});
-	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(defaultVisibleColumns);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
+
+	const { data, isLoading, isFetching, refetch } = useQuery({
+		queryKey: [params, pagination],
+		queryFn: queryFn,
+		initialData,
+		enabled: false,
+	});
+
+	console.log(data);
+
+	React.useEffect(() => {
+		refetch();
+	}, [params, pagination]);
+
+	React.useEffect(() => {
+		return () => {
+			updateFilterCookie(meta.definition, { ...params, pageSize: pagination.pageSize, page: pagination.pageIndex });
+		};
+	}, []);
 
 	const table = useReactTable({
 		data,
@@ -66,11 +95,13 @@ export function DataTable<TData, TValue>({
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
-		onPaginationChange: setPagination,
+		onPaginationChange,
 		onColumnFiltersChange: setColumnFilters,
 		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		manualPagination: true,
+		rowCount: count,
 		getPaginationRowModel: !hidePagination ? getPaginationRowModel() : undefined,
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),
@@ -79,7 +110,7 @@ export function DataTable<TData, TValue>({
 	});
 
 	return (
-		<div className='space-y-3 pt-[4px] pl-[4px] overflow-x-auto overflow-visible'>
+		<div className='space-y-3 p-[4px] overflow-x-auto overflow-visible'>
 			<DataTableToolbar
 				table={table}
 				facetedFilters={facetedFilters}
@@ -104,29 +135,36 @@ export function DataTable<TData, TValue>({
 						))}
 					</TableHeader>
 
-					<TableBody className='overflow-x-auto'>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && 'selected'}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-									))}
+					{isFetching || isLoading ? (
+						<TableSkeleton
+							columns={table.getHeaderGroups()[0].headers.length}
+							rows={pagination.pageSize}
+						/>
+					) : (
+						<TableBody className='overflow-x-auto'>
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && 'selected'}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className='h-24 text-center'
+									>
+										No results.
+									</TableCell>
 								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className='h-24 text-center'
-								>
-									No results.
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
+							)}
+						</TableBody>
+					)}
 				</Table>
 			</div>
 

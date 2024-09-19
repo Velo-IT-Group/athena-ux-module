@@ -17,6 +17,8 @@ import {
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '../popover-dialog';
+import { Comparison } from '@/utils/manage/params';
+import { QueryFunction, useQueries, useQuery } from '@tanstack/react-query';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
 	column?: Column<TData, TValue>;
@@ -26,15 +28,32 @@ interface DataTableFacetedFilterProps<TData, TValue> {
 		value: string | number;
 		icon?: React.ComponentType<{ className?: string }>;
 	}[];
+	defaultValues: string[];
+	addCondition: (newCondition: Comparison) => void;
+	removeCondition: (keyToRemove: string) => void;
+	queryFn?: QueryFunction;
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
 	column,
 	title,
 	options,
+	defaultValues,
+	addCondition,
+	removeCondition,
+	queryFn,
 }: DataTableFacetedFilterProps<TData, TValue>) {
 	const facets = column?.getFacetedUniqueValues();
-	const selectedValues = new Set(column?.getFilterValue() as string[]);
+	// const selectedValues = new Set(column?.getFilterValue() as string[]);
+	const selectedValues = new Set(defaultValues);
+	// console.log(selectedValues);
+
+	const { data, isFetching } = useQuery({
+		queryKey: [title ?? 'faceted-filter'],
+		queryFn,
+	});
+
+	// console.log(data, isFetching);
 
 	return (
 		<Popover>
@@ -43,6 +62,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 					variant='outline'
 					size='sm'
 					className='h-9 border-dashed capitalize'
+					disabled={isFetching}
 				>
 					<CirclePlus className='mr-2 h-3.5 w-3.5' />
 					{title}
@@ -106,6 +126,13 @@ export function DataTableFacetedFilter<TData, TValue>({
 											}
 											const filterValues = Array.from(selectedValues);
 											column?.setFilterValue(filterValues.length ? filterValues : undefined);
+											addCondition({
+												parameter: {
+													// @ts-ignore
+													[column?.columnDef.meta?.filterKey as string]: ` (${filterValues.toString()})`,
+												},
+												comparator: 'in',
+											});
 										}}
 									>
 										<div
@@ -114,7 +141,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 												isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible'
 											)}
 										>
-											<Check className={cn('h-3.5 w-3.5')} />
+											<Check />
 										</div>
 										{option.icon && <option.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />}
 										<span>{option.label}</span>
@@ -132,7 +159,11 @@ export function DataTableFacetedFilter<TData, TValue>({
 								<CommandSeparator />
 								<CommandGroup>
 									<CommandItem
-										onSelect={() => column?.setFilterValue(undefined)}
+										onSelect={() => {
+											column?.setFilterValue(undefined);
+											// @ts-ignore
+											removeCondition(column?.columnDef.meta?.filterKey);
+										}}
 										className='justify-center text-center'
 									>
 										Clear filters

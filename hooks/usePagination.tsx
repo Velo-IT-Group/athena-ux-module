@@ -11,13 +11,6 @@ export function usePagination<T>(definition: TableDefinition, params: Conditions
 
 	const { pageSize, pageIndex } = pagination;
 
-	useEffect(() => {
-		// console.log(pageSize, pageIndex);
-		// return () => {
-		// 	console.log('running');
-		// };
-	}, [pagination]);
-
 	return {
 		limit: pageSize,
 		onPaginationChange: setPagination,

@@ -545,6 +545,20 @@ export const serviceTicketTaskSchema = z.object({
 	summary: z.string(),
 });
 
+export const configurationStatusSchema = z.object({
+	id: z.number(),
+	description: z.string(),
+	closedFlag: z.boolean(),
+	defaultFlag: z.boolean(),
+});
+
+export const configurationTypeSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	inactiveFlag: z.boolean(),
+	systemFlag: z.boolean(),
+});
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type BoardStatus = z.infer<typeof boardStatusSchema>;
@@ -554,6 +568,8 @@ export type CustomField = z.infer<typeof customFieldSchema>;
 export type CommunicationItem = z.infer<typeof communicationItemSchema>;
 export type CommunicationType = z.infer<typeof communicationTypeSchema>;
 export type Contact = z.infer<typeof contactSchema>;
+export type ConfigurationStatus = z.infer<typeof configurationStatusSchema>;
+export type ConfigurationType = z.infer<typeof configurationTypeSchema>;
 export type Document = z.infer<typeof documentSchema>;
 export type Location = z.infer<typeof locationSchema>;
 export type Project = z.infer<typeof projectSchema>;

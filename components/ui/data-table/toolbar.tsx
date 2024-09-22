@@ -10,13 +10,11 @@ import { DataTableViewOptions } from './view-options';
 import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
 import Search from '@/components/search';
-import { usePathname } from 'next/navigation';
-import { useCookieFilter } from '@/hooks/useCookieFilter';
-import { QueryFunction } from '@tanstack/react-query';
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
 	items: Identifiable[];
+	isBoolean?: boolean;
 }
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
@@ -25,16 +23,6 @@ interface DataTableToolbarProps<TData> {
 
 export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
-	const { addCondition, removeCondition } = useCookieFilter(
-		table.options?.meta?.filterParams ?? {},
-		table.options?.meta?.definition ?? { page: '' }
-	);
-
-	const searchCondition = table.options.meta?.filterKey
-		? table.options?.meta?.filterParams?.conditions?.find(
-				(c) => Object.keys(c.parameter)[0] === table.options.meta?.filterKey
-		  )
-		: undefined;
 
 	return (
 		<div className='flex items-center justify-between'>
@@ -43,25 +31,19 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 					<Search
 						placeholder='Filter...'
 						queryParam={table.options?.meta?.filterKey as string}
-						defaultValue={searchCondition?.parameter[table.options?.meta?.filterKey as string] as string}
+						defaultValue={''}
 						className='h-9 w-[150px] lg:w-[250px] overflow-hidden'
-						addCondition={addCondition}
-						removeCondition={removeCondition}
+						setCondition={table.setCondition}
+						removeCondition={table.removeCondition}
 					/>
 				)}
 
 				{facetedFilters?.map(({ accessoryKey, items }) => {
 					const column = table.getColumn(accessoryKey as string);
-					const defaultValueCondition = table.options?.meta?.filterParams?.conditions?.find(
-						// @ts-ignore
-						(c) => Object.keys(c.parameter)[0] === column?.columnDef?.meta?.filterKey
-					);
-					const defaultValues = // @ts-ignore
-						(defaultValueCondition?.parameter[column?.columnDef?.meta?.filterKey as string] as string)
-							?.trim()
-							?.replace('(', '')
-							?.replace(')', '')
-							?.split(',');
+
+					const defaultValues =
+						table.getState()?.parameters?.conditions?.[(column?.columnDef?.meta?.filterKey as string) ?? ''] ?? [];
+
 					return (
 						<React.Fragment key={column?.id}>
 							{column && (
@@ -71,9 +53,9 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 									options={items.map(({ name, id }) => {
 										return { label: name, value: id };
 									})}
-									defaultValues={defaultValues}
-									addCondition={addCondition}
-									removeCondition={removeCondition}
+									setCondition={table.setCondition}
+									removeCondition={table.removeCondition}
+									defaultValues={defaultValues as string[]}
 								/>
 							)}
 						</React.Fragment>
@@ -83,7 +65,10 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 				{isFiltered && (
 					<Button
 						variant='ghost'
-						onClick={() => table.resetColumnFilters()}
+						onClick={() => {
+							table.resetColumnFilters();
+							table.resetConditions();
+						}}
 						className='h-9 px-2 lg:px-3'
 					>
 						Reset

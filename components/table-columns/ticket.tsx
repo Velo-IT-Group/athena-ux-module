@@ -23,8 +23,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 					'id'
 				)}&companyName=velo`}
 				target='_blank'
-				// href={`/tickets/${row.getValue('id')}`}
-				className={cn(buttonVariants({ variant: 'link' }), 'w-[80px]')}
+				className={cn(buttonVariants({ variant: 'link', className: 'w-[80px] px-0' }))}
 			>
 				#{row.getValue('id')}
 			</Link>
@@ -66,7 +65,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			return (
 				<div className='flex w-[100px] items-center'>
 					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
-					<span>{board.name}</span>
+					<span>{board?.name}</span>
 				</div>
 			);
 		},
@@ -94,7 +93,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			return (
 				<div className='flex w-[100px] items-center'>
 					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
-					<span>{status.name}</span>
+					<span>{status?.name}</span>
 				</div>
 			);
 		},
@@ -105,6 +104,68 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		},
 		meta: {
 			filterKey: 'status/id',
+		},
+	},
+	{
+		accessorKey: 'contact',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Contact'
+			/>
+		),
+		cell: ({ row }) => {
+			const reference = row.getValue('contact') as ReferenceType;
+
+			// if (!status) {
+			// 	return null;
+			// }
+
+			return (
+				<div className='flex items-center'>
+					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
+					<span>{reference?.name}</span>
+				</div>
+			);
+		},
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'contact/id',
+		},
+	},
+	{
+		accessorKey: 'company',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Company'
+			/>
+		),
+		cell: ({ row }) => {
+			const reference = row.getValue('company') as ReferenceType;
+
+			// if (!status) {
+			// 	return null;
+			// }
+
+			return (
+				<div className='flex items-center'>
+					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
+					<span>{reference?.name}</span>
+				</div>
+			);
+		},
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			return referenceRow && referenceRow.id ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'company/id',
 		},
 	},
 	{
@@ -156,7 +217,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			return (
 				<div className='flex items-center'>
 					{/* {priority.icon && <priority.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
-					<span>{priority.name}</span>
+					<span>{priority?.name}</span>
 				</div>
 			);
 		},

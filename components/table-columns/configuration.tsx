@@ -19,8 +19,9 @@ export const columns: ColumnDef<Configuration>[] = [
 		),
 		cell: ({ row }) => (
 			<Link
-				href={`/configurations/${row.original.id}`}
-				className={cn('font-medium max-w-[500px]', buttonVariants({ variant: 'link' }))}
+				href={`https://manage.velomethod.com/v4_6_release/services/system_io/router/openrecord.rails?locale=en_US&recordType=ConfigFV&companyName=velo&recid=${row.original.id}`}
+				target='_blank'
+				className={cn('font-medium max-w-[500px]', buttonVariants({ variant: 'link', className: 'px-0' }))}
 			>
 				{row.getValue('name')}
 			</Link>
@@ -42,6 +43,66 @@ export const columns: ColumnDef<Configuration>[] = [
 		},
 		enableSorting: false,
 		enableHiding: false,
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			if (!referenceRow) return false;
+
+			return value.includes(String(referenceRow.id));
+		},
+		meta: {
+			filterKey: 'status/id',
+		},
+	},
+	{
+		accessorKey: 'company',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Company'
+			/>
+		),
+		cell: ({ row }) => {
+			const reference = row.getValue('company') as ReferenceType;
+			return <span>{reference?.name}</span>;
+		},
+		enableSorting: false,
+		enableHiding: false,
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			if (!referenceRow) return false;
+
+			return value.includes(String(referenceRow.id));
+		},
+		meta: {
+			filterKey: 'company/id',
+		},
+	},
+	{
+		accessorKey: 'type',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Type'
+			/>
+		),
+		cell: ({ row }) => {
+			const reference = row.getValue('type') as ReferenceType;
+			return <span>{reference?.name}</span>;
+		},
+		enableSorting: false,
+		enableHiding: false,
+		filterFn: (row, id, value) => {
+			const referenceRow = row.getValue(id) as ReferenceType;
+
+			if (!referenceRow) return false;
+
+			return value.includes(String(referenceRow.id));
+		},
+		meta: {
+			filterKey: 'type/id',
+		},
 	},
 	{
 		accessorKey: 'site',

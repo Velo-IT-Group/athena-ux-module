@@ -21,7 +21,7 @@ const MemberList = async ({
 	defaultValue,
 	params = {
 		orderBy: { key: 'firstName' },
-		conditions: [{ parameter: { inactiveFlag: false } }],
+		conditions: { inactiveFlag: false },
 		pageSize: 1000,
 	},
 }: Props) => {

@@ -22,12 +22,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import { DataTablePagination } from './pagination';
 import { DataTableToolbar, FacetedFilter } from './toolbar';
-import { usePagination } from '@/hooks/usePagination';
 import { TableDefinition } from '@/types';
 import { Conditions } from '@/utils/manage/params';
 import TableSkeleton from './skeleton';
-import { QueryFunction, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { updateFilterCookie } from '@/components/cookie-filter-actions';
+import { useFilterParameters } from '@/hooks/useFilterParameters';
+import { ParameterFeature } from '@/types/table';
 declare module '@tanstack/table-core' {
 	interface TableMeta<TData extends RowData> {
 		filterKey: keyof TData;
@@ -42,7 +43,7 @@ interface DataTableProps<TData, TValue> {
 	meta: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
 	hidePagination?: boolean;
-	queryFn: QueryFunction<{ data: TData[]; count: number }, [Conditions<TData>], Conditions<TData>>;
+	queryFn: (params: Conditions<TData>) => Promise<{ data: TData[]; count: number }>;
 	defaultVisibleColumns?: VisibilityState;
 }
 
@@ -55,33 +56,34 @@ export function DataTable<TData, TValue>({
 	queryFn,
 	defaultVisibleColumns = {},
 }: DataTableProps<TData, TValue>) {
-	const [params, setParams] = React.useState<Conditions<TData>>(meta.filterParams ?? {});
-	const { pagination, onPaginationChange } = usePagination(meta.definition, meta.filterParams);
+	const { parameters, onParametersChange, pagination, onPaginationChange } = useFilterParameters(
+		meta.filterParams ?? {}
+	);
+	// const { pagination, onPaginationChange } = usePagination(meta.definition, meta.filterParams);
 	const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(defaultVisibleColumns);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
-	const { data, isLoading, isFetching, refetch } = useQuery({
-		queryKey: [params, pagination],
-		queryFn: () => queryFn(params),
-		initialData: { data: initialData, count: 0 },
+	const { data, isLoading, isFetching, error } = useQuery({
+		queryKey: [parameters, pagination],
+		queryFn: ({ queryKey }) => queryFn({ ...queryKey[0], page: pagination.pageIndex, pageSize: pagination.pageSize }),
+		placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
 	});
 
-	console.log(data);
-
-	React.useEffect(() => {
-		refetch();
-	}, [params, pagination]);
+	if (error) {
+		console.error(error);
+	}
 
 	React.useEffect(() => {
 		return () => {
-			updateFilterCookie(meta.definition, { ...params, pageSize: pagination.pageSize, page: pagination.pageIndex });
+			updateFilterCookie(meta.definition, { ...parameters, pageSize: pagination.pageSize, page: pagination.pageIndex });
 		};
 	}, []);
 
 	const table = useReactTable({
-		data: data.data,
+		_features: [ParameterFeature], //pass the new feature to merge with all of the built-in features under the hood
+		data: data?.data ?? [],
 		columns,
 		state: {
 			sorting,
@@ -89,7 +91,9 @@ export function DataTable<TData, TValue>({
 			rowSelection,
 			columnFilters,
 			pagination,
+			parameters,
 		},
+		onParameterChange: onParametersChange,
 		enableRowSelection: true,
 		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
@@ -99,7 +103,7 @@ export function DataTable<TData, TValue>({
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		manualPagination: true,
-		rowCount: data.count,
+		rowCount: data?.count ?? 0,
 		getPaginationRowModel: !hidePagination ? getPaginationRowModel() : undefined,
 		getSortedRowModel: getSortedRowModel(),
 		getFacetedRowModel: getFacetedRowModel(),

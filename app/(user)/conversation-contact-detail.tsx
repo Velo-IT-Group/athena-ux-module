@@ -21,12 +21,12 @@ type Props = {
 };
 
 const ConversationContactDetail = async ({ contactId, companyId, attributes }: Props) => {
-	const [contact, types, { companies }] = await Promise.all([
+	const [contact, types, { data: companies }] = await Promise.all([
 		getContact(contactId ?? 32569),
 		getCommunicationTypes(),
 		getCompanies({
-			conditions: [{ parameter: { 'status/id': 1 } }],
-			childConditions: [{ parameter: { 'types/id': 1 } }],
+			conditions: { 'status/id': 1 },
+			childConditions: { 'types/id': 1 },
 			orderBy: { key: 'name', order: 'asc' },
 			fields: ['id', 'name'],
 			pageSize: 1000,
@@ -79,8 +79,8 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 								serviceType='ticket'
 								params={{
 									orderBy: { key: 'firstName' },
-									conditions: [{ parameter: { inactiveFlag: false } }],
-									childConditions: [{ parameter: { 'types/id': 17 } }, { parameter: { 'types/id': 21 } }],
+									conditions: { inactiveFlag: false },
+									childConditions: { 'types/id': [17, 21] },
 									fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
 								}}
 								// facetedFilters={[{ accessoryKey: 'company', items: companies }]}

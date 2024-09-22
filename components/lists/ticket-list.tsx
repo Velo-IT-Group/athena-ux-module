@@ -1,17 +1,13 @@
 'use client';
+import React from 'react';
 import { getTickets } from '@/lib/manage/read';
 import { ServiceTicket } from '@/types/manage';
-import { Conditions, generateParams } from '@/utils/manage/params';
-import React from 'react';
+import { Conditions } from '@/utils/manage/params';
 import { DataTable } from '../ui/data-table';
 import { columns } from '../table-columns/ticket';
-import { Combobox } from '../ui/combobox';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { FacetedFilter } from '../ui/data-table/toolbar';
 import { TableDefinition } from '@/types';
-import { useQuery } from '@tanstack/react-query';
-import TableSkeleton from '../ui/data-table/skeleton';
-import { baseHeaders } from '@/lib/utils';
 
 type Props = {
 	type: 'table' | 'combobox' | 'select';
@@ -50,7 +46,7 @@ const TicketList = ({ type, defaultValue, params, definition, hidePagination = f
 				<DataTable
 					initialData={[]}
 					columns={columns}
-					queryFn={() => getTickets(params)}
+					queryFn={getTickets}
 					facetedFilters={facetedFilters}
 					// count={0}
 					meta={{
@@ -58,6 +54,7 @@ const TicketList = ({ type, defaultValue, params, definition, hidePagination = f
 						definition,
 						filterParams: params!,
 					}}
+					defaultVisibleColumns={{ priority: false, owner: false }}
 				/>
 			)}
 

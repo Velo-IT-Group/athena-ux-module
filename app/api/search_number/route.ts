@@ -45,13 +45,13 @@ export async function GET(request: NextRequest) {
 			{ status: 400, statusText: 'No phone number detected' }
 		);
 
-	const [contacts, { companies }] = await Promise.all([
+	const [contacts, { data: companies }] = await Promise.all([
 		getContacts({
-			childConditions: [{ parameter: { 'communicationItems/value': `'${phoneNumber}'` }, comparator: 'contains' }],
+			childConditions: { 'communicationItems/value': `'${phoneNumber}'` },
 			fields: ['id', 'firstName', 'lastName', 'company'],
 		}),
 		getCompanies({
-			conditions: [{ parameter: { phoneNumber: `'${phoneNumber}'` }, comparator: 'contains' }],
+			conditions: { phoneNumber: `'${phoneNumber}'` },
 			fields: ['id', 'identifier', 'name', 'status', 'phoneNumber', 'territory'],
 		}),
 	]);

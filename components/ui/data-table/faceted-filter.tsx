@@ -17,7 +17,7 @@ import {
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '../popover-dialog';
-import { Comparison } from '@/utils/manage/params';
+import { Comparison, KeyValue } from '@/utils/manage/params';
 import { QueryFunction, useQueries, useQuery } from '@tanstack/react-query';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
@@ -29,7 +29,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
 		icon?: React.ComponentType<{ className?: string }>;
 	}[];
 	defaultValues: string[];
-	addCondition: (newCondition: Comparison) => void;
+	setCondition: (condition: KeyValue) => void;
 	removeCondition: (keyToRemove: string) => void;
 	queryFn?: QueryFunction;
 }
@@ -39,19 +39,19 @@ export function DataTableFacetedFilter<TData, TValue>({
 	title,
 	options,
 	defaultValues,
-	addCondition,
+	setCondition,
 	removeCondition,
-	queryFn,
 }: DataTableFacetedFilterProps<TData, TValue>) {
 	const facets = column?.getFacetedUniqueValues();
 	// const selectedValues = new Set(column?.getFilterValue() as string[]);
-	const selectedValues = new Set(defaultValues);
+	const filterValues = (column?.getFilterValue() as string[]) ?? [];
+	const selectedValues = new Set(filterValues);
 	// console.log(selectedValues);
 
-	const { data, isFetching } = useQuery({
-		queryKey: [title ?? 'faceted-filter'],
-		queryFn,
-	});
+	// const { data, isFetching } = useQuery({
+	// 	queryKey: [title ?? 'faceted-filter'],
+	// 	queryFn,
+	// });
 
 	// console.log(data, isFetching);
 
@@ -62,7 +62,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 					variant='outline'
 					size='sm'
 					className='h-9 border-dashed capitalize'
-					disabled={isFetching}
+					// disabled={isFetching}
 				>
 					<CirclePlus className='mr-2 h-3.5 w-3.5' />
 					{title}
@@ -126,13 +126,13 @@ export function DataTableFacetedFilter<TData, TValue>({
 											}
 											const filterValues = Array.from(selectedValues);
 											column?.setFilterValue(filterValues.length ? filterValues : undefined);
-											addCondition({
-												parameter: {
-													// @ts-ignore
-													[column?.columnDef.meta?.filterKey as string]: ` (${filterValues.toString()})`,
-												},
-												comparator: 'in',
-											});
+											if (filterValues.length) {
+												// @ts-ignore
+												setCondition({ [column?.columnDef.meta?.filterKey as string]: filterValues });
+											} else {
+												// @ts-ignore
+												removeCondition(column?.columnDef.meta?.filterKey as string);
+											}
 										}}
 									>
 										<div

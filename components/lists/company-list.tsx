@@ -24,14 +24,14 @@ const CompanyList = async ({
 	type,
 	defaultValue,
 	params = {
-		conditions: [{ parameter: { 'status/id': 1 } }],
-		childConditions: [{ parameter: { 'types/id': 1 } }],
+		// conditions: { 'status/id': 1 },
+		childConditions: { 'types/id': 1 },
 		orderBy: { key: 'name' },
 		pageSize: 1000,
 	},
 	facetedFilters,
 }: Props) => {
-	const { companies, count } = await getCompanies(params);
+	const { data: companies, count } = await getCompanies(params);
 
 	return (
 		<>

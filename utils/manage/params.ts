@@ -1,7 +1,8 @@
 type Comparator = '=' | '!=' | '<' | '<=' | '>' | '>=' | '==' | 'contains' | 'like' | 'in' | 'not';
 
-interface KeyValue {
-	[key: string]: number | string | boolean | null | undefined;
+export interface KeyValue {
+	[key: string]: number | string | boolean | string[] | number[] | Date | null | undefined | { value: number | string | boolean, comparison: Comparator };
+	// comparator?: Comparator;
 }
 
 export interface Comparison {
@@ -10,8 +11,8 @@ export interface Comparison {
 }
 
 export type Conditions<T> = {
-	conditions?: Array<Comparison>;
-	childConditions?: Array<Comparison>;
+	conditions?: KeyValue;
+	childConditions?: KeyValue;
 	customFieldConditions?: string;
 	orderBy?: { key: keyof T; order?: 'asc' | 'desc' };
 	fields?: Array<keyof T>;
@@ -19,37 +20,41 @@ export type Conditions<T> = {
 	pageSize?: number;
 };
 
+const generateConditions = (condition: KeyValue) => {
+	let generatedConditions: string[] = []
+
+	Object.entries(condition).forEach(([key, value]) => {
+		const type = typeof value
+		if (type === 'object') {
+			if (Array.isArray(value)) {
+				generatedConditions.push(`${key} in (${value.toString()})`)
+				// @ts-ignore
+			} else if (value?.value !== undefined) {
+				// @ts-ignore
+				generatedConditions.push(`${key} ${value.comparison} ${value.value}`)
+			} else if (value instanceof Date) {
+				generatedConditions.push(`${key} contains [${value}]`)
+			} 
+		} else {
+			generatedConditions.push(`${key} = ${value}`)
+		}
+	})
+
+	return generatedConditions.length > 1 ? generatedConditions.map((c, i) => i === 0 ? c : `and ${c}`).join(' ') : generatedConditions[0]
+}
+
 const generateParams = <T>(init?: Conditions<T>): string => {
 	if (!init) return '';
 	const { conditions, childConditions, orderBy, fields, page, pageSize } = init;
 	let params = new URLSearchParams();
 
 	if (conditions) {
-		conditions.forEach((condition) => {
-			Object.entries(condition.parameter).forEach(([key, value]) => {
-				const conditions = params.get('conditions');
-				params.set(
-					'conditions',
-					conditions
-						? `${`${conditions} and ${key} ${condition.comparator ?? '='} ${value}`}`
-						: `${key} ${condition.comparator ?? '='} ${value}`
-				);
-			});
-		});
+		params.set('conditions', generateConditions(conditions))
+		console.log(generateConditions(conditions))
 	}
 
 	if (childConditions) {
-		childConditions.forEach((condition) => {
-			Object.entries(condition.parameter).forEach(([key, value]) => {
-				const childConditions = params.get('childConditions');
-				params.set(
-					'childConditions',
-					childConditions
-						? `${`${childConditions} or ${key} ${condition.comparator ?? '='} ${value}`}`
-						: `${key} ${condition.comparator ?? '='} ${value}`
-				);
-			});
-		});
+		params.set('childConditions', generateConditions(childConditions))
 	}
 
 	if (orderBy) {

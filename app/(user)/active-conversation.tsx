@@ -6,16 +6,22 @@ import { CommunicationItem, ServiceTicket } from '@/types/manage';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
 import ActivityList from '@/components/lists/activity-list';
-import { Suspense } from 'react';
-import TableSkeleton from '@/components/ui/data-table/skeleton';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
 import { relativeDate } from '@/utils/date';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { getBoards, getPriorities, getSystemMembers, getTickets } from '@/lib/manage/read';
+import {
+	getBoards,
+	getCompanies,
+	getConfigurations,
+	getConfigurationStatuses,
+	getConfigurationTypes,
+	getPriorities,
+	getSystemMembers,
+	getTickets,
+} from '@/lib/manage/read';
 import { createClient } from '@/utils/supabase/server';
 import { Conditions } from '@/utils/manage/params';
-import TicketTable from '@/components/ticket-table';
 import getQueryClient from '../getQueryClient';
 
 type Props = {
@@ -28,7 +34,7 @@ type Props = {
 };
 
 const ConversationDetails = async ({ contactId: userId, className, communicationItems, ticketFilter }: Props) => {
-	const headers = new Headers();
+	const client = getQueryClient();
 	const supabase = createClient();
 	const [
 		{
@@ -37,42 +43,62 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 		boards,
 		priorities,
 		members,
+		{ data: companies },
+		{ data: configurationStatuses },
+		configurationTypes,
 	] = await Promise.all([
 		supabase.auth.getUser(),
 		getBoards({
-			conditions: [
-				{ parameter: { inactiveFlag: false } },
-				{ parameter: { projectFlag: false } },
-				{ parameter: { 'workRole/id': ' (9, 5)' }, comparator: 'in' },
-			],
+			conditions: {
+				inactiveFlag: false,
+				projectFlag: false,
+				'workRole/id': [9, 5],
+			},
 			orderBy: { key: 'name' },
 			fields: ['id', 'name'],
 			pageSize: 1000,
 		}),
 		getPriorities({ fields: ['id', 'name'], orderBy: { key: 'name' }, pageSize: 1000 }),
 		getSystemMembers({
-			conditions: [{ parameter: { inactiveFlag: false } }],
+			conditions: { inactiveFlag: false },
 			fields: ['id', 'firstName', 'lastName'],
 			orderBy: { key: 'firstName' },
 			pageSize: 1000,
 		}),
+		getCompanies({
+			// conditions: { 'status/id': 1 },
+			childConditions: { 'types/id': 1 },
+			orderBy: { key: 'name', order: 'asc' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
+		getConfigurationStatuses({
+			fields: ['id', 'description'],
+			orderBy: {
+				key: 'description',
+			},
+		}),
+		getConfigurationTypes({
+			orderBy: { key: 'name' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
+		}),
 	]);
 
-	const client = getQueryClient();
 	const initalTickets = await client.fetchQuery({
 		queryKey: ['tickets', ticketFilter],
 		queryFn: ({ queryKey }) =>
 			getTickets({
 				...queryKey,
 				page: ticketFilter.page ?? 1,
-				conditions: [{ parameter: { 'board/id': ` (${boards.map((b) => b.id).toString()})` }, comparator: 'in' }],
+				conditions: {
+					'board/id': boards.map((b) => b.id),
+				},
 				pageSize: ticketFilter.pageSize ?? 20,
 				orderBy: { key: 'id', order: 'desc' },
 				fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
 			}),
 	});
-
-	console.log(initalTickets);
 
 	const [calls] = await Promise.all(
 		communicationItems?.length
@@ -100,7 +126,7 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 
 	return (
 		<div className={cn('w-full overflow-x-hidden', className)}>
-			<Tabs defaultValue={tabs[3].name}>
+			<Tabs defaultValue={tabs[2].name}>
 				<TabsList className='w-full'>
 					{tabs.map((tab) => (
 						<TabsTrigger
@@ -148,6 +174,8 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 					</Suspense> */}
 					{/* <TicketList
 						type='table'
+						defaultValue={initalConfigurations}
+						facetedFilters={}
 						// params={{
 						// 	conditions: [
 						// 		{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
@@ -174,59 +202,52 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 
 				<TabsContent value={tabs[2].name}>
 					<ConfigurationsList
-						id={0}
 						type='table'
 						params={{
-							// conditions: userId ? [{ parameter: { 'contact/id': userId } }] : [],
-
-							conditions: [{ parameter: { 'company/id': 250 } }],
-							fields: ['id', 'name', 'site', 'company', 'status', 'contact', 'deviceIdentifier'],
+							// conditions: { 'company/id': 250 },
+							fields: ['id', 'name', 'site', 'company', 'type', 'status', 'contact', 'deviceIdentifier'],
+							orderBy: {
+								key: 'name',
+							},
 						}}
+						definition={{ page: 'Dashboard', section: 'Configurations' }}
+						facetedFilters={[
+							{ accessoryKey: 'company', items: companies },
+							{
+								accessoryKey: 'status',
+								items: configurationStatuses.map(({ id, description }) => {
+									return { id, name: description };
+								}),
+							},
+							{ accessoryKey: 'type', items: configurationTypes },
+						]}
 					/>
 				</TabsContent>
 
 				<TabsContent value={tabs[3].name}>
-					<TicketTable
-						initialData={initalTickets}
-						defaultParams={{
+					<TicketList
+						type='table'
+						params={{
 							...ticketFilter,
-							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
+							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact', 'company'],
+							orderBy: { key: 'id', order: 'desc' },
 						}}
 						facetedFilters={[
 							{ accessoryKey: 'board', items: boards },
 							{ accessoryKey: 'priority', items: priorities },
 							{
-								accessoryKey: 'contact',
-								items: [],
-							},
-							{
 								accessoryKey: 'owner',
 								items: members.map((member) => {
 									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
 								}),
+							},
+							{
+								accessoryKey: 'company',
+								items: companies,
 							},
 						]}
 						definition={{ page: 'Dashboard', section: 'Tickets' }}
 					/>
-					{/* <TicketList
-						type='table'
-						params={{ ...ticketFilter, fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'] }}
-						facetedFilters={[
-							{ accessoryKey: 'board', items: boards },
-							{ accessoryKey: 'priority', items: priorities },
-							{
-								accessoryKey: 'contact',
-								items: [],
-							},
-							{
-								accessoryKey: 'owner',
-								items: members.map((member) => {
-									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
-								}),
-							},
-						]}
-						definition={{ page: 'Dashboard', section: 'Tickets' }}
-					/> */}
 				</TabsContent>
 			</Tabs>
 		</div>

@@ -10,38 +10,44 @@ import { Button, buttonVariants } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { FacetedFilter } from '../ui/data-table/toolbar';
+import { TableDefinition } from '@/types';
 
 type Props = {
-	id: number;
+	id?: number;
 	type: 'table' | 'combobox' | 'select';
 	defaultValue?: ReferenceType | Configuration[];
 	facetedFilters?: FacetedFilter<Configuration>[];
 	params?: Conditions<Configuration>;
+	definition: TableDefinition;
 };
 
-const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, params }: Props) => {
-	const { configurations, count } = await getAllConfigurations({ ...params, pageSize: 1000 });
+const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, params, definition }: Props) => {
+	// const { data: configurations, count } = await getConfigurations({ ...params });
+
+	// console.log(configurations);
 
 	return (
 		<>
 			{type === 'table' && (
-				// <DataTable
-				// 	data={configurations}
-				// 	columns={columns}
-				// 	count={count}
-				// 	meta={{ filterKey: 'name' }}
-				// 	facetedFilters={facetedFilters}
-				// />
-				<></>
+				<DataTable
+					initialData={[]}
+					columns={columns}
+					queryFn={getConfigurations}
+					facetedFilters={facetedFilters}
+					meta={{
+						filterKey: 'name',
+						definition,
+						filterParams: params!,
+					}}
+					defaultVisibleColumns={{ priority: false, owner: false }}
+				/>
 			)}
 			{type === 'combobox' && (
 				<Combobox
-					id={id}
+					id={id ?? 0}
 					path='configuration/id'
 					type='ticket'
-					items={configurations.map(({ id, name }) => {
-						return { label: name, value: `${id}-${name}` };
-					})}
+					items={[]}
 					placeholder='Search configurations...'
 					align='end'
 					side='left'

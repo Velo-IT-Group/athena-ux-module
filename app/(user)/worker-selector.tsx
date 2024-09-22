@@ -39,10 +39,7 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 		queryKey: ['members'],
 		queryFn: () =>
 			getSystemMembers({
-				conditions: [
-					{ parameter: { inactiveFlag: false } },
-					{ parameter: { officePhone: `'${null}'` }, comparator: '!=' },
-				],
+				conditions: { inactiveFlag: false, officePhone: `'${null}'` },
 				fields: ['id', 'firstName', 'lastName', 'officePhone'],
 				orderBy: { key: 'firstName' },
 				pageSize: 1000,

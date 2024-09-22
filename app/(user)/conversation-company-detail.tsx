@@ -10,7 +10,7 @@ type Props = {
 };
 
 const ConversationCompanyDetail = async ({ companyId: id }: Props) => {
-	const [company, { tickets, count }] = await Promise.all([getCompany(id ?? 250), getTickets()]);
+	const [company, { data: tickets, count }] = await Promise.all([getCompany(id ?? 250), getTickets()]);
 
 	return (
 		<aside className='min-h-0 flex flex-col overflow-y-scroll space-y-6 p-3 bg-background border-l'>

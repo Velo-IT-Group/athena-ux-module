@@ -6,14 +6,14 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useFormStatus } from 'react-dom';
 import { Button } from './ui/button';
 import { RefreshCcw, SearchIcon } from 'lucide-react';
-import { Comparison } from '@/utils/manage/params';
+import { Comparison, Conditions, KeyValue } from '@/utils/manage/params';
 
 type Props = {
 	placeholder: string;
 	className?: string;
 	queryParam?: string;
 	defaultValue?: string;
-	addCondition: (newCondition: Comparison) => void;
+	setCondition: (condition: KeyValue) => void;
 	removeCondition: (keyToRemove: string) => void;
 };
 
@@ -22,7 +22,7 @@ const Search = ({
 	className,
 	queryParam = 'search',
 	defaultValue,
-	addCondition,
+	setCondition,
 	removeCondition,
 }: Props) => {
 	const { pending } = useFormStatus();
@@ -33,15 +33,14 @@ const Search = ({
 
 	useEffect(() => {
 		if (!text) {
-			removeCondition(queryParam);
+			// delete parameters?.conditions?.[queryParam];
 		} else {
-			console.log(text);
-			addCondition({ parameter: { [queryParam]: `'${text}'` }, comparator: 'contains' });
+			setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'contains' } });
 		}
 	}, [text, queryParam]);
 
 	return (
-		<form
+		<div
 			className={cn(
 				'flex h-9 items-center w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
 				className
@@ -52,16 +51,16 @@ const Search = ({
 
 			<Input
 				placeholder={placeholder}
-				value={text}
+				defaultValue={text}
 				onChange={(event) => debounced(event.target.value)}
 				onKeyUp={(e) => {
 					if (e.key === 'Enter') {
-						debounced.cancel();
+						// debounced.cancel();
 						if (!text) {
 							removeCondition(queryParam);
 						} else {
 							console.log(text);
-							addCondition({ parameter: { [queryParam]: `'${text}'` }, comparator: 'contains' });
+							setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'contains' } });
 						}
 					}
 				}}
@@ -69,7 +68,7 @@ const Search = ({
 			/>
 
 			<Button className='hidden' />
-		</form>
+		</div>
 	);
 };
 

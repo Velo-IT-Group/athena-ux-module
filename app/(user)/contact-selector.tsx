@@ -30,8 +30,11 @@ const ContactSelector = ({ companyId, contactId, minimal = false }: Props) => {
 	const pathname = usePathname();
 	useEffect(() => {
 		getContacts({
-			conditions: companyId ? [{ parameter: { 'company/id': companyId } }, { parameter: { inactiveFlag: false } }] : [],
-			childConditions: [{ parameter: { 'types/id': 17 } }],
+			conditions: {
+				'company/id': companyId,
+				inactiveFlag: false,
+			},
+			childConditions: { 'types/id': 17 },
 			pageSize: 1000,
 			orderBy: { key: 'firstName' },
 		}).then((c) => {

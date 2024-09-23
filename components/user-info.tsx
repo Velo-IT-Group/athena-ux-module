@@ -76,7 +76,6 @@ const UserInfo = ({ user }: Props) => {
 						<div className='relative'>
 							<Avatar className='w-7 h-7 mr-1.5'>
 								<AvatarFallback>NB</AvatarFallback>
-								{/* <AvatarImage src={session?.user?.image ?? undefined} /> */}
 							</Avatar>
 
 							<div

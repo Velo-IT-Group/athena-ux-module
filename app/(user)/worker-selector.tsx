@@ -27,7 +27,7 @@ type Props = {
 };
 
 const WorkerSelector = ({ actionFn, children }: Props) => {
-	const { token, workspace } = useTwilio();
+	const { workspace } = useTwilio();
 	const { worker: currentWorker } = useWorker();
 	const { data, isLoading: isWorkersLoading } = useQuery({
 		queryKey: ['workers'],
@@ -38,7 +38,10 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 		queryKey: ['members'],
 		queryFn: () =>
 			getSystemMembers({
-				conditions: { inactiveFlag: false, officePhone: `not '${null}'` },
+				conditions: {
+					inactiveFlag: false,
+					// officePhone: `not '${null}'`
+				},
 				fields: ['id', 'firstName', 'lastName', 'officePhone'],
 				orderBy: { key: 'firstName' },
 				pageSize: 1000,

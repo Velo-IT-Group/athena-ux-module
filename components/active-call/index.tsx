@@ -10,11 +10,19 @@ type Props = {
 };
 
 export function ActiveCall({ task }: Props) {
+	const searchParams = new URLSearchParams();
+	if (task.attributes.userId) {
+		searchParams.set('contactId', task.attributes.userId);
+	}
+	if (task.attributes.companyId) {
+		searchParams.set('contactId', task.attributes.companyId);
+	}
+
 	return (
 		<Card>
 			<ActiveCallHeader
 				queueName={task.queueName}
-				searchParams={new URLSearchParams()}
+				searchParams={searchParams}
 			/>
 
 			<ActiveCallParticipants />

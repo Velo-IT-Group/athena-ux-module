@@ -23,7 +23,14 @@ export type Conditions<T> = {
 const generateConditions = (condition: KeyValue) => {
 	let generatedConditions: string[] = []
 
-	Object.entries(condition).forEach(([key, value]) => {
+	const entries = Object.entries(condition)
+
+	if (!entries.length) {
+		return ''
+	}
+
+	entries.forEach(([key, value]) => {
+		if (value === undefined) return;
 		const type = typeof value
 		if (type === 'object') {
 			if (Array.isArray(value)) {
@@ -50,7 +57,6 @@ const generateParams = <T>(init?: Conditions<T>): string => {
 
 	if (conditions) {
 		params.set('conditions', generateConditions(conditions))
-		console.log(generateConditions(conditions))
 	}
 
 	if (childConditions) {

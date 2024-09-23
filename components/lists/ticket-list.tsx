@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import { getTickets } from '@/lib/manage/read';
 import { ServiceTicket } from '@/types/manage';
@@ -14,32 +15,11 @@ type Props = {
 	defaultValue?: number;
 	params?: Conditions<ServiceTicket>;
 	hidePagination?: boolean;
-	facetedFilters?: FacetedFilter<ServiceTicket>[];
+	facetedFilters?: FacetedFilter<ServiceTicket | undefined>[];
 	definition: TableDefinition;
 };
 
 const TicketList = ({ type, defaultValue, params, definition, hidePagination = false, facetedFilters }: Props) => {
-	// const queryClient = getQueryClient();
-	// Note we are now using fetchQuery()
-	// const { data, isFetching } = useQuery({
-	// 	queryKey: ['tickets', params?.conditions, params?.page, params?.pageSize, params?.orderBy],
-	// 	queryFn: async () => {
-	// 		const [ticketResponse, countResponse] = await Promise.all([
-	// 			fetch(`${process.env.NEXT_PUBLIC_CONNECT_WISE_URL}/service/tickets${generateParams(params)}`, {
-	// 				headers: baseHeaders,
-	// 			}),
-	// 			fetch(`${process.env.NEXT_PUBLIC_CONNECT_WISE_URL}/service/tickets/count${generateParams(params)}`, {
-	// 				headers: baseHeaders,
-	// 			}),
-	// 		]);
-
-	// 		return {
-	// 			tickets: await ticketResponse.json(),
-	// 			count: (await countResponse.json()).count,
-	// 		};
-	// 	},
-	// });
-
 	return (
 		<>
 			{type === 'table' && (

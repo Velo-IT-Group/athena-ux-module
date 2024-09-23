@@ -38,7 +38,6 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 export const getCompanies = async (
 	conditions?: Conditions<Company>
 ): Promise<{ data: Company[]; count: number }> => {
-	console.log('COMPANIES', generateParams(conditions))
 	const [response, countResponse] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/company/companies${generateParams(conditions)}`, {
 			headers: baseHeaders,
@@ -138,7 +137,6 @@ export const getContactCommunications = async (
 
 export const getContacts = async (conditions?: Conditions<Contact>): Promise<{data: Contact[], count: number}> => {	
 	const generatedConditions = generateParams(conditions)
-	console.log('CONTACTS', generatedConditions)
 	const [response, countResponse] = await Promise.all([
 		await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${generatedConditions}`, {
 			headers: baseHeaders,
@@ -255,7 +253,6 @@ export const getAllConfigurations = async (
 export const getConfigurations = async (
 	conditions?: Conditions<Configuration>
 ): Promise<{ data: Configuration[]; count: number }> => {
-	console.log('CONFIGURATION', generateParams(conditions))
 
 	const [response, countResponse] = await Promise.all([
 			fetch(`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams(conditions)}`, {
@@ -291,7 +288,7 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
-	console.log(generateParams(conditions))
+	console.log(conditions, generateParams(conditions))
 	const [ticketResponse, projectTicketResponse, countResponse] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams({...conditions, pageSize: ((conditions?.pageSize ?? 10) / 2) })}`, {
 			headers: baseHeaders,
@@ -312,6 +309,7 @@ export const getTickets = async (
 		}),
 	]);
 	const serviceTickets = await ticketResponse.json() 
+	console.log(serviceTickets)
 	const projectTickets = await projectTicketResponse.json()
 
 	const data  = [...serviceTickets, ...projectTickets].sort((a,b) => b.id - a.id)
@@ -508,7 +506,6 @@ export const getPriorities = async (conditions?: Conditions<Priority>): Promise<
 };
 
 export const getBoards = async (conditions?: Conditions<Board>): Promise<Board[]> => {
-	console.log(generateParams(conditions))
 	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/boards/${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
@@ -536,7 +533,6 @@ export const getProjects = async (conditions?: Conditions<Project>): Promise<{ d
 	]);
 
 	if (!response.ok || !countResponse.ok) {
-		console.log(response.statusText)
 		throw new Error('Error fetching projects...', { cause: await response.json() });
 	}
 
@@ -603,7 +599,6 @@ export const getHoliday = async (
 	date: string = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date()),
 	conditions?: Conditions<Holiday>
 ): Promise<Holiday[]> => {
-	console.log(date);
 	const params = generateParams(conditions ? conditions : { conditions: { date: `[${date}]` } });
 	const response = await fetch(`${process.env.CONNECT_WISE_URL}/schedule/holidayLists/${id}/holidays${params ?? ''}`, {
 		headers: baseHeaders,

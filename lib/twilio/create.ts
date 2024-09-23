@@ -3,12 +3,21 @@ import { WorkerListInstanceCreateOptions } from 'twilio/lib/rest/taskrouter/v1/w
 import { createTask } from './taskrouter/helpers';
 import { createClient } from '@/utils/twilio';
 
-export const createWorker = async (friendlyName: string, attributes: WorkerListInstanceCreateOptions) => {
+export const createWorker = async (friendlyName: string, attributes: Record<string, any>) => {
 	const client = await createClient();
 
-	return await client.taskrouter.v1
-		.workspaces(process.env.WORKSPACE_SID!)
-		.workers.create({ friendlyName, attributes: JSON.stringify(attributes) });
+	console.log(friendlyName, attributes)
+
+	try {
+		const worker = await client.taskrouter.v1
+			.workspaces(process.env.TWILIO_WORKSPACE_SID!)
+			.workers.create({ friendlyName, attributes: JSON.stringify(attributes) })
+		
+			console.log(worker)
+			return worker
+	} catch (error) {
+		
+	}
 };
 
 export const createCallback = async (attributes: Object) => {

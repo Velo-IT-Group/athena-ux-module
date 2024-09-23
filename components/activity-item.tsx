@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+import React from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { Activity, Workspace } from 'twilio-taskrouter';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { Worker } from 'twilio-taskrouter';
@@ -11,10 +11,10 @@ import { Button } from './ui/button';
 import { Circle, Speaker, Volume2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useWorker } from '../providers/worker-provider';
-import { createClient } from '../utils/twilio';
 
 type Props = {
 	workers: Worker[];
+	conversations: Conversation[];
 	workspace: Workspace;
 	activity: Activity;
 	isCollapsed: boolean;
@@ -27,27 +27,9 @@ const activityColors: Record<string, string> = {
 	Offline: 'bg-gray-500',
 };
 
-const ActivityItem = ({ workers, workspace, activity, isCollapsed, onOpenChanges }: Props) => {
-	const [open, setOpen] = useState(false);
-	const { data: tasks } = useQuery({
-		queryKey: ['tasks'],
-		queryFn: async () => {
-			const client = await createClient();
-			return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks;
-		},
-		refetchInterval: open ? 1000 : false,
-	});
-
-	useEffect(() => {
-		onOpenChanges(open);
-	}, [open]);
-
+const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed, onOpenChanges }: Props) => {
 	return (
-		<Popover
-			key={activity.sid}
-			open={open}
-			onOpenChange={setOpen}
-		>
+		<Popover key={activity.sid}>
 			<Tooltip delayDuration={0}>
 				<TooltipTrigger asChild>
 					<PopoverTrigger asChild>
@@ -55,7 +37,6 @@ const ActivityItem = ({ workers, workspace, activity, isCollapsed, onOpenChanges
 							variant='ghost'
 							size={isCollapsed ? 'icon' : 'sm'}
 							className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
-							onClick={() => setOpen(!open)}
 						>
 							<Circle
 								className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
@@ -85,10 +66,8 @@ const ActivityItem = ({ workers, workspace, activity, isCollapsed, onOpenChanges
 					<CommandEmpty>Nothing found.</CommandEmpty>
 					<CommandList>
 						{workers?.map((worker) => {
-							const workerTasks =
-								tasks?.filter(
-									(task) => JSON.parse(task.attributes).conference.conferenceParticipants.worker.sid === worker.sid
-								) ?? [];
+							const workerConversations =
+								conversations?.filter((conversation) => conversation.agent === worker.sid) ?? [];
 							const workerAttributes = worker.attributes;
 							return (
 								<CommandItem
@@ -106,7 +85,7 @@ const ActivityItem = ({ workers, workspace, activity, isCollapsed, onOpenChanges
 
 									<span>{workerAttributes.full_name}</span>
 
-									{workerTasks?.length > 0 && (
+									{workerConversations?.length > 0 && (
 										<Button
 											variant='default'
 											size='smIcon'

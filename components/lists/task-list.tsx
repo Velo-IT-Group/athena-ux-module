@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState, Fragment } from 'react';
 import { useWorker } from '@/providers/worker-provider';
 import type { Reservation, Worker } from 'twilio-taskrouter';
 import { useDevice } from '@/providers/device-provider';
@@ -7,6 +8,7 @@ import { SignalType } from '@gnaudio/jabra-js';
 import { Separator } from '../ui/separator';
 import useReservations from '@/hooks/useReservations';
 import TaskNotification from '../task-notification';
+import { toast } from 'sonner';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -24,17 +26,20 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		try {
 			addReservation(r);
 			setActiveReservation(r);
-			if (r.task.attributes.direction === 'outboundDial') {
+			if (r.task.attributes.direction === 'outbound') {
 				await r.conference({ beep: false });
 			}
 
-			console.log(activeReservation);
-
-			if (currentCallControl && r.task.taskChannelUniqueName === 'voice') {
+			if (
+				r.task.attributes.direction !== 'outbound' &&
+				currentCallControl &&
+				r.task.taskChannelUniqueName === 'voice'
+			) {
 				try {
 					currentCallControl?.ring(true);
 				} catch (error) {
 					console.log(error);
+					toast.error(JSON.stringify(error));
 				}
 			}
 
@@ -44,6 +49,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					currentCallControl?.ring(false);
 				} catch (error) {
 					console.error(error);
+					toast.error(JSON.stringify(error));
 				}
 			});
 
@@ -54,6 +60,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					setActiveReservation(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
+					toast.error(JSON.stringify(error));
 				}
 			});
 
@@ -65,22 +72,31 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					setActiveReservation(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
+					toast.error(JSON.stringify(error));
 				}
 			});
 
 			r.on('wrapup', async (reservation) => {
-				console.log('Wrapping up');
-				removeReservation(reservation);
-				currentCallControl?.ring(false);
-				currentCallControl?.offHook(false);
+				try {
+					console.log('Wrapping up');
+					removeReservation(reservation);
+					currentCallControl?.ring(false);
+					currentCallControl?.offHook(false);
+				} catch (error) {
+					toast.error(JSON.stringify(error));
+				}
 				// toast.custom(() => <TaskWrapup />, { id: reservation.task.sid });
 			});
 
 			r.on('completed', async (reservation) => {
-				addReservation(reservation);
-				setActiveReservation(reservation);
-				currentCallControl?.ring(false);
-				currentCallControl?.offHook(false);
+				try {
+					addReservation(reservation);
+					setActiveReservation(reservation);
+					currentCallControl?.ring(false);
+					currentCallControl?.offHook(false);
+				} catch (error) {
+					toast.error(JSON.stringify(error));
+				}
 				// toast.dismiss(reservation.task.sid);
 			});
 
@@ -92,10 +108,12 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					// toast.dismiss(reservation.task.sid);
 				} catch (error) {
 					console.error('No call pending', error);
+					toast.error(JSON.stringify(error));
 				}
 			});
 		} catch (error) {
 			console.error(error);
+			toast.error(JSON.stringify(error));
 		}
 	};
 
@@ -117,7 +135,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				console.log(activeReservation);
 				await activeReservation?.conference({
 					beep: false,
-					endConferenceOnExit: true,
+					endConferenceOnExit: false,
 					endConferenceOnCustomerExit: true,
 				});
 			}
@@ -137,7 +155,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	}, [worker]);
 
 	return (
-		<>
+		<Fragment>
 			{reservations.length > 0 && (
 				<>
 					<Separator />
@@ -145,18 +163,20 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					<section className='space-y-1.5 px-1.5'>
 						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
-						{reservations.map((reservation) => (
-							<TaskNotification
-								key={reservation.sid}
-								reservation={reservation}
-								task={reservation.task}
-								isCollapsed={isCollapsed}
-							/>
-						))}
+						{reservations
+							.filter((r) => r.status !== 'completed')
+							.map((reservation) => (
+								<TaskNotification
+									key={reservation.sid}
+									reservation={reservation}
+									task={reservation.task}
+									isCollapsed={isCollapsed}
+								/>
+							))}
 					</section>
 				</>
 			)}
-		</>
+		</Fragment>
 	);
 };
 

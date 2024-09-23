@@ -154,37 +154,6 @@ export const contactColumns: ColumnDef<Contact>[] = [
 		},
 	},
 	{
-		accessorKey: 'defaultPhoneNbr',
-		header: ({ column }) => (
-			<DataTableColumnHeader
-				column={column}
-				title='Phone Number'
-			/>
-		),
-		cell: ({ row }) => {
-			const number = parsePhoneNumber(row?.getValue('defaultPhoneNbr') ?? '', 'US');
-
-			return (
-				<span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{number?.format('NATIONAL') ?? ''}</span>
-			);
-		},
-	},
-	{
-		accessorKey: 'communicationItems',
-		header: ({ column }) => (
-			<DataTableColumnHeader
-				column={column}
-				title='Email'
-			/>
-		),
-		cell: ({ row }) => {
-			const communicationItems = row.getValue('communicationItems') as CommunicationItem[];
-			const defaultEmail = communicationItems?.find((item) => item.defaultFlag && item.type.name === 'Email');
-
-			return <span className={cn(buttonVariants({ variant: 'link' }), 'px-0')}>{defaultEmail?.value}</span>;
-		},
-	},
-	{
 		accessorKey: 'company',
 		header: ({ column }) => (
 			<DataTableColumnHeader
@@ -204,6 +173,35 @@ export const contactColumns: ColumnDef<Contact>[] = [
 		},
 		meta: {
 			filterKey: 'company/id',
+		},
+	},
+	{
+		accessorKey: 'defaultPhoneNbr',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Phone Number'
+			/>
+		),
+		cell: ({ row }) => {
+			const number = parsePhoneNumber(row?.getValue('defaultPhoneNbr') ?? '', 'US');
+
+			return <span>{number?.format('NATIONAL') ?? ''}</span>;
+		},
+	},
+	{
+		accessorKey: 'communicationItems',
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title='Email'
+			/>
+		),
+		cell: ({ row }) => {
+			const communicationItems = row.getValue('communicationItems') as CommunicationItem[];
+			const defaultEmail = communicationItems?.find((item) => item.defaultFlag && item.type.name === 'Email');
+
+			return <span>{defaultEmail?.value}</span>;
 		},
 	},
 ];

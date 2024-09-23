@@ -6,7 +6,7 @@ import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskr
 export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promise<WorkerInstance[]> => {
 	const client = await createClient();
 	try {
-		return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workers.list(options);
+		return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).workers.list(options);
 	} catch (error) {
 		console.error(error);
 		return [];
@@ -21,7 +21,7 @@ export const call = async (CallSid: string, callerId: string, phone: string) => 
 
 	dial.conference(
 		{
-			endConferenceOnExit: true,
+			endConferenceOnExit: false,
 			statusCallbackEvent: ['join'],
 			statusCallback: `/api/phone/call/${CallSid}/add-participant/${encodeURIComponent(phone)}`,
 		},
@@ -37,7 +37,7 @@ export const addParticipant = async (sid: string, CallSid: string, phone: string
 			to: phone,
 			from: callerId,
 			earlyMedia: true,
-			endConferenceOnExit: true,
+			endConferenceOnExit: false,
 		});
 
 		return participant;

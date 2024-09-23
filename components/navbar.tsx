@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import UserInfo from './user-info';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
@@ -6,36 +5,40 @@ import { Phone } from 'lucide-react';
 import OutboundDialerContent from './outbound-dialer-content';
 import { createClient } from '@/utils/supabase/server';
 import HistorySelector from '@/components/history-selector';
+import getQueryClient from '@/app/getQueryClient';
+import OutboundDialer from './outbound-dialer';
 
 const Navbar = async () => {
 	const supabase = createClient();
+	const queryClient = getQueryClient();
 	const {
 		data: { user },
-	} = await supabase.auth.getUser();
-	const { data: profile } = await supabase
-		.from('profiles')
-		.select()
-		.eq('id', user?.id ?? '')
-		.single();
-	const { data: conversations } = await supabase
-		.schema('reporting')
-		.from('conversations')
-		.select()
-		.eq('agent', profile?.worker_sid ?? '');
+	} = await queryClient.fetchQuery({ queryKey: ['user'], queryFn: () => supabase.auth.getUser() });
+	const { data: profile } = await queryClient.fetchQuery({
+		queryKey: ['profiles', user?.id],
+		queryFn: () =>
+			supabase
+				.from('profiles')
+				.select()
+				.eq('id', user?.id ?? '')
+				.single(),
+	});
+	const { data: conversations } = await queryClient.fetchQuery({
+		queryKey: ['conversations', profile?.worker_sid],
+		queryFn: () =>
+			supabase
+				.schema('reporting')
+				.from('conversations')
+				.select()
+				.eq('agent', profile?.worker_sid ?? '')
+				.order('date', { ascending: false }),
+	});
 
 	if (!profile || !conversations) return <div></div>;
 
 	return (
 		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
-			<div className='flex items-center gap-3'>
-				<Image
-					src='/velo-logo-black.svg'
-					alt='Velo logo logo'
-					width={48}
-					height={48}
-					className='object-contain'
-				/>
-			</div>
+			<div className='flex items-center gap-3'></div>
 
 			<div className='flex items-center'>
 				<HistorySelector
@@ -54,7 +57,7 @@ const Navbar = async () => {
 					</PopoverTrigger>
 
 					<PopoverContent align='end'>
-						<OutboundDialerContent numbers={[]} />
+						<OutboundDialer />
 					</PopoverContent>
 				</Popover>
 

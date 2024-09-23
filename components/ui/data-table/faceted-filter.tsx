@@ -17,8 +17,8 @@ import {
 import { Popover, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { PopoverContent } from '../popover-dialog';
-import { Comparison, KeyValue } from '@/utils/manage/params';
-import { QueryFunction, useQueries, useQuery } from '@tanstack/react-query';
+import { KeyValue } from '@/utils/manage/params';
+import { QueryFunction } from '@tanstack/react-query';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
 	column?: Column<TData, TValue>;
@@ -43,15 +43,9 @@ export function DataTableFacetedFilter<TData, TValue>({
 	removeCondition,
 }: DataTableFacetedFilterProps<TData, TValue>) {
 	const facets = column?.getFacetedUniqueValues();
-	const selectedValues = new Set(column?.getFilterValue() as string[]);
-
-	React.useEffect(() => {
-		if (!defaultValues || !defaultValues.length) {
-			column?.setFilterValue(undefined);
-			return;
-		}
-		column?.setFilterValue(defaultValues.map(String));
-	}, []);
+	const defaults = defaultValues ? [...defaultValues].map(String) : [];
+	const filterValue = column?.getFilterValue() ? (column?.getFilterValue() as string[]) : [];
+	const selectedValues = new Set([...filterValue, ...defaults]);
 
 	return (
 		<Popover>
@@ -141,8 +135,11 @@ export function DataTableFacetedFilter<TData, TValue>({
 										>
 											<Check />
 										</div>
+
 										{option.icon && <option.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />}
+
 										<span>{option.label}</span>
+
 										{facets?.get(option.value) && (
 											<span className='ml-auto flex h-3.5 w-3.5 items-center justify-center font-mono text-xs'>
 												{facets.get(option.value)}
@@ -152,6 +149,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 								);
 							})}
 						</CommandGroup>
+
 						{selectedValues.size > 0 && (
 							<>
 								<CommandSeparator />

@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getCommunicationTypes, getCompanies, getContact } from '@/lib/manage/read';
 import { Building, ChevronsUpDown } from 'lucide-react';
 import React, { Suspense } from 'react';
@@ -10,8 +9,7 @@ import { Input } from '@/components/ui/input';
 import LabeledInput from '@/components/ui/labeled-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import ContactList from '@/components/lists/contact-list';
-import ContactProfileForm from './contact-profile-form';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
 import { parsePhoneNumber } from '@/lib/utils';
 
@@ -24,7 +22,6 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 		getContact(contactId ?? 32569),
 		getCommunicationTypes(),
 		getCompanies({
-			conditions: { 'status/id': 1 },
 			childConditions: { 'types/id': 1 },
 			orderBy: { key: 'name', order: 'asc' },
 			fields: ['id', 'name'],
@@ -63,6 +60,10 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 					</DialogTrigger>
 
 					<DialogContent className='max-w-none sm:max-w-none w-[calc(100vw-24px)] h-[calc(100vh-24px)] flex flex-col py-[3rem]'>
+						<DialogHeader>
+							<DialogTitle>Contacts</DialogTitle>
+						</DialogHeader>
+
 						<Suspense
 							fallback={
 								<TableSkeleton
@@ -143,72 +144,6 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 						</LabeledInput>
 					))}
 				</div>
-
-				{/* <Tabs
-					defaultValue='overview'
-					className='w-full space-y-3'
-				>
-					<TabsList className='w-full'>
-						<TabsTrigger
-							className='w-full'
-							value='overview'
-						>
-							Overview
-						</TabsTrigger>
-
-						<TabsTrigger
-							className='w-full'
-							value='profile'
-						>
-							Profile
-						</TabsTrigger>
-					</TabsList>
-
-					<TabsContent
-						value='overview'
-						className='grid gap-3 px-1.5'
-					>
-						<LabeledInput
-							label='Title'
-							name='title'
-							value={contact?.title}
-						/>
-
-						{Object.entries(groupedCommunications).map(([key, values]) => (
-							<LabeledInput
-								label={key}
-								name={key}
-								key={key}
-							>
-								{values.map(({ id, value, type }) => {
-									return (
-										<div
-											key={id}
-											className='grid grid-cols-[48px_1fr] items-start border border-input rounded-md overflow-hidden'
-										>
-											<div className='bg-muted/50 h-9 w-12 px-1.5 text-xs text-muted-foreground font-medium grid place-items-center border-r'>
-												{type.name}
-											</div>
-
-											<Input
-												name={key}
-												defaultValue={value}
-												className='h-9 w-full rounded-none border-0 px-1.5 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0'
-											/>
-										</div>
-									);
-								})}
-							</LabeledInput>
-						))}
-					</TabsContent>
-
-					<TabsContent
-						value='profile'
-						className='space-y-3 px-1.5'
-					>
-						<ContactProfileForm contact={contact} />
-					</TabsContent>
-				</Tabs> */}
 			</aside>
 		</Suspense>
 	);

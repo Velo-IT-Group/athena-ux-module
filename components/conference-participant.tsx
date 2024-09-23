@@ -6,7 +6,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import type { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 import type { Task } from 'twilio-taskrouter';
 import { useState } from 'react';
-import { ConferenceParticipantInstance } from 'twilio/lib/rest/insights/v1/conference/conferenceParticipant';
 
 type Props = {
 	task: Task;

@@ -154,6 +154,9 @@ export const columns: ColumnDef<Configuration>[] = [
 
 			return value.includes(String(referenceRow.id));
 		},
+		meta: {
+			filterKey: 'contact/id',
+		},
 	},
 	{
 		id: 'actions',

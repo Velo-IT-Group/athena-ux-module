@@ -1,10 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Activity, Building, Cable, PhoneIncoming, PhoneOutgoing, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
-import { getAllCalls } from '@/lib/twilio/read';
-import { CommunicationItem, ServiceTicket } from '@/types/manage';
-import { cn, parsePhoneNumber } from '@/lib/utils';
-import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
+import { cn } from '@/lib/utils';
 import ActivityList from '@/components/lists/activity-list';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import { groupBy } from 'lodash';
@@ -13,19 +10,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import {
 	getBoards,
 	getCompanies,
-	getConfigurations,
 	getConfigurationStatuses,
 	getConfigurationTypes,
+	getContacts,
 	getPriorities,
 	getProjects,
 	getSystemMembers,
-	getTickets,
 } from '@/lib/manage/read';
 import { createClient } from '@/utils/supabase/server';
-import { Conditions } from '@/utils/manage/params';
-import getQueryClient from '../getQueryClient';
-import { DataTable } from '@/components/ui/data-table';
-import { columns } from '@/components/table-columns/project';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -35,17 +27,11 @@ type Props = {
 	contactId?: number;
 	companyId?: number;
 	className?: string;
-	communicationItems?: CommunicationItem[];
-	searchParams: { [key: string]: string | string[] | undefined };
-	ticketFilter: Conditions<ServiceTicket>;
 };
 
-const ConversationDetails = async ({ contactId, companyId, className, communicationItems, ticketFilter }: Props) => {
+const ConversationDetails = async ({ contactId, companyId, className }: Props) => {
 	const supabase = createClient();
 	const [
-		{
-			data: { user },
-		},
 		boards,
 		priorities,
 		members,
@@ -54,8 +40,8 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 		configurationTypes,
 		{ data: calls },
 		{ data: projects },
+		{ data: contacts },
 	] = await Promise.all([
-		supabase.auth.getUser(),
 		getBoards({
 			conditions: {
 				inactiveFlag: false,
@@ -97,16 +83,23 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 			.select()
 			.eq('contact_id', contactId ? contactId : '')
 			.eq('company_id', companyId ? companyId : ''),
-		getProjects(),
+		getProjects({
+			conditions: {
+				closedFlag: false,
+			},
+		}),
+		getContacts({
+			conditions: {
+				'company/id': companyId ? [companyId] : undefined,
+				inactiveFlag: false,
+			},
+			orderBy: {
+				key: 'firstName',
+			},
+			fields: ['id', 'firstName', 'lastName'],
+			pageSize: 1000,
+		}),
 	]);
-
-	// const [calls] = await Promise.all(
-	// 	communicationItems?.length
-	// 		? communicationItems
-	// 				?.filter((item) => item.communicationType === 'Phone' && parsePhoneNumber(item.value).isValid)
-	// 				.map((item) => getAllCalls(item.value))
-	// 		: []
-	// );
 
 	const groupedCalls = groupBy(
 		calls?.sort((a, b) => {
@@ -161,10 +154,6 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 													icon: isInbound ? PhoneIncoming : PhoneOutgoing,
 													date: new Date(call.date),
 													text: `${isInbound ? call.agent : call.phone_number}`,
-													// 	text: `${
-													// 		isInbound ? call.phone_number : user?.email === call.toFormatted ? 'You' : call.toFormatted
-													// 	}
-													// called ${isInbound ? call.toFormatted : call.fromFormatted}`,
 												};
 											})}
 									/>
@@ -225,6 +214,7 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 							},
 						}}
 						definition={{ page: 'Dashboard', section: 'Configurations' }}
+						// @ts-ignore
 						facetedFilters={[
 							{ accessoryKey: 'company', items: companies },
 							{
@@ -233,8 +223,16 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 									return { id, name: description };
 								}),
 							},
+							companyId
+								? {
+										accessoryKey: 'contact',
+										items: contacts.map((c) => {
+											return { id: c.id, name: `${c.firstName} ${c.lastName ?? ''}` };
+										}),
+								  }
+								: undefined,
 							{ accessoryKey: 'type', items: configurationTypes },
-						]}
+						].filter(Boolean)}
 					/>
 				</TabsContent>
 
@@ -242,7 +240,6 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 					<TicketList
 						type='table'
 						params={{
-							// ...ticketFilter,
 							conditions: {
 								'company/id': companyId ? [companyId] : undefined,
 								'contact/id': contactId ? [contactId] : undefined,
@@ -250,6 +247,7 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact', 'company'],
 							orderBy: { key: 'id', order: 'desc' },
 						}}
+						// @ts-ignore
 						facetedFilters={[
 							{ accessoryKey: 'board', items: boards },
 							{ accessoryKey: 'priority', items: priorities },
@@ -259,11 +257,19 @@ const ConversationDetails = async ({ contactId, companyId, className, communicat
 									return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
 								}),
 							},
+							companyId
+								? {
+										accessoryKey: 'contact',
+										items: contacts.map((c) => {
+											return { id: c.id, name: `${c.firstName} ${c.lastName ?? ''}` };
+										}),
+								  }
+								: undefined,
 							{
 								accessoryKey: 'company',
 								items: companies,
 							},
-						]}
+						].filter(Boolean)}
 						definition={{ page: 'Dashboard', section: 'Tickets' }}
 					/>
 				</TabsContent>

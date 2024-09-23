@@ -58,8 +58,6 @@ export function DataTable<TData, TValue>({
 	const { parameters, onParametersChange, pagination, onPaginationChange } = useFilterParameters(
 		meta.filterParams ?? {}
 	);
-	// const { pagination, onPaginationChange } = usePagination(meta.definition, meta.filterParams);
-	// const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(defaultVisibleColumns);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);

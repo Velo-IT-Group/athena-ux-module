@@ -63,7 +63,7 @@ const IncomingTask = ({ reservation, task }: Props) => {
 						await reservation.conference({
 							beep: false,
 							startConferenceOnEnter: true,
-							endConferenceOnExit: true,
+							endConferenceOnExit: false,
 						});
 					}}
 				>

@@ -38,10 +38,10 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 					data-collapsed={isCollapsed}
 					className='group flex flex-col'
 				>
-					<div className={cn('flex h-12 items-center justify-center py-0.5', isCollapsed ? 'h-12' : 'px-1.5')}>
+					<div className={cn('flex h-12 items-center py-0.5', isCollapsed ? 'h-12 justify-center ' : 'px-[18px] ')}>
 						<Logo
 							isCollapsed={isCollapsed}
-							className='h-6 w-6'
+							className={isCollapsed ? 'h-6 w-6' : 'h-[23px] w-[48px]'}
 						/>
 					</div>
 

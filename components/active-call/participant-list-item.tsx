@@ -8,10 +8,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Skeleton } from '../ui/skeleton';
 import { useTaskContext } from './context';
 
-type Props = { sid: string; name: string; isYou: boolean; showRemoval: boolean };
+type Props = { sid: string; name: string; isYou: boolean; showRemoval: boolean; nameKey: string };
 
-const ParticipantListItem = ({ sid, name, isYou, showRemoval }: Props) => {
-	const { conference } = useTaskContext();
+const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) => {
+	const { conference, removeParticipantByName } = useTaskContext();
 	const {
 		isMuted,
 		isOnHold,
@@ -47,7 +47,7 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval }: Props) => {
 			className={cn(
 				buttonVariants({ variant: participant?.hold ? 'secondary' : 'ghost', size: 'sm' }),
 				'flex items-center justify-between h-9 hover:bg-transparent relative',
-				participant?.hold && 'opacity-50'
+				isOnHold && 'opacity-50'
 			)}
 		>
 			<div className='mr-1.5 relative'>
@@ -81,7 +81,10 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval }: Props) => {
 						<Button
 							variant='ghost'
 							size='icon'
-							onClick={() => removeParticipant.mutate()}
+							onClick={() => {
+								removeParticipant.mutate();
+								removeParticipantByName(nameKey);
+							}}
 						>
 							<CircleMinus />
 						</Button>

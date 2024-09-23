@@ -134,10 +134,8 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 					if (!eccFactory.supportsCallControl(d)) {
 						return;
 					}
-
 					// Convert the ISdkDevice to a ICallControlDevice
 					const ccDevice = await eccFactory.createCallControl(d);
-					console.log(ccDevice);
 
 					try {
 						const isLocked = await ccDevice.takeCallLock();

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { groupBy } from 'lodash';
-import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
 import { useEffect, useState } from 'react';

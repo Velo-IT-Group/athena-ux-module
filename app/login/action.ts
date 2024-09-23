@@ -21,7 +21,7 @@ export const signInWithAzure = async (formData: FormData) => {
 		provider: 'azure',
 		options: {
 			scopes: 'openid profile email User.Read Calendars.ReadBasic Calendars.Read Calendars.ReadWrite',
-			redirectTo: `${getURL()}/auth/callback`,
+			redirectTo: `${getURL()}/auth/callback?email=${formData.get('email')}`,
 		},
 	});
 

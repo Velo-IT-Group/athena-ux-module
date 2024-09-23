@@ -13,7 +13,6 @@ export const createAccessToken = async (
 	workerSid: string,
 	identity: string
 ) => {
-	console.log(accountSid, signingKeySid, signingKeySecret, workspaceSid, workerSid, identity);
 	const taskRouterGrant = new TaskRouterGrant({
 		workerSid,
 		workspaceSid,

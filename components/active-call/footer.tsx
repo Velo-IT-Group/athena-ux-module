@@ -3,28 +3,8 @@ import React from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
-import {
-	ArrowRightFromLine,
-	Circle,
-	Ellipsis,
-	Grip,
-	Mic,
-	MicOff,
-	Pause,
-	Phone,
-	PhoneForwarded,
-	Settings,
-	UserPlus,
-} from 'lucide-react';
+import { ArrowRightFromLine, Grip, Mic, Pause, Phone, PhoneForwarded } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
 import { useDevice } from '@/providers/device-provider';
 import WorkerSelector from '@/app/(user)/worker-selector';
 import { parsePhoneNumber } from '@/lib/utils';
@@ -32,7 +12,8 @@ import OutboundDialerContent from '../outbound-dialer-content';
 import { useTaskContext } from './context';
 
 const ActiveCallFooter = () => {
-	const { transferTask, addExternalParticipant, task, endConference } = useTaskContext();
+	const { transferTask, addExternalParticipant, task, endConference, conferenceParticipants, removeParticipantByName } =
+		useTaskContext();
 	const { muted, setMuted } = useDevice();
 
 	return (
@@ -145,98 +126,49 @@ const ActiveCallFooter = () => {
 						<span>Put call on hold</span>
 					</TooltipContent>
 				</Tooltip>
-
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant='secondary'
-							size='icon'
-						>
-							<Ellipsis className='h-3.5 w-3.5' />
-						</Button>
-					</DropdownMenuTrigger>
-
-					<DropdownMenuContent
-						side='top'
-						align='end'
-						className='w-48 dark'
-					>
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<Pause className='mr-3' />
-								<span>Hold</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<UserPlus className='mr-3' />
-								<span>Add People</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<PhoneForwarded className='mr-3' />
-								<span>Transfer Call</span>
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-
-						<DropdownMenuSeparator />
-
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<MicOff className='mr-3' />
-								<span>Mute Mic</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<Circle className='mr-3' />
-								<span>Record Call</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<Grip className='mr-3' />
-								<span>Show Keypad</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<Settings className='mr-3' />
-								<span>Audio Settings</span>
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-
-						<DropdownMenuSeparator />
-
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<ArrowRightFromLine className='mr-3' />
-								<span>Leave Call</span>
-							</DropdownMenuItem>
-
-							<DropdownMenuItem>
-								<Phone className='mr-3 rotate-[135deg] text-red-500' />
-								<span>End Call</span>
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-					</DropdownMenuContent>
-				</DropdownMenu>
 			</div>
 
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant='destructive'
-						size='icon'
-						onClick={() => endConference?.()}
-					>
-						<Phone className='rotate-[135deg]' />
-					</Button>
-				</TooltipTrigger>
+			<div className='flex items-center gap-1.5'>
+				{Object.keys(conferenceParticipants ?? {}).length > 2 && (
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								size='icon'
+								onClick={() => removeParticipantByName('worker')}
+							>
+								<ArrowRightFromLine />
+								<span className='sr-only'>Leave Call</span>
+							</Button>
+						</TooltipTrigger>
 
-				<TooltipContent
-					side='top'
-					align='center'
-				>
-					<span>End Call</span>
-				</TooltipContent>
-			</Tooltip>
+						<TooltipContent
+							side='top'
+							align='center'
+						>
+							<span>Leave Call</span>
+						</TooltipContent>
+					</Tooltip>
+				)}
+
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							variant='destructive'
+							size='icon'
+							onClick={() => endConference?.()}
+						>
+							<Phone className='rotate-[135deg]' />
+						</Button>
+					</TooltipTrigger>
+
+					<TooltipContent
+						side='top'
+						align='center'
+					>
+						<span>End Call</span>
+					</TooltipContent>
+				</Tooltip>
+			</div>
 		</CardFooter>
 	);
 };

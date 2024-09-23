@@ -22,7 +22,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 	const [status, setStatus] = useState('');
 
 	const getParticipant = useQuery({
-		queryKey: ['participant', conferenceSid, participantSid],
+		queryKey: ['participants', conferenceSid, participantSid],
 		queryFn: () => getConferenceParticipant(conferenceSid, participantSid),
 	});
 
@@ -41,7 +41,10 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 		mutationKey: ['toggleParticipantMute', conferenceSid, participantSid],
 		mutationFn: () => removeConferenceParticipant(conferenceSid, participantSid),
 		onSuccess: (data, variables) => {
-			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
+			queryClient.invalidateQueries({ queryKey: ['participants', conferenceSid, participantSid] });
+		},
+		onError(error, variables, context) {
+			toast.error(error.message);
 		},
 	});
 
@@ -50,7 +53,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 		mutationFn: ({ label, hold }: { label?: string; hold: boolean }) =>
 			updateConferenceParticipants(conferenceSid, label ?? participantSid, { Hold: hold }),
 		onSuccess: (data, variables) => {
-			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
+			queryClient.invalidateQueries({ queryKey: ['participants', conferenceSid, participantSid] });
 			setIsMuted(data.hold);
 		},
 		onError(error, variables, context) {

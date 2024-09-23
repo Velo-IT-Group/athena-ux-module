@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { redirect } from 'next/navigation';
 import UserLayout from './user-layout';
 import Navbar from '@/components/navbar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -38,7 +37,7 @@ const Layout = async ({ children }: Props) => {
 	}
 
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
-		const [worker, members, contacts] = await Promise.all([
+		const [worker, members, { data: contacts }] = await Promise.all([
 			findWorker(user?.email ?? ''),
 			getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
 			getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),

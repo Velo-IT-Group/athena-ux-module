@@ -91,7 +91,12 @@ const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props
 				>
 					<Phone className='w-3.5 h-3.5' /> <span>Call</span>
 				</Button> */}
-				<Button type='submit'>Submit</Button>
+				<Button
+					type='submit'
+					className='w-full'
+				>
+					Dial
+				</Button>
 			</form>
 		</Form>
 	);

@@ -6,7 +6,7 @@ import { useTaskContext } from './context';
 
 const ActiveCallParticipants = () => {
 	const { conferenceParticipants } = useTaskContext();
-	const entries = Object.entries(conferenceParticipants);
+	const entries = Object.entries(conferenceParticipants ?? {});
 
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
@@ -18,6 +18,7 @@ const ActiveCallParticipants = () => {
 						sid={value.sid}
 						isYou={key === 'worker'}
 						showRemoval={entries.length > 2}
+						nameKey={key}
 					/>
 				);
 			})}

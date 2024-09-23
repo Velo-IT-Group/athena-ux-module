@@ -68,7 +68,10 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 						/>
 					)}
 
-					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && <ActiveCall task={task} />}
+					{reservation.status === 'accepted' &&
+						(task.taskChannelUniqueName === 'voice' || task.taskChannelUniqueName === 'default') && (
+							<ActiveCall task={task} />
+						)}
 
 					{reservation.status === 'wrapping' && (
 						<TaskWrapup

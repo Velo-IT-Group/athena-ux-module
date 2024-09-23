@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input, InputProps } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface Props extends InputProps {
 	label?: string;
@@ -11,7 +12,7 @@ interface Props extends InputProps {
 const LabeledInput = React.forwardRef<HTMLInputElement, Props>(
 	({ children, className, type, description, label, ...props }, ref) => {
 		return (
-			<div className='grid gap-2'>
+			<div className={cn('grid gap-1.5', className)}>
 				{label && (
 					<Label htmlFor={props.name || props.id}>
 						{label}

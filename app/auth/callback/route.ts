@@ -24,8 +24,9 @@ export async function GET(request: NextRequest) {
 			const isLocalEnv = process.env.NODE_ENV === 'development';
 			
 			const workers = await getWorkers({ friendlyName: email }) 
-			console.log(workers)
 			const { data: { user } } = await supabase.auth.getUser()
+
+			console.log(user)
 			
 			if (!workers.length) {
 				const [members, { data: contacts }] = await Promise.all([
@@ -67,7 +68,9 @@ export async function GET(request: NextRequest) {
 				// we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
 				return NextResponse.redirect(`${origin}${next}`);
 			} else if (forwardedHost) {
-				return NextResponse.redirect(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? forwardedHost}${next}`);
+				return NextResponse.redirect(`${origin}${next}`);
+
+				// return NextResponse.redirect(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
 			}

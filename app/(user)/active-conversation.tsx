@@ -22,6 +22,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import LabeledInput from '@/components/ui/labeled-input';
 
 type Props = {
 	contactId?: number;
@@ -101,19 +102,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		}),
 	]);
 
-	const groupedCalls = groupBy(
-		calls?.sort((a, b) => {
-			const aDate = new Date(a.date);
-			const bDate = new Date(b.date);
-			if (aDate.getTime() < bDate.getTime()) return 1;
-			if (aDate.getTime() > bDate.getTime()) return -1;
-			return 0;
-		}),
-		({ date }) => relativeDate(new Date(date))
-	);
-
 	const tabs = [
-		{ name: 'Activity', icon: Activity },
 		{ name: 'Company', icon: Building },
 		{ name: 'Configurations', icon: Cable },
 		{ name: 'Tickets', icon: Tag },
@@ -133,49 +122,19 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 					))}
 				</TabsList>
 
-				<TabsContent value={tabs[0].name}>
-					<Accordion type='multiple'>
-						{Object.entries(groupedCalls).map(([date, calls]) => (
-							<AccordionItem value={date}>
-								<AccordionTrigger>{date}</AccordionTrigger>
-								<AccordionContent className='space-y-3 flex flex-col'>
-									<ActivityList
-										activities={calls
-											?.sort((a, b) => {
-												const aDate = new Date(a.date);
-												const bDate = new Date(b.date);
-												if (aDate.getTime() < bDate.getTime()) return 1;
-												if (aDate.getTime() > bDate.getTime()) return -1;
-												return 0;
-											})
-											.map((call) => {
-												const isInbound = call.direction === 'inbound';
-												return {
-													icon: isInbound ? PhoneIncoming : PhoneOutgoing,
-													date: new Date(call.date),
-													text: `${isInbound ? call.agent : call.phone_number}`,
-												};
-											})}
-									/>
-								</AccordionContent>
-							</AccordionItem>
-						))}
-					</Accordion>
-				</TabsContent>
-
 				<TabsContent
-					value={tabs[1].name}
+					value={tabs[0].name}
 					className='grid grid-cols-[2fr_1fr] gap-3'
 				>
 					<div>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
 					</div>
 
-					<div>
+					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
 						{projects.map((project) => (
 							<Card key={project.id}>
-								<CardContent className='py-1.5 flex justify-end'>
+								<CardContent className='py-3 flex justify-end'>
 									<Badge className='rounded-sm'>{project.status?.name}</Badge>
 								</CardContent>
 
@@ -184,14 +143,24 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 									<CardDescription className='text-sm'>{project?.description}</CardDescription>
 								</CardHeader>
 
-								<Separator />
+								<Separator className='my-3' />
 
 								<CardFooter>
-									<div className='flex items-center gap-1.5'>
-										<Progress
-											defaultValue={(project?.percentComplete ?? 0) * 100}
-											max={100}
-										/>
+									<div className='grid gap-1.5 w-full'>
+										<LabeledInput
+											label='Status'
+											className='w-full'
+										>
+											<Progress
+												value={(project?.percentComplete ?? 0) * 100}
+												max={100}
+												className='w-full'
+											/>
+										</LabeledInput>
+
+										<div className='text-secondary-foreground text-xs'>
+											{(project?.percentComplete ?? 0) * 100}% out of 100% complete
+										</div>
 									</div>
 								</CardFooter>
 							</Card>
@@ -199,7 +168,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 					</div>
 				</TabsContent>
 
-				<TabsContent value={tabs[2].name}>
+				<TabsContent value={tabs[1].name}>
 					<ConfigurationsList
 						type='table'
 						params={{
@@ -236,7 +205,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 					/>
 				</TabsContent>
 
-				<TabsContent value={tabs[3].name}>
+				<TabsContent value={tabs[2].name}>
 					<TicketList
 						type='table'
 						params={{

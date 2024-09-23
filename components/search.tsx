@@ -64,7 +64,7 @@ const Search = ({
 						}
 					}
 				}}
-				className='border-0 shadow-none focus-visible:ring-0'
+				className='border-0 shadow-none focus-visible:ring-0 focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0'
 			/>
 
 			<Button className='hidden' />

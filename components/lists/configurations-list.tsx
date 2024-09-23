@@ -22,10 +22,6 @@ type Props = {
 };
 
 const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, params, definition }: Props) => {
-	// const { data: configurations, count } = await getConfigurations({ ...params });
-
-	// console.log(configurations);
-
 	return (
 		<>
 			{type === 'table' && (

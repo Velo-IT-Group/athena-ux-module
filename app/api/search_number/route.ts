@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 			{ status: 400, statusText: 'No phone number detected' }
 		);
 
-	const [contacts, { data: companies }] = await Promise.all([
+	const [{data: contacts}, { data: companies }] = await Promise.all([
 		getContacts({
 			childConditions: { 'communicationItems/value': `'${phoneNumber}'` },
 			fields: ['id', 'firstName', 'lastName', 'company'],

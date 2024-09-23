@@ -30,7 +30,6 @@ const ConfigurationsList = async ({ id, type, defaultValue, facetedFilters, para
 		<>
 			{type === 'table' && (
 				<DataTable
-					initialData={[]}
 					columns={columns}
 					queryFn={getConfigurations}
 					facetedFilters={facetedFilters}

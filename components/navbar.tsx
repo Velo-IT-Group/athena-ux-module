@@ -38,7 +38,7 @@ const Navbar = async () => {
 
 	return (
 		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
-			<div className='flex items-center gap-3'></div>
+			<div className='flex items-center gap-3 text-lg font-semibold tracking-tight'>Dashboard</div>
 
 			<div className='flex items-center'>
 				<HistorySelector

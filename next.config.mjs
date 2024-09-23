@@ -1,3 +1,7 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	webpack: (config, { isServer }) => {
@@ -19,6 +23,7 @@ const nextConfig = {
 					process: false,
 				},
 			};
+			config.resolve.alias['yjs'] = path.resolve(__dirname, 'node_modules/yjs');
 		}
 		config.module.exprContextCritical = false; // Workaround to suppress next-i18next warning, see https://github.com/isaachinman/next-i18next/issues/1545
 

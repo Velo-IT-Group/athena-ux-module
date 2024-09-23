@@ -1,12 +1,8 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Activity, Building, Cable, PhoneIncoming, PhoneOutgoing, Tag } from 'lucide-react';
+import { Building, Cable, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { cn } from '@/lib/utils';
-import ActivityList from '@/components/lists/activity-list';
 import ConfigurationsList from '@/components/lists/configurations-list';
-import { groupBy } from 'lodash';
-import { relativeDate } from '@/utils/date';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
 	getBoards,
 	getCompanies,
@@ -23,6 +19,9 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import LabeledInput from '@/components/ui/labeled-input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import Tiptap from '@/components/tip-tap';
 
 type Props = {
 	contactId?: number;
@@ -87,6 +86,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		getProjects({
 			conditions: {
 				closedFlag: false,
+				'company/id': companyId,
 			},
 		}),
 		getContacts({
@@ -109,9 +109,9 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 	];
 
 	return (
-		<div className={cn('w-full overflow-x-hidden', className)}>
+		<div className={cn('overflow-x-hidden', className)}>
 			<Tabs defaultValue={tabs[2].name}>
-				<TabsList className='w-full'>
+				<TabsList className=''>
 					{tabs.map((tab) => (
 						<TabsTrigger
 							className='w-full'
@@ -124,42 +124,49 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 
 				<TabsContent
 					value={tabs[0].name}
-					className='grid grid-cols-[2fr_1fr] gap-3'
+					className='grid grid-cols-[3fr_2fr] gap-3'
 				>
-					<div>
+					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
+						<Tiptap />
 					</div>
 
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
 						{projects.map((project) => (
 							<Card key={project.id}>
-								<CardContent className='py-3 flex justify-end'>
-									<Badge className='rounded-sm'>{project.status?.name}</Badge>
-								</CardContent>
-
-								<CardHeader className='pt-0 pb-1.5'>
+								<CardHeader>
 									<CardTitle className='text-base'>{project?.name}</CardTitle>
-									<CardDescription className='text-sm'>{project?.description}</CardDescription>
+									<CardDescription className='text-sm'>
+										<Textarea
+											value={project?.description?.trim()}
+											readOnly
+											className='border-none px-0 focus-visible:ring-0'
+										/>
+									</CardDescription>
 								</CardHeader>
 
-								<Separator className='my-3' />
+								<CardContent className='space-y-3'>
+									<Separator className='' />
+								</CardContent>
 
 								<CardFooter>
 									<div className='grid gap-1.5 w-full'>
-										<LabeledInput
-											label='Status'
-											className='w-full'
-										>
+										<div className='grid gap-3'>
+											<div className='flex items-center justify-between gap-1.5'>
+												<Label>Status</Label>
+												<Badge className='rounded-sm'>{project.status?.name}</Badge>
+											</div>
+
 											<Progress
 												value={(project?.percentComplete ?? 0) * 100}
 												max={100}
 												className='w-full'
 											/>
-										</LabeledInput>
+										</div>
 
 										<div className='text-secondary-foreground text-xs'>
-											{(project?.percentComplete ?? 0) * 100}% out of 100% complete
+											{(project?.percentComplete ?? 0) * 100}% complete
 										</div>
 									</div>
 								</CardFooter>

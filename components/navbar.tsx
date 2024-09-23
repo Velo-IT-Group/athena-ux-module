@@ -12,6 +12,18 @@ const Navbar = async () => {
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
+	const { data: profile } = await supabase
+		.from('profiles')
+		.select()
+		.eq('id', user?.id ?? '')
+		.single();
+	const { data: conversations } = await supabase
+		.schema('reporting')
+		.from('conversations')
+		.select()
+		.eq('agent', profile?.worker_sid ?? '');
+
+	if (!profile || !conversations) return <div></div>;
 
 	return (
 		<nav className='flex items-center justify-between px-3 py-0.5 h-12'>
@@ -26,7 +38,10 @@ const Navbar = async () => {
 			</div>
 
 			<div className='flex items-center'>
-				<HistorySelector user={user} />
+				<HistorySelector
+					profile={profile}
+					initalConversations={conversations}
+				/>
 
 				<Popover>
 					<PopoverTrigger asChild>

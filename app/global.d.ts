@@ -4,4 +4,5 @@ declare global {
 	type Database = DB;
 
 	type Conversation = Database['reporting']['Tables']['conversations']['Row'];
+	type Profile = Database['public']['Tables']['profiles']['Row'];
 }

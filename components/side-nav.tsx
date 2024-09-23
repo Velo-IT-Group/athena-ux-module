@@ -6,6 +6,8 @@ import { ResizablePanel } from './ui/resizable';
 import TaskList from './lists/task-list';
 import { Separator } from './ui/separator';
 import FavIcon from './icons/favicon';
+import Logo from '@/app/logo';
+import SidebarActivityList from './sidebar-activity-list';
 
 type Props = {
 	isDefaultCollapsed: boolean;
@@ -37,7 +39,10 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 					className='group flex flex-col'
 				>
 					<div className={cn('flex h-12 items-center justify-center py-0.5', isCollapsed ? 'h-12' : 'px-1.5')}>
-						<FavIcon />
+						<Logo
+							isCollapsed={isCollapsed}
+							className='h-6 w-6'
+						/>
 					</div>
 
 					<div className='space-y-1.5'>
@@ -45,7 +50,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 
 						<Separator />
 
-						{/* <SidebarActivityList isCollapsed={isCollapsed} /> */}
+						<SidebarActivityList isCollapsed={isCollapsed} />
 					</div>
 				</div>
 			</ScrollArea>

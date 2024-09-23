@@ -21,20 +21,17 @@ type Props = {
 
 const SidebarActivityList = ({ isCollapsed }: Props) => {
 	const { worker } = useWorker();
-	const { token, currentWorkspace } = useTwilio();
-	const workspace = new Workspace(token, {}, currentWorkspace);
+	const { token, workspace } = useTwilio();
 	const client = new SyncClient(token);
 	const { data: workers } = useQuery({
 		queryKey: ['workers'],
-		queryFn: async () => {
-			return await workspace.fetchWorkers();
-		},
+		queryFn: () => workspace?.fetchWorkers(),
 	});
 	const { data: tasks } = useQuery({
 		queryKey: ['tasks'],
 		queryFn: async () => {
 			const response = await fetch(
-				`https://taskrouter.twilio.com/v1/Workspaces/${currentWorkspace}/Tasks?PageSize=20`,
+				`https://taskrouter.twilio.com/v1/Workspaces/${workspace?.workspaceSid}/Tasks?PageSize=20`,
 				{
 					headers: {
 						Authorization: `Basic ${btoa(`${process.env.TWILIO_API_KEY_SID}:${process.env.TWILIO_API_KEY_SECRET}`)}`,
@@ -45,7 +42,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 				}
 			);
 			const data = await response.json();
-			console.log(data);
 			return data.tasks;
 		},
 	});
@@ -67,19 +63,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 		});
 	}, [worker]);
 
-	useEffect(() => {
-		if (!token) return;
-		client.map('').then((map) => {
-			map.getItems({ limit: 1, order: 'desc' }).then(({ items }) => {
-				// setCumulativeStatsVoice((items[0].data as any)?.['cumulativeStats_voice']);
-			});
-
-			map.on('itemUpdated', (data) => {
-				// console.log(data);
-			});
-		});
-	}, [token]);
-
 	const workerArray = Array.from(workers?.values() ?? []);
 
 	return (
@@ -94,10 +77,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 									size={isCollapsed ? 'icon' : 'sm'}
 									className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
 								>
-									<Circle
-										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
-									/>
-									<span className={cn(isCollapsed && 'sr-only')}>{activity.name}</span>
 									<Circle
 										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
 									/>
@@ -139,38 +118,9 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 													src={user.attributes.imageUrl}
 												/>
 											</Avatar>
-											{workerArray
-												?.filter((worker) => worker.activitySid === activity.sid)
-												?.map((user) => (
-													<CommandItem
-														key={user.sid}
-														value={user.attributes.full_name}
-														className='flex items-center gap-1.5'
-													>
-														<Avatar className='w-3.5 h-3.5'>
-															<AvatarFallback className='w-3.5 h-3.5'>
-																{user.attributes.full_name.charAt(0)}
-															</AvatarFallback>
-															<AvatarImage
-																className='w-3.5 h-3.5'
-																src={user.attributes.imageUrl}
-															/>
-														</Avatar>
 
-														<span>{user.attributes.full_name}</span>
-														<span>{user.attributes.full_name}</span>
+											<span>{user.attributes.full_name}</span>
 
-														{/* {user.isOnCall && (
-												<Button
-													variant='default'
-													size='smIcon'
-													className='ml-auto animate-pulse'
-												>
-													<Phone />
-												</Button>
-											)} */}
-													</CommandItem>
-												))}
 											{/* {user.isOnCall && (
 												<Button
 													variant='default'

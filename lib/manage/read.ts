@@ -18,6 +18,7 @@ import type {
 	Location,
 	Note,
 	Priority,
+	Project,
 	RecordType,
 	Schedule,
 	ServiceTicket,
@@ -135,84 +136,26 @@ export const getContactCommunications = async (
 	}
 };
 
-export const getContacts = async (conditions?: Conditions<Contact>): Promise<Contact[]> => {
-	try {
-		const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${generateParams(conditions)}`, {
+export const getContacts = async (conditions?: Conditions<Contact>): Promise<{data: Contact[], count: number}> => {	
+	const generatedConditions = generateParams(conditions)
+	console.log('CONTACTS', generatedConditions)
+	const [response, countResponse] = await Promise.all([
+		await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${generatedConditions}`, {
 			headers: baseHeaders,
-		});
-
-		if (response.status !== 200) {
-			console.error(response.statusText);
-			throw Error('Could not fetch contacts...');
-		}
-
-		return await response.json();
-	} catch (error) {
-		console.error(error);
-		return [];
-	}
-};
-
-export const getAllContacts = async (
-	conditions?: Conditions<Contact>
-): Promise<{ contacts: Contact[]; count: number }> => {
-	let contacts: Contact[] = [];
-	const responseCount = await fetch(
-		`${process.env.CONNECT_WISE_URL}/company/contacts/count${generateParams(conditions)}`,
-		{
+	}),
+		await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/count${generatedConditions}`, {
 			headers: baseHeaders,
-		}
-	);
+	})
+	])
 
-	const { count } = await responseCount.json();
-
-	const pageCount = Math.ceil(count / 1000);
-
-	try {
-		if (pageCount > 1) {
-			const arrayCount = Array(pageCount).fill(null);
-
-			const [...allResponses] = await Promise.all(
-				arrayCount.map((_, index) =>
-					fetch(
-						`${process.env.CONNECT_WISE_URL}/company/contacts/${generateParams({
-							...conditions,
-							page: index + 1,
-							pageSize: 1000,
-						})}`,
-						{
-							headers: baseHeaders,
-						}
-					)
-				)
-			);
-
-			const [...data] = await Promise.all(allResponses.flatMap((response) => response.json()));
-			const items: Contact[] = data.flatMap((item) => item);
-			contacts = items;
-		} else {
-			const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts${generateParams(conditions)}`, {
-				headers: baseHeaders,
-			});
-
-			if (!response.ok) {
-				console.error(response.statusText);
-				throw Error('Could not fetch contacts...');
-			}
-
-			return {
-				contacts: await response.json(),
-				count,
-			};
-		}
-	} catch (error) {
-		console.error(error);
-		return { contacts: [], count: 0 };
+	if (!response.ok || !countResponse.ok) {
+		console.error(response.statusText, await response.json());
+		throw new Error(`Could not fetch contacts... ${response.statusText || countResponse.statusText}`);
 	}
 
 	return {
-		contacts,
-		count,
+		data: await response.json(),
+		count: (await countResponse.json()).count
 	};
 };
 
@@ -575,6 +518,32 @@ export const getBoards = async (conditions?: Conditions<Board>): Promise<Board[]
 	}
 
 	return await response.json();
+};
+
+export const getProjects = async (conditions?: Conditions<Project>): Promise<{ data: Project[], count: number}> => {
+	const headers = new Headers(baseHeaders)
+	headers.set(
+	'Authorization',
+	'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD')
+)
+	const [response, countResponse] = await Promise.all([
+		fetch(`${process.env.CONNECT_WISE_URL}/project/projects${generateParams(conditions)}`, {
+			headers,
+		}),
+		fetch(`${process.env.CONNECT_WISE_URL}/project/projects/count${generateParams(conditions)}`, {
+			headers,
+		}),
+	]);
+
+	if (!response.ok || !countResponse.ok) {
+		console.log(response.statusText)
+		throw new Error('Error fetching projects...', { cause: await response.json() });
+	}
+
+	return {
+		data: await response.json(),
+		count: (await countResponse.json()).count
+	}
 };
 
 export const getAuditTrail = async (

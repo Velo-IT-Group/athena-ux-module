@@ -6,15 +6,32 @@ import { type Task, TransferOptions } from 'twilio-taskrouter';
 import { toast } from 'sonner';
 import { useWorker } from '@/providers/worker-provider';
 import { parsePhoneNumber } from '@/lib/utils';
-import { getConferenceParticipants, updateConference } from '@/lib/twilio/conference/helpers';
+import {
+	createConferenceParticipant,
+	getConferenceParticipants,
+	updateConference,
+} from '@/lib/twilio/conference/helpers';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
+import useConference from '@/hooks/useConference';
+import { CreateParticipantParams } from '@/types/twilio';
+import { useTwilio } from '@/providers/twilio-provider';
+import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 
 interface Props {
+	addExternalParticipant:
+		| UseMutationResult<
+				ParticipantInstance,
+				Error,
+				{
+					To: string;
+					From: string;
+				}
+		  >
+		| undefined;
 	conference: ConferenceAttributes | undefined;
-	conferenceParticipants: ConferenceParticpant | undefined;
+	conferenceParticipants: ConferenceParticpant;
 	endConference: UseMutateFunction<ConferenceInstance, Error, void, unknown> | undefined;
 	task: Task | undefined;
-	setTask: React.Dispatch<React.SetStateAction<Task | undefined>>;
 	transferTask:
 		| UseMutationResult<
 				Task,
@@ -30,31 +47,66 @@ interface Props {
 }
 
 const initialValues: Props = {
+	addExternalParticipant: undefined,
 	conference: undefined,
-	conferenceParticipants: undefined,
+	conferenceParticipants: {},
 	endConference: undefined,
 	task: undefined,
-	setTask: () => undefined,
 	transferTask: undefined,
 	wrapUpTask: undefined,
 };
 
 type WithChildProps = {
-	task?: Task;
+	task: Task;
 	children: React.ReactNode;
 };
 
 const context = createContext(initialValues);
 const { Provider } = context;
 
-export const TaskContext = ({ task: defaultTask, children }: WithChildProps) => {
+export const TaskContext = ({ task, children }: WithChildProps) => {
+	const { workspace } = useTwilio();
 	const { worker } = useWorker();
-	const [task, setTask] = useState<Task | undefined>(defaultTask);
-	const [conference, setConference] = useState<ConferenceAttributes>(task?.attributes?.conference || {});
-	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>();
+	const { conference } = task.attributes;
+	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>({});
 
 	useEffect(() => {
-		if (!conference.participants) return;
+		if (!conference?.participants) return;
+		setConferenceParticipants(conference.participants);
+	}, [conference?.participants]);
+
+	const { mutate: endConference } = useMutation({
+		mutationFn: () => updateConference(conference.sid, { status: 'completed' }),
+	});
+
+	const addExternalParticipant = useMutation({
+		mutationFn: async (params: { To: string; From: string }) => {
+			// const { formattedNumber } = parsePhoneNumber(params.To, 'US', 'E.164');
+			return await createConferenceParticipant(conference.sid, params);
+		},
+		onSuccess(data, variables, context) {
+			setConferenceParticipants((prev) => {
+				return {
+					...prev,
+					external: {
+						...data,
+						name: parsePhoneNumber(variables.To).formattedNumber,
+					},
+				};
+			});
+
+			task.setAttributes({
+				...task.attributes,
+				conference: {
+					...task.attributes.conference,
+					conferenceParticipants,
+				},
+			});
+		},
+	});
+
+	useEffect(() => {
+		if (!conference?.participants) return;
 
 		setConferenceParticipants((prev) => {
 			return {
@@ -69,53 +121,40 @@ export const TaskContext = ({ task: defaultTask, children }: WithChildProps) => 
 				},
 			};
 		});
-	}, [conference.participants]);
-
-	const queryParticipants = useQuery({
-		queryKey: ['participants', conference.sid],
-		queryFn: () => getConferenceParticipants(conference.sid),
-	});
-
-	const { mutate: endConference } = useMutation({
-		mutationFn: () => updateConference(conference.sid, { status: 'completed' }),
-	});
+	}, [conference?.participants]);
 
 	useEffect(() => {
-		if (!task?.attributes?.conference) return;
-
-		setConference((prev) => {
-			return {
-				...prev,
-				participants: {
-					...prev.participants,
-					worker: {
-						sid: worker?.sid,
-						name: worker?.attributes.full_name,
-					},
-					customer: {
-						sid: prev.participants.customer,
-						name: task.attributes.name ?? task.attributes.from,
-					},
-				},
-			};
-		});
-	}, [task?.attributes?.conference]);
+		if (!task) return;
+		console.log(task);
+		setConferenceParticipants(task.attributes?.conference?.participants);
+	}, [task]);
 
 	const transferTask = useMutation({
 		mutationFn: ({ to, options }: { to: string; options: TransferOptions }) => task!.transfer(to, options),
-		onSuccess: (data, variables, context) => {
-			setConference((prev) => {
+		onSuccess: async (data, variables, context) => {
+			const worker = await workspace?.fetchWorker(variables.to);
+			setConferenceParticipants((prev) => {
 				return {
 					...prev,
-					participants: {
-						...prev.participants,
-						transferedWorker: {
-							name: '',
-							sid: variables.to,
-						},
+					transferedWorker: {
+						name: worker?.attributes.full_name,
+						sid: variables.to,
 					},
 				};
 			});
+
+			try {
+				data
+					.setAttributes({
+						...data.attributes,
+						conference: {
+							...data.attributes.conference,
+						},
+					})
+					.then(console.log);
+			} catch (error) {
+				console.error(error);
+			}
 		},
 		onError: (error) => {
 			toast.error('Error transferring task' + error.message);
@@ -129,27 +168,16 @@ export const TaskContext = ({ task: defaultTask, children }: WithChildProps) => 
 		},
 	});
 
-	useEffect(() => {
-		if (!task) return;
-		console.log(task);
-		setConferenceParticipants(task.attributes?.conference.participants);
-	}, [task]);
-
 	return (
 		<Provider
 			value={{
+				addExternalParticipant,
 				task,
-				setTask,
-				conference,
 				conferenceParticipants,
+				conference,
 				endConference,
 				transferTask,
 				wrapUpTask,
-				// muteParticipant,
-				// holdParticipant,
-				// removeParticipant,
-				// isLoading,
-				// queryParticipants,
 			}}
 		>
 			{children}

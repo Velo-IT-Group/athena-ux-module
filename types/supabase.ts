@@ -271,6 +271,7 @@ export type Database = {
           organization: string | null
           updated_at: string | null
           username: string | null
+          worker_sid: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -281,6 +282,7 @@ export type Database = {
           organization?: string | null
           updated_at?: string | null
           username?: string | null
+          worker_sid?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -291,6 +293,7 @@ export type Database = {
           organization?: string | null
           updated_at?: string | null
           username?: string | null
+          worker_sid?: string | null
         }
         Relationships: [
           {
@@ -872,7 +875,15 @@ export type Database = {
           talk_time?: number | null
           workflow?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_agent_fkey"
+            columns: ["agent"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["worker_sid"]
+          },
+        ]
       }
       conversations_new: {
         Row: {

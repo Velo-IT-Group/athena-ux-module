@@ -13,14 +13,13 @@ import ContactList from '@/components/lists/contact-list';
 import ContactProfileForm from './contact-profile-form';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import TableSkeleton from '@/components/ui/data-table/skeleton';
+import { parsePhoneNumber } from '@/lib/utils';
 
 type Props = {
 	contactId?: number;
-	companyId?: number;
-	attributes: Record<string, any>;
 };
 
-const ConversationContactDetail = async ({ contactId, companyId, attributes }: Props) => {
+const ConversationContactDetail = async ({ contactId }: Props) => {
 	const [contact, types, { data: companies }] = await Promise.all([
 		getContact(contactId ?? 32569),
 		getCommunicationTypes(),
@@ -74,16 +73,14 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 						>
 							<ContactList
 								type='table'
-								id={1}
-								path='contact/id'
-								serviceType='ticket'
+								definition={{ page: 'Dashboard', section: 'contact-picker' }}
 								params={{
-									orderBy: { key: 'firstName' },
 									conditions: { inactiveFlag: false },
-									childConditions: { 'types/id': [17, 21] },
+									childConditions: { 'types/id': 17 },
+									orderBy: { key: 'firstName' },
 									fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
 								}}
-								// facetedFilters={[{ accessoryKey: 'company', items: companies }]}
+								facetedFilters={[{ accessoryKey: 'company', items: companies }]}
 								columnDefs='homepage'
 							/>
 						</Suspense>
@@ -105,7 +102,49 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 					)}
 				</div>
 
-				<Tabs
+				<div className='w-full space-y-3'>
+					<h3 className='text-lg font-medium'>Overview</h3>
+
+					<LabeledInput
+						label='Title'
+						name='title'
+						value={contact?.title}
+					/>
+
+					{Object.entries(groupedCommunications).map(([key, values]) => (
+						<LabeledInput
+							label={key}
+							name={key}
+							key={key}
+						>
+							{values.map(({ id, value, type, communicationType }) => {
+								return (
+									<div
+										key={id}
+										className='grid grid-cols-[48px_1fr] items-start border border-input rounded-md overflow-hidden'
+									>
+										<div className='bg-muted/50 h-9 w-12 px-1.5 text-xs text-muted-foreground font-medium grid place-items-center border-r'>
+											{type.name}
+										</div>
+
+										<Input
+											name={key}
+											readOnly
+											defaultValue={
+												communicationType && ['Phone', 'Fax'].includes(communicationType)
+													? parsePhoneNumber(value).formattedNumber
+													: value
+											}
+											className='h-9 w-full rounded-none border-0 px-1.5 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0'
+										/>
+									</div>
+								);
+							})}
+						</LabeledInput>
+					))}
+				</div>
+
+				{/* <Tabs
 					defaultValue='overview'
 					className='w-full space-y-3'
 				>
@@ -132,7 +171,7 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 						<LabeledInput
 							label='Title'
 							name='title'
-							defaultValue={contact?.title}
+							value={contact?.title}
 						/>
 
 						{Object.entries(groupedCommunications).map(([key, values]) => (
@@ -169,7 +208,7 @@ const ConversationContactDetail = async ({ contactId, companyId, attributes }: P
 					>
 						<ContactProfileForm contact={contact} />
 					</TabsContent>
-				</Tabs>
+				</Tabs> */}
 			</aside>
 		</Suspense>
 	);

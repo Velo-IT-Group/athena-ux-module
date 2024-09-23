@@ -44,11 +44,9 @@ const TicketList = ({ type, defaultValue, params, definition, hidePagination = f
 		<>
 			{type === 'table' && (
 				<DataTable
-					initialData={[]}
 					columns={columns}
 					queryFn={getTickets}
 					facetedFilters={facetedFilters}
-					// count={0}
 					meta={{
 						filterKey: 'summary',
 						definition,

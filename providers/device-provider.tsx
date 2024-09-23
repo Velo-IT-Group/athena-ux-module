@@ -50,6 +50,7 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
+	const [open, setOpen] = useState(false);
 	const [device, setDevice] = useState<Device>();
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);

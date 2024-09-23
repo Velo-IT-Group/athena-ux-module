@@ -43,17 +43,15 @@ export function DataTableFacetedFilter<TData, TValue>({
 	removeCondition,
 }: DataTableFacetedFilterProps<TData, TValue>) {
 	const facets = column?.getFacetedUniqueValues();
-	// const selectedValues = new Set(column?.getFilterValue() as string[]);
-	const filterValues = (column?.getFilterValue() as string[]) ?? [];
-	const selectedValues = new Set(filterValues);
-	// console.log(selectedValues);
+	const selectedValues = new Set(column?.getFilterValue() as string[]);
 
-	// const { data, isFetching } = useQuery({
-	// 	queryKey: [title ?? 'faceted-filter'],
-	// 	queryFn,
-	// });
-
-	// console.log(data, isFetching);
+	React.useEffect(() => {
+		if (!defaultValues || !defaultValues.length) {
+			column?.setFilterValue(undefined);
+			return;
+		}
+		column?.setFilterValue(defaultValues.map(String));
+	}, []);
 
 	return (
 		<Popover>

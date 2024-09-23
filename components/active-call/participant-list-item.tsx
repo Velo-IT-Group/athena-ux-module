@@ -6,10 +6,12 @@ import { cn } from '@/lib/utils';
 import useConferenceParticipant from '@/hooks/useConferenceParticipant';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Skeleton } from '../ui/skeleton';
+import { useTaskContext } from './context';
 
-type Props = { conferenceSid: string; sid: string; name: string; isYou: boolean; showRemoval: boolean };
+type Props = { sid: string; name: string; isYou: boolean; showRemoval: boolean };
 
-const ParticipantListItem = ({ conferenceSid, sid, name, isYou, showRemoval }: Props) => {
+const ParticipantListItem = ({ sid, name, isYou, showRemoval }: Props) => {
+	const { conference } = useTaskContext();
 	const {
 		isMuted,
 		isOnHold,
@@ -24,7 +26,7 @@ const ParticipantListItem = ({ conferenceSid, sid, name, isYou, showRemoval }: P
 		toggleParticipantHoldState,
 		getParticipant,
 	} = useConferenceParticipant({
-		conferenceSid,
+		conferenceSid: conference?.sid ?? '',
 		participantSid: sid,
 	});
 

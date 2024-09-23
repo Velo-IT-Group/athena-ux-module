@@ -8,7 +8,7 @@ import { ActiveCall } from './active-call';
 import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
 import { toast } from 'sonner';
-import { useTaskContext } from '@/providers/task-context';
+import { TaskContext } from './active-call/context';
 
 type Props = {
 	reservation: Reservation;
@@ -20,8 +20,6 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
-	const { setTask } = useTaskContext();
-	setTask(task);
 
 	if (timer.minutes >= 3 && reservation.status === 'wrapping') {
 		console.log('dismissing', timer, reservation.status);
@@ -56,28 +54,30 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 				</Button>
 			</PopoverTrigger>
 
-			<PopoverContent
-				side='right'
-				align='start'
-				sideOffset={12}
-				className='p-0'
-			>
-				{reservation.status === 'pending' && task.attributes.direction !== 'outboundDial' && (
-					<IncomingTask
-						reservation={reservation}
-						task={task}
-					/>
-				)}
+			<TaskContext task={task}>
+				<PopoverContent
+					side='right'
+					align='start'
+					sideOffset={12}
+					className='p-0'
+				>
+					{reservation.status === 'pending' && task.attributes.direction !== 'outboundDial' && (
+						<IncomingTask
+							reservation={reservation}
+							task={task}
+						/>
+					)}
 
-				{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && <ActiveCall task={task} />}
+					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && <ActiveCall task={task} />}
 
-				{reservation.status === 'wrapping' && (
-					<TaskWrapup
-						task={task}
-						timer={timer}
-					/>
-				)}
-			</PopoverContent>
+					{reservation.status === 'wrapping' && (
+						<TaskWrapup
+							task={task}
+							timer={timer}
+						/>
+					)}
+				</PopoverContent>
+			</TaskContext>
 		</Popover>
 	);
 };

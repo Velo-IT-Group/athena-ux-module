@@ -17,34 +17,24 @@ export default async function Page({
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
-	const ticketFilterCookieKey = 'filter-dashboard-tickets';
-	const ticketFilterCookie = cookies().get(ticketFilterCookieKey);
-	const ticketFilter = (ticketFilterCookie ? JSON.parse(ticketFilterCookie.value) : {}) as Conditions<ServiceTicket>;
-	const task: TaskInstance | undefined = searchParams.taskSid
-		? await getTask(searchParams.taskSid as string)
-		: undefined;
-	const attributes = task ? JSON.parse(task?.attributes) : {};
+	// const ticketFilterCookieKey = 'filter-dashboard-tickets';
+	// const ticketFilterCookie = cookies().get(ticketFilterCookieKey);
+	// const ticketFilter = (ticketFilterCookie ? JSON.parse(ticketFilterCookie.value) : {}) as Conditions<ServiceTicket>;
 	const companyId = searchParams.companyId ? parseInt(searchParams.companyId as string) : undefined;
 	const contactId = searchParams.contactId ? parseInt(searchParams.contactId as string) : undefined;
 	const contactCommunications = await getContactCommunications(contactId ?? user?.user_metadata?.contactId ?? 0);
 
-	// console.log(ticketFilter);
-
 	return (
-		<main className='grid h-full w-full'>
-			{/* <ConversationContactDetail
-				companyId={companyId ?? 250}
-				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
-				attributes={attributes}
-			/> */}
+		<main className='grid grid-cols-[1fr_3fr] h-full w-full'>
+			<ConversationContactDetail contactId={contactId ?? user?.user_metadata?.contactId} />
 
 			<ConversationDetails
-				contactId={contactId ?? user?.user_metadata?.contactId ?? 10}
-				companyId={companyId ?? 250}
+				contactId={contactId ?? user?.user_metadata?.contactId}
+				companyId={companyId ?? user?.user_metadata?.companyId}
 				communicationItems={contactCommunications}
 				className='p-6'
 				searchParams={searchParams}
-				ticketFilter={ticketFilter}
+				ticketFilter={{}}
 			/>
 		</main>
 	);

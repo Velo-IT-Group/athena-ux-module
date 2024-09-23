@@ -29,6 +29,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { updateFilterCookie } from '@/components/cookie-filter-actions';
 import { useFilterParameters } from '@/hooks/useFilterParameters';
 import { ParameterFeature } from '@/types/table';
+import { toast } from 'sonner';
 declare module '@tanstack/table-core' {
 	interface TableMeta<TData extends RowData> {
 		filterKey: keyof TData;
@@ -39,7 +40,6 @@ declare module '@tanstack/table-core' {
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
-	initialData: TData[];
 	meta: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
 	hidePagination?: boolean;
@@ -49,7 +49,6 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({
 	columns,
-	initialData,
 	meta,
 	facetedFilters,
 	hidePagination = false,
@@ -60,7 +59,7 @@ export function DataTable<TData, TValue>({
 		meta.filterParams ?? {}
 	);
 	// const { pagination, onPaginationChange } = usePagination(meta.definition, meta.filterParams);
-	const [rowSelection, setRowSelection] = React.useState({});
+	// const [rowSelection, setRowSelection] = React.useState({});
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(defaultVisibleColumns);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -73,6 +72,7 @@ export function DataTable<TData, TValue>({
 
 	if (error) {
 		console.error(error);
+		toast.error(error.message);
 	}
 
 	React.useEffect(() => {
@@ -88,14 +88,11 @@ export function DataTable<TData, TValue>({
 		state: {
 			sorting,
 			columnVisibility,
-			rowSelection,
 			columnFilters,
 			pagination,
 			parameters,
 		},
 		onParameterChange: onParametersChange,
-		enableRowSelection: true,
-		onRowSelectionChange: setRowSelection,
 		onSortingChange: setSorting,
 		onPaginationChange,
 		onColumnFiltersChange: setColumnFilters,

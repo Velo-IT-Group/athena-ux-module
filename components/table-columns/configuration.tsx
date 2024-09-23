@@ -21,7 +21,7 @@ export const columns: ColumnDef<Configuration>[] = [
 			<Link
 				href={`https://manage.velomethod.com/v4_6_release/services/system_io/router/openrecord.rails?locale=en_US&recordType=ConfigFV&companyName=velo&recid=${row.original.id}`}
 				target='_blank'
-				className={cn('font-medium max-w-[500px]', buttonVariants({ variant: 'link', className: 'px-0' }))}
+				className={cn('font-medium', buttonVariants({ variant: 'link', className: 'px-0' }))}
 			>
 				{row.getValue('name')}
 			</Link>
@@ -137,10 +137,14 @@ export const columns: ColumnDef<Configuration>[] = [
 		cell: ({ row }) => {
 			const contact = row.getValue('contact') as ReferenceType;
 			return (
-				<div className='flex items-center space-x-2'>
-					<User className='mr-1.5' />
-					<span className='truncate font-medium'>{contact?.name}</span>
-				</div>
+				<>
+					{contact !== undefined && (
+						<div className='flex items-center space-x-2'>
+							<User className='mr-1.5' />
+							<span className='truncate font-medium'>{contact?.name}</span>
+						</div>
+					)}
+				</>
 			);
 		},
 		filterFn: (row, id, value) => {

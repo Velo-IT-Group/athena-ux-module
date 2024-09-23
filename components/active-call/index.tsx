@@ -4,29 +4,12 @@ import ActiveCallHeader from './header';
 import ActiveCallFooter from './footer';
 import ActiveCallParticipants from './participants';
 import { Task } from 'twilio-taskrouter';
-import useTask from '@/hooks/useTask';
-import useConference from '@/hooks/useConference';
-import { useEffect } from 'react';
 
 type Props = {
 	task: Task;
 };
 
 export function ActiveCall({ task }: Props) {
-	const { transferTask, conference } = useTask(task);
-	const { addConferenceParticipantMutation, conferenceParticipants, endConference, updateConferenceParticipantsState } =
-		useConference({
-			conference,
-			task,
-		});
-
-	useEffect(() => {
-		if (!conference) return;
-		updateConferenceParticipantsState(conference.participants);
-	}, [conference]);
-
-	// const confP = { ...conference.participants, ...conferenceParticipants };
-
 	return (
 		<Card>
 			<ActiveCallHeader
@@ -34,17 +17,9 @@ export function ActiveCall({ task }: Props) {
 				searchParams={new URLSearchParams()}
 			/>
 
-			<ActiveCallParticipants
-				sid={conference.sid}
-				participants={conferenceParticipants ?? {}}
-			/>
+			<ActiveCallParticipants />
 
-			<ActiveCallFooter
-				task={task}
-				endConference={endConference}
-				transferTask={transferTask}
-				addConferenceParticipantMutation={addConferenceParticipantMutation}
-			/>
+			<ActiveCallFooter />
 		</Card>
 	);
 }

@@ -1,14 +1,13 @@
 'use client';
-import { useContext, useState, Dispatch, createContext, useRef } from 'react';
+import { useContext, useState, createContext, useRef } from 'react';
+import { Workspace } from 'twilio-taskrouter';
 interface TwilioProviderProps {
-	currentWorkspace: string | undefined;
-	setCurrentWorkspace: Dispatch<React.SetStateAction<string | undefined>>;
+	workspace: Workspace | undefined;
 	token: string;
 }
 
 const initialValues: TwilioProviderProps = {
-	currentWorkspace: '',
-	setCurrentWorkspace: () => undefined,
+	workspace: undefined,
 	token: '',
 };
 
@@ -23,12 +22,10 @@ const context = createContext(initialValues);
 const { Provider } = context;
 
 export const TwilioProvider = ({ authToken, workspaceSid, children }: WithChildProps) => {
-	const tokenRef = useRef(authToken);
-	const [currentWorkspace, setCurrentWorkspace] = useState<string | undefined>(workspaceSid);
+	const workspace = new Workspace(authToken, {}, workspaceSid);
 
 	const values = {
-		currentWorkspace,
-		setCurrentWorkspace,
+		workspace,
 		token: authToken,
 	};
 

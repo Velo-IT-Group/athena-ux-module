@@ -25,33 +25,14 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Dialpad } from '../dialpad';
-// import { PopoverContent } from '../ui/popover-dialog';
 import { useDevice } from '@/providers/device-provider';
-import { Task, TransferOptions } from 'twilio-taskrouter';
 import WorkerSelector from '@/app/(user)/worker-selector';
-import { UseMutateFunction, UseMutationResult } from '@tanstack/react-query';
-import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
-import { CreateParticipantParams } from '@/lib/twilio/conference/helpers';
 import { parsePhoneNumber } from '@/lib/utils';
 import OutboundDialerContent from '../outbound-dialer-content';
+import { useTaskContext } from './context';
 
-type Props = {
-	task: Task;
-	endConference: UseMutateFunction<ConferenceInstance, Error, void, unknown>;
-	transferTask: UseMutationResult<
-		Task,
-		Error,
-		{
-			to: string;
-			options: TransferOptions;
-		},
-		unknown
-	>;
-	addConferenceParticipantMutation: UseMutationResult<any, Error, CreateParticipantParams, unknown>;
-};
-
-const ActiveCallFooter = ({ task, addConferenceParticipantMutation, endConference, transferTask }: Props) => {
+const ActiveCallFooter = () => {
+	const { transferTask, addExternalParticipant, task, endConference } = useTaskContext();
 	const { muted, setMuted } = useDevice();
 
 	return (
@@ -81,10 +62,10 @@ const ActiveCallFooter = ({ task, addConferenceParticipantMutation, endConferenc
 						<WorkerSelector
 							actionFn={(isWorker, id) => {
 								if (isWorker) {
-									transferTask.mutate({ to: id as string, options: {} });
+									transferTask?.mutate({ to: id as string, options: {} });
 								} else {
-									addConferenceParticipantMutation.mutate({
-										From: task.attributes.to,
+									addExternalParticipant?.mutate({
+										From: task?.attributes.to,
 										To: parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '',
 									});
 								}
@@ -129,14 +110,14 @@ const ActiveCallFooter = ({ task, addConferenceParticipantMutation, endConferenc
 					</Tooltip>
 
 					<PopoverContent
-						side='left'
-						className='dark'
+						side='bottom'
+						align='end'
 					>
 						<OutboundDialerContent
 							numbers={[]}
 							onSubmit={(data) => {
-								addConferenceParticipantMutation.mutate({
-									From: task.attributes.to,
+								addExternalParticipant?.mutate({
+									From: task?.attributes.to,
 									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
 								});
 							}}
@@ -243,7 +224,7 @@ const ActiveCallFooter = ({ task, addConferenceParticipantMutation, endConferenc
 					<Button
 						variant='destructive'
 						size='icon'
-						onClick={() => endConference()}
+						onClick={() => endConference?.()}
 					>
 						<Phone className='rotate-[135deg]' />
 					</Button>

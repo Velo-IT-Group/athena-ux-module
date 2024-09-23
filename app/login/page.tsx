@@ -4,33 +4,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import LabeledInput from '@/components/ui/labeled-input';
 import Image from 'next/image';
 import { signInWithAzure, signInWithPassword } from './action';
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
-import { toast } from 'sonner';
+import Logo from '../logo';
 
 const Page = async () => {
-	// const supabase = createClient();
-	// const {
-	// 	data: { user },
-	// } = await supabase.auth.getUser();
-
-	// if (user) {
-	// 	await supabase.auth.signOut();
-	// }
-
 	return (
 		<div className='grid place-items-center w-screen h-screen bg-muted/50'>
 			<form
 				className='flex flex-col justify-center items-center gap-3 pb-28'
 				action={signInWithPassword}
 			>
-				<Image
-					src='/velo-logo-black.svg'
-					alt='Velo logo'
-					height={208}
-					width={208}
-					className='object-contain'
-				/>
+				<Logo className='h-[94px] w-[208px] fill-current' />
 
 				<Card className='w-full max-w-sm'>
 					<CardHeader>

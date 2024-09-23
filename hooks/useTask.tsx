@@ -18,11 +18,10 @@ const useTask = (task: Task) => {
 	const { worker } = useWorker();
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const [conference, setConference] = useState<ConferenceAttributes>(task?.attributes?.conference || {});
-	const { token, currentWorkspace } = useTwilio();
-	const workspace = new Workspace(token, {}, currentWorkspace);
+	const { workspace } = useTwilio();
 	const { data: workers, isLoading: isWorkersLoading } = useQuery({
 		queryKey: ['workers'],
-		queryFn: () => workspace.fetchWorkers(),
+		queryFn: () => workspace?.fetchWorkers(),
 	});
 
 	useEffect(() => {

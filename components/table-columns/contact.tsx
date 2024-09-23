@@ -1,11 +1,8 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-
-import { Checkbox } from '@/components/ui/checkbox';
-import type { CommunicationItem, Company, Contact, ReferenceType } from '@/types/manage';
+import type { CommunicationItem, Contact, ReferenceType } from '@/types/manage';
 import { DataTableColumnHeader } from '../ui/data-table/column-header';
-import { DataTableRowActions } from '../ui/data-table/row-actions';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
@@ -13,27 +10,6 @@ import parsePhoneNumber from 'libphonenumber-js';
 import CheckMark from '@/app/(user)/checkmark';
 
 export const columns: ColumnDef<Contact>[] = [
-	{
-		id: 'select',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-				className='translate-y-[2px]'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-				className='translate-y-[2px]'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
 	{
 		accessorKey: 'firstName',
 		header: ({ column }) => (
@@ -122,6 +98,9 @@ export const columns: ColumnDef<Contact>[] = [
 			const referenceRow = row.getValue(id) as ReferenceType;
 
 			return referenceRow ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'company/id',
 		},
 	},
 ];
@@ -222,6 +201,9 @@ export const contactColumns: ColumnDef<Contact>[] = [
 			const referenceRow = row.getValue(id) as ReferenceType;
 
 			return referenceRow ? value.includes(String(referenceRow.id)) : false;
+		},
+		meta: {
+			filterKey: 'company/id',
 		},
 	},
 ];

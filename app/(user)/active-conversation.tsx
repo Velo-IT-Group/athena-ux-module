@@ -17,12 +17,19 @@ import {
 	getConfigurationStatuses,
 	getConfigurationTypes,
 	getPriorities,
+	getProjects,
 	getSystemMembers,
 	getTickets,
 } from '@/lib/manage/read';
 import { createClient } from '@/utils/supabase/server';
 import { Conditions } from '@/utils/manage/params';
 import getQueryClient from '../getQueryClient';
+import { DataTable } from '@/components/ui/data-table';
+import { columns } from '@/components/table-columns/project';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 type Props = {
 	contactId?: number;
@@ -33,8 +40,7 @@ type Props = {
 	ticketFilter: Conditions<ServiceTicket>;
 };
 
-const ConversationDetails = async ({ contactId: userId, className, communicationItems, ticketFilter }: Props) => {
-	const client = getQueryClient();
+const ConversationDetails = async ({ contactId, companyId, className, communicationItems, ticketFilter }: Props) => {
 	const supabase = createClient();
 	const [
 		{
@@ -46,6 +52,8 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 		{ data: companies },
 		{ data: configurationStatuses },
 		configurationTypes,
+		{ data: calls },
+		{ data: projects },
 	] = await Promise.all([
 		supabase.auth.getUser(),
 		getBoards({
@@ -83,38 +91,32 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 			fields: ['id', 'name'],
 			pageSize: 1000,
 		}),
+		supabase
+			.schema('reporting')
+			.from('conversations')
+			.select()
+			.eq('contact_id', contactId ? contactId : '')
+			.eq('company_id', companyId ? companyId : ''),
+		getProjects(),
 	]);
 
-	const initalTickets = await client.fetchQuery({
-		queryKey: ['tickets', ticketFilter],
-		queryFn: ({ queryKey }) =>
-			getTickets({
-				...queryKey,
-				page: ticketFilter.page ?? 1,
-				conditions: {
-					'board/id': boards.map((b) => b.id),
-				},
-				pageSize: ticketFilter.pageSize ?? 20,
-				orderBy: { key: 'id', order: 'desc' },
-				fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-			}),
-	});
-
-	const [calls] = await Promise.all(
-		communicationItems?.length
-			? communicationItems
-					?.filter((item) => item.communicationType === 'Phone' && parsePhoneNumber(item.value).isValid)
-					.map((item) => getAllCalls(item.value))
-			: []
-	);
+	// const [calls] = await Promise.all(
+	// 	communicationItems?.length
+	// 		? communicationItems
+	// 				?.filter((item) => item.communicationType === 'Phone' && parsePhoneNumber(item.value).isValid)
+	// 				.map((item) => getAllCalls(item.value))
+	// 		: []
+	// );
 
 	const groupedCalls = groupBy(
 		calls?.sort((a, b) => {
-			if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
-			if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
+			const aDate = new Date(a.date);
+			const bDate = new Date(b.date);
+			if (aDate.getTime() < bDate.getTime()) return 1;
+			if (aDate.getTime() > bDate.getTime()) return -1;
 			return 0;
 		}),
-		({ endTime }) => relativeDate(endTime)
+		({ date }) => relativeDate(new Date(date))
 	);
 
 	const tabs = [
@@ -145,21 +147,24 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 								<AccordionTrigger>{date}</AccordionTrigger>
 								<AccordionContent className='space-y-3 flex flex-col'>
 									<ActivityList
-										activities={(calls as CallInstance[])
+										activities={calls
 											?.sort((a, b) => {
-												if (a.dateUpdated.getTime() < b.dateUpdated.getTime()) return 1;
-												if (a.dateUpdated.getTime() > b.dateUpdated.getTime()) return -1;
+												const aDate = new Date(a.date);
+												const bDate = new Date(b.date);
+												if (aDate.getTime() < bDate.getTime()) return 1;
+												if (aDate.getTime() > bDate.getTime()) return -1;
 												return 0;
 											})
-											.map((call: CallInstance) => {
+											.map((call) => {
 												const isInbound = call.direction === 'inbound';
 												return {
 													icon: isInbound ? PhoneIncoming : PhoneOutgoing,
-													date: call.endTime,
-													text: `${
-														isInbound ? call.fromFormatted : user?.email === call.toFormatted ? 'You' : call.toFormatted
-													}
-												called ${isInbound ? call.toFormatted : call.fromFormatted}`,
+													date: new Date(call.date),
+													text: `${isInbound ? call.agent : call.phone_number}`,
+													// 	text: `${
+													// 		isInbound ? call.phone_number : user?.email === call.toFormatted ? 'You' : call.toFormatted
+													// 	}
+													// called ${isInbound ? call.toFormatted : call.fromFormatted}`,
 												};
 											})}
 									/>
@@ -169,42 +174,51 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 					</Accordion>
 				</TabsContent>
 
-				<TabsContent value={tabs[1].name}>
-					{/* <Suspense fallback={<TableSkeleton />}>
-					</Suspense> */}
-					{/* <TicketList
-						type='table'
-						defaultValue={initalConfigurations}
-						facetedFilters={}
-						// params={{
-						// 	conditions: [
-						// 		{ parameter: { summary: `'${searchParams['summary'] as string}'` }, comparator: 'contains' },
-						// 		{ parameter: { 'company/id': companyId! } },
-						// 		{ parameter: { 'contact/id': userId }, comparator: '!=' },
-						// 		// { parameter: { closedFlag: false } },
-						// 	],
-						// 	fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact'],
-						// 	// pageSize: 1000,
-						// }}
-						// facetedFilters={[
-						// 	{ accessoryKey: 'board', items: boards },
-						// 	{ accessoryKey: 'priority', items: priorities },
-						// 	{
-						// 		accessoryKey: 'owner',
-						// 		items: members.map((member) => {
-						// 			return { id: member.id, name: `${member.firstName} ${member.lastName ?? ''}` };
-						// 		}),
-						// 	},
-						// ]}
-						definition={{ page: 'Dashboard', section: 'Company' }}
-					/> */}
+				<TabsContent
+					value={tabs[1].name}
+					className='grid grid-cols-[2fr_1fr] gap-3'
+				>
+					<div>
+						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
+					</div>
+
+					<div>
+						<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
+						{projects.map((project) => (
+							<Card key={project.id}>
+								<CardContent className='py-1.5 flex justify-end'>
+									<Badge className='rounded-sm'>{project.status?.name}</Badge>
+								</CardContent>
+
+								<CardHeader className='pt-0 pb-1.5'>
+									<CardTitle className='text-base'>{project?.name}</CardTitle>
+									<CardDescription className='text-sm'>{project?.description}</CardDescription>
+								</CardHeader>
+
+								<Separator />
+
+								<CardFooter>
+									<div className='flex items-center gap-1.5'>
+										<Progress
+											defaultValue={(project?.percentComplete ?? 0) * 100}
+											max={100}
+										/>
+									</div>
+								</CardFooter>
+							</Card>
+						))}
+					</div>
 				</TabsContent>
 
 				<TabsContent value={tabs[2].name}>
 					<ConfigurationsList
 						type='table'
 						params={{
-							// conditions: { 'company/id': 250 },
+							conditions: {
+								'company/id': companyId ? [companyId] : undefined,
+								'contact/id': contactId ? [contactId] : undefined,
+								'status/id': [2],
+							},
 							fields: ['id', 'name', 'site', 'company', 'type', 'status', 'contact', 'deviceIdentifier'],
 							orderBy: {
 								key: 'name',
@@ -228,7 +242,11 @@ const ConversationDetails = async ({ contactId: userId, className, communication
 					<TicketList
 						type='table'
 						params={{
-							...ticketFilter,
+							// ...ticketFilter,
+							conditions: {
+								'company/id': companyId ? [companyId] : undefined,
+								'contact/id': contactId ? [contactId] : undefined,
+							},
 							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact', 'company'],
 							orderBy: { key: 'id', order: 'desc' },
 						}}

@@ -43,7 +43,11 @@ const HistoryListItem = ({ conversation }: Props) => {
 					<span className='text-muted-foreground text-xs'>
 						{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(startTime)}
 						{' - '}
-						{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(endTime)}
+						{conversation.talk_time
+							? Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(
+									addSeconds(startTime, conversation?.talk_time ?? 0)
+							  )
+							: 'Current'}
 					</span>
 				</div>
 			</div>

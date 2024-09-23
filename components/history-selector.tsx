@@ -1,3 +1,4 @@
+'use client';
 import { History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,23 +12,45 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { groupBy } from 'lodash';
 import { User } from '@supabase/supabase-js';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
+import { useEffect, useState } from 'react';
 
 type Props = {
-	user: User | null;
+	profile: Profile;
+	initalConversations: Conversation[];
 };
 
-const HistorySelector = async ({ user }: Props) => {
+const HistorySelector = ({ profile, initalConversations }: Props) => {
 	const supabase = createClient();
-	const { data: conversation } = await supabase
-		.schema('reporting')
-		.from('conversations')
-		.select('id, date, direction, phone_number, talk_time, contact_id')
-		.eq('agent', user?.user_metadata.workerSid ?? '')
-		.order('date', { ascending: false });
+	const [conversations, setConversations] = useState<Conversation[]>(initalConversations);
 
-	const groupedCalls = groupBy(conversation, ({ date }) =>
+	useEffect(() => {
+		// setConversations(initalConversations);
+		const channel = supabase
+			.channel('reporting_conversations')
+			.on(
+				'postgres_changes',
+				{ event: 'INSERT', schema: 'reporting', table: 'conversations', filter: `agent=eq.${profile?.worker_sid}` },
+				(payload) => {
+					console.log(payload);
+					// setConversations(prev => [...prev, payload.new])
+				}
+			)
+			.subscribe();
+
+		return () => {
+			channel.unsubscribe();
+		};
+	}, []);
+
+	// .schema('reporting')
+	// .from('conversations')
+	// .select('id, date, direction, phone_number, talk_time, contact_id')
+	// .eq('agent', user?.user_metadata.workerSid ?? '')
+	// .order('date', { ascending: false });
+
+	const groupedCalls = groupBy(conversations, ({ date }) =>
 		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(date))
 	);
 
@@ -52,13 +75,14 @@ const HistorySelector = async ({ user }: Props) => {
 
 					<CommandEmpty>No call history found.</CommandEmpty>
 
-					<CommandList>
+					<CommandList className='relative'>
 						{Object?.entries(groupedCalls).map(([key, conversations], index) => (
 							<div key={`${key}-separator`}>
 								{index !== 0 && <CommandSeparator key={`${key}-seperator`} />}
 								<CommandGroup
 									key={key}
 									heading={key}
+									className='[&_[cmdk-group-heading]]:sticky [&_[cmdk-group-heading]]:top-0 relative'
 								>
 									{conversations?.map((conversation) => (
 										<HistoryListItem conversation={conversation as Conversation} />

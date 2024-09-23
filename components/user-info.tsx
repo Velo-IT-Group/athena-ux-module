@@ -43,7 +43,7 @@ const UserInfo = ({ user }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
 	const { worker } = useWorker();
-	const [isOpen, setIsOpen] = useState(false);
+	const [isAvailable, setIsAvailable] = useState(false);
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const { token } = useTwilio();
 
@@ -57,6 +57,12 @@ const UserInfo = ({ user }: Props) => {
 		console.log(worker.attributes);
 		setAttributes(worker?.attributes);
 	}, [worker, worker?.attributes]);
+
+	useEffect(() => {
+		if (!worker?.activity) return;
+
+		setIsAvailable(worker.activity.available);
+	}, [worker, worker?.activity]);
 
 	return (
 		<AlertDialog>
@@ -75,8 +81,8 @@ const UserInfo = ({ user }: Props) => {
 
 							<div
 								className={cn(
-									'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5'
-									// currentActivity?.available ? 'bg-green-500' : 'bg-red-500'
+									'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5',
+									isAvailable ? 'bg-green-500' : 'bg-red-500'
 								)}
 							/>
 						</div>
@@ -117,7 +123,7 @@ const UserInfo = ({ user }: Props) => {
 						<DropdownMenuItem
 							onSelect={async () => {
 								await supabase.auth.signOut();
-								// push('/login');
+								push('/login');
 							}}
 						>
 							<LogOut className='mr-2 h-3.5 w-3.5' />

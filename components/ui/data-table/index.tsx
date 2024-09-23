@@ -68,6 +68,11 @@ export function DataTable<TData, TValue>({
 		placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
 	});
 
+	React.useEffect(() => {
+		if (!meta.filterParams) return;
+		onParametersChange(meta.filterParams);
+	}, [meta.filterParams]);
+
 	if (error) {
 		console.error(error);
 		toast.error(error.message);

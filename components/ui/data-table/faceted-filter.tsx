@@ -45,7 +45,14 @@ export function DataTableFacetedFilter<TData, TValue>({
 	const facets = column?.getFacetedUniqueValues();
 	const defaults = defaultValues ? [...defaultValues].map(String) : [];
 	const filterValue = column?.getFilterValue() ? (column?.getFilterValue() as string[]) : [];
-	const selectedValues = new Set([...filterValue, ...defaults]);
+	let selectedValues = new Set([...filterValue, ...defaults]);
+
+	React.useEffect(() => {
+		if (!defaultValues) return;
+		const defaults = defaultValues ? [...defaultValues].map(String) : [];
+
+		selectedValues = new Set([...filterValue, ...defaults]);
+	}, [defaultValues]);
 
 	return (
 		<Popover>

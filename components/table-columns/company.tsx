@@ -118,8 +118,8 @@ export const columns: ColumnDef<Company>[] = [
 			return <span>{territory.name}</span>;
 		},
 	},
-	{
-		id: 'actions',
-		cell: ({ row }) => <DataTableRowActions row={row} />,
-	},
+	// {
+	// 	id: 'actions',
+	// 	cell: ({ row }) => <DataTableRowActions row={row} />,
+	// },
 ];

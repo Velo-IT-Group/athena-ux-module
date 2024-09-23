@@ -267,8 +267,8 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 			filterKey: 'owner/id',
 		},
 	},
-	{
-		id: 'actions',
-		cell: ({ row }) => <DataTableRowActions row={row} />,
-	},
+	// {
+	// 	id: 'actions',
+	// 	cell: ({ row }) => <DataTableRowActions row={row} />,
+	// },
 ];

@@ -46,8 +46,8 @@ export const columns: ColumnDef<FilterTarget>[] = [
 		enableSorting: false,
 		enableHiding: false,
 	},
-	{
-		id: 'actions',
-		cell: ({ row }) => <DataTableRowActions row={row} />,
-	},
+	// {
+	// 	id: 'actions',
+	// 	cell: ({ row }) => <DataTableRowActions row={row} />,
+	// },
 ];

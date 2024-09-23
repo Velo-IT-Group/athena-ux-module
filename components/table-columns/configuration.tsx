@@ -158,8 +158,8 @@ export const columns: ColumnDef<Configuration>[] = [
 			filterKey: 'contact/id',
 		},
 	},
-	{
-		id: 'actions',
-		cell: ({ row }) => <DataTableRowActions row={row} />,
-	},
+	// {
+	// 	id: 'actions',
+	// 	cell: ({ row }) => <DataTableRowActions row={row} />,
+	// },
 ];

@@ -15,7 +15,7 @@ export function ActiveCall({ task }: Props) {
 		searchParams.set('contactId', task.attributes.userId);
 	}
 	if (task.attributes.companyId) {
-		searchParams.set('contactId', task.attributes.companyId);
+		searchParams.set('companyId', task.attributes.companyId);
 	}
 
 	return (

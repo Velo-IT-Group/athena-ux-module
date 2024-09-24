@@ -77,7 +77,7 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 								definition={{ page: 'Dashboard', section: 'contact-picker' }}
 								params={{
 									conditions: { inactiveFlag: false },
-									childConditions: { 'types/id': 17 },
+									// childConditions: { 'types/id': 17 },
 									orderBy: { key: 'firstName' },
 									fields: ['id', 'firstName', 'lastName', 'company', 'communicationItems', 'defaultPhoneNbr'],
 								}}

@@ -10,14 +10,14 @@ export default async function Page({
 	const contactId = searchParams.contactId ? parseInt(searchParams.contactId as string) : undefined;
 
 	return (
-		<main className='grid h-full w-full p-6 gap-3'>
+		<main className='grid grid-cols-[1fr_3fr] w-full gap-3'>
 			{/* <h1 className='text-3xl font-bold tracking-tight'>Dashboard</h1> */}
-			{/* <ConversationContactDetail contactId={contactId} /> */}
+			<ConversationContactDetail contactId={contactId} />
 
 			<ConversationDetails
 				contactId={contactId}
 				companyId={companyId}
-				// className='p-6'
+				className='p-6'
 			/>
 		</main>
 	);

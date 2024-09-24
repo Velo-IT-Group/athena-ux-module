@@ -8,7 +8,7 @@ import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { Worker } from 'twilio-taskrouter';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { Button } from './ui/button';
-import { Circle, Speaker, Volume2 } from 'lucide-react';
+import { Circle, Phone, Speaker, Voicemail, Volume2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useWorker } from '../providers/worker-provider';
 
@@ -84,16 +84,26 @@ const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed
 									</Avatar>
 
 									<span>{workerAttributes.full_name}</span>
-
-									{workerConversations?.length > 0 && (
+									<div className='flex items-center gap-1.5 ml-auto'>
 										<Button
 											variant='default'
 											size='smIcon'
 											className='ml-auto animate-pulse'
 										>
-											<Volume2 />
+											<Voicemail />
 										</Button>
-									)}
+
+										<Button
+											variant='default'
+											size='smIcon'
+											className='ml-auto animate-pulse'
+										>
+											<Phone />
+										</Button>
+									</div>
+
+									{/* {workerConversations?.length > 0 && (
+									)} */}
 								</CommandItem>
 							);
 						})}

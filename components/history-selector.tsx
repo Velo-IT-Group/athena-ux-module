@@ -14,13 +14,17 @@ import { groupBy } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type Props = {
 	profile: Profile;
 	initalConversations: Conversation[];
+	align?: 'center' | 'end' | 'start';
+	side?: 'top' | 'right' | 'bottom' | 'left';
+	isCollapsed: boolean;
 };
 
-const HistorySelector = ({ profile, initalConversations }: Props) => {
+const HistorySelector = ({ profile, initalConversations, align = 'end', side, isCollapsed }: Props) => {
 	const supabase = createClient();
 	const [conversations, setConversations] = useState<Conversation[]>(initalConversations);
 
@@ -59,15 +63,18 @@ const HistorySelector = ({ profile, initalConversations }: Props) => {
 				<Button
 					variant='ghost'
 					role='combobox'
-					className='justify-between'
+					size={isCollapsed ? 'icon' : 'sm'}
+					className={cn(!isCollapsed && 'justify-start')}
 				>
 					<History />
+					<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>History</span>
 				</Button>
 			</PopoverTrigger>
 
 			<PopoverContent
 				className='min-w-80 p-0'
-				align='end'
+				align={align}
+				side={side}
 			>
 				<Command>
 					<CommandInput placeholder='Filter calls...' />

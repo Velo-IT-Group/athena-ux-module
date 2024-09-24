@@ -4,7 +4,6 @@ import { ChevronsUpDown, PhoneForwarded } from 'lucide-react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
-import { Workspace } from 'twilio-taskrouter';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,7 +41,7 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 					inactiveFlag: false,
 					// officePhone: `not '${null}'`
 				},
-				fields: ['id', 'firstName', 'lastName', 'officePhone'],
+				fields: ['id', 'firstName', 'lastName', 'homePhone', 'mobilePhone', 'officePhone', 'defaultPhone'],
 				orderBy: { key: 'firstName' },
 				pageSize: 1000,
 			}),

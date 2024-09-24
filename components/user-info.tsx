@@ -11,15 +11,15 @@ import {
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { Bell, BellOff, LogOut } from 'lucide-react';
+import { Bell, BellOff, LogOut, UserIcon } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
 import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
-import type { Session, User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -37,9 +37,12 @@ import { useTwilio } from '../providers/twilio-provider';
 
 type Props = {
 	user: User | null;
+	isCollapsed: boolean;
+	align?: 'center' | 'end' | 'start';
+	side?: 'top' | 'right' | 'bottom' | 'left';
 };
 
-const UserInfo = ({ user }: Props) => {
+const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
 	const { worker } = useWorker();
@@ -74,9 +77,10 @@ const UserInfo = ({ user }: Props) => {
 						className='justify-start'
 					>
 						<div className='relative'>
-							<Avatar className='w-7 h-7 mr-1.5'>
+							{/* <Avatar className='w-7 h-7 mr-1.5'>
 								<AvatarFallback>NB</AvatarFallback>
-							</Avatar>
+							</Avatar> */}
+							<UserIcon />
 
 							<div
 								className={cn(
@@ -86,13 +90,14 @@ const UserInfo = ({ user }: Props) => {
 							/>
 						</div>
 
-						<span>{user?.user_metadata?.full_name}</span>
+						<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>{user?.user_metadata?.full_name}</span>
 					</Button>
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent
 					className='w-72'
-					align='end'
+					align={align}
+					side={side}
 					forceMount
 				>
 					<DropdownMenuGroup>

@@ -289,34 +289,38 @@ export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
 	console.log(conditions, generateParams(conditions))
-	const [ticketResponse, projectTicketResponse, countResponse] = await Promise.all([
-		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams({...conditions, pageSize: ((conditions?.pageSize ?? 10) / 2) })}`, {
+	const [
+		ticketResponse,
+		// projectTicketResponse,
+		countResponse
+	] = await Promise.all([
+		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generateParams(conditions) })}`, {
 			headers: baseHeaders,
 		}),
-		fetch(`${process.env.CONNECT_WISE_URL}/project/tickets${generateParams(
-			{
-				...conditions,
-				conditions: {...conditions?.conditions, isIssueFlag: true},
-				pageSize: ((conditions?.pageSize ?? 10) / 2)
-			})})
-			}
-			`
-		, {
-			headers: baseHeaders,
-		}),
+		// fetch(`${process.env.CONNECT_WISE_URL}/project/tickets${generateParams(
+		// 	{
+		// 		...conditions,
+		// 		conditions: {...conditions?.conditions, isIssueFlag: true},
+		// 		pageSize: ((conditions?.pageSize ?? 10) / 2)
+		// 	})})
+		// 	}
+		// 	`
+		// , {
+		// 	headers: baseHeaders,
+		// }),
 		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/count${generateParams(conditions)}`, {
 			headers: baseHeaders,
 		}),
 	]);
 	const serviceTickets = await ticketResponse.json() 
-	console.log(serviceTickets)
-	const projectTickets = await projectTicketResponse.json()
+	// console.log(serviceTickets)
+	// const projectTickets = await projectTicketResponse.json()
 
-	const data  = [...serviceTickets, ...projectTickets].sort((a,b) => b.id - a.id)
+	// const data  = [...serviceTickets, ...projectTickets].sort((a,b) => b.id - a.id)
 	
 
 	return {
-		data,
+		data: serviceTickets,
 		count: (await countResponse.json()).count,
 	};
 };

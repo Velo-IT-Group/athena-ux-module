@@ -1,18 +1,18 @@
 import { ReactNode } from 'react';
 import UserLayout from './user-layout';
-import Navbar from '@/components/navbar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import SideNav from '@/components/side-nav';
 import { Toaster } from 'sonner';
 import { cookies } from 'next/headers';
 import { onLayoutChange } from './layout-actions';
-import { Separator } from '@/components/ui/separator';
 import { createClient } from '@/utils/supabase/server';
 import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactQueryProvider from '@/providers/react-query';
+import { redirect } from 'next/navigation';
+import Navbar from '@/components/navbar';
 
 type Props = {
 	children: ReactNode;
@@ -25,16 +25,17 @@ const Layout = async ({ children }: Props) => {
 			data: { user },
 		},
 	] = await Promise.all([supabase.auth.getUser()]);
+
+	if (!user || !user.user_metadata || !user.email) {
+		redirect('/login');
+	}
+
 	const cookieStore = cookies();
 	const layout = cookieStore.get('react-resizable-panels:layout');
 	const collapsed = cookieStore.get('react-resizable-panels:collapsed');
 
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
-
-	if (!user || !user.email) {
-		return <span>...</span>;
-	}
 
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, { data: contacts }] = await Promise.all([
@@ -74,14 +75,12 @@ const Layout = async ({ children }: Props) => {
 						defaultLayout={defaultLayout ?? [15, 32, 48]}
 					/>
 
-					<ResizableHandle />
+					<ResizableHandle className='opacity-0' />
 
-					<ResizablePanel>
-						<Navbar />
+					<ResizablePanel className='my-3 mr-3 bg-background rounded-md border shadow'>
+						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
+							<Navbar />
 
-						<Separator />
-
-						<ScrollArea className='h-[calc(100vh-49px)] flex flex-col'>
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>
 					</ResizablePanel>

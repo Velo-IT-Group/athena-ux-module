@@ -46,7 +46,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			conditions: {
 				inactiveFlag: false,
 				projectFlag: false,
-				'workRole/id': [9, 5],
+				// 'workRole/id': [9, 5],
 			},
 			orderBy: { key: 'name' },
 			fields: ['id', 'name'],
@@ -217,6 +217,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 						type='table'
 						params={{
 							conditions: {
+								closedFlag: false,
 								'company/id': companyId ? [companyId] : undefined,
 								'contact/id': contactId ? [contactId] : undefined,
 							},

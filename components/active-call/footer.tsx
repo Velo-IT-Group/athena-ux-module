@@ -92,7 +92,7 @@ const ActiveCallFooter = () => {
 
 					<PopoverContent
 						side='bottom'
-						align='end'
+						align='start'
 					>
 						<OutboundDialerContent
 							numbers={[]}

@@ -1,5 +1,6 @@
 'use client';
 import { CommandItem } from '@/components/ui/command';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getContact } from '@/lib/manage/read';
 import { parsePhoneNumber } from '@/lib/utils';
 import { addSeconds } from '@/utils/date';
@@ -13,11 +14,9 @@ type Props = {
 
 const HistoryListItem = ({ conversation }: Props) => {
 	const startTime = new Date(conversation.date);
-	const endTime = addSeconds(startTime, conversation?.talk_time ?? 0);
-	const { data } = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ['contact', conversation.contact_id],
-		// @ts-ignore
-		queryFn: () => getContact(conversation.contact_id, { fields: ['id', 'firstName', 'lastName', 'company/name'] }),
+		queryFn: () => getContact(conversation.contact_id, { fields: ['id', 'firstName', 'lastName', 'company'] }),
 	});
 
 	const name = data ? `${data?.firstName} ${data?.lastName ?? ''}` : undefined;
@@ -36,8 +35,14 @@ const HistoryListItem = ({ conversation }: Props) => {
 				<PhoneIncoming className='mr-3 text-green-500' />
 			)}
 			<div>
-				{name && name}
-				{name && ' • '}
+				{isLoading ? (
+					<Skeleton className='h-2 w-5' />
+				) : (
+					<>
+						{name && name}
+						{name && ' • '}
+					</>
+				)}
 				{parsePhoneNumber(conversation.phone_number ?? '').formattedNumber}
 				<div>
 					<span className='text-muted-foreground text-xs'>

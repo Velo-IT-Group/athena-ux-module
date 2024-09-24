@@ -21,7 +21,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { DataTablePagination } from './pagination';
-import { DataTableToolbar, FacetedFilter } from './toolbar';
+import { BooleanFilter, DataTableToolbar, FacetedFilter } from './toolbar';
 import { TableDefinition } from '@/types';
 import { Conditions } from '@/utils/manage/params';
 import TableSkeleton from './skeleton';
@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	meta: TableMeta<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
+	booleanFilters?: BooleanFilter<TData>[];
 	hidePagination?: boolean;
 	queryFn: (params: Conditions<TData>) => Promise<{ data: TData[]; count: number }>;
 	defaultVisibleColumns?: VisibilityState;
@@ -51,6 +52,7 @@ export function DataTable<TData, TValue>({
 	columns,
 	meta,
 	facetedFilters,
+	booleanFilters,
 	hidePagination = false,
 	queryFn,
 	defaultVisibleColumns = {},
@@ -116,6 +118,7 @@ export function DataTable<TData, TValue>({
 			<DataTableToolbar
 				table={table}
 				facetedFilters={facetedFilters}
+				booleanFilters={booleanFilters}
 			/>
 
 			<div className='rounded-md border'>

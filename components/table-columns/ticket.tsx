@@ -30,6 +30,9 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		),
 		enableSorting: true,
 		enableHiding: false,
+		meta: {
+			filterKey: 'id',
+		},
 	},
 	{
 		accessorKey: 'summary',
@@ -46,9 +49,12 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 				<div className='flex items-center space-x-2'>
 					{/* {label && <Badge variant='outline'>{label.label}</Badge>} */}
 					<Circle className={cn('stroke-none fill-primary', row?.original?.priority?.id === 7 && 'fill-green-500')} />
-					<span className='max-w-[500px] truncate font-medium'>{row.getValue('summary')}</span>
+					<span className='max-w-[40ch] truncate font-medium'>{row.getValue('summary')}</span>
 				</div>
 			);
+		},
+		meta: {
+			filterKey: 'summary',
 		},
 	},
 	{

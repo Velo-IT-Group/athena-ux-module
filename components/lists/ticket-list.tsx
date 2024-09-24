@@ -27,6 +27,7 @@ const TicketList = ({ type, defaultValue, params, definition, hidePagination = f
 					columns={columns}
 					queryFn={getTickets}
 					facetedFilters={facetedFilters}
+					booleanFilters={[{ accessoryKey: 'closedFlag', title: 'Show All Tickets', defaultValue: false }]}
 					meta={{
 						filterKey: 'summary',
 						definition,

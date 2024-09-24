@@ -69,7 +69,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	const workerArray = Array.from(workers?.values() ?? []);
 
 	return (
-		<div className='grid gap-1.5 px-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-1.5 group-[[data-collapsed=true]]:py-1.5'>
+		<div className='grid gap-1.5 mx-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:mx-1.5 group-[[data-collapsed=true]]:py-1.5'>
 			{activities?.map((activity) => (
 				<ActivityItem
 					key={activity.sid}

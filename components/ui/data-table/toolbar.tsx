@@ -10,22 +10,29 @@ import { DataTableViewOptions } from './view-options';
 import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
 import Search from '@/components/search';
+import BooleanFilter from './boolean-filter';
+
+export interface BooleanFilter<TData> {
+	accessoryKey: keyof TData;
+	title?: string;
+	defaultValue: boolean;
+}
 
 export interface FacetedFilter<TData> {
 	accessoryKey: keyof TData;
 	items: Identifiable[];
-	isBoolean?: boolean;
 }
 interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
+	booleanFilters?: BooleanFilter<TData>[];
 }
 
-export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableToolbarProps<TData>) {
+export function DataTableToolbar<TData>({ table, facetedFilters, booleanFilters }: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
 
 	return (
-		<div className='flex items-center justify-between'>
+		<div className='flex items-center justify-between gap-1.5 overflow-x-auto'>
 			<div className='flex flex-1 items-center space-x-2'>
 				{table.options?.meta?.filterKey && (
 					<Search
@@ -76,7 +83,22 @@ export function DataTableToolbar<TData>({ table, facetedFilters }: DataTableTool
 					</Button>
 				)}
 			</div>
-			<DataTableViewOptions table={table} />
+
+			<div className='ml-auto flex items-center gap-1.5'>
+				<>
+					{booleanFilters?.map(({ accessoryKey, defaultValue, title }) => (
+						<BooleanFilter
+							accessoryKey={accessoryKey}
+							title={title ?? accessoryKey.toString()}
+							defaultValue={defaultValue}
+							setCondition={table.setCondition}
+							removeCondition={table.removeCondition}
+						/>
+					))}
+				</>
+
+				<DataTableViewOptions table={table} />
+			</div>
 		</div>
 	);
 }

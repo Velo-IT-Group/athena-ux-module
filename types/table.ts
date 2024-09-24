@@ -18,7 +18,7 @@ export interface ParameterInstance<TData> {
   setParameter: (updater: Updater<Conditions<TData>>) => void
   setCondition: (condition: KeyValue) => void
   removeCondition: (key: string) => void
-  resetConditions: () => void
+  resetConditions: (conditions?: Conditions<TData>) => void
 }
 
 // Use declaration merging to add our new feature APIs and state types to TanStack Table's existing types.
@@ -92,7 +92,7 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
 			  }
 		  } as Conditions<TData>
 
-		  console.log(old, old.conditions, newParameters)
+		  // console.log(old, old.conditions, newParameters)
         return newParameters
       })
     }
@@ -112,9 +112,13 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
         return newParameters
       })
     }
-	table.resetConditions = () => {
+	table.resetConditions = (value) => {
       table.setParameter((old) => {
-		delete old.conditions
+        if (value?.conditions) {
+          old.conditions = value.conditions
+        } else {
+          delete old.conditions
+        }
         return old
       })
     }

@@ -9,6 +9,11 @@ import { Separator } from '../ui/separator';
 import useReservations from '@/hooks/useReservations';
 import TaskNotification from '../task-notification';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
+import { Phone } from 'lucide-react';
+import OutboundDialer from '../outbound-dialer';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -156,26 +161,48 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 	return (
 		<Fragment>
-			{reservations.length > 0 && (
+			<Separator />
+
+			<section className='space-y-1.5 mx-1.5'>
+				{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
+
 				<>
-					<Separator />
+					{reservations.length > 0 ? (
+						<>
+							{reservations
+								.filter((r) => r.status !== 'completed')
+								.map((reservation) => (
+									<TaskNotification
+										key={reservation.sid}
+										reservation={reservation}
+										task={reservation.task}
+										isCollapsed={isCollapsed}
+									/>
+								))}
+						</>
+					) : (
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant='ghost'
+									size={isCollapsed ? 'icon' : 'sm'}
+									className={cn(!isCollapsed && 'justify-start')}
+								>
+									<Phone className='fill-current stroke-none' />
+									<span className={cn('ml-1.5', isCollapsed && 'sr-only')}>Outbound Dialer</span>
+								</Button>
+							</PopoverTrigger>
 
-					<section className='space-y-1.5 px-1.5'>
-						{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
-
-						{reservations
-							.filter((r) => r.status !== 'completed')
-							.map((reservation) => (
-								<TaskNotification
-									key={reservation.sid}
-									reservation={reservation}
-									task={reservation.task}
-									isCollapsed={isCollapsed}
-								/>
-							))}
-					</section>
+							<PopoverContent
+								align='start'
+								side='right'
+							>
+								<OutboundDialer />
+							</PopoverContent>
+						</Popover>
+					)}
 				</>
-			)}
+			</section>
 		</Fragment>
 	);
 };

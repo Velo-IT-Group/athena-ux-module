@@ -47,14 +47,29 @@ export async function GET(request: NextRequest) {
 
 	const [{data: contacts}, { data: companies }] = await Promise.all([
 		getContacts({
+			conditions: { inactiveFlag: false }, 
 			childConditions: { 'communicationItems/value': `'${phoneNumber}'` },
-			fields: ['id', 'firstName', 'lastName', 'company'],
+			fields: ['id', 'firstName', 'lastName', 'company', 'inactiveFlag'],
 		}),
 		getCompanies({
 			conditions: { phoneNumber: `'${phoneNumber}'` },
 			fields: ['id', 'identifier', 'name', 'status', 'phoneNumber', 'territory'],
 		}),
 	]);
+
+	console.log(contacts, companies)
+
+	// No contacts found but found company
+	if (!contacts.length && companies.length) {
+		if (companies.length > 2) {
+			
+		}
+		
+	} else if (contacts.length && !companies.length) {
+		if (contacts.length > 2 && contacts.every(c => !c.inactiveFlag)) {
+			
+		}
+	}
 
 	if (!contacts.length && !companies.length) {
 		return Response.json(

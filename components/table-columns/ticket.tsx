@@ -2,7 +2,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import type { ReferenceType, ServiceTicket } from '@/types/manage';
 import { DataTableColumnHeader } from '../ui/data-table/column-header';
-import { DataTableRowActions } from '../ui/data-table/row-actions';
 import { Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -11,10 +10,11 @@ import { buttonVariants } from '../ui/button';
 export const columns: ColumnDef<ServiceTicket>[] = [
 	{
 		accessorKey: 'id',
-		header: ({ column }) => (
+		header: ({ column, table }) => (
 			<DataTableColumnHeader
 				column={column}
 				title='Ticket'
+				setSort={table.setSort}
 			/>
 		),
 		cell: ({ row }) => (
@@ -36,19 +36,29 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 	},
 	{
 		accessorKey: 'summary',
-		header: ({ column }) => (
-			<DataTableColumnHeader
-				column={column}
-				title='Summary'
-			/>
-		),
+		header: ({ column, table }) => {
+			return (
+				<DataTableColumnHeader
+					column={column}
+					title='Summary'
+					setSort={table.setSort}
+				/>
+			);
+		},
 		cell: ({ row }) => {
 			// const label = labels.find((label) => label.value === row.original.label);
 
 			return (
-				<div className='flex items-center space-x-2'>
-					{/* {label && <Badge variant='outline'>{label.label}</Badge>} */}
-					<Circle className={cn('stroke-none fill-primary', row?.original?.priority?.id === 7 && 'fill-green-500')} />
+				<div className='flex items-center space-x-1.5'>
+					<Circle
+						className={cn(
+							'stroke-none',
+							row?.original?.priority?.id === 6 && 'fill-red-500',
+							// row?.original?.priority?.id === 8 && 'fill-yellow-500',
+							row?.original?.priority?.id === 8 && 'fill-[#FFFE0D]',
+							row?.original?.priority?.id === 7 && 'fill-blue-500'
+						)}
+					/>
 					<span className='max-w-[40ch] truncate font-medium'>{row.getValue('summary')}</span>
 				</div>
 			);

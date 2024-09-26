@@ -288,7 +288,7 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
-	console.log(conditions, generateParams(conditions))
+	// console.log(conditions, generateParams(conditions))
 	const [
 		ticketResponse,
 		// projectTicketResponse,

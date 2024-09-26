@@ -15,10 +15,10 @@ export const updateWorker = async (workerSid: string, options: WorkerContextUpda
 	}
 };
 
-export const updateTask = async (workerSid: string, options: TaskContextUpdateOptions) => {
+export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
 	const client = await createClient();
 	try {
-		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(workerSid).update(options);
+		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(taskSid).update(options);
 
 		console.log(worker);
 	} catch (error) {

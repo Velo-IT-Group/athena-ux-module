@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
 					getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
 					getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
 				]);
-				console.log(user)
 				
 				const worker = await createWorker(email, {
 					contact_uri: `client:${email}`,
@@ -41,7 +40,7 @@ export async function GET(request: NextRequest) {
 					...user?.user_metadata,
 					
 				})
-				console.log(worker)
+
 				await supabase.auth.updateUser({
 					data: {
 						...user?.user_metadata,
@@ -50,7 +49,7 @@ export async function GET(request: NextRequest) {
 						contactId: contacts?.[0]?.id ?? 32569,
 					},
 				});
-				await supabase.from('profiles').update({ worker_sid: worker?.sid })
+				await supabase.from('profiles').update({ worker_sid: worker?.sid }).eq('id', user?.id ?? '')
 				// try {
 				// } catch (error) {
 				// 	console.log(error)

@@ -36,29 +36,35 @@ export const createConferenceParticipant = async (
 	conferenceSid: string,
 	params: CreateParticipantParams
 ): Promise<ParticipantInstance> => {
-	let headers = new Headers();
-	headers.set(
-		'Authorization',
-		`Basic ${btoa(process.env.TWILIO_API_KEY_SID + ':' + process.env.TWILIO_API_KEY_SECRET)}`
-	);
-	headers.set('Content-Type', 'application/x-www-form-urlencoded');
-	const body = new URLSearchParams(params as unknown as Record<string, string>);
-	console.log(body, params);
+	const client = await createClient();
+	const participant = await client.conferences(conferenceSid).participants.create({from: params.From, to: params.To, endConferenceOnExit: false})
 
-	const response = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Conferences/${conferenceSid}/Participants.json`,
-		{
-			headers,
-			method: 'POST',
-			body,
-		}
-	);
+	// let headers = new Headers();
+	// headers.set(
+	// 	'Authorization',
+	// 	`Basic ${btoa(process.env.TWILIO_API_KEY_SID + ':' + process.env.TWILIO_API_KEY_SECRET)}`
+	// );
+	// headers.set('Content-Type', 'application/x-www-form-urlencoded');
+	// const body = new URLSearchParams(params as unknown as Record<string, string>);
+	// console.log(body, conferenceSid, params);
+	
 
-	if (!response.ok) {
-		console.log(response);
-	}
 
-	return await response.json();
+	// const response = await fetch(
+	// 	`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Conferences/${conferenceSid}/Participants.json`,
+	// 	{
+	// 		headers,
+	// 		method: 'POST',
+	// 		body,
+	// 	}
+	// );
+
+	// if (!response.ok) {
+	// 	console.error(response);
+	// 	throw new Error(response.statusText)
+	// }
+
+	return JSON.parse(JSON.stringify(participant))
 };
 
 export const getConferenceByName = async (friendlyName: string) => {

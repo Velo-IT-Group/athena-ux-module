@@ -73,6 +73,9 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 
 	const { mutate: endConference } = useMutation({
 		mutationFn: () => updateConference(conference.sid, { status: 'completed' }),
+		onError(error, variables, context) {
+			toast.error(JSON.stringify(error));
+		},
 	});
 
 	const addExternalParticipant = useMutation({
@@ -100,6 +103,9 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 			// 		participants: conferenceParticipants,
 			// 	},
 			// });
+		},
+		onError(error, variables, context) {
+			toast.error(JSON.stringify(error));
 		},
 	});
 
@@ -172,14 +178,14 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 			}
 		},
 		onError: (error) => {
-			toast.error('Error transferring task' + error.message);
+			toast.error('Error transferring task ' + JSON.stringify(error));
 		},
 	});
 
 	const wrapUpTask = useMutation({
 		mutationFn: (reason: string) => task!.wrapUp({ reason }),
 		onError: (error) => {
-			toast.error('Error transferring task' + error.message);
+			toast.error('Error transferring task ' + JSON.stringify(error));
 		},
 	});
 

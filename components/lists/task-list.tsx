@@ -73,7 +73,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				try {
 					removeReservation(reservation);
 					currentCallControl?.ring(false);
-					// toast.dismiss(reservation.task.sid);
 					setActiveReservation(undefined);
 				} catch (error) {
 					console.error('No call pending', error);
@@ -84,7 +83,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			r.on('wrapup', async (reservation) => {
 				try {
 					console.log('Wrapping up');
-					removeReservation(reservation);
 					currentCallControl?.ring(false);
 					currentCallControl?.offHook(false);
 				} catch (error) {
@@ -95,14 +93,13 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 			r.on('completed', async (reservation) => {
 				try {
-					addReservation(reservation);
-					setActiveReservation(reservation);
+					removeReservation(reservation);
+					setActiveReservation(undefined);
 					currentCallControl?.ring(false);
 					currentCallControl?.offHook(false);
 				} catch (error) {
 					toast.error(JSON.stringify(error));
 				}
-				// toast.dismiss(reservation.task.sid);
 			});
 
 			r.on('timeout', async (reservation) => {
@@ -110,7 +107,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 					removeReservation(reservation);
 					currentCallControl?.ring(false);
 					setActiveReservation(undefined);
-					// toast.dismiss(reservation.task.sid);
 				} catch (error) {
 					console.error('No call pending', error);
 					toast.error(JSON.stringify(error));
@@ -159,6 +155,8 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		};
 	}, [worker]);
 
+	const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
+
 	return (
 		<Fragment>
 			<Separator />
@@ -167,9 +165,9 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
 				<>
-					{reservations.length > 0 ? (
+					{incompleteTasks.length > 0 ? (
 						<>
-							{reservations
+							{incompleteTasks
 								.filter((r) => r.status !== 'completed')
 								.map((reservation) => (
 									<TaskNotification

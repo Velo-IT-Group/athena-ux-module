@@ -1,5 +1,5 @@
 'use client';
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { X } from 'lucide-react';
 import { Button } from '../ui/button';
 import Timer from '../timer';
@@ -26,7 +26,7 @@ const TaskWrapup = ({ task, timer }: Props) => {
 
 	return (
 		<Card>
-			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
+			<CardHeader className='flex-row justify-between items-center p-3 gap-12 border-b'>
 				<CardTitle className='text-lg'>Wrapping</CardTitle>
 
 				<CardDescription>
@@ -44,9 +44,14 @@ const TaskWrapup = ({ task, timer }: Props) => {
 				</CardDescription>
 			</CardHeader>
 
-			<CardFooter>
-				<Button onClick={() => completeTaskMutation.mutate()}>Complete</Button>
-			</CardFooter>
+			<CardContent className='p-3 pt-1.5'>
+				<Button
+					className='w-full'
+					onClick={() => completeTaskMutation.mutate()}
+				>
+					Complete
+				</Button>
+			</CardContent>
 		</Card>
 	);
 };

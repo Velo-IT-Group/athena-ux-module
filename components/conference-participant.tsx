@@ -19,7 +19,7 @@ const ConferenceParticipant = ({ task, participant }: Props) => {
 		<Button
 			variant='ghost'
 			size='sm'
-			className='flex items-center space-x-2 w-full justify-start group'
+			className='flex items-center space-x-1.5 w-full justify-start group'
 		>
 			<Avatar className='h-auto w-auto'>
 				<AvatarFallback className='text-xs p-1.5'>BC</AvatarFallback>

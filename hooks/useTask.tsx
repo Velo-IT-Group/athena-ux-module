@@ -1,4 +1,5 @@
 'use client';
+import { updateTask } from '@/lib/twilio/update';
 import { parsePhoneNumber } from '@/lib/utils';
 import { useTwilio } from '@/providers/twilio-provider';
 import { useWorker } from '@/providers/worker-provider';
@@ -86,7 +87,15 @@ const useTask = (task: Task) => {
 		},
 	});
 
+	const cancelTask = useMutation({
+		mutationFn: (reason: string) => updateTask(task!.sid, { assignmentStatus: 'canceled' }),
+		onError: (error) => {
+			toast.error('Error transferring task' + error.message);
+		},
+	});
+
 	return {
+		cancelTask,
 		conference,
 		transferTask,
 		wrapUpTask,

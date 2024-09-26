@@ -7,8 +7,8 @@ const useTimer = (date?: Date) => {
 	const [hours, setHours] = useState(0);
 
 	useEffect(() => {
+		const startTime = date ?? new Date();
 		const interval = setInterval(() => {
-			const startTime = date ?? new Date();
 			const time = Date.now() - startTime.getTime();
 
 			const m = Math.floor((time / 1000 / 60) % 60);
@@ -17,7 +17,7 @@ const useTimer = (date?: Date) => {
 
 			setHours(h);
 			setMinutes(m);
-			setSeconds(s);
+			setSeconds(s * 1);
 		}, 1000);
 
 		return () => clearInterval(interval);

@@ -19,6 +19,7 @@ export interface ParameterInstance<TData> {
   setCondition: (condition: KeyValue) => void
   removeCondition: (key: string) => void
   resetConditions: (conditions?: Conditions<TData>) => void
+  setSort: (orderBy?: { key: keyof TData; order?: 'asc' | 'desc' }) => void
 }
 
 // Use declaration merging to add our new feature APIs and state types to TanStack Table's existing types.
@@ -75,6 +76,7 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
 	table.setParameter = updater => {
 		  const safeUpdater: Updater<Conditions<TData>> = old => {
 			let newState = functionalUpdate(updater, old)
+      console.log(newState)
 			
         return newState
       }
@@ -119,6 +121,15 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
         } else {
           delete old.conditions
         }
+        return old
+      })
+    }
+	table.setSort = (value) => {
+    console.log(value)
+      table.setParameter((old) => {
+        if (value) {
+          old.orderBy = value
+        } 
         return old
       })
     }

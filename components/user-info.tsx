@@ -77,14 +77,11 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 						className='justify-start'
 					>
 						<div className='relative'>
-							{/* <Avatar className='w-7 h-7 mr-1.5'>
-								<AvatarFallback>NB</AvatarFallback>
-							</Avatar> */}
 							<UserIcon />
 
 							<div
 								className={cn(
-									'w-2 h-2 rounded-full absolute bottom-0 border border-white right-1.5',
+									'w-2 h-2 rounded-full absolute border border-white -right-0.5 -bottom-0.5',
 									isAvailable ? 'bg-green-500' : 'bg-red-500'
 								)}
 							/>

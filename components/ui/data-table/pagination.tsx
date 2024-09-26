@@ -16,7 +16,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
 			</div>
 
 			<div className='flex items-center space-x-6 lg:space-x-8'>
-				<div className='flex items-center space-x-2'>
+				<div className='flex items-center space-x-1.5'>
 					<p className='text-sm font-medium'>Rows per page</p>
 					<Select
 						value={`${table.getState().pagination.pageSize}`}
@@ -44,7 +44,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
 					Page {table.getState().pagination.pageIndex} of {table.getPageCount()}
 				</div>
 
-				<div className='flex items-center space-x-2'>
+				<div className='flex items-center space-x-1.5'>
 					<Button
 						variant='outline'
 						size='icon'

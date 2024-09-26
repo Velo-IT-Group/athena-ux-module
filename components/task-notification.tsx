@@ -9,6 +9,9 @@ import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
 import { toast } from 'sonner';
 import { TaskContext } from './active-call/context';
+import OutboundTask from './outbound-task';
+import { MessageSquareText, Phone } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type Props = {
 	reservation: Reservation;
@@ -44,9 +47,15 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 					className='h-9 w-9 animate-pulse'
 					key={reservation.task.sid}
 				>
-					{reservation.task.taskChannelUniqueName === 'default' && '📞'}
-					{reservation.task.taskChannelUniqueName === 'voice' && '📞'}
-					{reservation.task.taskChannelUniqueName === 'chat' && '💬'}
+					{reservation.task.taskChannelUniqueName === 'default' && (
+						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+					)}
+					{reservation.task.taskChannelUniqueName === 'voice' && (
+						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+					)}
+					{reservation.task.taskChannelUniqueName === 'chat' && (
+						<MessageSquareText className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+					)}
 
 					<span className={isCollapsed ? 'sr-only' : 'text-muted-foreground flex items-center gap-1.5 font-medium'}>
 						{attributes.name ?? attributes.from}
@@ -61,7 +70,14 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 					sideOffset={12}
 					className='p-0'
 				>
-					{reservation.status === 'pending' && task.attributes.direction !== 'outboundDial' && (
+					{reservation.status === 'pending' && task.attributes.direction === 'outbound' && (
+						<OutboundTask
+							reservation={reservation}
+							task={task}
+						/>
+					)}
+
+					{reservation.status === 'pending' && task.attributes.direction !== 'outbound' && (
 						<IncomingTask
 							reservation={reservation}
 							task={task}

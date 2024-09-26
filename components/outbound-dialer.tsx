@@ -7,6 +7,12 @@ import { toast } from 'sonner';
 
 type Props = {};
 
+const numbers = {
+	'214': '+12142148356',
+	'281': '+12817208356',
+	'337': '+13377067517',
+};
+
 const OutboundDialer = (props: Props) => {
 	const { worker } = useWorker();
 
@@ -15,15 +21,20 @@ const OutboundDialer = (props: Props) => {
 			numbers={[]}
 			onSubmit={(data) => {
 				try {
+					const to = data.get('To') as string;
+					const splitNumber: string[] = to.split(' ');
+					const areaCode = splitNumber?.[1];
 					worker?.createTask(
-						parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
-						'+18449402678',
-						'WW497b90bc1703176f6845c09c8bf4fa8a',
-						'WQee659e96340b3899ad1fad7578fe6515',
+						parsePhoneNumber(to, 'US', 'E.164').formattedNumber ?? '',
+						// @ts-ignore
+						(numbers[areaCode] as string) ?? process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER,
+						process.env.NEXT_PUBLIC_TWILIO_WORKFLOW_SID!,
+						process.env.NEXT_PUBLIC_TWILIO_TASK_QUEUE_SID!,
 						{
 							attributes: {
 								direction: 'outbound',
 							},
+							taskChannelUniqueName: 'voice',
 						}
 					);
 				} catch (error) {

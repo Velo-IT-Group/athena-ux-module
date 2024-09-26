@@ -8,21 +8,23 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Skeleton } from '../ui/skeleton';
 import { useTaskContext } from './context';
 
-type Props = { sid: string; name: string; isYou: boolean; showRemoval: boolean; nameKey: string };
+type Props = {
+	sid: string;
+	name: string;
+	isYou: boolean;
+	showRemoval: boolean;
+	nameKey: string;
+};
 
 const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) => {
-	const { conference, removeParticipantByName } = useTaskContext();
+	const { conference, removeParticipantByName, wrapUpTask } = useTaskContext();
 	const {
-		isMuted,
 		isOnHold,
-		toggleParticipantMute,
 		removeParticipant,
 		setIsMuted,
 		setIsCoaching,
-		isCoaching,
 		setIsOnHold,
 		setStatus,
-		status,
 		toggleParticipantHoldState,
 		getParticipant,
 	} = useConferenceParticipant({
@@ -84,6 +86,7 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) 
 							onClick={() => {
 								removeParticipant.mutate();
 								removeParticipantByName(nameKey);
+								wrapUpTask?.mutate('Left conference');
 							}}
 						>
 							<CircleMinus />

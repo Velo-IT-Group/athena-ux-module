@@ -6,7 +6,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useFormStatus } from 'react-dom';
 import { Button } from './ui/button';
 import { RefreshCcw, SearchIcon } from 'lucide-react';
-import { Comparison, Conditions, KeyValue } from '@/utils/manage/params';
+import { KeyValue } from '@/utils/manage/params';
 
 type Props = {
 	placeholder: string;
@@ -33,9 +33,10 @@ const Search = ({
 
 	useEffect(() => {
 		if (!text) {
-			// delete parameters?.conditions?.[queryParam];
+			removeCondition(queryParam);
 		} else {
-			setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'contains' } });
+			const value = text.replace('*', '%');
+			setCondition({ [queryParam]: { value: `'${value}'`, comparison: 'like' } });
 		}
 	}, [text, queryParam]);
 
@@ -53,14 +54,16 @@ const Search = ({
 				placeholder={placeholder}
 				defaultValue={text}
 				onChange={(event) => debounced(event.target.value)}
+				autoFocus
 				onKeyUp={(e) => {
 					if (e.key === 'Enter') {
 						// debounced.cancel();
 						if (!text) {
 							removeCondition(queryParam);
 						} else {
-							console.log(text);
-							setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'contains' } });
+							const value = text.replace('*', '%');
+
+							setCondition({ [queryParam]: { value: `'${value}'`, comparison: 'contains' } });
 						}
 					}
 				}}

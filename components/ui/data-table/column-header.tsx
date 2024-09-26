@@ -14,19 +14,21 @@ import {
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
 	column: Column<TData, TValue>;
 	title: string;
+	setSort?: (orderBy?: { key: keyof TData; order?: 'asc' | 'desc' }) => void;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
 	column,
 	title,
 	className,
+	setSort,
 }: DataTableColumnHeaderProps<TData, TValue>) {
 	if (!column.getCanSort()) {
 		return <div className={cn(className)}>{title}</div>;
 	}
 
 	return (
-		<div className={cn('flex items-center space-x-2', className)}>
+		<div className={cn('flex items-center space-x-1.5', className)}>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button
@@ -45,11 +47,17 @@ export function DataTableColumnHeader<TData, TValue>({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align='start'>
-					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+					<DropdownMenuItem
+						onClick={() => setSort?.({ key: (column.columnDef.meta?.filterKey as keyof TData) ?? column.id })}
+					>
 						<ArrowUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
 						Asc
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+					<DropdownMenuItem
+						onClick={() =>
+							setSort?.({ key: (column.columnDef.meta?.filterKey as keyof TData) ?? column.id, order: 'desc' })
+						}
+					>
 						<ArrowDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
 						Desc
 					</DropdownMenuItem>

@@ -25,6 +25,8 @@ const activityColors: Record<string, string> = {
 	Available: 'bg-green-500',
 	Unavailable: 'bg-red-500',
 	Offline: 'bg-gray-500',
+	Break: 'bg-gray-500',
+	'On-Site': 'bg-orange-500',
 };
 
 const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed, onOpenChanges }: Props) => {

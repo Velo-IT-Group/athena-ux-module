@@ -46,7 +46,7 @@ const ActiveCallFooter = () => {
 									transferTask?.mutate({ to: id as string, options: {} });
 								} else {
 									addExternalParticipant?.mutate({
-										From: task?.attributes.to,
+										From: task?.attributes.to ?? task?.attributes.from,
 										To: parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '',
 									});
 								}
@@ -98,7 +98,7 @@ const ActiveCallFooter = () => {
 							numbers={[]}
 							onSubmit={(data) => {
 								addExternalParticipant?.mutate({
-									From: task?.attributes.to,
+									From: task?.attributes.to ?? task?.attributes.from,
 									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
 								});
 							}}

@@ -15,7 +15,7 @@ const GroupedAvatar = ({ users }: Props) => {
 	const bigGroup = users.length > 3;
 
 	return (
-		<div className='flex -space-x-2.5 rtl:space-x-reverse'>
+		<div className='flex -space-x-1.5.5 rtl:space-x-reverse'>
 			{users.slice(0, bigGroup ? 3 : users.length).map((user) => (
 				<Avatar
 					key={user.id}

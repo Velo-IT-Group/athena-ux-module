@@ -82,7 +82,7 @@ export const columns: ColumnDef<Company>[] = [
 			// const label = labels.find((label) => label.value === row.original.label);
 
 			return (
-				<div className='flex items-center space-x-2'>
+				<div className='flex items-center space-x-1.5'>
 					{/* {label && <Badge variant='outline'>{label.label}</Badge>} */}
 					{/* <Circle className={cn('stroke-none fill-primary', row?.original?.priority?.id === 7 && 'fill-green-500')} /> */}
 					<span className='max-w-[500px] truncate font-medium'>{row.getValue('name')}</span>

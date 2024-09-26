@@ -139,7 +139,7 @@ export const columns: ColumnDef<Configuration>[] = [
 			return (
 				<>
 					{contact !== undefined && (
-						<div className='flex items-center space-x-2'>
+						<div className='flex items-center space-x-1.5'>
 							<User className='mr-1.5' />
 							<span className='truncate font-medium'>{contact?.name}</span>
 						</div>

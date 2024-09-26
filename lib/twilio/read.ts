@@ -2,6 +2,7 @@
 import { createClient } from '@/utils/twilio';
 import { twiml } from 'twilio';
 import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+import { CountryInstance } from 'twilio/lib/rest/voice/v1/dialingPermissions/country';
 
 export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promise<WorkerInstance[]> => {
 	const client = await createClient();
@@ -64,4 +65,17 @@ export const getAllCalls = async (identity?: string, limit: number = 25) => {
 	const [inbound, outbound] = await Promise.all([getInboundCalls(identity), getOutboundCalls(identity)]);
 
 	return [...inbound, ...outbound];
+};
+
+export const getDialingPermissions = async (identity?: string, limit: number = 25): Promise<CountryInstance[]> => {
+	const client = await createClient()
+
+	const data = await client.voice.v1.dialingPermissions.countries.list({
+		lowRiskNumbersEnabled: true,
+		limit: 1000
+		// highRiskSpecialNumbersEnabled: true,
+		// highRiskTollfraudNumbersEnabled: true
+	});
+
+	return JSON.parse(JSON.stringify(data));
 };

@@ -19,6 +19,7 @@ import { getSystemMembers } from '@/lib/manage/read';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWorker } from '@/providers/worker-provider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import WorkerListItem from './worker-list-item';
 
 type Props = {
 	actionFn?: (isWorker: boolean, id: string | number) => void;
@@ -149,30 +150,35 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 								</>
 							) : (
 								<>
-									{members?.map((item) => {
+									{members?.map((member) => {
 										return (
-											<CommandItem
-												key={item.id}
-												value={`${item.officePhone}-${item.firstName} ${item.lastName ?? ''}`}
-												onSelect={(currentValue) => {
-													const id = currentValue.split('-')[0];
-													console.log(currentValue);
-													actionFn && actionFn(false, id);
-													setOpen(false);
-												}}
-												className='flex items-center justify-between gap-3'
-											>
-												<span>
-													{item.firstName} {item.lastName ?? ''}
-												</span>
+											<WorkerListItem
+												key={member.id}
+												actionFn={actionFn}
+												member={member}
+												onOpenChange={setOpen}
+											/>
+											// <CommandItem
+											// 	key={item.id}
+											// 	value={`${item.officePhone}-${item.firstName} ${item.lastName ?? ''}`}
+											// 	onSelect={(currentValue) => {
+											// 		const id = currentValue.split('-')[0];
+											// 		actionFn?.(false, id);
+											// 		setOpen(false);
+											// 	}}
+											// 	className='flex items-center justify-between gap-3'
+											// >
+											// 	<span>
+											// 		{item.firstName} {item.lastName ?? ''}
+											// 	</span>
 
-												<Button
-													size='smIcon'
-													variant='ghost'
-												>
-													<PhoneForwarded />
-												</Button>
-											</CommandItem>
+											// 	<Button
+											// 		size='smIcon'
+											// 		variant='ghost'
+											// 	>
+											// 		<PhoneForwarded />
+											// 	</Button>
+											// </CommandItem>
 										);
 									})}
 								</>

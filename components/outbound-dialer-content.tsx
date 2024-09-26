@@ -1,15 +1,7 @@
 'use client';
-import React, { Suspense, useRef } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Phone } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { PopoverContent } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import LabeledInput from './ui/labeled-input';
 import { PhoneInput } from './phone-input';
-import { useWorker } from '@/providers/worker-provider';
-import { useDevice } from '@/providers/device-provider';
-import { toast } from 'sonner';
 import { Form, FormField } from './ui/form';
 import { useForm } from 'react-hook-form';
 import { CreateParticipantParams, createPartipantParamsSchema } from '@/types/twilio';
@@ -29,15 +21,10 @@ const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props
 	return (
 		<Form {...form}>
 			<form
-				// action={(e: FormData) => {
-				// 	console.log('submitting');
-				// }}
 				onSubmit={(e) => {
 					e.preventDefault();
 					const data = new FormData(e.currentTarget);
 					onSubmit?.(data);
-					// console.log(new FormData(e.target));
-					// console.log(e.formData);
 				}}
 				className='space-y-3'
 			>

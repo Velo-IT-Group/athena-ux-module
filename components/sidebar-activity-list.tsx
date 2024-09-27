@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
 import { useWorker } from '@/providers/worker-provider';
@@ -12,20 +12,31 @@ type Props = {
 };
 
 const SidebarActivityList = ({ isCollapsed }: Props) => {
+	const supabase = createClient();
+
+	const { workspace } = useTwilio();
+	const { worker } = useWorker();
+
 	const [open, setOpen] = useState(false);
 	const [conversations, setConversations] = useState<Conversation[]>([]);
-	const { workspace } = useTwilio();
-	const supabase = createClient();
-	const { worker } = useWorker();
+
 	const { data: workers } = useQuery({
 		queryKey: ['workers'],
 		queryFn: () => workspace?.fetchWorkers(),
 		refetchInterval: open ? 1000 : 10000,
 	});
+
 	const { data } = useQuery({
 		queryKey: ['conversations'],
-		queryFn: async () =>
-			await supabase.schema('reporting').from('conversations').select().is('talk_time', null).is('abandoned', null),
+		queryFn: async () => {
+			console.log('running');
+			return await supabase
+				.schema('reporting')
+				.from('conversations')
+				.select()
+				.is('talk_time', null)
+				.is('abandoned', null);
+		},
 	});
 
 	useEffect(() => {
@@ -34,7 +45,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 			return;
 		}
 
-		console.log(data.data);
 		setConversations(data?.data as unknown as Conversation[]);
 	}, [data]);
 
@@ -49,18 +59,20 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	useEffect(() => {
 		// setConversations(initalConversations);
+
 		const channel = supabase
-			.channel('reporting_conversations')
+			.channel('realtime_conversations')
 			.on('postgres_changes', { event: 'INSERT', schema: 'reporting', table: 'conversations' }, (payload) => {
-				console.log(payload);
-				// setConversations(prev => [...prev, payload.new])
+				console.log({ payload });
+				const newItem = payload.new as Conversation;
+				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
 			})
 			.on('postgres_changes', { event: 'UPDATE', schema: 'reporting', table: 'conversations' }, (payload) => {
-				console.log(payload);
-				// setConversations(prev => [...prev, payload.new])
+				console.log({ payload });
+				const newItem = payload.new as Conversation;
+				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
 			})
 			.subscribe();
-
 		return () => {
 			supabase.removeChannel(channel);
 		};
@@ -70,6 +82,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	return (
 		<div className='grid gap-1.5 mx-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:mx-1.5 group-[[data-collapsed=true]]:py-1.5'>
+			{/* <pre>{JSON.stringify(conversations, null, 2)}</pre> */}
 			{activities?.map((activity) => (
 				<ActivityItem
 					key={activity.sid}

@@ -59,7 +59,7 @@ const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed
 
 			<PopoverContent
 				side='right'
-				align='center'
+				align='start'
 				sideOffset={6}
 				className='p-0'
 			>
@@ -69,44 +69,15 @@ const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed
 					<CommandList>
 						{workers?.map((worker) => {
 							const workerConversations =
-								conversations?.filter((conversation) => conversation.agent === worker.sid) ?? [];
+								conversations?.filter((conversation) => conversation.agent === worker.sid && !conversation.talk_time) ??
+								[];
 							const workerAttributes = worker.attributes;
 							return (
-								<CommandItem
+								<ActivityListItem
 									key={worker.sid}
-									value={workerAttributes.full_name}
-									className='flex items-center gap-1.5'
-								>
-									<Avatar className='w-3.5 h-3.5'>
-										<AvatarFallback className='w-3.5 h-3.5'>{workerAttributes.full_name.charAt(0)}</AvatarFallback>
-										<AvatarImage
-											className='w-3.5 h-3.5'
-											src={workerAttributes.imageUrl}
-										/>
-									</Avatar>
-
-									<span>{workerAttributes.full_name}</span>
-									<div className='flex items-center gap-1.5 ml-auto'>
-										<Button
-											variant='default'
-											size='smIcon'
-											className='ml-auto animate-pulse'
-										>
-											<Voicemail />
-										</Button>
-
-										<Button
-											variant='default'
-											size='smIcon'
-											className='ml-auto animate-pulse'
-										>
-											<Phone />
-										</Button>
-									</div>
-
-									{/* {workerConversations?.length > 0 && (
-									)} */}
-								</CommandItem>
+									worker={worker}
+									conversations={workerConversations}
+								/>
 							);
 						})}
 					</CommandList>
@@ -118,13 +89,12 @@ const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed
 
 type ActivityListItemProps = {
 	worker: Worker;
-	tasks: TaskInstance[];
+	conversations: Conversation[];
 };
 
-const ActivityListItem = ({ worker, tasks }: ActivityListItemProps) => {
-	const { worker: work } = useWorker();
+const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
 	const workerAttributes = worker.attributes;
-	const taskWithConference = tasks.find((task) => JSON.parse(task.attributes).conference.sid);
+	// const taskWithConference = conversations.find((c) => JSON.parse(task.attributes).conference.sid);
 	// const addConferenceParticipantMutation = useMutation({
 	// 	mutationFn: (params: CreateParticipantParams) => work.monitor,
 	// });
@@ -143,15 +113,18 @@ const ActivityListItem = ({ worker, tasks }: ActivityListItemProps) => {
 				/>
 			</Avatar>
 
-			<span>{workerAttributes.full_name}</span>
+			<div>
+				<p>{workerAttributes.full_name}</p>
+				{/* <p className='text-muted-foreground text-sm'>{worker.sid}</p> */}
+			</div>
 
-			{tasks?.length > 0 && (
+			{conversations?.length > 0 && (
 				<Button
 					variant='default'
 					size='smIcon'
 					className='ml-auto animate-pulse'
 				>
-					<Volume2 />
+					<Phone />
 				</Button>
 			)}
 		</CommandItem>

@@ -36,8 +36,16 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side, is
 				'postgres_changes',
 				{ event: 'INSERT', schema: 'reporting', table: 'conversations', filter: `agent=eq.${profile?.worker_sid}` },
 				(payload) => {
-					console.log(payload);
-					// setConversations(prev => [...prev, payload.new])
+					const newItem = payload.new as Conversation;
+					setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
+				}
+			)
+			.on(
+				'postgres_changes',
+				{ event: 'UPDATE', schema: 'reporting', table: 'conversations', filter: `agent=eq.${profile?.worker_sid}` },
+				(payload) => {
+					const newItem = payload.new as Conversation;
+					setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
 				}
 			)
 			.subscribe();

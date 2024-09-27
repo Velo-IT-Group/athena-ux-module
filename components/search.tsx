@@ -35,8 +35,12 @@ const Search = ({
 		if (!text) {
 			removeCondition(queryParam);
 		} else {
-			const value = text.replace('*', '%');
-			setCondition({ [queryParam]: { value: `'${value}'`, comparison: 'like' } });
+			if (text.includes('*')) {
+				// const value = text.replace('*', '%');
+				setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'like' } });
+			} else {
+				setCondition({ [queryParam]: { value: `'${text}'`, comparison: 'contains' } });
+			}
 		}
 	}, [text, queryParam]);
 

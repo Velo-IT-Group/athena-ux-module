@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
 			const workers = await getWorkers({ friendlyName: email }) 
 			const { data: { user } } = await supabase.auth.getUser()
 
-			console.log(user)
 			
 			if (!workers.length) {
 				const [members, { data: contacts }] = await Promise.all([
@@ -61,6 +60,8 @@ export async function GET(request: NextRequest) {
 						workerSid: workers[0].sid
 					}
 				})
+
+				await supabase.from('profiles').update({ worker_sid: workers[0]?.sid }).eq('id', user?.id ?? '')
 			}
 
 			if (isLocalEnv) {

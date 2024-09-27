@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 	const [{data: contacts}, { data: companies }] = await Promise.all([
 		getContacts({
-			conditions: { inactiveFlag: false }, 
+			// conditions: { inactiveFlag: false }, 
 			childConditions: { 'communicationItems/value': `'${phoneNumber}'` },
 			fields: ['id', 'firstName', 'lastName', 'company', 'inactiveFlag'],
 		}),

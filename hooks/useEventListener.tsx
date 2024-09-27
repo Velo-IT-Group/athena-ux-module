@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 
-const useEventListener = (eventName: string, handler: (event: Event) => void, element = window) => {
+const useEventListener = (eventName: keyof DocumentEventMap, handler: (event: Event) => void, element = window) => {
 	const savedHandler = useRef(handler);
 
 	useEffect(() => {

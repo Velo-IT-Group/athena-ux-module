@@ -26,13 +26,14 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) 
 		setIsOnHold,
 		setStatus,
 		toggleParticipantHoldState,
-		getParticipant,
+		participant,
+		isParticipantLoading,
 	} = useConferenceParticipant({
 		conferenceSid: conference?.sid ?? '',
 		participantSid: sid,
 	});
 
-	const { data: participant, isLoading } = getParticipant;
+	// const { data: participant, isLoading } = getParticipant;
 
 	useEffect(() => {
 		if (!participant) return;
@@ -42,7 +43,7 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) 
 		setIsCoaching(participant.coaching);
 	}, [participant]);
 
-	if (isLoading) return <Skeleton className='h-9 w-full' />;
+	if (isParticipantLoading) return <Skeleton className='h-9 w-full' />;
 
 	return (
 		<div

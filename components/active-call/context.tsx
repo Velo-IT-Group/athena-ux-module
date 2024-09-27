@@ -1,5 +1,5 @@
 'use client';
-import { useContext, useState, createContext, useEffect } from 'react';
+import { useContext, useState, createContext, useEffect, useMemo } from 'react';
 import { UseMutateFunction, useMutation, UseMutationResult } from '@tanstack/react-query';
 import { ConferenceAttributes, ConferenceParticpant } from '@/hooks/useTask';
 import { type Task, TransferOptions } from 'twilio-taskrouter';
@@ -10,6 +10,7 @@ import { createConferenceParticipant, updateConference } from '@/lib/twilio/conf
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { useTwilio } from '@/providers/twilio-provider';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
+import useTimer from '@/hooks/useTimer';
 
 interface Props {
 	addExternalParticipant:
@@ -22,10 +23,16 @@ interface Props {
 				}
 		  >
 		| undefined;
+	completeTask: UseMutationResult<void, Error, void, unknown> | undefined;
 	conference: ConferenceAttributes | undefined;
 	conferenceParticipants: ConferenceParticpant;
 	endConference: UseMutateFunction<ConferenceInstance, Error, void, unknown> | undefined;
 	task: Task | undefined;
+	timer: {
+		seconds: number;
+		minutes: number;
+		hours: number;
+	};
 	transferTask:
 		| UseMutationResult<
 				Task,
@@ -45,6 +52,12 @@ const initialValues: Props = {
 	addExternalParticipant: undefined,
 	conference: undefined,
 	conferenceParticipants: {},
+	completeTask: undefined,
+	timer: {
+		hours: 0,
+		minutes: 0,
+		seconds: 0,
+	},
 	endConference: undefined,
 	task: undefined,
 	transferTask: undefined,
@@ -65,6 +78,7 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 	const { worker } = useWorker();
 	const { conference } = task.attributes;
 	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>({});
+	const timer = useTimer();
 
 	useEffect(() => {
 		if (!conference?.participants) return;
@@ -189,15 +203,24 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 		},
 	});
 
+	const completeTask = useMutation({
+		mutationKey: ['completeTask'],
+		mutationFn: async () => {
+			await task?.complete('completed');
+		},
+	});
+
 	return (
 		<Provider
 			value={{
 				addExternalParticipant,
 				task,
+				completeTask,
 				conferenceParticipants,
 				conference,
 				endConference,
 				transferTask,
+				timer,
 				wrapUpTask,
 				removeParticipantByName,
 			}}

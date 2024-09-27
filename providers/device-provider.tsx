@@ -6,6 +6,7 @@ import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { initalizeJabra } from '@/lib/jabra';
 import { CallControlFactory, ICallControl, SignalType } from '@gnaudio/jabra-js';
 import { toast } from 'sonner';
+import useEventListener from '@/hooks/useEventListener';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -50,7 +51,6 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
-	const [open, setOpen] = useState(false);
 	const [device, setDevice] = useState<Device>();
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);
@@ -139,18 +139,17 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 					try {
 						const isLocked = await ccDevice.takeCallLock();
-						if (isLocked) {
-							setCurrentCallControl(ccDevice);
-							ccDevice.ring(false);
-						} else {
-							toast.error('Unable to get headset lock.');
-						}
+						if (!isLocked) throw new Error('Error getting lock');
+						setCurrentCallControl(ccDevice);
 					} catch (error) {
 						toast.error('Call lock already established.');
 					}
 				});
 			})
-			.catch((e) => console.log(e));
+			.catch((e) => {
+				console.error(e);
+				toast.error(e);
+			});
 
 		return () => {
 			if (currentCallControl) {
@@ -164,7 +163,7 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 		currentCallControl.deviceSignals.subscribe((signal) => {
 			if (signal.type === SignalType.PHONE_MUTE) {
-				setMuted(signal.value);
+				setMuted((prev) => !prev);
 			}
 		});
 	}, [currentCallControl]);

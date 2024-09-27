@@ -5,8 +5,8 @@ import { Button, buttonVariants } from '../ui/button';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import Timer from '../timer';
-import useTimer from '@/hooks/useTimer';
 import { PopoverClose } from '@radix-ui/react-popover';
+import { useTaskContext } from './context';
 
 type Props = {
 	queueName: string;
@@ -14,7 +14,7 @@ type Props = {
 };
 
 const ActiveCallHeader = ({ queueName, searchParams }: Props) => {
-	const timer = useTimer(new Date());
+	const { timer } = useTaskContext();
 
 	return (
 		<CardHeader className='flex-row items-center justify-between p-3 gap-3 border-b space-y-0'>

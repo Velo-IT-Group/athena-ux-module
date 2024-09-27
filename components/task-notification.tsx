@@ -1,5 +1,5 @@
 'use client';
-import { startTransition, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 import { Reservation, Task } from 'twilio-taskrouter';
@@ -7,11 +7,12 @@ import IncomingTask from './incoming-task';
 import { ActiveCall } from './active-call';
 import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
-import { toast } from 'sonner';
-import { TaskContext } from './active-call/context';
+import { TaskContext, useTaskContext } from './active-call/context';
 import OutboundTask from './outbound-task';
 import { MessageSquareText, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDevice } from '@/providers/device-provider';
+import { SignalType } from '@gnaudio/jabra-js';
 
 type Props = {
 	reservation: Reservation;
@@ -20,17 +21,31 @@ type Props = {
 };
 
 const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
+	const { currentCallControl } = useDevice();
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
+	const { completeTask } = useTaskContext();
 
-	if (timer.minutes >= 3 && reservation.status === 'wrapping') {
+	const acceptedStatuses = ['pending', 'accepted'];
+
+	if (timer.minutes >= 5 && !acceptedStatuses.includes(reservation.status)) {
 		console.log('dismissing', timer, reservation.status);
-		startTransition(async () => {
-			toast.dismiss(task.sid);
-			await task.complete('completed');
-		});
+		completeTask?.mutate();
 	}
+
+	useEffect(() => {
+		if (!currentCallControl) return;
+		currentCallControl?.deviceSignals.subscribe(async (d) => {
+			if (d.type === SignalType.HOOK_SWITCH) {
+				await reservation?.conference({
+					beep: false,
+					endConferenceOnExit: false,
+					endConferenceOnCustomerExit: true,
+				});
+			}
+		});
+	}, [currentCallControl]);
 
 	return (
 		<Popover

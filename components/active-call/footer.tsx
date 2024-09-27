@@ -10,6 +10,7 @@ import WorkerSelector from '@/app/(user)/worker-selector';
 import { parsePhoneNumber } from '@/lib/utils';
 import OutboundDialerContent from '../outbound-dialer-content';
 import { useTaskContext } from './context';
+import { toast } from 'sonner';
 
 const ActiveCallFooter = () => {
 	const { transferTask, addExternalParticipant, task, endConference, conferenceParticipants, removeParticipantByName } =
@@ -112,7 +113,12 @@ const ActiveCallFooter = () => {
 							variant='secondary'
 							size='icon'
 							onClick={async () => {
-								// await task?.hold(task.attributes.workerSid, true);
+								console.log(conferenceParticipants.customer);
+								try {
+									await task?.hold(conferenceParticipants.customer.sid, true);
+								} catch (error) {
+									toast.error(error as string);
+								}
 							}}
 						>
 							<Pause className='h-3.5 w-3.5' />

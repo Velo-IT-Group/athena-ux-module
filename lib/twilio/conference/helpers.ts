@@ -134,7 +134,7 @@ export const getConferenceParticipant = async (
 export const updateConference = async (conferenceSid: string, params: ConferenceContextUpdateOptions) => {
 	const client = await createClient();
 
-	return await client.conferences(conferenceSid).update(params);
+	return JSON.parse(JSON.stringify(await client.conferences(conferenceSid).update(params)));
 };
 
 export const updateConferenceParticipants = async (
@@ -148,6 +148,7 @@ export const updateConferenceParticipants = async (
 		`Basic ${btoa(process.env.TWILIO_API_KEY_SID + ':' + process.env.TWILIO_API_KEY_SECRET)}`
 	);
 	headers.set('Content-Type', 'application/x-www-form-urlencoded');
+	const newParams = {...params, HoldUrl: 'https://notification-service-5201.twil.io/HoldMusic%20copy.mp3'}
 	console.log(conferenceSid, participant);
 	const response = await fetch(
 		`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Conferences/${conferenceSid}/Participants/${participant}.json`,

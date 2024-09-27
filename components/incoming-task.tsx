@@ -64,6 +64,7 @@ const IncomingTask = ({ reservation, task }: Props) => {
 							beep: false,
 							startConferenceOnEnter: true,
 							endConferenceOnExit: false,
+							endConferenceOnCustomerExit: true,
 						});
 					}}
 				>

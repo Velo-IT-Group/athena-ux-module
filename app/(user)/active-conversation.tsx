@@ -141,7 +141,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 										<Textarea
 											value={project?.description?.trim()}
 											readOnly
-											className='border-none px-0 focus-visible:ring-0'
+											className='border-none px-0 focus-visible:ring-0 shadow-none'
 										/>
 									</CardDescription>
 								</CardHeader>

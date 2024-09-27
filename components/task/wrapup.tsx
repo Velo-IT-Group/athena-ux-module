@@ -1,11 +1,11 @@
 'use client';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { X } from 'lucide-react';
 import { Button } from '../ui/button';
 import Timer from '../timer';
 import { Task } from 'twilio-taskrouter';
-import { useMutation } from '@tanstack/react-query';
 import { PopoverClose } from '@radix-ui/react-popover';
+import { useTaskContext } from '../active-call/context';
 
 type Props = {
 	task: Task;
@@ -16,13 +16,8 @@ type Props = {
 	};
 };
 
-const TaskWrapup = ({ task, timer }: Props) => {
-	const completeTaskMutation = useMutation({
-		mutationKey: ['completeTask'],
-		mutationFn: async () => {
-			await task?.complete('completed');
-		},
-	});
+const TaskWrapup = ({ timer }: Props) => {
+	const { completeTask } = useTaskContext();
 
 	return (
 		<Card>
@@ -47,7 +42,7 @@ const TaskWrapup = ({ task, timer }: Props) => {
 			<CardContent className='p-3 pt-1.5'>
 				<Button
 					className='w-full'
-					onClick={() => completeTaskMutation.mutate()}
+					onClick={() => completeTask?.mutate()}
 				>
 					Complete
 				</Button>

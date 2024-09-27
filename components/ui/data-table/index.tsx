@@ -75,6 +75,16 @@ export function DataTable<TData, TValue>({
 		onParametersChange(meta.filterParams);
 	}, [meta.filterParams]);
 
+	React.useEffect(() => {
+		if (parameters.pageSize !== pagination.pageSize) return;
+		const filters = {
+			...parameters,
+			pagination,
+		};
+		console.log(filters);
+		onParametersChange(filters);
+	}, [pagination]);
+
 	if (error) {
 		console.error(error);
 		toast.error(error.message);

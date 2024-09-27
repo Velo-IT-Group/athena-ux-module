@@ -1,6 +1,6 @@
 'use client';
 import { ReactNode, useState } from 'react';
-import { ChevronsUpDown, PhoneForwarded } from 'lucide-react';
+import { Building, ChevronsUpDown, Phone, PhoneForwarded, Smartphone } from 'lucide-react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
@@ -20,6 +20,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useWorker } from '@/providers/worker-provider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import WorkerListItem from './worker-list-item';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { parsePhoneNumber } from '@/lib/utils';
+import { SystemMember } from '@/types/manage';
 
 type Props = {
 	actionFn?: (isWorker: boolean, id: string | number) => void;
@@ -50,6 +58,26 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState<WorkerInstance>();
 	const workers = Array.from(data?.values() ?? []);
+
+	function hasMultipleNumbers(member: SystemMember) {
+		const phoneKeys = ['homePhone', 'mobilePhone', 'officePhone'];
+
+		let valueCount = 0;
+
+		for (const key of phoneKeys) {
+			// @ts-ignore
+			if (member[key]) {
+				valueCount++;
+			}
+
+			if (valueCount > 1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	return (
 		<Popover
 			open={open}
@@ -152,12 +180,98 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 								<>
 									{members?.map((member) => {
 										return (
-											<WorkerListItem
-												key={member.id}
-												actionFn={actionFn}
-												member={member}
-												onOpenChange={setOpen}
-											/>
+											<CommandItem
+												value={`${member.officePhone ?? member.mobilePhone ?? member.officePhone}-${member.firstName} ${
+													member.lastName ?? ''
+												}`}
+												onSelect={(currentValue) => {
+													if (!hasMultipleNumbers(member)) {
+														const id = currentValue.split('-')[0];
+														actionFn?.(false, id);
+														setOpen(false);
+														// onOpenChange(false);
+														return;
+													}
+
+													setOpen(true);
+												}}
+												className='flex items-center justify-between gap-3'
+											>
+												<span>
+													{member.firstName} {member.lastName ?? ''}
+												</span>
+
+												{hasMultipleNumbers(member) ? (
+													<DropdownMenu
+														open={open}
+														onOpenChange={setOpen}
+													>
+														<DropdownMenuTrigger asChild>
+															<Button
+																size='smIcon'
+																variant='ghost'
+															>
+																<PhoneForwarded />
+															</Button>
+														</DropdownMenuTrigger>
+
+														<DropdownMenuContent
+															side='right'
+															align='start'
+														>
+															{member.homePhone && (
+																<DropdownMenuItem
+																	defaultChecked={member.defaultPhone === 'Home'}
+																	onSelect={() => {
+																		actionFn?.(false, member.homePhone!);
+																		// onOpenChange(false);
+																		setOpen(false);
+																		return;
+																	}}
+																>
+																	<Phone className='mr-1.5' /> {parsePhoneNumber(member.homePhone).formattedNumber}
+																</DropdownMenuItem>
+															)}
+
+															{member.mobilePhone && (
+																<DropdownMenuItem
+																	defaultChecked={member.defaultPhone === 'Mobile'}
+																	onSelect={() => {
+																		actionFn?.(false, member.mobilePhone!);
+																		// onOpenChange(false);
+																		setOpen(false);
+																		return;
+																	}}
+																>
+																	<Smartphone className='mr-1.5' />{' '}
+																	{parsePhoneNumber(member.mobilePhone).formattedNumber}
+																</DropdownMenuItem>
+															)}
+
+															{member.officePhone && (
+																<DropdownMenuItem
+																	defaultChecked={member.defaultPhone === 'Office'}
+																	onSelect={() => {
+																		actionFn?.(false, member.officePhone!);
+																		// onOpenChange(false);
+																		setOpen(false);
+																		return;
+																	}}
+																>
+																	<Building className='mr-1.5' /> {parsePhoneNumber(member.officePhone).formattedNumber}
+																</DropdownMenuItem>
+															)}
+														</DropdownMenuContent>
+													</DropdownMenu>
+												) : (
+													<Button
+														size='smIcon'
+														variant='ghost'
+													>
+														<PhoneForwarded />
+													</Button>
+												)}
+											</CommandItem>
 											// <CommandItem
 											// 	key={item.id}
 											// 	value={`${item.officePhone}-${item.firstName} ${item.lastName ?? ''}`}

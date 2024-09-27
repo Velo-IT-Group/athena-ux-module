@@ -76,7 +76,7 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
 	table.setParameter = updater => {
 		  const safeUpdater: Updater<Conditions<TData>> = old => {
 			let newState = functionalUpdate(updater, old)
-      console.log(newState)
+      // console.log(newState)
 			
         return newState
       }
@@ -110,7 +110,7 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
 			  }
 		  } as Conditions<TData>
 
-		  console.log(old, old.conditions, newParameters)
+		  // console.log(old, old.conditions, newParameters)
         return newParameters
       })
     }
@@ -125,7 +125,7 @@ export const ParameterFeature: TableFeature<any> = { //Use the TableFeature type
       })
     }
 	table.setSort = (value) => {
-    console.log(value)
+    // console.log(value)
       table.setParameter((old) => {
         if (value) {
           old.orderBy = value

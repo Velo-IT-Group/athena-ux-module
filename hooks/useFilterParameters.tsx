@@ -1,6 +1,5 @@
 import { Comparison, Conditions } from '@/utils/manage/params';
-import { useState } from 'react';
-import { usePagination } from './usePagination';
+import { useEffect, useState } from 'react';
 
 export function useFilterParameters<T>(params?: Conditions<T>) {
 	const [parameters, setParameters] = useState<Conditions<T>>(params ?? {});
@@ -10,11 +9,18 @@ export function useFilterParameters<T>(params?: Conditions<T>) {
 		key: keyof T;
 		order?: 'asc' | 'desc';
 	}>();
-	const [fields, setFields] = useState<Array<keyof T>>([]);
 	const [pagination, setPagination] = useState({
 		pageSize: params?.pageSize ?? 20,
 		pageIndex: params?.page ?? 1,
 	});
+
+	useEffect(() => {
+		if (pagination.pageIndex === parameters.page && pagination.pageSize === parameters.pageSize) return;
+
+		setParameters((prev) => {
+			return { ...prev, page: pagination.pageIndex, pageSize: pagination.pageSize };
+		});
+	}, [pagination]);
 
 	return {
 		parameters,

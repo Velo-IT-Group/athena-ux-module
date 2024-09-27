@@ -21,7 +21,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 	const [isOnHold, setIsOnHold] = useState(false);
 	const [status, setStatus] = useState('');
 
-	const getParticipant = useQuery({
+	const { data, isLoading } = useQuery({
 		queryKey: ['participants', conferenceSid, participantSid],
 		queryFn: () => getConferenceParticipant(conferenceSid, participantSid),
 	});
@@ -34,6 +34,9 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 			queryClient.invalidateQueries({ queryKey: ['participant', conferenceSid, participantSid] });
 
 			setIsMuted(data.muted);
+		},
+		onError(error, variables, context) {
+			toast.error(JSON.stringify(error));
 		},
 	});
 
@@ -66,7 +69,8 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 		isCoaching,
 		status,
 		isOnHold,
-		getParticipant,
+		participant: data,
+		isParticipantLoading: isLoading,
 		setIsMuted,
 		setIsCoaching,
 		setStatus,

@@ -162,7 +162,7 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 		if (task === undefined || task === null || !task.attributes || task.attributes.conference) return;
 		console.log(task);
 		setConferenceParticipants(task.attributes?.conference?.participants);
-	}, [task]);
+	}, [task.attributes.conference]);
 
 	const transferTask = useMutation({
 		mutationFn: ({ to, options }: { to: string; options: TransferOptions }) => task!.transfer(to, options),

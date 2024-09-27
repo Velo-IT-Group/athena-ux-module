@@ -54,7 +54,8 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 				.from('conversations')
 				.select()
 				.eq('agent', profile?.worker_sid ?? '')
-				.order('date', { ascending: false });
+				.order('date', { ascending: false })
+				.limit(25);
 			if (error) throw new Error(error.message);
 			return data;
 		},

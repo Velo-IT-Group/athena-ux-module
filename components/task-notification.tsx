@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 import { Reservation, Task } from 'twilio-taskrouter';
@@ -9,7 +9,7 @@ import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
 import { TaskContext, useTaskContext } from './active-call/context';
 import OutboundTask from './outbound-task';
-import { MessageSquareText, Phone } from 'lucide-react';
+import { MessageSquareText, Phone, Voicemail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDevice } from '@/providers/device-provider';
 import { SignalType } from '@gnaudio/jabra-js';
@@ -26,12 +26,16 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
 	const { completeTask } = useTaskContext();
+	const [isPending, startTransition] = useTransition();
 
 	const acceptedStatuses = ['pending', 'accepted'];
 
 	if (timer.minutes >= 5 && !acceptedStatuses.includes(reservation.status)) {
-		console.log('dismissing', timer, reservation.status);
-		completeTask?.mutate();
+		// console.log('dismissing', timer, reservation.status);
+
+		startTransition(async () => {
+			await task.complete('Automatically wrapped up');
+		});
 	}
 
 	useEffect(() => {
@@ -65,9 +69,14 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 					{reservation.task.taskChannelUniqueName === 'default' && (
 						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
 					)}
-					{reservation.task.taskChannelUniqueName === 'voice' && (
-						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
-					)}
+					{reservation.task.taskChannelUniqueName === 'voice' &&
+						reservation.task.attributes.taskType === 'voicemail' && (
+							<Voicemail className={cn(!isCollapsed && 'mr-1.5')} />
+						)}
+					{reservation.task.taskChannelUniqueName === 'voice' &&
+						reservation.task.attributes.taskType !== 'voicemail' && (
+							<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+						)}
 					{reservation.task.taskChannelUniqueName === 'chat' && (
 						<MessageSquareText className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
 					)}

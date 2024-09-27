@@ -1,6 +1,6 @@
 'use client';
 import { CardHeader, CardTitle } from '../ui/card';
-import { Rocket, SquareArrowOutUpRight, X } from 'lucide-react';
+import { Filter, Rocket, SquareArrowOutUpRight, X } from 'lucide-react';
 import { Button, buttonVariants } from '../ui/button';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
@@ -35,7 +35,7 @@ const ActiveCallHeader = ({ queueName, searchParams }: Props) => {
 						className: 'p-0 w-9 h-9',
 					})}
 				>
-					<SquareArrowOutUpRight className='text-muted-foreground' />
+					<Filter className='text-muted-foreground' />
 				</Link>
 
 				<Tooltip>

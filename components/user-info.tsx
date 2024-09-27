@@ -62,10 +62,14 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	}, [worker, worker?.attributes]);
 
 	useEffect(() => {
-		if (!worker?.activity) return;
+		if (!worker) return;
 
-		setIsAvailable(worker.activity.available);
-	}, [worker, worker?.activity]);
+		setIsAvailable(worker.available);
+
+		worker.on('activityUpdated', (w) => {
+			setIsAvailable(w.available);
+		});
+	}, [worker]);
 
 	return (
 		<AlertDialog>

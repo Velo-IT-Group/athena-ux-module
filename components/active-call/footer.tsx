@@ -13,8 +13,15 @@ import { useTaskContext } from './context';
 import { toast } from 'sonner';
 
 const ActiveCallFooter = () => {
-	const { transferTask, addExternalParticipant, task, endConference, conferenceParticipants, removeParticipantByName } =
-		useTaskContext();
+	const {
+		transferTask,
+		addExternalParticipant,
+		task,
+		endConference,
+		conferenceParticipants,
+		removeParticipantByName,
+		wrapUpTask,
+	} = useTaskContext();
 	const { muted, setMuted } = useDevice();
 
 	return (
@@ -140,7 +147,10 @@ const ActiveCallFooter = () => {
 						<TooltipTrigger asChild>
 							<Button
 								size='icon'
-								onClick={() => removeParticipantByName('worker')}
+								onClick={() => {
+									removeParticipantByName('worker');
+									wrapUpTask?.mutate('Transfered');
+								}}
 							>
 								<ArrowRightFromLine />
 								<span className='sr-only'>Leave Call</span>

@@ -21,7 +21,7 @@ const useTimer = (date?: Date) => {
 		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [date]);
+	}, []);
 
 	return {
 		seconds,

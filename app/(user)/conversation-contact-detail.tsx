@@ -19,7 +19,7 @@ type Props = {
 
 const ConversationContactDetail = async ({ contactId }: Props) => {
 	const [contact, types, { data: companies }] = await Promise.all([
-		getContact(contactId ?? 32569),
+		getContact(contactId),
 		getCommunicationTypes(),
 		getCompanies({
 			childConditions: { 'types/id': 1 },
@@ -50,9 +50,13 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 							className=''
 						>
 							<h2 className='text-2xl font-semibold group flex items-center gap-1.5'>
-								<span>
-									{contact?.firstName} {contact?.lastName}
-								</span>
+								{contact ? (
+									<span>
+										{contact?.firstName} {contact?.lastName}
+									</span>
+								) : (
+									<span>Select user</span>
+								)}
 
 								<ChevronsUpDown className='h-3.5 w-3.5 shrink-0' />
 							</h2>
@@ -88,29 +92,33 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 					</DialogContent>
 				</Dialog>
 
-				<div className='flex items-center gap-1.5 text-muted-foreground'>
-					<Building />
+				{contact && (
+					<div className='flex items-center gap-1.5 text-muted-foreground'>
+						<Building />
 
-					<span className='text-sm font-medium'>{contact?.company?.name}</span>
+						<span className='text-sm font-medium'>{contact?.company?.name}</span>
 
-					{isVip && (
-						<Badge
-							variant='caution'
-							className='rounded'
-						>
-							VIP
-						</Badge>
-					)}
-				</div>
+						{isVip && (
+							<Badge
+								variant='caution'
+								className='rounded'
+							>
+								VIP
+							</Badge>
+						)}
+					</div>
+				)}
 
 				<div className='w-full space-y-3'>
 					<h3 className='text-lg font-medium'>Overview</h3>
 
-					<LabeledInput
-						label='Title'
-						name='title'
-						value={contact?.title}
-					/>
+					{contact && (
+						<LabeledInput
+							label='Title'
+							name='title'
+							value={contact?.title}
+						/>
+					)}
 
 					{Object.entries(groupedCommunications).map(([key, values]) => (
 						<LabeledInput

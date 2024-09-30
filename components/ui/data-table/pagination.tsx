@@ -41,14 +41,14 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
 				</div>
 
 				<div className='flex items-center justify-center text-sm font-medium'>
-					Page {table.getState().pagination.pageIndex} of {table.getPageCount()}
+					Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
 				</div>
 
 				<div className='flex items-center space-x-1.5'>
 					<Button
 						variant='outline'
 						size='icon'
-						onClick={() => table.setPageIndex(1)}
+						onClick={() => table.setPageIndex(0)}
 						disabled={!table.getCanPreviousPage()}
 					>
 						<span className='sr-only'>Go to first page</span>
@@ -78,7 +78,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
 					<Button
 						variant='outline'
 						size='icon'
-						onClick={() => table.setPageIndex(table.getPageCount())}
+						onClick={() => table.setPageIndex(table.getPageCount() - 1)}
 						disabled={!table.getCanNextPage()}
 					>
 						<span className='sr-only'>Go to last page</span>

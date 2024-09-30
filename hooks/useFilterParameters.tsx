@@ -11,16 +11,16 @@ export function useFilterParameters<T>(params?: Conditions<T>) {
 	}>();
 	const [pagination, setPagination] = useState({
 		pageSize: params?.pageSize ?? 20,
-		pageIndex: params?.page ?? 1,
+		pageIndex: params?.page ?? 0,
 	});
 
-	useEffect(() => {
-		if (pagination.pageIndex === parameters.page && pagination.pageSize === parameters.pageSize) return;
+	// useEffect(() => {
+	// 	// if (pagination.pageIndex === parameters.page && pagination.pageSize === parameters.pageSize) return;
 
-		setParameters((prev) => {
-			return { ...prev, page: pagination.pageIndex, pageSize: pagination.pageSize };
-		});
-	}, [pagination]);
+	// 	setParameters((prev) => {
+	// 		return { ...prev, page: pagination.pageIndex, pageSize: pagination.pageSize };
+	// 	});
+	// }, [pagination]);
 
 	return {
 		parameters,

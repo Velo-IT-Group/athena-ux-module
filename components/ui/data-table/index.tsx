@@ -64,9 +64,12 @@ export function DataTable<TData, TValue>({
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
-	const { data, isLoading, isFetching, error } = useQuery({
+	const { data, isLoading, isFetching, error, refetch } = useQuery({
 		queryKey: [parameters, pagination],
-		queryFn: ({ queryKey }) => queryFn({ ...queryKey[0], page: pagination.pageIndex, pageSize: pagination.pageSize }),
+		queryFn: ({ queryKey }) => {
+			console.log(queryKey, pagination);
+			return queryFn({ ...queryKey[0], page: pagination.pageIndex + 1, pageSize: pagination.pageSize });
+		},
 		placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
 	});
 
@@ -76,13 +79,16 @@ export function DataTable<TData, TValue>({
 	}, [meta.filterParams]);
 
 	React.useEffect(() => {
-		if (parameters.pageSize !== pagination.pageSize) return;
-		const filters = {
-			...parameters,
-			pagination,
-		};
-		console.log(filters);
-		onParametersChange(filters);
+		console.log('refetching');
+		refetch();
+		// if()
+		// const filters: Conditions<TData> = {
+		// 	...parameters,
+		// 	pageSize: pagination.pageSize,
+		// 	page: pagination.pageIndex,
+		// };
+		// // console.log(filters);
+		// onParametersChange(filters);
 	}, [pagination]);
 
 	if (error) {

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import OutboundDialerContent from './outbound-dialer-content';
 import { useWorker } from '@/providers/worker-provider';
 import { parsePhoneNumber } from '@/lib/utils';
@@ -9,6 +9,9 @@ import { Button } from './ui/button';
 import { BellRing, FlaskConical, Mic, Volume2 } from 'lucide-react';
 import { Progress } from './ui/progress';
 import { useDevice } from '@/providers/device-provider';
+import useAudioTest from '@/hooks/useAudioTest';
+import { lookupPhoneNumber } from '@/lib/twilio/phoneNumbers';
+import { SignalType, webHidPairing } from '@gnaudio/jabra-js';
 
 type Props = {};
 
@@ -19,19 +22,67 @@ const numbers = {
 };
 
 const OutboundDialer = (props: Props) => {
+	const [inputDeviceId, setInputDeviceId] = useState('');
+	const [outputDeviceId, setOutputDeviceId] = useState('');
+	const previousInputDeviceIdRef = useRef('');
+	const {
+		error,
+		setError,
+		isRecording,
+		isAudioInputTestRunning,
+		isAudioOutputTestRunning,
+		playAudio,
+		playbackURI,
+		readAudioInput,
+		stopAudioTest,
+		inputLevel,
+		outputLevel,
+	} = useAudioTest();
+	const volumeLevel = isAudioOutputTestRunning ? outputLevel : inputLevel;
+
+	// stop test when not on AudioTest and there's an active test
+	useEffect(() => {
+		const newInputDeviceSelected = previousInputDeviceIdRef.current !== inputDeviceId;
+		previousInputDeviceIdRef.current = inputDeviceId;
+
+		// Restarts the test to continuously capture audio input
+		if (!error && (newInputDeviceSelected || (!isRecording && !isAudioInputTestRunning))) {
+			readAudioInput({ deviceId: inputDeviceId });
+		}
+
+		if (error) {
+			stopAudioTest();
+		}
+
+		return () => {
+			// stopAudioTest();
+		};
+	}, [
+		error,
+		inputDeviceId,
+		isRecording,
+		isAudioInputTestRunning,
+		readAudioInput,
+		stopAudioTest,
+		stopAudioTest,
+		isAudioInputTestRunning,
+		isAudioOutputTestRunning,
+	]);
+
 	const [isRinging, setIsRinging] = useState(false);
 	const { worker } = useWorker();
-	const { currentCallControl, testDevice } = useDevice();
+	const { currentCallControl, testDevice, device } = useDevice();
 
 	return (
 		<div className='space-y-1.5'>
 			<OutboundDialerContent
 				numbers={[]}
-				onSubmit={(data) => {
+				onSubmit={async (data) => {
 					try {
 						const to = data.get('To') as string;
 						const splitNumber: string[] = to.split(' ');
 						const areaCode = splitNumber?.[1];
+						const numberReturn = await lookupPhoneNumber(to);
 						worker?.createTask(
 							parsePhoneNumber(to, 'US', 'E.164').formattedNumber ?? '',
 							// @ts-ignore
@@ -41,6 +92,9 @@ const OutboundDialer = (props: Props) => {
 							{
 								attributes: {
 									direction: 'outbound',
+									name: numberReturn?.name,
+									companyId: numberReturn?.companyId,
+									contactId: numberReturn?.userId,
 								},
 								taskChannelUniqueName: 'voice',
 							}
@@ -58,9 +112,17 @@ const OutboundDialer = (props: Props) => {
 					variant='outline'
 					size='icon'
 					className='shrink-0'
-					onClick={() => {
-						currentCallControl?.ring(!isRinging);
-						setIsRinging((prev) => !prev);
+					onClick={async () => {
+						try {
+							// await webHidPairing();
+							// currentCallControl?.takeCallLock();
+							console.log(currentCallControl);
+							currentCallControl?.ring(!isRinging);
+							setIsRinging((prev) => !prev);
+						} catch (error) {
+							console.error(error);
+							toast.error(JSON.stringify(error) as string);
+						}
 					}}
 				>
 					<BellRing />
@@ -79,23 +141,29 @@ const OutboundDialer = (props: Props) => {
 					<FlaskConical />
 				</Button>
 
-				<Button
+				{/* <Button
 					variant='outline'
 					size='icon'
 					className='shrink-0'
 				>
 					<Mic />
-				</Button>
+				</Button> */}
 
-				<Progress className='shrink grow-0' />
+				<Progress
+					value={volumeLevel}
+					className='shrink grow-0'
+				/>
 
-				<Button
+				{/* <Button
 					variant='outline'
 					size='icon'
 					className='shrink-0'
+					onClick={() => {
+						device?.connect({ params: { To: '+19032962250' } });
+					}}
 				>
 					<Volume2 />
-				</Button>
+				</Button> */}
 			</div>
 		</div>
 	);

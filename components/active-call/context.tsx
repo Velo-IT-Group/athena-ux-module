@@ -1,16 +1,14 @@
 'use client';
-import { useContext, useState, createContext, useEffect, useMemo } from 'react';
+import { useContext, useState, createContext, useEffect } from 'react';
 import { UseMutateFunction, useMutation, UseMutationResult } from '@tanstack/react-query';
 import { ConferenceAttributes, ConferenceParticpant } from '@/hooks/useTask';
 import { type Task, TransferOptions } from 'twilio-taskrouter';
 import { toast } from 'sonner';
-import { useWorker } from '@/providers/worker-provider';
-import { parsePhoneNumber } from '@/lib/utils';
 import { createConferenceParticipant, updateConference } from '@/lib/twilio/conference/helpers';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
-import { useTwilio } from '@/providers/twilio-provider';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 import useTimer from '@/hooks/useTimer';
+import { Participant } from './participant-list-item';
 
 interface Props {
 	addExternalParticipant:
@@ -20,6 +18,7 @@ interface Props {
 				{
 					To: string;
 					From: string;
+					attributes?: Record<any, any>;
 				}
 		  >
 		| undefined;
@@ -35,7 +34,7 @@ interface Props {
 	};
 	transferTask:
 		| UseMutationResult<
-				Task,
+				void,
 				Error,
 				{
 					to: string;
@@ -45,7 +44,7 @@ interface Props {
 		  >
 		| undefined;
 	wrapUpTask: UseMutationResult<Task, Error, string, unknown> | undefined;
-	removeParticipantByName: (name: string) => void;
+	removeParticipantByName: (name: Participant) => void;
 }
 
 const initialValues: Props = {
@@ -74,11 +73,35 @@ const context = createContext(initialValues);
 const { Provider } = context;
 
 export const TaskContext = ({ task, children }: WithChildProps) => {
-	const { workspace } = useTwilio();
-	const { worker } = useWorker();
 	const { conference } = task.attributes;
 	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>({});
 	const timer = useTimer();
+
+	const updateParticipants = async (key: Participant, sid: string, operation: 'insert' | 'delete' = 'insert') => {
+		let newParticipants;
+		if (operation === 'insert') {
+			newParticipants = {
+				...conferenceParticipants,
+				[key]: sid,
+			};
+		} else {
+			let participants = conferenceParticipants;
+			delete participants[key];
+			newParticipants = participants;
+		}
+
+		await task.setAttributes({
+			...task.attributes,
+			conference: {
+				...task.attributes.conference,
+				participants: newParticipants,
+			},
+		});
+
+		setConferenceParticipants(newParticipants);
+
+		return newParticipants;
+	};
 
 	useEffect(() => {
 		if (!conference?.participants) return;
@@ -93,103 +116,33 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 	});
 
 	const addExternalParticipant = useMutation({
-		mutationFn: async (params: { To: string; From: string }) => {
-			// const { formattedNumber } = parsePhoneNumber(params.To, 'US', 'E.164');
-			return await createConferenceParticipant(conference.sid, params);
-		},
-		onSuccess(data, variables, context) {
-			setConferenceParticipants((prev) => {
-				return {
-					...prev,
-					external: {
-						...data,
-						// @ts-ignore
-						sid: data.call_sid,
-						name: parsePhoneNumber(variables.To).formattedNumber,
-					},
-				};
+		mutationFn: async (params: { To: string; From: string; attributes?: Record<any, any> }) => {
+			const participant = await createConferenceParticipant(conference.sid, params);
+			await updateParticipants('external', participant.callSid);
+			await task.setAttributes({
+				...task.attributes,
+				...params?.attributes,
 			});
-
-			// task.setAttributes({
-			// 	...task.attributes,
-			// 	conference: {
-			// 		...task.attributes.conference,
-			// 		participants: conferenceParticipants,
-			// 	},
-			// });
+			return participant;
 		},
 		onError(error, variables, context) {
 			toast.error(JSON.stringify(error));
 		},
 	});
 
-	const removeParticipantByName = (name: string) => {
-		setConferenceParticipants((prev) => {
-			delete prev[name];
-			return prev;
-		});
+	const removeParticipantByName = (name: Participant) => {
+		updateParticipants(name, '', 'delete');
 	};
 
 	useEffect(() => {
-		if (!conference?.participants) return;
-
-		let customerName = '';
-		if (task.attributes.direction === 'outbound') {
-			customerName = parsePhoneNumber(task?.attributes.outbound_to).formattedNumber ?? '';
-		} else {
-			customerName = task?.attributes.name
-				? task?.attributes.name
-				: parsePhoneNumber(task?.attributes.from).formattedNumber;
-		}
-
-		setConferenceParticipants((prev) => {
-			return {
-				...prev,
-				worker: {
-					sid: task?.attributes.conference.participants.worker,
-					workerSid: worker?.sid,
-					name: worker?.attributes?.full_name,
-				},
-				customer: {
-					sid: task?.attributes.conference.participants.customer,
-					name: customerName,
-				},
-			};
-		});
-	}, [conference?.participants]);
-
-	useEffect(() => {
 		if (task === undefined || task === null || !task.attributes || task.attributes.conference) return;
-		console.log(task);
 		setConferenceParticipants(task.attributes?.conference?.participants);
 	}, [task.attributes.conference]);
 
 	const transferTask = useMutation({
-		mutationFn: ({ to, options }: { to: string; options: TransferOptions }) => task!.transfer(to, options),
-		onSuccess: async (data, variables, context) => {
-			const worker = await workspace?.fetchWorker(variables.to);
-			setConferenceParticipants((prev) => {
-				return {
-					...prev,
-					transferedWorker: {
-						name: worker?.attributes.full_name,
-						sid: variables.to,
-					},
-				};
-			});
-
-			try {
-				data
-					.setAttributes({
-						...data.attributes,
-						conference: {
-							...data.attributes.conference,
-						},
-					})
-					.then(console.log);
-			} catch (error) {
-				console.error(error);
-			}
+		mutationFn: async ({ to, options }: { to: string; options: TransferOptions }) => {
+			await task!.transfer(to, options);
+			await updateParticipants('worker', to);
 		},
 		onError: (error) => {
 			toast.error('Error transferring task ' + JSON.stringify(error));

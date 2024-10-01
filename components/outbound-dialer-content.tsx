@@ -34,53 +34,10 @@ const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props
 					render={({ field }) => <PhoneInput {...field} />}
 				/>
 
-				{/* <Separator /> */}
-
-				{/* {showNumbers && (
-					<>
-						<LabeledInput
-							label='Caller ID'
-							name='from'
-							id='from'
-						>
-							<Select
-								name='from'
-								defaultValue={numbers.length ? numbers[0].phoneNumber : undefined}
-							>
-								<SelectTrigger>
-									<SelectValue placeholder='Select caller id...' />
-								</SelectTrigger>
-
-								<SelectContent>
-									{numbers?.map((number) => (
-										<SelectItem
-											key={number.phoneNumber}
-											value={number.phoneNumber}
-										>
-											{number.friendlyName}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</LabeledInput>
-
-						<Separator />
-					</>
-				)} */}
-
-				{/* <LabeledInput label='Agent'>
-				<Suspense><WorkerSelect /></Suspense>
-			</LabeledInput> */}
-
-				{/* <Button
-					className='w-full space-x-1.5'
-					type='submit'
-				>
-					<Phone className='w-3.5 h-3.5' /> <span>Call</span>
-				</Button> */}
 				<Button
 					type='submit'
 					className='w-full'
+					disabled={form.formState.disabled}
 				>
 					Dial
 				</Button>

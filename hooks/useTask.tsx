@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Task, TransferOptions, Workspace } from 'twilio-taskrouter';
 
-export type ConferenceParticpant = Record<string, Record<string, any>>;
+export type ConferenceParticpant = Record<string, any>;
 
 export type ConferenceAttributes = {
 	sid: string;

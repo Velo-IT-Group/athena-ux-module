@@ -53,9 +53,14 @@ const ActiveCallFooter = () => {
 								if (isWorker) {
 									transferTask?.mutate({ to: id as string, options: {} });
 								} else {
+									const parsedNumber = parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '';
+									const attributes = {
+										externalContact: parsePhoneNumber(id as string, 'US').formattedNumber,
+									};
 									addExternalParticipant?.mutate({
 										From: task?.attributes.to ?? task?.attributes.from,
-										To: parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '',
+										To: parsedNumber,
+										attributes,
 									});
 								}
 							}}

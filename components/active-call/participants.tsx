@@ -1,12 +1,12 @@
 'use client';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CardContent } from '../ui/card';
-import ParticipantListItem from './participant-list-item';
+import ParticipantListItem, { Participant } from './participant-list-item';
 import { useTaskContext } from './context';
 
 const ActiveCallParticipants = () => {
 	const { conferenceParticipants } = useTaskContext();
-	const entries = Object.entries(conferenceParticipants ?? {});
+	const entries = useMemo(() => Object.entries(conferenceParticipants ?? {}), [conferenceParticipants]);
 
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
@@ -14,11 +14,9 @@ const ActiveCallParticipants = () => {
 				return (
 					<ParticipantListItem
 						key={key}
-						name={value.name}
-						sid={value.sid}
-						isYou={key === 'worker'}
+						participantType={key as Participant}
+						sid={value}
 						showRemoval={entries.length > 2}
-						nameKey={key}
 					/>
 				);
 			})}

@@ -141,6 +141,7 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 					try {
 						const isLocked = await ccDevice.takeCallLock();
+
 						if (!isLocked) throw new Error('Error getting lock');
 						setCurrentCallControl(ccDevice);
 					} catch (error) {

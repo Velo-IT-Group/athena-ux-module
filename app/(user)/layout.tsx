@@ -13,6 +13,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactQueryProvider from '@/providers/react-query';
 import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
+import { SyncClient } from 'twilio-sync';
+import { getConferences } from '@/lib/twilio/conference/helpers';
 
 type Props = {
 	children: ReactNode;
@@ -62,6 +64,9 @@ const Layout = async ({ children }: Props) => {
 		user?.user_metadata.workerSid ?? '',
 		user?.email
 	);
+
+	const conf = await getConferences();
+	console.log(conf);
 
 	return (
 		<ReactQueryProvider>

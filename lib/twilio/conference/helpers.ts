@@ -88,7 +88,7 @@ export const getConferenceByName = async (friendlyName: string) => {
 
 export const getConferenceParticipants = async (
 	conferenceSid: string
-): Promise<{ participants: ParticipantInstance[] }> => {
+): Promise<ParticipantInstance[]> => {
 	let headers = new Headers();
 	headers.set(
 		'Authorization',
@@ -105,7 +105,9 @@ export const getConferenceParticipants = async (
 		console.log(response.statusText);
 	}
 
-	return await response.json();
+	const data = await response.json();
+
+	return data.participants
 };
 
 export const getConferenceParticipant = async (
@@ -155,7 +157,7 @@ export const updateConferenceParticipants = async (
 		{
 			headers,
 			method: 'POST',
-			body: new URLSearchParams(params),
+			body: new URLSearchParams(newParams),
 		}
 	);
 
@@ -175,3 +177,9 @@ export const removeConferenceParticipant = async (conferenceSid: string, partici
 
 	return await client.conferences(conferenceSid).participants(participant).remove();
 };
+
+export const getConferences = async () => {
+	const client = await createClient();
+
+	return await client.conferences.list({status: 'init'})
+}

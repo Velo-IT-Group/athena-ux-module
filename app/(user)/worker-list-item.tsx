@@ -13,7 +13,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react';
 
 type Props = {
 	member: SystemMember;
-	actionFn: ((isWorker: boolean, id: string | number) => void) | undefined;
+	actionFn: ((isWorker: boolean, id: string | number, attributes?: Record<string, any>) => void) | undefined;
 	onOpenChange: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -47,7 +47,11 @@ const WorkerListItem = ({ member, actionFn, onOpenChange }: Props) => {
 			onSelect={(currentValue) => {
 				if (!hasMultipleNumbers()) {
 					const id = currentValue.split('-')[0];
-					actionFn?.(false, id);
+					const attributes = {
+						externalContact: `${member.firstName} ${member.lastName ?? ''}`,
+					};
+					console.log(attributes);
+					actionFn?.(false, id, attributes);
 					onOpenChange(false);
 					return;
 				}

@@ -22,7 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import WorkerListItem from './worker-list-item';
 
 type Props = {
-	actionFn?: (isWorker: boolean, id: string | number) => void;
+	actionFn?: (isWorker: boolean, id: string | number, attributes?: Record<string, any>) => void;
 	children?: ReactNode;
 };
 
@@ -158,27 +158,6 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 												member={member}
 												onOpenChange={setOpen}
 											/>
-											// <CommandItem
-											// 	key={item.id}
-											// 	value={`${item.officePhone}-${item.firstName} ${item.lastName ?? ''}`}
-											// 	onSelect={(currentValue) => {
-											// 		const id = currentValue.split('-')[0];
-											// 		actionFn?.(false, id);
-											// 		setOpen(false);
-											// 	}}
-											// 	className='flex items-center justify-between gap-3'
-											// >
-											// 	<span>
-											// 		{item.firstName} {item.lastName ?? ''}
-											// 	</span>
-
-											// 	<Button
-											// 		size='smIcon'
-											// 		variant='ghost'
-											// 	>
-											// 		<PhoneForwarded />
-											// 	</Button>
-											// </CommandItem>
 										);
 									})}
 								</>

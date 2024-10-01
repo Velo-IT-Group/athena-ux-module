@@ -2,22 +2,27 @@
 import React, { useEffect } from 'react';
 import { Button, buttonVariants } from '../ui/button';
 import { CircleMinus, Pause, Phone, Play, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, parsePhoneNumber } from '@/lib/utils';
 import useConferenceParticipant from '@/hooks/useConferenceParticipant';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Skeleton } from '../ui/skeleton';
 import { useTaskContext } from './context';
+import { useWorker } from '@/providers/worker-provider';
+
+export type Participant = 'worker' | 'customer' | 'external' | 'transferredWorker';
 
 type Props = {
+	participantType: Participant;
 	sid: string;
-	name: string;
-	isYou: boolean;
+	// name: string;
+	// isYou: boolean;
 	showRemoval: boolean;
-	nameKey: string;
+	// nameKey: string;
 };
 
-const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) => {
-	const { conference, removeParticipantByName, wrapUpTask } = useTaskContext();
+const ParticipantListItem = ({ participantType, sid, showRemoval }: Props) => {
+	const { conference, removeParticipantByName, wrapUpTask, task } = useTaskContext();
+	const { worker } = useWorker();
 	const {
 		isOnHold,
 		removeParticipant,
@@ -58,7 +63,15 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) 
 			</div>
 
 			<p className='text-sm'>
-				{name} {isYou && <span className='text-xs font-medium'>You</span>}
+				<span>
+					{participantType === 'worker' && worker?.attributes.full_name}
+					{participantType === 'customer' &&
+						(task?.attributes.name ?? parsePhoneNumber(task?.attributes.from).formattedNumber)}
+					{participantType === 'external' && task?.attributes?.externalContact}
+					{participantType === 'transferredWorker' && task?.transfers?.outgoing?.to}
+				</span>
+
+				{participantType === 'worker' && <span className='text-xs font-medium ml-1.5'>You</span>}
 			</p>
 
 			<Tooltip>
@@ -86,8 +99,10 @@ const ParticipantListItem = ({ sid, name, isYou, showRemoval, nameKey }: Props) 
 							size='icon'
 							onClick={() => {
 								removeParticipant.mutate();
-								removeParticipantByName(nameKey);
-								wrapUpTask?.mutate('Left conference');
+								removeParticipantByName(participantType);
+								if (participantType === 'worker') {
+									wrapUpTask?.mutate('Left conference');
+								}
 							}}
 						>
 							<CircleMinus />

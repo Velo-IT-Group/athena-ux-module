@@ -15,18 +15,6 @@ import { WorkflowListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/works
 
 const TaskRouterCapability = jwt.taskrouter.TaskRouterCapability;
 
-export const createTask = async (workflowSid: string, attributes: Object) => {
-	const client = await createTwilioClient();
-	const payload = {
-		workflowSid,
-		attributes: JSON.stringify(attributes),
-		timeout: 3600,
-		taskChannel: 'voice',
-	};
-
-	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks.create(payload);
-};
-
 export const getTask = async (taskSid: string, params?: TaskListInstanceOptions) => {
 	const client = await createTwilioClient();
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(taskSid).fetch();

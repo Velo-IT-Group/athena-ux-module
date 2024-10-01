@@ -1,138 +1,131 @@
+'use client';
 import { useTwilio } from '@/providers/twilio-provider';
-import { SyncClient, type SyncDocument } from 'twilio-sync';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { SyncClient, SyncListItem, type SyncDocument } from 'twilio-sync';
 
-export const useSyncDocs = () => {
+type TaskSyncObject = {
+	task: string;
+	reservation: string;
+	worker: {
+		name: string;
+		sid: string;
+	};
+	customer: {
+		name: string;
+		sid: string;
+	};
+	dateCreated: string;
+	wrapUpTime?: string;
+};
+
+export const useTwilioSync = (listName: string) => {
 	const { token } = useTwilio();
-	const client = new SyncClient(token);
+	// const syncClient = new SyncClient(token);
+	const [syncClient, setSyncClient] = useState<SyncClient | null>(null);
+	const [listItems, setListItems] = useState<TaskSyncObject[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
-	// Getting the Sync Document
-	const getSyncDoc = async (syncDocName: string): Promise<SyncDocument | undefined> => {
-		try {
-			const doc = await client.document(syncDocName);
-			return doc;
-		} catch (error) {
-			console.error('Sync Util: getSyncDoc: Error calling this function', error);
-		}
-	};
-
-	// This is where we update the Sync Document we pass in the syncDocName we are updating
-	// We will pass the syncDocName along with the object
-	const updateSyncDoc = async (syncDocName: string, object: Array<any>) => {
-		try {
-			const doc = await client.document(syncDocName);
-
-			if (syncDocName === 'Agent-Assistance') {
-				doc.update({
-					agentAssistance: object,
-				});
-			} else {
-				doc.update({
-					supervisors: object,
-				});
+	useEffect(() => {
+		const initSyncClient = async () => {
+			try {
+				const client = new SyncClient(token, { logLevel: 'info' });
+				setSyncClient(client);
+			} catch (err) {
+				toast.error(JSON.stringify(err));
+				// setError('Error initializing Sync Client');
+				// console.error(err);
 			}
+		};
 
-			const resolvedDoc = client.document(syncDocName);
-			return resolvedDoc;
-		} catch (error) {
-			console.error('Sync Util: updateSyncDoc: Error calling this function', error);
-		}
-	};
+		initSyncClient();
+	}, [token]);
 
-	// This function takes inputs from other parts of the application to add/remove based on the updateStatus
-	// we will adjust the array and eventually pass this into the updateSyncDoc function to update the Sync Doc with the new array
-	const initSyncDocAgentAssistance = async (
-		agentWorkerSID: string,
-		agentFN: string,
-		conferenceSID: string,
-		selectedTaskSID: string,
-		updateStatus: string
-	) => {
-		const docToUpdate = `Agent-Assistance`;
-		let agentAssistanceArray: Array<any> = [];
-		const doc = await getSyncDoc(docToUpdate);
-		// if (doc?.data?.agentAssistance) {
-		// 	agentAssistanceArray = [...doc.data.agentAssistance];
-		// }
-		if (updateStatus === 'add') {
-			agentAssistanceArray.push({
-				conference: conferenceSID,
-				agentWorkerSID,
-				agentFN,
-				selectedTaskSID,
-				needsAssistance: true,
-			});
-			// this.updateSyncDoc(docToUpdate, agentAssistanceArray);
-		} else if (updateStatus === 'remove') {
-			const removeAgentAssistanceIndex = agentAssistanceArray?.findIndex(
-				(a: any) => a.agentWorkerSID === agentWorkerSID
-			);
-			if (removeAgentAssistanceIndex > -1) {
-				agentAssistanceArray.splice(removeAgentAssistanceIndex, 1);
-			}
-			await updateSyncDoc(docToUpdate, agentAssistanceArray);
-		}
-	};
+	// Fetch the list and populate initial items
+	const fetchList = useCallback(async () => {
+		if (!syncClient) return;
+		setLoading(true);
 
-	// This function takes inputs from other parts of the application to add/remove based on the updateStatus
-	// we will adjust the array and eventually pass this into the updateSyncDoc function to update the Sync Doc with the new array
-	const initSyncDocSupervisors = async (
-		agentWorkerSID: string,
-		conferenceSID: string,
-		supervisorSID: string,
-		supervisorFN: string,
-		supervisorStatus: string,
-		updateStatus: string
-	) => {
 		try {
-			const docToUpdate = `syncDoc.${agentWorkerSID}`;
-			let supervisorsArray: Array<any> = [];
-			const doc = await getSyncDoc(docToUpdate);
-			// if (doc?.data.supervisors) {
-			// 	supervisorsArray = [...doc.data.supervisors];
-			// }
-			if (updateStatus === 'add') {
-				supervisorsArray.push({
-					conference: conferenceSID,
-					supervisorSID,
-					supervisor: supervisorFN,
-					status: supervisorStatus,
-				});
-				await updateSyncDoc(docToUpdate, supervisorsArray);
-			} else if (updateStatus === 'update') {
-				const updateSupervisorIndex = supervisorsArray.findIndex((s) => s.supervisorSID === supervisorSID);
-				if (updateSupervisorIndex > -1) {
-					supervisorsArray[updateSupervisorIndex].status = supervisorStatus;
-				}
-				await updateSyncDoc(docToUpdate, supervisorsArray);
-			} else if (updateStatus === 'remove') {
-				const removeSupervisorIndex = supervisorsArray.findIndex((s) => s.supervisorSID === supervisorSID);
-				if (removeSupervisorIndex > -1) {
-					supervisorsArray.splice(removeSupervisorIndex, 1);
-				}
-				await updateSyncDoc(docToUpdate, supervisorsArray);
-			}
-		} catch (error) {
-			console.error('Sync Util: initSyncDocSupervisors: Error calling this function', error);
-		}
-	};
+			const list = await syncClient.list(listName);
+			const { items } = await list.getItems({ limit: 1000 });
 
-	// This will be called when we are tearing down the call to clean up the Sync Doc
-	const clearSyncDoc = async (syncDocName: string) => {
-		try {
-			const doc = await client.document(syncDocName);
-			doc.update({
-				supervisors: [],
-			});
-		} catch (error) {
-			console.error('Sync Util: clearSyncDoc: Error calling this function', error);
+			setListItems(items.map((item) => item.data as TaskSyncObject));
+		} catch (err) {
+			// setError('Error fetching the list');
+			console.error(err);
+			// toast.error(JSON.stringify(err));
+		} finally {
+			setLoading(false);
 		}
-	};
+	}, [syncClient, listName]);
+
+	// Create a new item in the list
+	const addItem = useCallback(
+		async (data: any) => {
+			if (!syncClient) return;
+
+			try {
+				const list = await syncClient.list(listName);
+				const newItem = await list.push(data);
+				// setListItems((prevItems) => [...prevItems, { index: newItem.index, data: newItem.data }]);
+			} catch (err) {
+				setError('Error adding item to the list');
+				console.error(err);
+			}
+		},
+		[syncClient, listName]
+	);
+
+	// Update an item in the list
+	const updateItem = useCallback(
+		async (index: number, newData: any) => {
+			if (!syncClient) return;
+
+			try {
+				const list = await syncClient.list(listName);
+				await list.update(index, newData);
+				// setListItems((prevItems) =>
+				// 	prevItems.map((item) => (item.index === index ? { ...item, data: newData } : item))
+				// );
+			} catch (err) {
+				setError('Error updating item');
+				console.error(err);
+			}
+		},
+		[syncClient, listName]
+	);
+
+	// Delete an item from the list
+	const deleteItem = useCallback(
+		async (index: number) => {
+			if (!syncClient) return;
+
+			try {
+				const list = await syncClient.list(listName);
+				await list.remove(index);
+				// setListItems((prevItems) => prevItems.filter((item) => item.index !== index));
+			} catch (err) {
+				setError('Error deleting item');
+				console.error(err);
+			}
+		},
+		[syncClient, listName]
+	);
+
+	useEffect(() => {
+		if (!syncClient) return;
+
+		fetchList();
+	}, [syncClient]);
 
 	return {
-		getSyncDoc,
-		updateSyncDoc,
-		initSyncDocAgentAssistance,
-		initSyncDocSupervisors,
-		clearSyncDoc,
+		listItems,
+		loading,
+		error,
+		addItem,
+		updateItem,
+		deleteItem,
 	};
 };

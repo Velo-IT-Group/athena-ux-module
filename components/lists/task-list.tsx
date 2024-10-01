@@ -86,8 +86,10 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		r.on('wrapup', async (reservation) => {
 			try {
 				console.log('Wrapping up');
+				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
+				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -96,9 +98,9 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		r.on('completed', async (reservation) => {
 			try {
 				removeReservation(reservation);
-				setActiveReservation(undefined);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
+				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -109,6 +111,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
+				currentCallControl?.offHook(false);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));

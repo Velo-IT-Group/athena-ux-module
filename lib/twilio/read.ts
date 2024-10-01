@@ -1,7 +1,7 @@
 'use server';
 import { createClient } from '@/utils/twilio';
 import { twiml } from 'twilio';
-import { WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+import {  WorkerInstance, WorkerListInstanceOptions } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { CountryInstance } from 'twilio/lib/rest/voice/v1/dialingPermissions/country';
 
 export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promise<WorkerInstance[]> => {
@@ -12,6 +12,11 @@ export const getWorkers = async (options: WorkerListInstanceOptions = {}): Promi
 		console.error(error);
 		return [];
 	}
+};
+
+export const getWorker = async (sid: string, options: WorkerListInstanceOptions = {}): Promise<WorkerInstance> => {
+	const client = await createClient();
+	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).workers(sid).fetch();
 };
 
 export const call = async (CallSid: string, callerId: string, phone: string) => {

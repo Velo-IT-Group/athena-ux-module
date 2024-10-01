@@ -130,20 +130,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		});
 	};
 
-	// useEffect(() => {
-	// 	if (!currentCallControl || !activeReservation) return;
-	// 	currentCallControl?.deviceSignals.subscribe(async (d) => {
-	// 		if (d.type === SignalType.HOOK_SWITCH) {
-	// 			console.log(activeReservation);
-	// 			await activeReservation?.conference({
-	// 				beep: false,
-	// 				endConferenceOnExit: false,
-	// 				endConferenceOnCustomerExit: true,
-	// 			});
-	// 		}
-	// 	});
-	// }, [currentCallControl, activeReservation]);
-
 	useEffect(() => {
 		if (!worker) return;
 		worker?.on('ready', onWorkerReady);

@@ -120,3 +120,140 @@ export type WorkerAttributes = {
 	email: string;
 	on_call: boolean;
 };
+
+export const preflightTestReportSchema = z.object({
+  callSid: z.string(),
+  edge: z.string(),
+  iceCandidateStats: z.string(),
+  networkTiming: z.object({
+    signaling: z.object({
+      start: z.number(),
+      end: z.number(),
+      duration: z.number()
+    }),
+    dtls: z.object({
+      start: z.number(),
+      end: z.number(),
+      duration: z.number()
+    }),
+    ice: z.object({ start: z.number(), end: z.number(), duration: z.number() }),
+    peerConnection: z.object({
+      start: z.number(),
+      end: z.number(),
+      duration: z.number()
+    })
+  }),
+  samples: z.array(
+    z.object({
+      audioInputLevel: z.number(),
+      audioOutputLevel: z.number(),
+      bytesReceived: z.number(),
+      bytesSent: z.number(),
+      codecName: z.string(),
+      jitter: z.number(),
+      mos: z.null(),
+      packetsLost: z.number(),
+      packetsLostFraction: z.number(),
+      packetsReceived: z.number(),
+      packetsSent: z.number(),
+      rtt: z.number(),
+      timestamp: z.number(),
+      totals: z.object({
+        bytesReceived: z.number(),
+        bytesSent: z.number(),
+        packetsLost: z.number(),
+        packetsLostFraction: z.number(),
+        packetsReceived: z.number(),
+        packetsSent: z.number()
+      })
+    })
+  ),
+  selectedEdge: z.string(),
+  stats: z.object({
+    jitter: z.object({ average: z.number(), max: z.number(), min: z.number() }),
+    mos: z.object({ average: z.number(), max: z.number(), min: z.number() }),
+    rtt: z.object({ average: z.number(), max: z.number(), min: z.number() })
+  }),
+  testTiming: z.object({
+    start: z.number(),
+    end: z.number(),
+    duration: z.number()
+  }),
+  totals: z.object({
+    bytesReceived: z.number(),
+    bytesSent: z.number(),
+    packetsLost: z.number(),
+    packetsLostFraction: z.number(),
+    packetsReceived: z.number(),
+    packetsSent: z.number()
+  }),
+  warnings: z.array(
+    z.object({
+      name: z.string(),
+      description: z.string(),
+      rtcWarning: z.object({
+        values: z.array(z.number()),
+        samples: z.array(
+          z.object({
+            audioInputLevel: z.number(),
+            audioOutputLevel: z.number(),
+            bytesReceived: z.number(),
+            bytesSent: z.number(),
+            codecName: z.string(),
+            jitter: z.number(),
+            mos: z.number(),
+            packetsLost: z.number(),
+            packetsLostFraction: z.number(),
+            packetsReceived: z.number(),
+            packetsSent: z.number(),
+            rtt: z.number(),
+            timestamp: z.number(),
+            totals: z.object({
+              bytesReceived: z.number(),
+              bytesSent: z.number(),
+              packetsLost: z.number(),
+              packetsLostFraction: z.number(),
+              packetsReceived: z.number(),
+              packetsSent: z.number()
+            })
+          })
+        ),
+        name: z.string(),
+        threshold: z.object({ name: z.string(), value: z.number() })
+      })
+    })
+  ),
+  selectedIceCandidatePairStats: z.object({
+    localCandidate: z.object({
+      id: z.string(),
+      timestamp: z.number(),
+      type: z.string(),
+      transportId: z.string(),
+      isRemote: z.boolean(),
+      networkType: z.string(),
+      ip: z.string(),
+      address: z.string(),
+      port: z.number(),
+      protocol: z.string(),
+      candidateType: z.string(),
+      priority: z.number()
+    }),
+    remoteCandidate: z.object({
+      id: z.string(),
+      timestamp: z.number(),
+      type: z.string(),
+      transportId: z.string(),
+      isRemote: z.boolean(),
+      ip: z.string(),
+      address: z.string(),
+      port: z.number(),
+      protocol: z.string(),
+      candidateType: z.string(),
+      priority: z.number()
+    })
+  }),
+  isTurnRequired: z.boolean(),
+  callQuality: z.string()
+})
+
+export type PreflightTestReport = z.infer<typeof preflightTestReportSchema>

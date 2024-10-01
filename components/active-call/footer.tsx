@@ -51,7 +51,14 @@ const ActiveCallFooter = () => {
 						<WorkerSelector
 							actionFn={(isWorker, id) => {
 								if (isWorker) {
-									transferTask?.mutate({ to: id as string, options: {} });
+									transferTask?.mutate({
+										to: id as string,
+										options: {
+											attributes: {
+												transferredWorker: id,
+											},
+										},
+									});
 								} else {
 									const parsedNumber = parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '';
 									const attributes = {

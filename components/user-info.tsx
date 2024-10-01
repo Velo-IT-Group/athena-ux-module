@@ -34,6 +34,7 @@ import { useWorker } from '../providers/worker-provider';
 import { useMutation } from '@tanstack/react-query';
 import { changeOnCallEngineer } from '../utils/twilio/workers';
 import { useTwilio } from '../providers/twilio-provider';
+import { updateOnCallEngineer } from '@/lib/twilio/update';
 
 type Props = {
 	user: User | null;
@@ -113,7 +114,12 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 						<DropdownMenuSeparator />
 
 						<AlertDialogTrigger asChild>
-							<DropdownMenuItem disabled={attributes?.on_call}>
+							<DropdownMenuItem
+								disabled={attributes?.on_call}
+								onSelect={async () => {
+									await updateOnCallEngineer(worker?.sid ?? '');
+								}}
+							>
 								{attributes?.on_call ? <Bell className='mr-1.5' /> : <BellOff className='mr-1.5' />}
 								<span>{attributes?.on_call ? 'You are on call' : 'You are not on call'}</span>
 							</DropdownMenuItem>

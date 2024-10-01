@@ -18,14 +18,7 @@ export const columns: ColumnDef<Contact>[] = [
 				title='First Name'
 			/>
 		),
-		cell: ({ row }) => (
-			<Link
-				href={`/contacts/${row.original.id}`}
-				className='font-medium w-[80px]'
-			>
-				{row.getValue('firstName')}
-			</Link>
-		),
+		cell: ({ row }) => <span className='font-medium w-[80px]'>{row.getValue('firstName')}</span>,
 		enableSorting: false,
 		enableHiding: false,
 	},
@@ -40,14 +33,7 @@ export const columns: ColumnDef<Contact>[] = [
 		cell: ({ row }) => {
 			// const label = labels.find((label) => label.value === row.original.label);
 
-			return (
-				<Link
-					href={`/contacts/${row.original.id}`}
-					className='font-medium w-[80px]'
-				>
-					{row.getValue('lastName')}
-				</Link>
-			);
+			return <span className='font-medium w-[80px]'>{row.getValue('lastName')}</span>;
 		},
 	},
 	{
@@ -121,14 +107,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 				title='First Name'
 			/>
 		),
-		cell: ({ row }) => (
-			<Link
-				href={`/contacts/${row.original.id}`}
-				className='font-medium w-[80px]'
-			>
-				{row.getValue('firstName')}
-			</Link>
-		),
+		cell: ({ row }) => <span className='font-medium w-[80px]'>{row.getValue('firstName')}</span>,
 		enableSorting: false,
 		enableHiding: false,
 	},
@@ -143,14 +122,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 		cell: ({ row }) => {
 			// const label = labels.find((label) => label.value === row.original.label);
 
-			return (
-				<Link
-					href={`/contacts/${row.original.id}`}
-					className='font-medium w-[80px]'
-				>
-					{row.getValue('lastName')}
-				</Link>
-			);
+			return <span className='font-medium w-[80px]'>{row.getValue('lastName')}</span>;
 		},
 	},
 	{

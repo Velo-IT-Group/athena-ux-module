@@ -6,7 +6,7 @@ import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
 import { initalizeJabra } from '@/lib/jabra';
 import { CallControlFactory, ICallControl, SignalType } from '@gnaudio/jabra-js';
 import { toast } from 'sonner';
-import useEventListener from '@/hooks/useEventListener';
+import { PreflightTestReport } from '@/types/twilio';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -20,6 +20,7 @@ interface DeviceProviderProps {
 	setCurrentCallControl: Dispatch<SetStateAction<ICallControl | undefined>>;
 	muted: boolean;
 	setMuted: Dispatch<SetStateAction<boolean>>;
+	testDevice: () => void;
 }
 
 const initialValues: DeviceProviderProps = {
@@ -34,6 +35,7 @@ const initialValues: DeviceProviderProps = {
 	setCurrentCallControl: () => undefined,
 	muted: true,
 	setMuted: () => false,
+	testDevice: () => undefined,
 };
 
 type WithChildProps = {
@@ -168,6 +170,20 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 		});
 	}, [currentCallControl]);
 
+	const testDevice = () => {
+		if (!window) return;
+		const preflightTest = Device.runPreflight(authToken, { fakeMicInput: true });
+
+		preflightTest.on('completed', (report: PreflightTestReport) => {
+			report.warnings.forEach((warning) => toast.warning(warning.name));
+			toast.success('Test successful');
+		});
+
+		preflightTest.on('failed', (error) => {
+			toast.error(error);
+		});
+	};
+
 	return (
 		<Provider
 			value={{
@@ -182,6 +198,7 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 				setCurrentCallControl,
 				muted,
 				setMuted,
+				testDevice,
 			}}
 		>
 			{children}

@@ -86,7 +86,7 @@ const Layout = async ({ children }: Props) => {
 					</ResizablePanel>
 				</ResizablePanelGroup>
 
-				<Toaster />
+				<Toaster richColors />
 			</UserLayout>
 		</ReactQueryProvider>
 	);

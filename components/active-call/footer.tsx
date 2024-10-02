@@ -11,6 +11,7 @@ import { parsePhoneNumber } from '@/lib/utils';
 import OutboundDialerContent from '../outbound-dialer-content';
 import { useTaskContext } from './context';
 import { toast } from 'sonner';
+import { removeConferenceParticipant } from '@/lib/twilio/conference/helpers';
 
 const ActiveCallFooter = () => {
 	const {
@@ -19,8 +20,10 @@ const ActiveCallFooter = () => {
 		task,
 		endConference,
 		conferenceParticipants,
+		conference,
 		removeParticipantByName,
 		wrapUpTask,
+		updateParticipants,
 	} = useTaskContext();
 	const { muted, setMuted } = useDevice();
 
@@ -53,12 +56,9 @@ const ActiveCallFooter = () => {
 								if (isWorker) {
 									transferTask?.mutate({
 										to: id as string,
-										options: {
-											attributes: {
-												transferredWorker: id,
-											},
-										},
+										options: {},
 									});
+									updateParticipants('transferredWorker', id as string).then(console.log);
 								} else {
 									const parsedNumber = parsePhoneNumber(id as string, 'US', 'E.164').formattedNumber ?? '';
 									const attributes = {
@@ -117,9 +117,14 @@ const ActiveCallFooter = () => {
 						<OutboundDialerContent
 							numbers={[]}
 							onSubmit={(data) => {
+								const parsedNumber = parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '';
+								const attributes = {
+									externalContact: parsePhoneNumber(data.get('To') as string, 'US').formattedNumber,
+								};
 								addExternalParticipant?.mutate({
 									From: task?.attributes.to ?? task?.attributes.from,
-									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
+									To: parsedNumber,
+									attributes,
 								});
 							}}
 						/>
@@ -160,6 +165,7 @@ const ActiveCallFooter = () => {
 							<Button
 								size='icon'
 								onClick={() => {
+									removeConferenceParticipant(conference?.sid ?? '', conference?.participants.worker);
 									removeParticipantByName('worker');
 									wrapUpTask?.mutate('Transfered');
 								}}

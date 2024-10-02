@@ -1,17 +1,14 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import OutboundDialerContent from './outbound-dialer-content';
 import { useWorker } from '@/providers/worker-provider';
 import { parsePhoneNumber } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
-import { BellRing, FlaskConical, Mic, Volume2 } from 'lucide-react';
-import { Progress } from './ui/progress';
+import { BellRing, FlaskConical } from 'lucide-react';
 import { useDevice } from '@/providers/device-provider';
-import useAudioTest from '@/hooks/useAudioTest';
 import { lookupPhoneNumber } from '@/lib/twilio/phoneNumbers';
-import { SignalType, webHidPairing } from '@gnaudio/jabra-js';
 
 type Props = {};
 
@@ -22,56 +19,9 @@ const numbers = {
 };
 
 const OutboundDialer = (props: Props) => {
-	const [inputDeviceId, setInputDeviceId] = useState('');
-	const [outputDeviceId, setOutputDeviceId] = useState('');
-	const previousInputDeviceIdRef = useRef('');
-	const {
-		error,
-		setError,
-		isRecording,
-		isAudioInputTestRunning,
-		isAudioOutputTestRunning,
-		playAudio,
-		playbackURI,
-		readAudioInput,
-		stopAudioTest,
-		inputLevel,
-		outputLevel,
-	} = useAudioTest();
-	const volumeLevel = isAudioOutputTestRunning ? outputLevel : inputLevel;
-
-	// stop test when not on AudioTest and there's an active test
-	useEffect(() => {
-		const newInputDeviceSelected = previousInputDeviceIdRef.current !== inputDeviceId;
-		previousInputDeviceIdRef.current = inputDeviceId;
-
-		// Restarts the test to continuously capture audio input
-		if (!error && (newInputDeviceSelected || (!isRecording && !isAudioInputTestRunning))) {
-			readAudioInput({ deviceId: inputDeviceId });
-		}
-
-		if (error) {
-			stopAudioTest();
-		}
-
-		return () => {
-			// stopAudioTest();
-		};
-	}, [
-		error,
-		inputDeviceId,
-		isRecording,
-		isAudioInputTestRunning,
-		readAudioInput,
-		stopAudioTest,
-		stopAudioTest,
-		isAudioInputTestRunning,
-		isAudioOutputTestRunning,
-	]);
-
 	const [isRinging, setIsRinging] = useState(false);
 	const { worker } = useWorker();
-	const { currentCallControl, testDevice, device } = useDevice();
+	const { currentCallControl, testDevice } = useDevice();
 
 	return (
 		<div className='space-y-1.5'>
@@ -149,10 +99,10 @@ const OutboundDialer = (props: Props) => {
 					<Mic />
 				</Button> */}
 
-				<Progress
+				{/* <Progress
 					value={volumeLevel}
 					className='shrink grow-0'
-				/>
+				/> */}
 
 				{/* <Button
 					variant='outline'

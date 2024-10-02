@@ -9,6 +9,7 @@ import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 import useTimer from '@/hooks/useTimer';
 import { Participant } from './participant-list-item';
+import { useTwilio } from '@/providers/twilio-provider';
 
 interface Props {
 	addExternalParticipant:
@@ -45,6 +46,11 @@ interface Props {
 		| undefined;
 	wrapUpTask: UseMutationResult<Task, Error, string, unknown> | undefined;
 	removeParticipantByName: (name: Participant) => void;
+	updateParticipants: (
+		key: Participant,
+		sid: string,
+		operation?: 'insert' | 'delete'
+	) => Promise<ConferenceParticpant | undefined>;
 }
 
 const initialValues: Props = {
@@ -62,6 +68,7 @@ const initialValues: Props = {
 	transferTask: undefined,
 	wrapUpTask: undefined,
 	removeParticipantByName: () => undefined,
+	updateParticipants: async () => undefined,
 };
 
 type WithChildProps = {
@@ -74,6 +81,7 @@ const { Provider } = context;
 
 export const TaskContext = ({ task, children }: WithChildProps) => {
 	const { conference } = task.attributes;
+	const { workspace } = useTwilio();
 	const [conferenceParticipants, setConferenceParticipants] = useState<ConferenceParticpant>({});
 	const timer = useTimer();
 
@@ -89,6 +97,11 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 			delete participants[key];
 			newParticipants = participants;
 		}
+
+		console.log({
+			...task.attributes.conference,
+			participants: newParticipants,
+		});
 
 		await task.setAttributes({
 			...task.attributes,
@@ -141,8 +154,9 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 
 	const transferTask = useMutation({
 		mutationFn: async ({ to, options }: { to: string; options: TransferOptions }) => {
+			const worker = await workspace?.fetchWorker(to);
 			await task!.transfer(to, options);
-			await updateParticipants('worker', to);
+			await updateParticipants('transferredWorker', worker?.attributes.full_name);
 		},
 		onError: (error) => {
 			toast.error('Error transferring task ' + JSON.stringify(error));
@@ -176,6 +190,7 @@ export const TaskContext = ({ task, children }: WithChildProps) => {
 				timer,
 				wrapUpTask,
 				removeParticipantByName,
+				updateParticipants,
 			}}
 		>
 			{children}

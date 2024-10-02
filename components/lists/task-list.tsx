@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { Phone } from 'lucide-react';
 import OutboundDialer from '../outbound-dialer';
+import { useNotifications } from '@/providers/notification-provider';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -25,6 +26,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	const { currentCallControl } = useDevice();
 	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const { reservations, addReservation, removeReservation } = useReservations();
+	const { createNotification } = useNotifications();
 
 	const onReservationCreated = async (r: Reservation) => {
 		console.log(currentCallControl);
@@ -36,6 +38,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		} else {
 			try {
 				currentCallControl?.ring(true);
+				createNotification(`New Phone Call From ${r.task.attributes.name}`);
 			} catch (error) {
 				console.log(error);
 				toast.error(JSON.stringify(error));

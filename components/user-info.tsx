@@ -10,7 +10,6 @@ import {
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
-import { Avatar, AvatarFallback } from './ui/avatar';
 import { Bell, BellOff, LogOut, UserIcon } from 'lucide-react';
 import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
 import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';

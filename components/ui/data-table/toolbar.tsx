@@ -88,6 +88,7 @@ export function DataTableToolbar<TData>({ table, facetedFilters, booleanFilters 
 				<>
 					{booleanFilters?.map(({ accessoryKey, defaultValue, title }) => (
 						<BooleanFilter
+							key={`${accessoryKey as string}-${title}`}
 							accessoryKey={accessoryKey}
 							title={title ?? accessoryKey.toString()}
 							defaultValue={defaultValue}

@@ -23,6 +23,7 @@ const LabeledInput = React.forwardRef<HTMLInputElement, Props>(
 					<Input
 						ref={ref}
 						{...props}
+						className={className}
 					/>
 				) : (
 					children

@@ -12,6 +12,10 @@ import OutboundDialerContent from '../outbound-dialer-content';
 import { useTaskContext } from './context';
 import { toast } from 'sonner';
 
+type ErrorType = {
+	message: string;
+};
+
 const ActiveCallFooter = () => {
 	const {
 		transferTask,
@@ -117,9 +121,13 @@ const ActiveCallFooter = () => {
 						<OutboundDialerContent
 							numbers={[]}
 							onSubmit={(data) => {
+								const attributes = {
+									externalContact: parsePhoneNumber(data.get('To') as string, 'US').formattedNumber,
+								};
 								addExternalParticipant?.mutate({
 									From: task?.attributes.to ?? task?.attributes.from,
 									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
+									attributes,
 								});
 							}}
 						/>
@@ -134,9 +142,11 @@ const ActiveCallFooter = () => {
 							onClick={async () => {
 								console.log(conferenceParticipants.customer);
 								try {
-									await task?.hold(conferenceParticipants.customer.sid, true);
+									await task?.hold(conferenceParticipants.customer, true);
 								} catch (error) {
-									toast.error(error as string);
+									const newError = error as ErrorType;
+									console.error(newError);
+									toast.error(JSON.stringify(newError.message));
 								}
 							}}
 						>

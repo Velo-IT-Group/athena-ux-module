@@ -117,6 +117,8 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 							label='Title'
 							name='title'
 							value={contact?.title}
+							readOnly
+							className='focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0'
 						/>
 					)}
 

@@ -205,7 +205,7 @@ export function PhoneInput({
 			<Input
 				ref={inputRef}
 				type='text'
-				pattern='^(\+)?[0-9\s]*$'
+				// pattern='^\+?[0-9\s]*$'
 				name='phone'
 				id={id}
 				placeholder='Phone'

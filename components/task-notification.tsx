@@ -21,6 +21,7 @@ type Props = {
 };
 
 const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
+	'use no memo'; // opts out this component from being compiled by React Compiler
 	const { currentCallControl } = useDevice();
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
@@ -32,10 +33,9 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 
 	if (timer.minutes >= 5 && !acceptedStatuses.includes(reservation.status)) {
 		// console.log('dismissing', timer, reservation.status);
-
-		startTransition(async () => {
-			await task.complete('Automatically wrapped up');
-		});
+		// startTransition(async () => {
+		// 	await task.complete('Automatically wrapped up');
+		// });
 	}
 
 	useEffect(() => {

@@ -25,10 +25,7 @@ const HistoryListItem = ({ conversation }: Props) => {
 	}`;
 
 	return (
-		<CommandItem
-			key={conversation.id}
-			value={value}
-		>
+		<CommandItem value={value}>
 			{conversation.direction === 'outbound' ? (
 				<PhoneOutgoing className='mr-3 text-red-500' />
 			) : (

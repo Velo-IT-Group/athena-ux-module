@@ -2,7 +2,7 @@
 import React from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Activity } from 'twilio-taskrouter';
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Worker } from 'twilio-taskrouter';
@@ -76,22 +76,24 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 			>
 				<Command>
 					<CommandInput placeholder={'Search users'} />
-					<CommandEmpty>Nothing found.</CommandEmpty>
 					<CommandList>
-						{workers?.map((worker) => {
-							const workerConversations =
-								conversations?.filter((conversation) => conversation.agent === worker.sid && !conversation.talk_time) ??
-								[];
-							const workerAttributes = worker.attributes;
-							return (
-								<ActivityListItem
-									key={worker.sid}
-									worker={worker}
-									conversations={workerConversations}
-								/>
-							);
-						})}
+						<CommandGroup heading={activity.name}>
+							{workers?.map((worker) => {
+								const workerConversations =
+									conversations?.filter(
+										(conversation) => conversation.agent === worker.sid && !conversation.talk_time
+									) ?? [];
+								return (
+									<ActivityListItem
+										key={worker.sid}
+										worker={worker}
+										conversations={workerConversations}
+									/>
+								);
+							})}
+						</CommandGroup>
 					</CommandList>
+					<CommandEmpty>Nothing users.</CommandEmpty>
 				</Command>
 			</PopoverContent>
 		</Popover>

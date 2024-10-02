@@ -1,27 +1,25 @@
 'use client';
 import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command';
-import { Activity, Workspace } from 'twilio-taskrouter';
-import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Activity } from 'twilio-taskrouter';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Worker } from 'twilio-taskrouter';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { Button } from './ui/button';
-import { Circle, Phone, Speaker, Voicemail, Volume2 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { useWorker } from '../providers/worker-provider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Circle, Phone } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type Props = {
 	workers: Worker[];
+	currentActivity?: Activity;
 	conversations: Conversation[];
-	workspace: Workspace;
 	activity: Activity;
 	isCollapsed: boolean;
-	onOpenChanges: (open: boolean) => void;
 };
 
-const activityColors: Record<string, string> = {
+export const activityColors: Record<string, string> = {
 	Available: 'bg-green-500',
 	Unavailable: 'bg-red-500',
 	Offline: 'bg-gray-500',
@@ -29,33 +27,46 @@ const activityColors: Record<string, string> = {
 	'On-Site': 'bg-orange-500',
 };
 
-const ActivityItem = ({ workers, workspace, conversations, activity, isCollapsed, onOpenChanges }: Props) => {
+const ActivityItem = ({ workers, currentActivity, conversations, activity, isCollapsed }: Props) => {
 	return (
-		<Popover key={activity.sid}>
-			<Tooltip delayDuration={0}>
-				<TooltipTrigger asChild>
-					<PopoverTrigger asChild>
-						<Button
-							variant='ghost'
-							size={isCollapsed ? 'icon' : 'sm'}
-							className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
+		<Popover>
+			<ContextMenu>
+				<Tooltip>
+					<ContextMenuTrigger asChild>
+						<TooltipTrigger asChild>
+							<PopoverTrigger asChild>
+								<Button
+									variant='ghost'
+									size={isCollapsed ? 'icon' : 'sm'}
+									className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
+								>
+									<Circle
+										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
+									/>
+
+									<span className={cn(isCollapsed && 'sr-only')}>{activity.name}</span>
+								</Button>
+							</PopoverTrigger>
+						</TooltipTrigger>
+					</ContextMenuTrigger>
+
+					<ContextMenuContent>
+						<ContextMenuItem
+							onSelect={async () => await activity.setAsCurrent()}
+							disabled={currentActivity?.sid === activity.sid}
 						>
-							<Circle
-								className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
-							/>
+							Set as current activity
+						</ContextMenuItem>
+					</ContextMenuContent>
 
-							<span className={cn(isCollapsed && 'sr-only')}>{activity.name}</span>
-						</Button>
-					</PopoverTrigger>
-				</TooltipTrigger>
-
-				<TooltipContent side='right'>
-					{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-				</TooltipContent>
-				<TooltipContent side='right'>
-					{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-				</TooltipContent>
-			</Tooltip>
+					<TooltipContent side='right'>
+						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
+					</TooltipContent>
+					<TooltipContent side='right'>
+						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
+					</TooltipContent>
+				</Tooltip>
+			</ContextMenu>
 
 			<PopoverContent
 				side='right'
@@ -94,10 +105,6 @@ type ActivityListItemProps = {
 
 const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
 	const workerAttributes = worker.attributes;
-	// const taskWithConference = conversations.find((c) => JSON.parse(task.attributes).conference.sid);
-	// const addConferenceParticipantMutation = useMutation({
-	// 	mutationFn: (params: CreateParticipantParams) => work.monitor,
-	// });
 
 	return (
 		<CommandItem

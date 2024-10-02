@@ -58,17 +58,13 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	}, [worker]);
 
 	useEffect(() => {
-		// setConversations(initalConversations);
-
 		const channel = supabase
 			.channel('realtime_conversations')
 			.on('postgres_changes', { event: 'INSERT', schema: 'reporting', table: 'conversations' }, (payload) => {
-				console.log({ payload });
 				const newItem = payload.new as Conversation;
 				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
 			})
 			.on('postgres_changes', { event: 'UPDATE', schema: 'reporting', table: 'conversations' }, (payload) => {
-				console.log({ payload });
 				const newItem = payload.new as Conversation;
 				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
 			})
@@ -82,16 +78,14 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	return (
 		<div className='grid gap-1.5 mx-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:mx-1.5 group-[[data-collapsed=true]]:py-1.5'>
-			{/* <pre>{JSON.stringify(conversations, null, 2)}</pre> */}
 			{activities?.map((activity) => (
 				<ActivityItem
 					key={activity.sid}
 					workers={workerArray.filter((worker) => worker.activitySid === activity.sid)}
+					currentActivity={worker?.activity}
 					conversations={conversations}
-					workspace={workspace!}
 					activity={activity}
 					isCollapsed={isCollapsed}
-					onOpenChanges={setOpen}
 				/>
 			))}
 		</div>

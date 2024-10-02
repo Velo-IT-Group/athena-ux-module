@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getWorkers } from '@/lib/twilio/read';
 import { createWorker } from '@/lib/twilio/create';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
+import { updateWorker } from '@/lib/twilio/update';
 
 export async function GET(request: NextRequest) {
 	const { searchParams, origin } = request.nextUrl;
@@ -62,6 +63,15 @@ export async function GET(request: NextRequest) {
 				})
 
 				await supabase.from('profiles').update({ worker_sid: workers[0]?.sid }).eq('id', user?.id ?? '')
+
+				const parsedAttributes = JSON.parse(workers[0].attributes)
+
+				await updateWorker(workers[0].sid, {
+					attributes: {
+						...parsedAttributes,
+						contact_uri: `client:${user?.email}`
+					}
+				})
 			}
 
 			if (isLocalEnv) {

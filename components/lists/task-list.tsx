@@ -86,7 +86,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		r.on('wrapup', async (reservation) => {
 			try {
 				console.log('Wrapping up');
-				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
 				setActiveReservation(undefined);

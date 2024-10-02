@@ -26,17 +26,6 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
-	const { completeTask } = useTaskContext();
-	const [isPending, startTransition] = useTransition();
-
-	const acceptedStatuses = ['pending', 'accepted'];
-
-	if (timer.minutes >= 5 && !acceptedStatuses.includes(reservation.status)) {
-		// console.log('dismissing', timer, reservation.status);
-		// startTransition(async () => {
-		// 	await task.complete('Automatically wrapped up');
-		// });
-	}
 
 	useEffect(() => {
 		if (!currentCallControl) return;

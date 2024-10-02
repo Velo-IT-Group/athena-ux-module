@@ -13,15 +13,17 @@ type Props = {
 
 const UserLayout = ({ token, children }: Props) => {
 	return (
-		<TooltipProvider>
-			<NotificationProvider>
-				<TwilioProvider authToken={token}>
-					<DeviceProvider authToken={token}>
-						<WorkerProvider authToken={token}>{children}</WorkerProvider>
-					</DeviceProvider>
-				</TwilioProvider>
-			</NotificationProvider>
-		</TooltipProvider>
+		<NotificationProvider>
+			<TooltipProvider>
+				<NotificationProvider>
+					<TwilioProvider authToken={token}>
+						<DeviceProvider authToken={token}>
+							<WorkerProvider authToken={token}>{children}</WorkerProvider>
+						</DeviceProvider>
+					</TwilioProvider>
+				</NotificationProvider>
+			</TooltipProvider>
+		</NotificationProvider>
 	);
 };
 

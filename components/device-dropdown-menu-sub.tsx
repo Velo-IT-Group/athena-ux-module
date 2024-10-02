@@ -20,24 +20,22 @@ const DeviceDropdownMenuSub = () => {
 				<Command>
 					<CommandList>
 						<CommandGroup heading='Speaker'>
-							<CommandList>
-								{audioOutputDevices.map((mediaDevice) => {
-									return (
-										<CommandItem
-											key={mediaDevice.deviceId}
-											value={mediaDevice.groupId}
-										>
-											<Check
-												className={cn(
-													'mr-2 h-3.5 w-3.5',
-													defaultOutput?.groupId === mediaDevice.groupId ? 'opacity-100' : 'opacity-0'
-												)}
-											/>
-											{mediaDevice.label}
-										</CommandItem>
-									);
-								})}
-							</CommandList>
+							{audioOutputDevices.map((mediaDevice) => {
+								return (
+									<CommandItem
+										key={mediaDevice.deviceId}
+										value={mediaDevice.groupId}
+									>
+										<Check
+											className={cn(
+												'mr-2 h-3.5 w-3.5',
+												defaultOutput?.groupId === mediaDevice.groupId ? 'opacity-100' : 'opacity-0'
+											)}
+										/>
+										{mediaDevice.label}
+									</CommandItem>
+								);
+							})}
 						</CommandGroup>
 
 						<CommandSeparator />

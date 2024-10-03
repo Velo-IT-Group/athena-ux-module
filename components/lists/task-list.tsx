@@ -27,6 +27,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const { reservations, addReservation, removeReservation } = useReservations();
 	const { createNotification } = useNotifications();
+	const audio = new Audio('/phone_ringing.mp3');
 
 	const onReservationCreated = async (r: Reservation) => {
 		console.log(currentCallControl);
@@ -39,6 +40,8 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				currentCallControl?.ring(true);
 				createNotification(`New Phone Call From ${r.task.attributes.name}`);
+				audio.loop = true;
+				audio.play();
 			} catch (error) {
 				console.log(error);
 				toast.error(JSON.stringify(error));
@@ -57,6 +60,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		r.on('accepted', async (reservation) => {
 			console.log('Call accepted');
 			try {
+				audio.pause();
 				currentCallControl?.ring(false);
 			} catch (error) {
 				console.error(error);
@@ -66,6 +70,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('rejected', async (reservation) => {
 			try {
+				audio.pause();
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
@@ -77,6 +82,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('canceled', async (reservation) => {
 			try {
+				audio.pause();
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
@@ -88,6 +94,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('wrapup', async (reservation) => {
 			try {
+				audio.pause();
 				console.log('Wrapping up');
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
@@ -99,6 +106,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('completed', async (reservation) => {
 			try {
+				audio.pause();
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
@@ -110,6 +118,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('timeout', async (reservation) => {
 			try {
+				audio.pause();
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);

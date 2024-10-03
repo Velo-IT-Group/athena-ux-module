@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-import { X } from 'lucide-react';
+import { RefreshCcw, X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ import { DataTableFacetedFilter } from './faceted-filter';
 import { Identifiable } from '@/types';
 import Search from '@/components/search';
 import BooleanFilter from './boolean-filter';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 
 export interface BooleanFilter<TData> {
 	accessoryKey: keyof TData;
@@ -26,9 +28,25 @@ interface DataTableToolbarProps<TData> {
 	table: Table<TData>;
 	facetedFilters?: FacetedFilter<TData>[];
 	booleanFilters?: BooleanFilter<TData>[];
+	refetch: (options?: RefetchOptions) => Promise<
+		QueryObserverResult<
+			{
+				data: TData[];
+				count: number;
+			},
+			Error
+		>
+	>;
+	isRefetching: boolean;
 }
 
-export function DataTableToolbar<TData>({ table, facetedFilters, booleanFilters }: DataTableToolbarProps<TData>) {
+export function DataTableToolbar<TData>({
+	table,
+	facetedFilters,
+	booleanFilters,
+	refetch,
+	isRefetching,
+}: DataTableToolbarProps<TData>) {
 	const isFiltered = table.getState().columnFilters.length > 0;
 
 	return (
@@ -85,18 +103,25 @@ export function DataTableToolbar<TData>({ table, facetedFilters, booleanFilters 
 			</div>
 
 			<div className='ml-auto flex items-center gap-1.5'>
-				<>
-					{booleanFilters?.map(({ accessoryKey, defaultValue, title }) => (
-						<BooleanFilter
-							key={`${accessoryKey as string}-${title}`}
-							accessoryKey={accessoryKey}
-							title={title ?? accessoryKey.toString()}
-							defaultValue={defaultValue}
-							setCondition={table.setCondition}
-							removeCondition={table.removeCondition}
-						/>
-					))}
-				</>
+				{booleanFilters?.map(({ accessoryKey, defaultValue, title }) => (
+					<BooleanFilter
+						key={`${accessoryKey as string}-${title}`}
+						accessoryKey={accessoryKey}
+						title={title ?? accessoryKey.toString()}
+						defaultValue={defaultValue}
+						setCondition={table.setCondition}
+						removeCondition={table.removeCondition}
+					/>
+				))}
+
+				<Button
+					size='icon'
+					variant='ghost'
+					onClick={async () => await refetch()}
+					disabled={isRefetching}
+				>
+					<RefreshCcw className={cn(isRefetching && 'animate-spin')} />
+				</Button>
 
 				<DataTableViewOptions table={table} />
 			</div>

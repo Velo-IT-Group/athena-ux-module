@@ -80,9 +80,10 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side, is
 			</PopoverTrigger>
 
 			<PopoverContent
-				className='min-w-80 p-0'
 				align={align}
 				side={side}
+				sideOffset={12}
+				className='min-w-80 p-0'
 			>
 				<Command>
 					<CommandInput placeholder='Filter calls...' />

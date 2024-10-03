@@ -33,7 +33,7 @@ const TaskWrapup = ({ timer }: Props) => {
 							size='icon'
 							className='p-0 w-9 h-9'
 						>
-							<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
+							<X className='inline-block text-gray-400 cursor-pointer' />
 						</Button>
 					</PopoverClose>
 				</CardDescription>

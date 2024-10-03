@@ -14,6 +14,8 @@ type Props = {
 const IncomingTask = ({ reservation, task }: Props) => {
 	const { attributes } = task;
 
+	const isVoicemail = attributes.taskType === 'voicemail';
+
 	return (
 		<Card
 			key={reservation.sid}
@@ -60,12 +62,16 @@ const IncomingTask = ({ reservation, task }: Props) => {
 					size={'sm'}
 					className='text-sm'
 					onClick={async () => {
-						await reservation.conference({
-							beep: false,
-							startConferenceOnEnter: true,
-							endConferenceOnExit: false,
-							endConferenceOnCustomerExit: true,
-						});
+						if (isVoicemail) {
+							reservation.accept();
+						} else {
+							await reservation.conference({
+								beep: false,
+								startConferenceOnEnter: true,
+								endConferenceOnExit: false,
+								endConferenceOnCustomerExit: true,
+							});
+						}
 					}}
 				>
 					Accept

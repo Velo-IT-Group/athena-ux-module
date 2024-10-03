@@ -4,7 +4,6 @@ import { useEffect, useState, Fragment } from 'react';
 import { useWorker } from '@/providers/worker-provider';
 import type { Reservation, Worker } from 'twilio-taskrouter';
 import { useDevice } from '@/providers/device-provider';
-import { SignalType } from '@gnaudio/jabra-js';
 import { Separator } from '../ui/separator';
 import useReservations from '@/hooks/useReservations';
 import TaskNotification from '../task-notification';
@@ -14,6 +13,8 @@ import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { Phone } from 'lucide-react';
 import OutboundDialer from '../outbound-dialer';
+import { useNotifications } from '@/providers/notification-provider';
+import useRinger from '@/hooks/useRinger';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -25,6 +26,8 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	const { currentCallControl } = useDevice();
 	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const { reservations, addReservation, removeReservation } = useReservations();
+	const { createNotification } = useNotifications();
+	const { togglePlayback } = useRinger();
 
 	const onReservationCreated = async (r: Reservation) => {
 		console.log(currentCallControl);
@@ -36,6 +39,10 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		} else {
 			try {
 				currentCallControl?.ring(true);
+				createNotification(`New Phone Call From ${r.task.attributes.name}`);
+				togglePlayback(true);
+				// audio.loop = true;
+				// audio.play();
 			} catch (error) {
 				console.log(error);
 				toast.error(JSON.stringify(error));
@@ -54,6 +61,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		r.on('accepted', async (reservation) => {
 			console.log('Call accepted');
 			try {
+				togglePlayback(false);
 				currentCallControl?.ring(false);
 			} catch (error) {
 				console.error(error);
@@ -63,6 +71,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('rejected', async (reservation) => {
 			try {
+				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
@@ -74,6 +83,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('canceled', async (reservation) => {
 			try {
+				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
@@ -85,6 +95,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('wrapup', async (reservation) => {
 			try {
+				togglePlayback(false);
 				console.log('Wrapping up');
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
@@ -96,6 +107,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('completed', async (reservation) => {
 			try {
+				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
@@ -107,6 +119,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		r.on('timeout', async (reservation) => {
 			try {
+				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				setActiveReservation(undefined);
@@ -120,8 +133,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 	const onWorkerReady = async (w: Worker) => {
 		console.log('Worker Ready', w.sid);
-		// setActivity(w.activity);
-		// 	// setActivityList(w.activities);
 		const reservations = Array.from(w.reservations.values());
 
 		reservations.forEach((reservation) => {
@@ -175,7 +186,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 								<Button
 									variant='ghost'
 									size={isCollapsed ? 'icon' : 'sm'}
-									className={cn(!isCollapsed && 'justify-start')}
+									className={cn('w-full', !isCollapsed && 'justify-start')}
 								>
 									<Phone className='fill-current stroke-none' />
 									<span className={cn('ml-1.5', isCollapsed && 'sr-only')}>Outbound Dialer</span>
@@ -185,6 +196,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 							<PopoverContent
 								align='start'
 								side='right'
+								sideOffset={12}
 							>
 								<OutboundDialer />
 							</PopoverContent>

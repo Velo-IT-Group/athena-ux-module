@@ -13,6 +13,7 @@ import { MessageSquareText, Phone, Voicemail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDevice } from '@/providers/device-provider';
 import { SignalType } from '@gnaudio/jabra-js';
+import VoicemailTask from './voicemail-task';
 
 type Props = {
 	reservation: Reservation;
@@ -26,6 +27,8 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
+
+	const isVoicemail = task.attributes.taskType === 'voicemail';
 
 	useEffect(() => {
 		if (!currentCallControl) return;
@@ -51,8 +54,8 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 			>
 				<Button
 					variant='secondary'
-					size='icon'
-					className='h-9 w-9 animate-pulse'
+					size={isCollapsed ? 'icon' : 'default'}
+					className={cn('animate-pulse', isCollapsed ? 'h-9 w-9' : 'w-full justify-start')}
 					key={reservation.task.sid}
 				>
 					{reservation.task.taskChannelUniqueName === 'default' && (
@@ -97,10 +100,13 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 						/>
 					)}
 
-					{reservation.status === 'accepted' &&
-						(task.taskChannelUniqueName === 'voice' || task.taskChannelUniqueName === 'default') && (
-							<ActiveCall task={task} />
-						)}
+					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && !isVoicemail && (
+						<ActiveCall task={task} />
+					)}
+
+					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && isVoicemail && (
+						<VoicemailTask task={task} />
+					)}
 
 					{reservation.status === 'wrapping' && (
 						<TaskWrapup

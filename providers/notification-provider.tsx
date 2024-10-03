@@ -1,28 +1,44 @@
 'use client';
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
-import { toast, useSonner } from 'sonner';
-const context = React.createContext({});
+
+interface TwilioProviderProps {
+	createNotification: (title: string, options?: NotificationOptions) => void;
+}
+
+const initialValues: TwilioProviderProps = {
+	createNotification: () => undefined,
+};
+
+type WithChildProps = {
+	children: React.ReactNode;
+};
+
+const context = React.createContext(initialValues);
 const { Provider } = context;
 
-export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-	const { toasts } = useSonner();
+export const NotificationProvider = ({ children }: WithChildProps) => {
+	const [isFocused, setIsFocused] = useState(false);
 
 	useEffect(() => {
-		if (!toasts.length) return;
+		window.addEventListener('focus', () => {
+			setIsFocused(true);
+		});
+		window.addEventListener('blur', () => {
+			setIsFocused(false);
+		});
+	}, []);
+
+	useEffect(() => {
 		if (!('Notification' in window)) {
 			// Check if the browser supports notifications
 			alert('This browser does not support desktop notification');
 		} else if (Notification.permission === 'granted') {
-			// Check whether notification permissions have already been granted;
-			// if so, create a notification
-			const notification = new Notification('Hi there!');
-			// …
 		} else if (Notification.permission !== 'denied') {
 			// We need to ask the user for permission
 			Notification.requestPermission().then((permission) => {
 				// If the user accepts, let's create a notification
 				if (permission === 'granted') {
-					const notification = new Notification('Hi there!');
+					// const notification = new Notification('Hi there!');
 					// …
 				}
 			});
@@ -37,16 +53,13 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		if (toasts.length) return;
-		window.addEventListener('blur', function () {});
+	const createNotification = (title: string, options?: NotificationOptions) => {
+		if (!isFocused) {
+			new Notification(title, options);
+		}
+	};
 
-		return () => {
-			window.removeEventListener('blur', function () {});
-		};
-	}, [toasts]);
-
-	return <Provider value={{}}>{children}</Provider>;
+	return <Provider value={{ createNotification }}>{children}</Provider>;
 };
 
 export const useNotifications = () => {

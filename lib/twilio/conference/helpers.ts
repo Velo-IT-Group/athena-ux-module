@@ -150,14 +150,12 @@ export const updateConferenceParticipants = async (
 		`Basic ${btoa(process.env.TWILIO_API_KEY_SID + ':' + process.env.TWILIO_API_KEY_SECRET)}`
 	);
 	headers.set('Content-Type', 'application/x-www-form-urlencoded');
-	const newParams = {...params, HoldUrl: 'https://notification-service-5201.twil.io/HoldMusic%20copy.mp3'}
-	console.log(conferenceSid, participant);
 	const response = await fetch(
 		`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Conferences/${conferenceSid}/Participants/${participant}.json`,
 		{
 			headers,
 			method: 'POST',
-			body: new URLSearchParams(newParams),
+			body: new URLSearchParams(params),
 		}
 	);
 

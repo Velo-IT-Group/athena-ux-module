@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 
 const useRinger = (doLoop: boolean = true) => {
-	const [hasClicked, setHasClicked] = useState(false);
 	const [audio, setAudio] = useState<HTMLAudioElement>();
 	const [playing, setPlaying] = useState(false);
 
@@ -17,26 +16,6 @@ const useRinger = (doLoop: boolean = true) => {
 	const togglePlayback = (play: boolean) => {
 		setPlaying(play);
 	};
-
-	useEffect(() => {
-		if (!window) return;
-
-		if (!hasClicked) {
-			window.addEventListener('click', () => {
-				setHasClicked(true);
-			});
-		} else {
-			window.addEventListener('click', () => {
-				setHasClicked(false);
-			});
-		}
-
-		return () => {
-			window.removeEventListener('click', () => {
-				setHasClicked(true);
-			});
-		};
-	}, [window, hasClicked]);
 
 	useEffect(() => {
 		if (!audio) return;

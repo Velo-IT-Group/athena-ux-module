@@ -80,9 +80,10 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side, is
 			</PopoverTrigger>
 
 			<PopoverContent
-				className='min-w-80 p-0'
 				align={align}
 				side={side}
+				sideOffset={12}
+				className='min-w-80 p-0'
 			>
 				<Command>
 					<CommandInput placeholder='Filter calls...' />
@@ -99,7 +100,10 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side, is
 									className='[&_[cmdk-group-heading]]:sticky [&_[cmdk-group-heading]]:top-0 relative'
 								>
 									{conversations?.map((conversation) => (
-										<HistoryListItem conversation={conversation as Conversation} />
+										<HistoryListItem
+											key={conversation.id}
+											conversation={conversation as Conversation}
+										/>
 									))}
 								</CommandGroup>
 							</div>

@@ -99,7 +99,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 					className='w-72'
 					align={align}
 					side={side}
-					forceMount
+					sideOffset={12}
 				>
 					<DropdownMenuGroup>
 						<DropdownMenuLabel>My Account</DropdownMenuLabel>

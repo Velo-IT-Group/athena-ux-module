@@ -71,7 +71,7 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 			<PopoverContent
 				side='right'
 				align='start'
-				sideOffset={6}
+				sideOffset={12}
 				className='p-0'
 			>
 				<Command>

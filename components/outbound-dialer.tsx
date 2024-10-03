@@ -9,10 +9,11 @@ import { Button } from './ui/button';
 import { BellRing, FlaskConical } from 'lucide-react';
 import { useDevice } from '@/providers/device-provider';
 import { lookupPhoneNumber } from '@/lib/twilio/phoneNumbers';
+import useRinger from '@/hooks/useRinger';
 
 type Props = {};
 
-const numbers = {
+export const numbers = {
 	'214': '+12142148356',
 	'281': '+12817208356',
 	'337': '+13377067517',
@@ -22,6 +23,7 @@ const OutboundDialer = (props: Props) => {
 	const [isRinging, setIsRinging] = useState(false);
 	const { worker } = useWorker();
 	const { currentCallControl, testDevice } = useDevice();
+	const { playing, togglePlayback } = useRinger();
 
 	return (
 		<div className='space-y-1.5'>
@@ -62,12 +64,10 @@ const OutboundDialer = (props: Props) => {
 					variant='outline'
 					size='icon'
 					className='shrink-0'
-					onClick={async () => {
+					onClick={() => {
 						try {
-							// await webHidPairing();
-							// currentCallControl?.takeCallLock();
 							console.log(currentCallControl);
-							currentCallControl?.ring(!isRinging);
+							togglePlayback(!playing);
 							setIsRinging((prev) => !prev);
 						} catch (error) {
 							console.error(error);
@@ -83,37 +83,11 @@ const OutboundDialer = (props: Props) => {
 					size='icon'
 					className='shrink-0'
 					onClick={() => {
-						// currentCallControl?.ring(!isRinging);
 						testDevice();
-						// setIsRinging((prev) => !prev);
 					}}
 				>
 					<FlaskConical />
 				</Button>
-
-				{/* <Button
-					variant='outline'
-					size='icon'
-					className='shrink-0'
-				>
-					<Mic />
-				</Button> */}
-
-				{/* <Progress
-					value={volumeLevel}
-					className='shrink grow-0'
-				/> */}
-
-				{/* <Button
-					variant='outline'
-					size='icon'
-					className='shrink-0'
-					onClick={() => {
-						device?.connect({ params: { To: '+19032962250' } });
-					}}
-				>
-					<Volume2 />
-				</Button> */}
 			</div>
 		</div>
 	);

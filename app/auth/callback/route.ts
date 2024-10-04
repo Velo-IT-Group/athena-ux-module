@@ -5,73 +5,82 @@ import { getWorkers } from '@/lib/twilio/read';
 import { createWorker } from '@/lib/twilio/create';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { updateWorker } from '@/lib/twilio/update';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+
+const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) => {
+	const email = user?.user_metadata.email
+	const [members, { data: contacts }] = await Promise.all([
+		getSystemMembers({ conditions: { officeEmail: `'${email}'` } }),
+		getContacts({ childConditions: { 'communicationItems/value': `'${email}'` } }),
+	]);
+	
+	const worker = await createWorker(email, {
+		contact_uri: `client:${email}`,
+		on_call: false,
+		...user?.user_metadata,
+		
+	})
+
+	await supabase.auth.updateUser({
+		data: {
+			...user?.user_metadata,
+			workerSid: worker?.sid,
+			referenceId: members?.[0]?.id ?? 310,
+			contactId: contacts?.[0]?.id ?? 32569,
+		},
+	});
+	
+	await supabase.from('profiles').update({ worker_sid: worker?.sid }).eq('id', user?.id ?? '')
+}
+
+const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, worker: WorkerInstance) => {
+	const email = user?.user_metadata.email
+	
+	await supabase.auth.updateUser({
+		data: {
+			...user?.user_metadata,
+			workerSid: worker.sid
+		}
+	})
+
+	await supabase.from('profiles').update({ worker_sid: worker.sid }).eq('id', user?.id ?? '')
+
+	const parsedAttributes = JSON.parse(worker.attributes)
+
+	await updateWorker(worker.sid, {
+		attributes: {
+			...parsedAttributes,
+			contact_uri: `client:${email}`
+		}
+	})
+}
 
 export async function GET(request: NextRequest) {
 	const { searchParams, origin } = request.nextUrl;
 
 	const code = searchParams.get('code');
-	const email = searchParams.get('email') as string;
 	// if "next" is in param, use it as the redirect URL
 	const next = searchParams.get('next') ?? '/';
 	
-
-	console.log(code, next, origin, searchParams);
-
 	if (code) {
 		const supabase = createClient();
 		const { error } = await supabase.auth.exchangeCodeForSession(code);
+
 		if (!error) {
 			const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
 			const isLocalEnv = process.env.NODE_ENV === 'development';
 			
-			const workers = await getWorkers({ friendlyName: email }) 
 			const { data: { user } } = await supabase.auth.getUser()
 
+			const email = user?.user_metadata.email;
+
+			const workers = await getWorkers({ friendlyName: email }) 
 			
 			if (!workers.length) {
-				const [members, { data: contacts }] = await Promise.all([
-					getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
-					getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
-				]);
-				
-				const worker = await createWorker(email, {
-					contact_uri: `client:${email}`,
-					on_call: false,
-					...user?.user_metadata,
-					
-				})
-
-				await supabase.auth.updateUser({
-					data: {
-						...user?.user_metadata,
-						workerSid: worker?.sid,
-						referenceId: members?.[0]?.id ?? 310,
-						contactId: contacts?.[0]?.id ?? 32569,
-					},
-				});
-				await supabase.from('profiles').update({ worker_sid: worker?.sid }).eq('id', user?.id ?? '')
-				// try {
-				// } catch (error) {
-				// 	console.log(error)
-				// }
+				await updateUnknownWorker(supabase, user)
 			} else {
-				await supabase.auth.updateUser({
-					data: {
-						...user?.user_metadata,
-						workerSid: workers[0].sid
-					}
-				})
-
-				await supabase.from('profiles').update({ worker_sid: workers[0]?.sid }).eq('id', user?.id ?? '')
-
-				const parsedAttributes = JSON.parse(workers[0].attributes)
-
-				await updateWorker(workers[0].sid, {
-					attributes: {
-						...parsedAttributes,
-						contact_uri: `client:${user?.email}`
-					}
-				})
+				await updateKnownWorker(supabase, user, workers[0])
 			}
 
 			if (isLocalEnv) {

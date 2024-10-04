@@ -1,5 +1,5 @@
 'use client';
-import { useContext, createContext, useEffect, useState } from 'react';
+import { useContext, createContext, useEffect, useState, useMemo } from 'react';
 import type { Call } from '@twilio/voice-sdk';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
@@ -28,16 +28,7 @@ export type CustomCall = {
 };
 
 export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
-	const [worker, setWorker] = useState<Worker>();
-
-	useEffect(() => {
-		if (!authToken) return;
-		setWorker(new Supervisor(authToken));
-
-		return () => {
-			worker?.disconnect();
-		};
-	}, [authToken]);
+	const worker = useMemo(() => new Supervisor(authToken), [authToken]);
 
 	return <Provider value={{ worker }}>{children}</Provider>;
 };

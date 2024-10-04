@@ -35,7 +35,11 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		addReservation(r);
 		setActiveReservation(r);
 		if (r.task.attributes.direction === 'outbound') {
-			await r.conference({ beep: false });
+			await r.conference({
+				beep: false,
+				conferenceStatusCallback: 'https://b940-170-55-184-242.ngrok-free.app/hello-world',
+				conferenceStatusCallbackEvent: 'start,end,join,leave,mute,hold,speaker',
+			});
 		} else {
 			try {
 				currentCallControl?.ring(true);

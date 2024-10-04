@@ -50,8 +50,8 @@ const Layout = async ({ children }: Props) => {
 			data: {
 				...user?.user_metadata,
 				workerSid: worker.sid,
-				referenceId: members?.[0]?.id ?? 310,
-				contactId: contacts?.[0]?.id ?? 32569,
+				referenceId: members?.[0]?.id,
+				contactId: contacts?.[0]?.id,
 			},
 		});
 	}

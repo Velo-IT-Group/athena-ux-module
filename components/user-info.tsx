@@ -46,7 +46,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
 	const { worker } = useWorker();
-	const [isAvailable, setIsAvailable] = useState(false);
+	const [isAvailable, setIsAvailable] = useState(worker?.available);
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const { token } = useTwilio();
 
@@ -57,7 +57,6 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 
 	useEffect(() => {
 		if (!worker?.attributes || Object.keys(worker.attributes).length === 0) return;
-		console.log(worker.attributes);
 		setAttributes(worker?.attributes);
 	}, [worker, worker?.attributes]);
 
@@ -69,7 +68,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 		worker.on('activityUpdated', (w) => {
 			setIsAvailable(w.available);
 		});
-	}, [worker]);
+	}, [worker?.activity]);
 
 	return (
 		<AlertDialog>

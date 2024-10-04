@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useDevice } from '@/providers/device-provider';
 import { SignalType } from '@gnaudio/jabra-js';
 import VoicemailTask from './voicemail-task';
+import useSyncMap from '@/hooks/useSyncMap';
 
 type Props = {
 	reservation: Reservation;
@@ -27,6 +28,7 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
+	// const { getSyncItem } = useSyncMap('active-conferences');
 
 	const isVoicemail = task.attributes.taskType === 'voicemail';
 
@@ -38,6 +40,8 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 					beep: false,
 					endConferenceOnExit: false,
 					endConferenceOnCustomerExit: true,
+					conferenceStatusCallback: 'https://b940-170-55-184-242.ngrok-free.app/hello-world',
+					conferenceStatusCallbackEvent: 'start,end,join,leave,mute,hold,speaker',
 				});
 			}
 		});

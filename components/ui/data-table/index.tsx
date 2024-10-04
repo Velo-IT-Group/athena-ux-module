@@ -57,6 +57,7 @@ export function DataTable<TData, TValue>({
 	queryFn,
 	defaultVisibleColumns = {},
 }: DataTableProps<TData, TValue>) {
+	'use no memo';
 	const { parameters, onParametersChange, pagination, onPaginationChange } = useFilterParameters(
 		meta.filterParams ?? {}
 	);
@@ -127,8 +128,8 @@ export function DataTable<TData, TValue>({
 				table={table}
 				facetedFilters={facetedFilters}
 				booleanFilters={booleanFilters}
-				refetch={refetch}
 				isRefetching={isRefetching}
+				refetch={refetch}
 			/>
 
 			<div className='rounded-md border'>

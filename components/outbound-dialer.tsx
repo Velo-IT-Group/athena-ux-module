@@ -46,7 +46,7 @@ const OutboundDialer = (props: Props) => {
 									direction: 'outbound',
 									name: numberReturn?.name,
 									companyId: numberReturn?.companyId,
-									contactId: numberReturn?.userId,
+									userId: numberReturn?.userId,
 								},
 								taskChannelUniqueName: 'voice',
 							}

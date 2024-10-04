@@ -220,6 +220,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 								closedFlag: false,
 								'company/id': companyId ? [companyId] : undefined,
 								'contact/id': contactId ? [contactId] : undefined,
+								parentTicketId: null,
 							},
 							fields: ['id', 'summary', 'board', 'status', 'priority', 'owner', 'contact', 'company'],
 							orderBy: { key: 'id', order: 'desc' },

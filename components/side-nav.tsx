@@ -129,7 +129,7 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 							>
 								<UserIcon />
 
-								<Skeleton className='h-5 w-full' />
+								{!isCollapsed && <Skeleton className='h-5 w-full' />}
 							</Button>
 						) : (
 							<UserInfo

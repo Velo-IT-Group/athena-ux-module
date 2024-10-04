@@ -55,7 +55,7 @@ const VoicemailTask = ({ task }: Props) => {
 									direction: 'outbound',
 									name: task.attributes.name,
 									companyId: task.attributes.companyId,
-									contactId: task.attributes.userId,
+									userId: task.attributes.userId,
 								},
 								taskChannelUniqueName: 'voice',
 							}

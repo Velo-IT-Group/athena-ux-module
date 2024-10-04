@@ -24,7 +24,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 	const { data, isLoading } = useQuery({
 		queryKey: ['participants', conferenceSid, participantSid],
 		queryFn: () => getConferenceParticipant(conferenceSid, participantSid),
-		refetchOnWindowFocus: true,
+		refetchOnWindowFocus: 'always',
 	});
 
 	const toggleParticipantMute = useMutation({

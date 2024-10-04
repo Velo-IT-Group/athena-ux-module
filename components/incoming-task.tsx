@@ -70,6 +70,8 @@ const IncomingTask = ({ reservation, task }: Props) => {
 								startConferenceOnEnter: true,
 								endConferenceOnExit: false,
 								endConferenceOnCustomerExit: true,
+								conferenceStatusCallback: 'https://b940-170-55-184-242.ngrok-free.app/hello-world',
+								conferenceStatusCallbackEvent: 'start,end,join,leave,mute,hold,speaker',
 							});
 						}
 					}}

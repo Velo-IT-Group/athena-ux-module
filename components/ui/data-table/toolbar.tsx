@@ -47,6 +47,7 @@ export function DataTableToolbar<TData>({
 	refetch,
 	isRefetching,
 }: DataTableToolbarProps<TData>) {
+	'use no memo';
 	const isFiltered = table.getState().columnFilters.length > 0;
 
 	return (

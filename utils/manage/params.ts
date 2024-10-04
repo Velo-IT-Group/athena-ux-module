@@ -41,7 +41,10 @@ const generateConditions = (condition: KeyValue) => {
 				generatedConditions.push(`${key} ${value.comparison} ${value.value}`)
 			} else if (value instanceof Date) {
 				generatedConditions.push(`${key} contains [${value}]`)
-			} 
+			} else if (value === null) {
+				generatedConditions.push(`${key} = ${value}`)
+
+			}
 		} else {
 			generatedConditions.push(`${key} = ${value}`)
 		}

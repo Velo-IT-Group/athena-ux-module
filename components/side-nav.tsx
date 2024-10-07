@@ -8,58 +8,19 @@ import { Separator } from './ui/separator';
 import Logo from '@/app/logo';
 import SidebarActivityList from './sidebar-activity-list';
 import HistorySelector from './history-selector';
-import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@/utils/supabase/client';
 import UserInfo from './user-info';
-import { Button } from './ui/button';
-import { History, UserIcon } from 'lucide-react';
-import { Skeleton } from './ui/skeleton';
+import { User } from '@supabase/supabase-js';
 
 type Props = {
 	isDefaultCollapsed: boolean;
 	defaultLayout?: number[];
+	user: User;
+	profile: Profile;
+	conversations: Conversation[];
 };
 
-const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) => {
-	const supabase = createClient();
+const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48], user, profile, conversations }: Props) => {
 	const [isCollapsed, setIsCollapsed] = useState(isDefaultCollapsed);
-
-	const { data: user, isLoading: isUserLoading } = useQuery({
-		queryKey: ['user'],
-		queryFn: async () => {
-			const { data, error } = await supabase.auth.getUser();
-			if (error) throw new Error(error.message);
-			return data.user;
-		},
-	});
-
-	const { data: profile, isLoading: isProfileLoading } = useQuery({
-		queryKey: ['profiles', user?.id],
-		queryFn: async () => {
-			const { data, error } = await supabase
-				.from('profiles')
-				.select()
-				.eq('id', user?.id ?? '')
-				.single();
-			if (error) throw new Error(error.message);
-			return data;
-		},
-	});
-
-	const { data: conversations, isLoading: isConversationsLoading } = useQuery({
-		queryKey: ['conversations', profile?.id],
-		queryFn: async () => {
-			const { data, error } = await supabase
-				.schema('reporting')
-				.from('conversations')
-				.select()
-				.eq('agent', profile?.worker_sid ?? '')
-				.order('date', { ascending: false })
-				.limit(25);
-			if (error) throw new Error(error.message);
-			return data;
-		},
-	});
 
 	return (
 		<ResizablePanel
@@ -100,44 +61,18 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 					</div>
 
 					<div className='mt-auto flex flex-col gap-1.5 mx-1.5'>
-						{isProfileLoading || isConversationsLoading ? (
-							<Button
-								variant='ghost'
-								role='combobox'
-								size={isCollapsed ? 'icon' : 'sm'}
-								className={cn(!isCollapsed && 'justify-start')}
-								disabled
-							>
-								<History />
-								<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>History</span>
-							</Button>
-						) : (
-							<HistorySelector
-								profile={profile!}
-								initalConversations={conversations!}
-								side='right'
-								isCollapsed={isCollapsed}
-							/>
-						)}
+						<HistorySelector
+							profile={profile!}
+							initalConversations={conversations!}
+							side='right'
+							isCollapsed={isCollapsed}
+						/>
 
-						{isUserLoading ? (
-							<Button
-								variant='ghost'
-								size='sm'
-								className='justify-start'
-								disabled
-							>
-								<UserIcon />
-
-								<Skeleton className='h-5 w-full' />
-							</Button>
-						) : (
-							<UserInfo
-								user={user!}
-								isCollapsed={isCollapsed}
-								side='right'
-							/>
-						)}
+						<UserInfo
+							user={user!}
+							isCollapsed={isCollapsed}
+							side='right'
+						/>
 					</div>
 				</div>
 			</ScrollArea>

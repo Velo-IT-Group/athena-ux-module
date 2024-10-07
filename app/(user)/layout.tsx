@@ -14,13 +14,16 @@ import ReactQueryProvider from '@/providers/react-query';
 import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
+import getQueryClient from '../getQueryClient';
 
 type Props = {
 	children: ReactNode;
 };
 
 const Layout = async ({ children }: Props) => {
+	const queryClient = getQueryClient();
 	const supabase = createClient();
+
 	const [
 		{
 			data: { user },
@@ -55,14 +58,38 @@ const Layout = async ({ children }: Props) => {
 		});
 	}
 
-	const twilioToken = await createAccessToken(
-		process.env.TWILIO_ACCOUNT_SID as string,
-		process.env.TWILIO_API_KEY_SID as string,
-		process.env.TWILIO_API_KEY_SECRET as string,
-		process.env.TWILIO_WORKSPACE_SID as string,
-		user?.user_metadata.workerSid ?? '',
-		user?.email
-	);
+	const { data: profile } = await queryClient.fetchQuery({
+		queryKey: ['profiles', user?.id],
+		queryFn: async () =>
+			supabase
+				.from('profiles')
+				.select()
+				.eq('id', user?.id ?? '')
+				.single(),
+	});
+	const { data: conversations } = await queryClient.fetchQuery({
+		queryKey: ['conversations', user?.id],
+		queryFn: async () =>
+			await supabase
+				.schema('reporting')
+				.from('conversations')
+				.select()
+				.eq('agent', user.user_metadata?.worker_sid ?? '')
+				.order('date', { ascending: false })
+				.limit(25),
+	});
+	const twilioToken = await queryClient.fetchQuery({
+		queryKey: ['accessToken'],
+		queryFn: async () =>
+			createAccessToken(
+				process.env.TWILIO_ACCOUNT_SID as string,
+				process.env.TWILIO_API_KEY_SID as string,
+				process.env.TWILIO_API_KEY_SECRET as string,
+				process.env.TWILIO_WORKSPACE_SID as string,
+				user?.user_metadata.workerSid ?? '',
+				user?.email ?? ''
+			),
+	});
 
 	return (
 		<ReactQueryProvider>
@@ -74,6 +101,9 @@ const Layout = async ({ children }: Props) => {
 					<SideNav
 						isDefaultCollapsed={defaultCollapsed ?? true}
 						defaultLayout={defaultLayout ?? [15, 32, 48]}
+						conversations={conversations!}
+						profile={profile!}
+						user={user}
 					/>
 
 					<ResizableHandle className='opacity-0' />

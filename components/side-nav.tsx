@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from './ui/scroll-area';
 import { ResizablePanel } from './ui/resizable';
@@ -11,9 +11,11 @@ import HistorySelector from './history-selector';
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/utils/supabase/client';
 import UserInfo from './user-info';
-import { Button } from './ui/button';
+import { Button, buttonVariants } from './ui/button';
 import { History, UserIcon } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
+import { linksConfig } from '@/config/links';
+import Link from 'next/link';
 
 type Props = {
 	isDefaultCollapsed: boolean;
@@ -61,6 +63,8 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 		},
 	});
 
+	const { sidebarNav } = linksConfig;
+
 	return (
 		<ResizablePanel
 			minSize={12}
@@ -91,6 +95,27 @@ const SideNav = ({ isDefaultCollapsed, defaultLayout = [15, 32, 48] }: Props) =>
 						</div>
 
 						<div className='space-y-1.5'>
+							{sidebarNav.map((section, index) => (
+								<section
+									key={`${index}-${section.title}`}
+									className='mx-1.5'
+								>
+									{section.items.map((item, index) => (
+										<Link
+											key={`${index}-${item.title}`}
+											href={item.href ?? '#'}
+											className={cn(
+												buttonVariants({ size: 'sm', variant: 'ghost' }),
+												'flex justify-start text-muted-foreground'
+											)}
+										>
+											{item.icon && <item.icon className='inline-block mr-1.5' />}
+											{item.title}
+										</Link>
+									))}
+								</section>
+							))}
+
 							<TaskList isCollapsed={isCollapsed} />
 
 							<Separator />

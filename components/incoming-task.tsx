@@ -73,15 +73,19 @@ const IncomingTask = ({ reservation, task }: Props) => {
 					size={'sm'}
 					className='text-sm'
 					onClick={async () => {
-						if (isVoicemail) {
-							reservation.accept();
-						} else {
-							await reservation.conference({
-								beep: false,
-								startConferenceOnEnter: true,
-								endConferenceOnExit: false,
-								endConferenceOnCustomerExit: true,
-							});
+						try {
+							if (isVoicemail) {
+								await reservation.accept();
+							} else {
+								await reservation.conference({
+									beep: false,
+									startConferenceOnEnter: true,
+									endConferenceOnExit: false,
+									endConferenceOnCustomerExit: true,
+								});
+							}
+						} catch (error: any) {
+							console.error(error);
 						}
 					}}
 				>

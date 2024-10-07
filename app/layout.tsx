@@ -25,7 +25,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<div className='bg-muted/50'>{children}</div>
+					<div className='bg-muted/25'>{children}</div>
 				</ThemeProvider>
 			</body>
 		</html>

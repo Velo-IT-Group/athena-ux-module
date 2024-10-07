@@ -24,43 +24,26 @@ type Props = {
 const TaskList = ({ isCollapsed, className }: Props) => {
 	const { worker } = useWorker();
 	const { currentCallControl } = useDevice();
-	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const { reservations, addReservation, removeReservation } = useReservations();
 	const { createNotification } = useNotifications();
 	const { togglePlayback } = useRinger();
 
 	const onReservationCreated = async (r: Reservation) => {
-		console.log(currentCallControl);
 		console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
+		const isVoicemail = r.task.attributes.taskType === 'voicemail';
 		addReservation(r);
-		setActiveReservation(r);
 		if (r.task.attributes.direction === 'outbound') {
 			await r.conference({
 				beep: false,
 				conferenceStatusCallback: 'https://b940-170-55-184-242.ngrok-free.app/hello-world',
 				conferenceStatusCallbackEvent: 'start,end,join,leave,mute,hold,speaker',
 			});
+		} else if (isVoicemail) {
+			createNotification(`New Voicemail From ${r.task.attributes.name}`);
 		} else {
-			try {
-				currentCallControl?.ring(true);
-				createNotification(`New Phone Call From ${r.task.attributes.name}`);
-				togglePlayback(true);
-				// audio.loop = true;
-				// audio.play();
-			} catch (error) {
-				console.log(error);
-				toast.error(JSON.stringify(error));
-			}
+			createNotification(`New Phone Call From ${r.task.attributes.name}`);
+			togglePlayback(true);
 		}
-
-		// if (
-		// 	r.task.attributes.direction !== 'outbound' &&
-		// 	currentCallControl &&
-		// 	r.task.taskChannelUniqueName === 'voice' &&
-		// 	r.status !== 'accepted'
-		// ) {
-
-		// }
 
 		r.on('accepted', async (reservation) => {
 			console.log('Call accepted');
@@ -78,7 +61,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
@@ -90,20 +72,18 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
 			}
 		});
 
-		r.on('wrapup', async (reservation) => {
+		r.on('wrapup', async () => {
 			try {
 				togglePlayback(false);
 				console.log('Wrapping up');
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -115,7 +95,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -126,7 +105,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 				currentCallControl?.offHook(false);
 			} catch (error) {
 				console.error('No call pending', error);
@@ -148,20 +126,17 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		if (!worker) return;
 		worker?.on('ready', onWorkerReady);
 
-		return () => {
-			worker?.off('ready', onWorkerReady);
-		};
-	}, [worker]);
-
-	useEffect(() => {
-		if (worker === undefined) return;
-
 		worker?.on('reservationCreated', onReservationCreated);
 
+		worker.on('error', (e) => {
+			console.error(e.message);
+		});
+
 		return () => {
+			worker?.off('ready', onWorkerReady);
 			worker?.off('reservationCreated', onReservationCreated);
 		};
-	}, [worker, currentCallControl]);
+	}, [worker]);
 
 	const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
 

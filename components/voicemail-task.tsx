@@ -16,17 +16,20 @@ const VoicemailTask = ({ task }: Props) => {
 
 	return (
 		<Card className='shadow-none border-none'>
-			<CardHeader className='flex-row items-center p-3 gap-3 border-b justify-between space-y-0'>
-				<CardTitle className='flex items-center gap-1.5'>
+			<CardHeader className='flex-row justify-between space-y-0 items-center p-3 gap-3 border-b'>
+				<CardTitle className='flex items-center'>
 					<Voicemail className='inline-block mr-1.5 text-yellow-400' />
 					<span className='text-sm font-normal text-nowrap'>New Voicemail</span>
 				</CardTitle>
 
 				<CardDescription className='flex items-center gap-1.5'>
-					{/* <span className='text-nowrap'>Voicemail</span> */}
-
-					<PopoverClose>
-						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
+					<PopoverClose asChild>
+						<Button
+							variant='ghost'
+							size='smIcon'
+						>
+							<X className='inline-block text-gray-400 cursor-pointer' />
+						</Button>
 					</PopoverClose>
 				</CardDescription>
 			</CardHeader>

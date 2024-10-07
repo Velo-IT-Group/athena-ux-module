@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import OutboundDialerContent from './outbound-dialer-content';
+import OutboundDialerContent, { outboundPhoneSchema } from './outbound-dialer-content';
 import { useWorker } from '@/providers/worker-provider';
 import { parsePhoneNumber } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { BellRing, FlaskConical } from 'lucide-react';
 import { useDevice } from '@/providers/device-provider';
 import { lookupPhoneNumber } from '@/lib/twilio/phoneNumbers';
 import useRinger from '@/hooks/useRinger';
+import { z } from 'zod';
 
 type Props = {};
 
@@ -25,36 +26,41 @@ const OutboundDialer = (props: Props) => {
 	const { currentCallControl, testDevice } = useDevice();
 	const { playing, togglePlayback } = useRinger();
 
+	async function onSubmit(values: z.infer<typeof outboundPhoneSchema>) {
+		// Do something with the form values.
+		// ✅ This will be type-safe and validated.
+		try {
+			const to = values.To;
+			const splitNumber: string[] = to.split(' ');
+			const areaCode = splitNumber?.[1];
+			const numberReturn = await lookupPhoneNumber(to);
+			console.log(to, splitNumber, areaCode, numberReturn);
+			await worker?.createTask(
+				parsePhoneNumber(to, 'US', 'E.164').formattedNumber ?? '',
+				// @ts-ignore
+				(numbers[areaCode] as string) ?? process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER,
+				process.env.NEXT_PUBLIC_TWILIO_WORKFLOW_SID!,
+				process.env.NEXT_PUBLIC_TWILIO_TASK_QUEUE_SID!,
+				{
+					attributes: {
+						direction: 'outbound',
+						name: numberReturn?.name,
+						companyId: numberReturn?.companyId,
+						userId: numberReturn?.userId,
+					},
+					taskChannelUniqueName: 'voice',
+				}
+			);
+		} catch (error) {
+			toast.error(JSON.stringify(error, null, 2));
+		}
+	}
+
 	return (
 		<div className='space-y-1.5'>
 			<OutboundDialerContent
 				numbers={[]}
-				onSubmit={async (data) => {
-					try {
-						const to = data.get('To') as string;
-						const splitNumber: string[] = to.split(' ');
-						const areaCode = splitNumber?.[1];
-						const numberReturn = await lookupPhoneNumber(to);
-						worker?.createTask(
-							parsePhoneNumber(to, 'US', 'E.164').formattedNumber ?? '',
-							// @ts-ignore
-							(numbers[areaCode] as string) ?? process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER,
-							process.env.NEXT_PUBLIC_TWILIO_WORKFLOW_SID!,
-							process.env.NEXT_PUBLIC_TWILIO_TASK_QUEUE_SID!,
-							{
-								attributes: {
-									direction: 'outbound',
-									name: numberReturn?.name,
-									companyId: numberReturn?.companyId,
-									userId: numberReturn?.userId,
-								},
-								taskChannelUniqueName: 'voice',
-							}
-						);
-					} catch (error) {
-						toast.error(JSON.stringify(error, null, 2));
-					}
-				}}
+				onSubmit={onSubmit}
 			/>
 
 			<Separator />

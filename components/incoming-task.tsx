@@ -16,8 +16,6 @@ const IncomingTask = ({ reservation, task }: Props) => {
 
 	const isVoicemail = attributes.taskType === 'voicemail';
 
-	console.log(isVoicemail);
-
 	return (
 		<Card className='shadow-none border-none'>
 			<CardHeader className='flex-row justify-between space-y-0 items-center p-3 gap-3 border-b'>

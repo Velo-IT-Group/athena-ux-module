@@ -289,7 +289,6 @@ export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
 	const generatedConditions = generateParams(conditions)
-	console.log(generatedConditions)
 	const [
 		ticketResponse,
 		// projectTicketResponse,

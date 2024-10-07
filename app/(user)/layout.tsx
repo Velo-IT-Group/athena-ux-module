@@ -84,7 +84,7 @@ const Layout = async ({ children }: Props) => {
 
 					<ResizablePanel className='my-3 mr-3 bg-background rounded-md border shadow'>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
-							<Navbar />
+							{/* <Navbar /> */}
 
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>

@@ -66,10 +66,8 @@ export function DataTable<TData, TValue>({
 
 	const { data, isLoading, isFetching, error, refetch, isRefetching } = useQuery({
 		queryKey: [parameters, pagination],
-		queryFn: ({ queryKey }) => {
-			console.log(queryKey, pagination);
-			return queryFn({ ...queryKey[0], page: pagination.pageIndex + 1, pageSize: pagination.pageSize });
-		},
+		queryFn: ({ queryKey }) =>
+			queryFn({ ...queryKey[0], page: pagination.pageIndex + 1, pageSize: pagination.pageSize }),
 		placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
 	});
 
@@ -79,7 +77,6 @@ export function DataTable<TData, TValue>({
 	}, [meta.filterParams]);
 
 	React.useEffect(() => {
-		console.log('refetching');
 		refetch();
 	}, [pagination]);
 

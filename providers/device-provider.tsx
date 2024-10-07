@@ -79,18 +79,8 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			device?.register();
 		}
 
-		device.on('registered', async (d) => {
-			console.log('Twilio.Device Ready to make and receive calls!');
-			// setDeviceRegistration(true);
-
-			// setActiveCall((prev) => {
-			// 	return { ...prev, call };
-			// });
-		});
-
 		device.on('error', (error) => {
 			console.error(error);
-			// setDeviceRegistration(false);
 		});
 
 		device.on('incoming', (call: Call) => {
@@ -99,17 +89,18 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 			call.accept();
 
 			call.on('accept', (c: Call) => {
-				setActiveCalls((prev) => [...prev.filter((res) => res.parameters.CallSid !== c.parameters.CallSid), c]);
-				setActiveCall(call);
+				setActiveCall(c);
 				currentCallControl?.offHook(true);
-				console.log(c);
 			});
 
-			call.on('disconnect', (c: Call) => {
-				setActiveCalls((prev) => [...prev.filter((call) => call.parameters.CallSid !== c.parameters.CallSid)]);
+			call.on('disconnect', () => {
 				setActiveCall(undefined);
 				currentCallControl?.offHook(false);
 			});
+		});
+
+		device.on('registered', async (d) => {
+			console.log('Twilio.Device Ready to make and receive calls!');
 		});
 
 		return () => {

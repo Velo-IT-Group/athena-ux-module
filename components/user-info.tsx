@@ -57,7 +57,6 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 
 	useEffect(() => {
 		if (!worker?.attributes || Object.keys(worker.attributes).length === 0) return;
-		console.log(worker.attributes);
 		setAttributes(worker?.attributes);
 	}, [worker, worker?.attributes]);
 

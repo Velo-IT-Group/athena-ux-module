@@ -24,16 +24,14 @@ type Props = {
 const TaskList = ({ isCollapsed, className }: Props) => {
 	const { worker } = useWorker();
 	const { currentCallControl } = useDevice();
-	const [activeReservation, setActiveReservation] = useState<Reservation>();
 	const { reservations, addReservation, removeReservation } = useReservations();
 	const { createNotification } = useNotifications();
 	const { togglePlayback } = useRinger();
 
 	const onReservationCreated = async (r: Reservation) => {
-		const isVoicemail = r.task.attributes.taskType === 'voicemail';
 		console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
+		const isVoicemail = r.task.attributes.taskType === 'voicemail';
 		addReservation(r);
-		setActiveReservation(r);
 		if (r.task.attributes.direction === 'outbound') {
 			await r.conference({ beep: false });
 		} else if (isVoicemail) {
@@ -59,7 +57,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
@@ -71,20 +68,18 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
 			}
 		});
 
-		r.on('wrapup', async (reservation) => {
+		r.on('wrapup', async () => {
 			try {
 				togglePlayback(false);
 				console.log('Wrapping up');
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -96,7 +91,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
 				currentCallControl?.offHook(false);
-				setActiveReservation(undefined);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -107,7 +101,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				togglePlayback(false);
 				removeReservation(reservation);
 				currentCallControl?.ring(false);
-				setActiveReservation(undefined);
 				currentCallControl?.offHook(false);
 			} catch (error) {
 				console.error('No call pending', error);
@@ -129,20 +122,17 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		if (!worker) return;
 		worker?.on('ready', onWorkerReady);
 
-		return () => {
-			worker?.off('ready', onWorkerReady);
-		};
-	}, [worker]);
-
-	useEffect(() => {
-		if (worker === undefined) return;
-
 		worker?.on('reservationCreated', onReservationCreated);
 
+		worker.on('error', (e) => {
+			console.error(e.message);
+		});
+
 		return () => {
+			worker?.off('ready', onWorkerReady);
 			worker?.off('reservationCreated', onReservationCreated);
 		};
-	}, [worker, currentCallControl]);
+	}, [worker]);
 
 	const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
 

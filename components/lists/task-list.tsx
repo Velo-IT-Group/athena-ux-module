@@ -30,33 +30,18 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	const { togglePlayback } = useRinger();
 
 	const onReservationCreated = async (r: Reservation) => {
-		console.log(currentCallControl);
+		const isVoicemail = r.task.attributes.taskType === 'voicemail';
 		console.log(`Reservation ${r.sid} has been created for ${worker?.sid}`);
 		addReservation(r);
 		setActiveReservation(r);
 		if (r.task.attributes.direction === 'outbound') {
 			await r.conference({ beep: false });
+		} else if (isVoicemail) {
+			createNotification(`New Voicemail From ${r.task.attributes.name}`);
 		} else {
-			try {
-				currentCallControl?.ring(true);
-				createNotification(`New Phone Call From ${r.task.attributes.name}`);
-				togglePlayback(true);
-				// audio.loop = true;
-				// audio.play();
-			} catch (error) {
-				console.log(error);
-				toast.error(JSON.stringify(error));
-			}
+			createNotification(`New Phone Call From ${r.task.attributes.name}`);
+			togglePlayback(true);
 		}
-
-		// if (
-		// 	r.task.attributes.direction !== 'outbound' &&
-		// 	currentCallControl &&
-		// 	r.task.taskChannelUniqueName === 'voice' &&
-		// 	r.status !== 'accepted'
-		// ) {
-
-		// }
 
 		r.on('accepted', async (reservation) => {
 			console.log('Call accepted');

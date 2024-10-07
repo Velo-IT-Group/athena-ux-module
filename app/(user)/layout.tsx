@@ -13,8 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactQueryProvider from '@/providers/react-query';
 import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
-import { SyncClient } from 'twilio-sync';
-import { getConferences } from '@/lib/twilio/conference/helpers';
+import { Analytics } from '@vercel/analytics/react';
 
 type Props = {
 	children: ReactNode;
@@ -65,9 +64,6 @@ const Layout = async ({ children }: Props) => {
 		user?.email
 	);
 
-	const conf = await getConferences();
-	console.log(conf);
-
 	return (
 		<ReactQueryProvider>
 			<UserLayout token={twilioToken}>
@@ -92,6 +88,7 @@ const Layout = async ({ children }: Props) => {
 				</ResizablePanelGroup>
 
 				<Toaster richColors />
+				<Analytics />
 			</UserLayout>
 		</ReactQueryProvider>
 	);

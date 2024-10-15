@@ -3,14 +3,16 @@ import { useContext, createContext, useEffect, useState } from 'react';
 import type { Call } from '@twilio/voice-sdk';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
-import { Worker, Supervisor, Workspace } from 'twilio-taskrouter';
+import { Worker, Supervisor, Activity } from 'twilio-taskrouter';
 
 interface WorkerProviderProps {
 	worker: Worker | undefined;
+	activity: Activity | undefined;
 }
 
 const initialValues: WorkerProviderProps = {
 	worker: undefined,
+	activity: undefined,
 };
 
 type WithChildProps = {
@@ -29,17 +31,29 @@ export type CustomCall = {
 
 export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 	const [worker, setWorker] = useState<Worker>();
+	const [activity, setActivity] = useState<Activity>();
 
 	useEffect(() => {
 		if (!authToken) return;
-		setWorker(new Supervisor(authToken));
+		const worker = new Supervisor(authToken);
+		setWorker(worker);
 
 		return () => {
 			worker?.disconnect();
 		};
 	}, [authToken]);
 
-	return <Provider value={{ worker }}>{children}</Provider>;
+	useEffect(() => {
+		if (!worker || !worker.activity) return;
+		console.log(worker.activity);
+		setActivity(worker.activity);
+
+		worker.on('activityUpdated', (w) => {
+			setActivity(w.activity);
+		});
+	}, [worker, worker?.activity]);
+
+	return <Provider value={{ worker, activity }}>{children}</Provider>;
 };
 
 export const useWorker = () => {

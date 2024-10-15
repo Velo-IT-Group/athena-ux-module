@@ -34,6 +34,7 @@ import { useMutation } from '@tanstack/react-query';
 import { changeOnCallEngineer } from '../utils/twilio/workers';
 import { useTwilio } from '../providers/twilio-provider';
 import { updateOnCallEngineer } from '@/lib/twilio/update';
+import { activityColors } from './activity-item';
 
 type Props = {
 	user: User | null;
@@ -45,8 +46,7 @@ type Props = {
 const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
-	const { worker } = useWorker();
-	const [isAvailable, setIsAvailable] = useState(false);
+	const { worker, activity } = useWorker();
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const { token } = useTwilio();
 
@@ -59,16 +59,6 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 		if (!worker?.attributes || Object.keys(worker.attributes).length === 0) return;
 		setAttributes(worker?.attributes);
 	}, [worker, worker?.attributes]);
-
-	useEffect(() => {
-		if (!worker) return;
-
-		setIsAvailable(worker.available);
-
-		worker.on('activityUpdated', (w) => {
-			setIsAvailable(w.available);
-		});
-	}, [worker]);
 
 	return (
 		<AlertDialog>
@@ -85,7 +75,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 							<div
 								className={cn(
 									'w-2 h-2 rounded-full absolute border border-white -right-0.5 -bottom-0.5',
-									isAvailable ? 'bg-green-500' : 'bg-red-500'
+									activity && activityColors[activity?.name]
 								)}
 							/>
 						</div>

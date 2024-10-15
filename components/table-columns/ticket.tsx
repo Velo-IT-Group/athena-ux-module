@@ -53,10 +53,10 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 					<Circle
 						className={cn(
 							'stroke-none',
-							row?.original?.priority?.id === 6 && 'fill-red-500',
+							row?.original?.priority?.id === 6 && 'fill-[#DC3221]',
 							// row?.original?.priority?.id === 8 && 'fill-yellow-500',
-							row?.original?.priority?.id === 7 && 'fill-green-500',
-							row?.original?.priority?.id === 8 && 'fill-blue-500'
+							row?.original?.priority?.id === 7 && 'fill-[#029E73]',
+							row?.original?.priority?.id === 8 && 'fill-[#56B4E9]'
 						)}
 					/>
 					<span className='max-w-[40ch] truncate font-medium'>{row.getValue('summary')}</span>

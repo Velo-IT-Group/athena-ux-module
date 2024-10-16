@@ -22,7 +22,7 @@ type Props = {
 
 const Layout = async ({ children }: Props) => {
 	const queryClient = getQueryClient();
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const [
 		{
@@ -34,7 +34,7 @@ const Layout = async ({ children }: Props) => {
 		redirect('/login');
 	}
 
-	const cookieStore = cookies();
+	const cookieStore = await cookies();
 	const layout = cookieStore.get('react-resizable-panels:layout');
 	const collapsed = cookieStore.get('react-resizable-panels:collapsed');
 

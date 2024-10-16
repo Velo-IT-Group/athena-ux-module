@@ -9,7 +9,8 @@ export const createClient = async () =>
 	});
 
 export const createSyncClient = async () => {
-	const token = cookies().get('twilio_token')?.value;
+	const cookieStore = await cookies()
+	const token = cookieStore.get('twilio_token')?.value;
 	console.log('TOKEN', token);
 	if (!token) throw new Error('No token found');
 

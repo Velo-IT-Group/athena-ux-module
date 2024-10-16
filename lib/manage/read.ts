@@ -1,4 +1,3 @@
-'use server';
 import { type Conditions, generateParams, baseHeaders } from '@/utils/manage/params';
 import type {
 	AuditTrailEntry,
@@ -35,9 +34,7 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 	return await response.json();
 };
 
-export const getCompanies = async (
-	conditions?: Conditions<Company>
-): Promise<{ data: Company[]; count: number }> => {
+export const getCompanies = async (conditions?: Conditions<Company>): Promise<{ data: Company[]; count: number }> => {
 	const [response, countResponse] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/company/companies${generateParams(conditions)}`, {
 			headers: baseHeaders,
@@ -51,7 +48,7 @@ export const getCompanies = async (
 
 	if (!response.ok || !countResponse.ok) {
 		console.error(response.statusText ?? countResponse.statusText);
-		throw new Error(countResponse.statusText || response.statusText)
+		throw new Error(countResponse.statusText || response.statusText);
 	}
 
 	return {
@@ -83,8 +80,11 @@ export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>)
 	return await response.json();
 };
 
-export const getContact = async (id?: number | null, conditions?: Conditions<Contact>): Promise<Contact | undefined> => {
-	if(!id) return;
+export const getContact = async (
+	id?: number | null,
+	conditions?: Conditions<Contact>
+): Promise<Contact | undefined> => {
+	if (!id) return;
 	try {
 		const response = await fetch(
 			`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/${generateParams(conditions)}`,
@@ -135,16 +135,16 @@ export const getContactCommunications = async (
 	}
 };
 
-export const getContacts = async (conditions?: Conditions<Contact>): Promise<{data: Contact[], count: number}> => {	
-	const generatedConditions = generateParams(conditions)
+export const getContacts = async (conditions?: Conditions<Contact>): Promise<{ data: Contact[]; count: number }> => {
+	const generatedConditions = generateParams(conditions);
 	const [response, countResponse] = await Promise.all([
 		await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${generatedConditions}`, {
 			headers: baseHeaders,
-	}),
+		}),
 		await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/count${generatedConditions}`, {
 			headers: baseHeaders,
-	})
-	])
+		}),
+	]);
 
 	if (!response.ok || !countResponse.ok) {
 		console.error(response.statusText, await response.json());
@@ -153,7 +153,7 @@ export const getContacts = async (conditions?: Conditions<Contact>): Promise<{da
 
 	return {
 		data: await response.json(),
-		count: (await countResponse.json()).count
+		count: (await countResponse.json()).count,
 	};
 };
 
@@ -170,7 +170,9 @@ export const getConfiguration = async (id: number, conditions?: Conditions<Confi
 	return await response.json();
 };
 
-export const getConfigurationTypes = async (conditions?: Conditions<ConfigurationType>): Promise<ConfigurationType[]> => {
+export const getConfigurationTypes = async (
+	conditions?: Conditions<ConfigurationType>
+): Promise<ConfigurationType[]> => {
 	const response = await fetch(
 		`${process.env.CONNECT_WISE_URL}/company/configurations/types${generateParams(conditions)}`,
 		{
@@ -253,22 +255,21 @@ export const getAllConfigurations = async (
 export const getConfigurations = async (
 	conditions?: Conditions<Configuration>
 ): Promise<{ data: Configuration[]; count: number }> => {
-
 	const [response, countResponse] = await Promise.all([
-			fetch(`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams(conditions)}`, {
-				headers: baseHeaders,
-			}),
-			fetch(`${process.env.CONNECT_WISE_URL}/company/configurations/count${generateParams(conditions)}`, {
-				headers: baseHeaders,
-			}),
-		]);
+		fetch(`${process.env.CONNECT_WISE_URL}/company/configurations${generateParams(conditions)}`, {
+			headers: baseHeaders,
+		}),
+		fetch(`${process.env.CONNECT_WISE_URL}/company/configurations/count${generateParams(conditions)}`, {
+			headers: baseHeaders,
+		}),
+	]);
 
-		if (response.status !== 200 || countResponse.status !== 200) throw Error('Could not fetch configurations...');
+	if (response.status !== 200 || countResponse.status !== 200) throw Error('Could not fetch configurations...');
 
-		return {
-			data: await response.json(),
-			count: (await countResponse.json()).count,
-		};
+	return {
+		data: await response.json(),
+		count: (await countResponse.json()).count,
+	};
 };
 
 export const getTasks = async (
@@ -288,11 +289,11 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
-	const generatedConditions = generateParams(conditions)
+	const generatedConditions = generateParams(conditions);
 	const [
 		ticketResponse,
 		// projectTicketResponse,
-		countResponse
+		countResponse,
 	] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/service/tickets${generatedConditions}`, {
 			headers: baseHeaders,
@@ -313,17 +314,16 @@ export const getTickets = async (
 		}),
 	]);
 	// console.log(ticketResponse)
-	// const serviceTickets = await ticketResponse.json() 
+	// const serviceTickets = await ticketResponse.json()
 	// console.log(serviceTickets)
 	// const projectTickets = await projectTicketResponse.json()
 
 	// const data  = [...serviceTickets, ...projectTickets].sort((a,b) => b.id - a.id)
 
 	// console.log(serviceTickets)
-	
 
 	return {
-		data: await ticketResponse.json(), 
+		data: await ticketResponse.json(),
 		count: (await countResponse.json()).count,
 	};
 };
@@ -441,20 +441,16 @@ export const getStatuses = async (id: number, conditions?: Conditions<BoardStatu
 	return await response.json();
 };
 
-export const getConfigurationStatuses = async (conditions?: Conditions<ConfigurationStatus>): Promise<{ data: ConfigurationStatus[], count: number}> => {
+export const getConfigurationStatuses = async (
+	conditions?: Conditions<ConfigurationStatus>
+): Promise<{ data: ConfigurationStatus[]; count: number }> => {
 	const [response, countResponse] = await Promise.all([
-		fetch(
-		`${process.env.CONNECT_WISE_URL}/company/configurations/statuses/${generateParams(conditions)}`,
-		{
+		fetch(`${process.env.CONNECT_WISE_URL}/company/configurations/statuses/${generateParams(conditions)}`, {
 			headers: baseHeaders,
-		}
-		),
-		fetch(
-		`${process.env.CONNECT_WISE_URL}/company/configurations/statuses/count${generateParams(conditions)}`,
-		{
+		}),
+		fetch(`${process.env.CONNECT_WISE_URL}/company/configurations/statuses/count${generateParams(conditions)}`, {
 			headers: baseHeaders,
-		}
-		),
+		}),
 	]);
 
 	if (!response.ok || !countResponse.ok) {
@@ -464,8 +460,8 @@ export const getConfigurationStatuses = async (conditions?: Conditions<Configura
 
 	return {
 		data: await response.json(),
-		count: (await countResponse.json()).count
-	}
+		count: (await countResponse.json()).count,
+	};
 };
 
 export const getBoardTypes = async (id: number, conditions?: Conditions<BoardType>): Promise<BoardType[]> => {
@@ -524,12 +520,9 @@ export const getBoards = async (conditions?: Conditions<Board>): Promise<Board[]
 	return await response.json();
 };
 
-export const getProjects = async (conditions?: Conditions<Project>): Promise<{ data: Project[], count: number}> => {
-	const headers = new Headers(baseHeaders)
-	headers.set(
-	'Authorization',
-	'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD')
-)
+export const getProjects = async (conditions?: Conditions<Project>): Promise<{ data: Project[]; count: number }> => {
+	const headers = new Headers(baseHeaders);
+	headers.set('Authorization', 'Basic ' + btoa('velo+X32LB4Xx5GW5MFNz:XcwrfwGpCODhSpvD'));
 	const [response, countResponse] = await Promise.all([
 		fetch(`${process.env.CONNECT_WISE_URL}/project/projects${generateParams(conditions)}`, {
 			headers,
@@ -545,8 +538,8 @@ export const getProjects = async (conditions?: Conditions<Project>): Promise<{ d
 
 	return {
 		data: await response.json(),
-		count: (await countResponse.json()).count
-	}
+		count: (await countResponse.json()).count,
+	};
 };
 
 export const getAuditTrail = async (

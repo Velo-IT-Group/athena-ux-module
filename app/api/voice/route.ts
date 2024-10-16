@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
 
 export async function POST(request: Request) {
-	const supabase = createClient();
+	const supabase = await createClient();
 	const twiml = new VoiceResponse();
 	const [
 		{

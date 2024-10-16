@@ -5,8 +5,8 @@ import { Conditions } from '@/utils/manage/params';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-export const updateFilterCookie = <T,>(defintion: TableDefinition, params: Conditions<T>) => {
-	const cookieStore = cookies();
+export const updateFilterCookie = async <T,>(defintion: TableDefinition, params: Conditions<T>) => {
+	const cookieStore = await cookies();
 
 	const { page, section } = defintion;
 

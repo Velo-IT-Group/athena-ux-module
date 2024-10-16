@@ -1,7 +1,7 @@
 'use server';
 import { cookies } from 'next/headers';
 
-export const onLayoutChange = (sizes: number[]) => {
-	const cookieStore = cookies();
+export const onLayoutChange = async (sizes: number[]) => {
+	const cookieStore = await cookies();
 	cookieStore.set('react-resizable-panels:layout', JSON.stringify(sizes));
 };

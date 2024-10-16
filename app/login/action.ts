@@ -15,7 +15,7 @@ const getURL = () => {
 };
 
 export const signInWithAzure = async (formData: FormData) => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: 'azure',
@@ -31,7 +31,7 @@ export const signInWithAzure = async (formData: FormData) => {
 };
 
 export const signInWithPassword = async (data: FormData) => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const email = data.get('email') as string;
 	const password = data.get('password') as string;

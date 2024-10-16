@@ -30,7 +30,7 @@ type Props = {
 };
 
 const ConversationDetails = async ({ contactId, companyId, className }: Props) => {
-	const supabase = createClient();
+	const supabase = await createClient();
 	const [
 		boards,
 		priorities,

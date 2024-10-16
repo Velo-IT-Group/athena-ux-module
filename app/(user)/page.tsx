@@ -7,7 +7,7 @@ export default async function Page({
 }: {
 	searchParams: { [key: string]: string | string[] | undefined };
 }) {
-	const supabase = createClient();
+	const supabase = await createClient();
 	const companyId = searchParams.companyId ? parseInt(searchParams.companyId as string) : undefined;
 	const contactId = searchParams.contactId ? parseInt(searchParams.contactId as string) : undefined;
 	const {

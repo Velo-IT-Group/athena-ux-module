@@ -94,7 +94,7 @@ export const getWorkflows = async () => {
 
 export const updateWorkerReservation = async (id: string, update: ReservationContextUpdateOptions) => {
 	const client = await createTwilioClient();
-	const supabase = createClient();
+	const supabase = await createClient();
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();

@@ -11,6 +11,7 @@ import { parsePhoneNumber } from '@/lib/utils';
 import OutboundDialerContent from '../outbound-dialer-content';
 import { useTaskContext } from './context';
 import { toast } from 'sonner';
+import { Dialpad } from '../dialpad';
 
 const ActiveCallFooter = () => {
 	const {
@@ -22,7 +23,7 @@ const ActiveCallFooter = () => {
 		removeParticipantByName,
 		wrapUpTask,
 	} = useTaskContext();
-	const { muted, setMuted } = useDevice();
+	const { muted, setMuted, activeCall } = useDevice();
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
@@ -114,15 +115,7 @@ const ActiveCallFooter = () => {
 						side='bottom'
 						align='start'
 					>
-						<OutboundDialerContent
-							numbers={[]}
-							onSubmit={(data) => {
-								addExternalParticipant?.mutate({
-									From: task?.attributes.to ?? task?.attributes.from,
-									To: parsePhoneNumber(data.get('To') as string, 'US', 'E.164').formattedNumber ?? '',
-								});
-							}}
-						/>
+						<Dialpad onValueChange={(value) => activeCall?.sendDigits(value)} />
 					</PopoverContent>
 				</Popover>
 

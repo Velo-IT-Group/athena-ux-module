@@ -1,5 +1,5 @@
 'use client';
-import { Rocket, X } from 'lucide-react';
+import { Rocket, User, Voicemail, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,21 +14,30 @@ type Props = {
 const IncomingTask = ({ reservation, task }: Props) => {
 	const { attributes } = task;
 
+	const isVoicemail = attributes.taskType === 'voicemail';
+
 	return (
-		<Card
-			key={reservation.sid}
-			className='shadow-none border-none'
-		>
-			<CardHeader className='flex-row items-center p-3 gap-12 border-b'>
-				<CardTitle>
-					<Rocket className='h-3.5 w-3.5 inline-block mr-1.5 text-yellow-400' />
+		<Card className='shadow-none border-none'>
+			<CardHeader className='flex-row justify-between space-y-0 items-center p-3 gap-3 border-b'>
+				<CardTitle className='flex items-center'>
+					{isVoicemail ? (
+						<Voicemail className='mr-1.5 inline-block text-yellow-400' />
+					) : (
+						<Rocket className='h-3.5 w-3.5 inline-block mr-1.5 text-yellow-400' />
+					)}
 					<span className='text-sm font-normal'>{task.queueName}</span>
 				</CardTitle>
 
-				<CardDescription>
-					Incoming call
-					<PopoverClose>
-						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
+				<CardDescription className='flex items-center gap-1.5'>
+					<span className='text-nowrap text-xs'>{isVoicemail ? 'Incoming Voicemail' : 'Incoming call'}</span>
+
+					<PopoverClose asChild>
+						<Button
+							variant='ghost'
+							size='smIcon'
+						>
+							<X className='inline-block text-gray-400 cursor-pointer' />
+						</Button>
 					</PopoverClose>
 				</CardDescription>
 			</CardHeader>
@@ -36,11 +45,15 @@ const IncomingTask = ({ reservation, task }: Props) => {
 			<CardContent className='flex flex-col items-center p-3 space-y-3'>
 				<Avatar>
 					<AvatarImage src='/placeholder-usereservation.jpg' />
-					<AvatarFallback>AC</AvatarFallback>
+					<AvatarFallback className='text-muted-foreground'>
+						<User className='w-5 h-5' />
+					</AvatarFallback>
 				</Avatar>
+
 				<div className='text-center'>
 					<p className='font-medium text-sm'>{attributes.name}</p>
-					<p className='text-gray-400 text-xs'>is calling {task.queueName}</p>
+
+					<p className='text-gray-400 text-xs'> {isVoicemail ? 'left voicemail' : `is calling ${task.queueName}`}</p>
 				</div>
 			</CardContent>
 
@@ -60,12 +73,20 @@ const IncomingTask = ({ reservation, task }: Props) => {
 					size={'sm'}
 					className='text-sm'
 					onClick={async () => {
-						await reservation.conference({
-							beep: false,
-							startConferenceOnEnter: true,
-							endConferenceOnExit: false,
-							endConferenceOnCustomerExit: true,
-						});
+						try {
+							if (isVoicemail) {
+								await reservation.accept();
+							} else {
+								await reservation.conference({
+									beep: false,
+									startConferenceOnEnter: true,
+									endConferenceOnExit: false,
+									endConferenceOnCustomerExit: true,
+								});
+							}
+						} catch (error: any) {
+							console.error(error);
+						}
 					}}
 				>
 					Accept

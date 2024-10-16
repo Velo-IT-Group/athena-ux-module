@@ -24,6 +24,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 	const { data, isLoading } = useQuery({
 		queryKey: ['participants', conferenceSid, participantSid],
 		queryFn: () => getConferenceParticipant(conferenceSid, participantSid),
+		refetchOnWindowFocus: true,
 	});
 
 	const toggleParticipantMute = useMutation({
@@ -41,7 +42,7 @@ const useConferenceParticipant = ({ conferenceSid, participantSid }: Props) => {
 	});
 
 	const removeParticipant = useMutation({
-		mutationKey: ['toggleParticipantMute', conferenceSid, participantSid],
+		mutationKey: ['removeParticipant', conferenceSid, participantSid],
 		mutationFn: () => removeConferenceParticipant(conferenceSid, participantSid),
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ['participants', conferenceSid, participantSid] });

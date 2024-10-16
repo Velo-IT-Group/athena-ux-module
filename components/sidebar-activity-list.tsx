@@ -28,15 +28,8 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	const { data } = useQuery({
 		queryKey: ['conversations'],
-		queryFn: async () => {
-			console.log('running');
-			return await supabase
-				.schema('reporting')
-				.from('conversations')
-				.select()
-				.is('talk_time', null)
-				.is('abandoned', null);
-		},
+		queryFn: async () =>
+			await supabase.schema('reporting').from('conversations').select().is('talk_time', null).is('abandoned', null),
 	});
 
 	useEffect(() => {

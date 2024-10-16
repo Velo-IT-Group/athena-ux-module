@@ -57,8 +57,6 @@ export async function GET(request: NextRequest) {
 		}),
 	]);
 
-	console.log(contacts, companies)
-
 	// No contacts found but found company
 	if (!contacts.length && companies.length) {
 		if (companies.length > 2) {

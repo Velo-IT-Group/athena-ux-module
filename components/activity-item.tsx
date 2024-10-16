@@ -36,9 +36,12 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 						<TooltipTrigger asChild>
 							<PopoverTrigger asChild>
 								<Button
-									variant='ghost'
+									variant={currentActivity?.sid === activity.sid ? 'secondary' : 'ghost'}
 									size={isCollapsed ? 'icon' : 'sm'}
-									className={isCollapsed ? 'h-9 w-9' : 'justify-start'}
+									className={cn(
+										isCollapsed ? 'h-9 w-9' : 'justify-start',
+										currentActivity?.sid === activity.sid && 'bg-secondary'
+									)}
 								>
 									<Circle
 										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
@@ -71,7 +74,7 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 			<PopoverContent
 				side='right'
 				align='start'
-				sideOffset={6}
+				sideOffset={12}
 				className='p-0'
 			>
 				<Command>

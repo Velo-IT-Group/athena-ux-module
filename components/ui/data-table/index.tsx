@@ -64,12 +64,10 @@ export function DataTable<TData, TValue>({
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 
-	const { data, isLoading, isFetching, error, refetch } = useQuery({
+	const { data, isLoading, isFetching, error, refetch, isRefetching } = useQuery({
 		queryKey: [parameters, pagination],
-		queryFn: ({ queryKey }) => {
-			console.log(queryKey, pagination);
-			return queryFn({ ...queryKey[0], page: pagination.pageIndex + 1, pageSize: pagination.pageSize });
-		},
+		queryFn: ({ queryKey }) =>
+			queryFn({ ...queryKey[0], page: pagination.pageIndex + 1, pageSize: pagination.pageSize }),
 		placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
 	});
 
@@ -79,16 +77,7 @@ export function DataTable<TData, TValue>({
 	}, [meta.filterParams]);
 
 	React.useEffect(() => {
-		console.log('refetching');
 		refetch();
-		// if()
-		// const filters: Conditions<TData> = {
-		// 	...parameters,
-		// 	pageSize: pagination.pageSize,
-		// 	page: pagination.pageIndex,
-		// };
-		// // console.log(filters);
-		// onParametersChange(filters);
 	}, [pagination]);
 
 	if (error) {
@@ -135,6 +124,8 @@ export function DataTable<TData, TValue>({
 				table={table}
 				facetedFilters={facetedFilters}
 				booleanFilters={booleanFilters}
+				refetch={refetch}
+				isRefetching={isRefetching}
 			/>
 
 			<div className='rounded-md border'>

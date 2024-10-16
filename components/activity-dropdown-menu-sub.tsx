@@ -5,22 +5,11 @@ import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useWorker } from '@/providers/worker-provider';
-import { useEffect, useState } from 'react';
-import { Activity } from 'twilio-taskrouter';
 
 type Props = {};
 
 const ActivityDropdownMenuSub = ({}: Props) => {
-	const { worker } = useWorker();
-	const [currentActivity, setCurrentActivity] = useState<Activity | undefined>(undefined);
-
-	useEffect(() => {
-		setCurrentActivity(worker?.activity);
-
-		return () => {
-			setCurrentActivity(undefined);
-		};
-	}, [worker?.activity]);
+	const { worker, activity } = useWorker();
 
 	return (
 		<DropdownMenuSub>
@@ -36,9 +25,7 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 										onSelect={async (currentValue) => {
 											try {
 												const act = worker?.activities.get(currentValue);
-												const activity = await act?.setAsCurrent();
-												if (!activity) throw Error('No activity provided...');
-												setCurrentActivity(activity);
+												await act?.setAsCurrent();
 											} catch (error: any) {
 												console.error(error);
 												toast.error('Failed to set activity', { description: error.message });
@@ -47,10 +34,7 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 										}}
 									>
 										<Check
-											className={cn(
-												'mr-2 h-3.5 w-3.5',
-												activity?.sid === currentActivity?.sid ? 'opacity-100' : 'opacity-0'
-											)}
+											className={cn('mr-2 h-3.5 w-3.5', activity?.sid === activity?.sid ? 'opacity-100' : 'opacity-0')}
 										/>
 
 										{activity.name}
@@ -63,8 +47,8 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 			</DropdownMenuSubContent>
 
 			<DropdownMenuSubTrigger>
-				<Circle className={cn('stroke-none  mr-1.5', currentActivity?.available ? 'fill-green-500' : 'fill-red-500')} />
-				<span>{currentActivity?.name}</span>
+				<Circle className={cn('stroke-none  mr-1.5', activity?.available ? 'fill-green-500' : 'fill-red-500')} />
+				<span>{activity?.name}</span>
 			</DropdownMenuSubTrigger>
 		</DropdownMenuSub>
 	);

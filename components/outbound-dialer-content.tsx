@@ -1,31 +1,34 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PhoneInput } from './phone-input';
 import { Form, FormField } from './ui/form';
 import { useForm } from 'react-hook-form';
-import { CreateParticipantParams, createPartipantParamsSchema } from '@/types/twilio';
+import { CreateParticipantParams } from '@/types/twilio';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useWorker } from '@/providers/worker-provider';
 
 type Props = {
 	showNumbers?: boolean;
 	numbers: { phoneNumber: string; friendlyName: string }[];
-	onSubmit?: (data: FormData) => void;
+	onSubmit(values: z.infer<typeof outboundPhoneSchema>): Promise<void>;
 };
 
-const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props) => {
+export const outboundPhoneSchema = z.object({
+	To: z.string(),
+});
+
+const OutboundDialerContent = ({ onSubmit }: Props) => {
+	const { activity } = useWorker();
 	const form = useForm<CreateParticipantParams>({
-		resolver: zodResolver(createPartipantParamsSchema),
+		resolver: zodResolver(outboundPhoneSchema),
 	});
 
 	return (
 		<Form {...form}>
 			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					const data = new FormData(e.currentTarget);
-					onSubmit?.(data);
-				}}
+				onSubmit={form.handleSubmit(onSubmit)}
 				className='space-y-3'
 			>
 				<FormField
@@ -37,7 +40,7 @@ const OutboundDialerContent = ({ showNumbers = false, numbers, onSubmit }: Props
 				<Button
 					type='submit'
 					className='w-full'
-					disabled={form.formState.disabled}
+					disabled={!activity?.available || form.formState.disabled || form.formState.isSubmitting}
 				>
 					Dial
 				</Button>

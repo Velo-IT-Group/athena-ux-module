@@ -133,6 +133,7 @@ const ActiveCallFooter = () => {
 					<PopoverContent
 						side='bottom'
 						align='start'
+						className='w-auto'
 						forceMount
 					>
 						<Dialpad onValueChange={(value) => activeCall?.sendDigits(value)} />

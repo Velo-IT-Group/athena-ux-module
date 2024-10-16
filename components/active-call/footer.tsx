@@ -3,7 +3,7 @@ import React from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
-import { ArrowRightFromLine, Grip, Mic, Pause, Phone, PhoneForwarded } from 'lucide-react';
+import { ArrowRightFromLine, Grip, Mic, Pause, Phone, PhoneForwarded, UserPlus2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import { useDevice } from '@/providers/device-provider';
 import WorkerSelector from '@/app/(user)/worker-selector';
@@ -96,7 +96,7 @@ const ActiveCallFooter = () => {
 								variant='secondary'
 								size='icon'
 							>
-								<PhoneForwarded />
+								<UserPlus2 />
 							</Button>
 						</WorkerSelector>
 					</TooltipTrigger>
@@ -139,32 +139,6 @@ const ActiveCallFooter = () => {
 						<Dialpad onValueChange={(value) => activeCall?.sendDigits(value)} />
 					</PopoverContent>
 				</Popover>
-
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Button
-							variant='secondary'
-							size='icon'
-							onClick={async () => {
-								console.log(conferenceParticipants.customer);
-								try {
-									await task?.hold(conferenceParticipants.customer.sid, true);
-								} catch (error) {
-									toast.error(error as string);
-								}
-							}}
-						>
-							<Pause className='h-3.5 w-3.5' />
-						</Button>
-					</TooltipTrigger>
-
-					<TooltipContent
-						side='top'
-						align='center'
-					>
-						<span>Put call on hold</span>
-					</TooltipContent>
-				</Tooltip>
 			</div>
 
 			<div className='flex items-center gap-1.5'>

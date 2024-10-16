@@ -16,6 +16,9 @@ const digitButtons: DialpadItem[] = [
 	{ name: '7', value: '7' },
 	{ name: '8', value: '8' },
 	{ name: '9', value: '9' },
+	{ name: '*', value: '*' },
+	{ name: '0', value: '0' },
+	{ name: '#', value: '#' },
 ];
 
 type Props = {

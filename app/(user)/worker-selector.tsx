@@ -1,6 +1,6 @@
 'use client';
 import { ReactNode, useState } from 'react';
-import { ChevronsUpDown, PhoneForwarded } from 'lucide-react';
+import { ChevronsUpDown, Phone, PhoneForwarded, Search } from 'lucide-react';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useWorker } from '@/providers/worker-provider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import WorkerListItem from './worker-list-item';
+import { parsePhoneNumber } from '@/lib/utils';
 
 type Props = {
 	actionFn?: (isWorker: boolean, id: string | number, attributes?: Record<string, any>) => void;
@@ -49,7 +50,10 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 	});
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState<WorkerInstance>();
+	const [text, setText] = useState('');
 	const workers = Array.from(data?.values() ?? []);
+	const parsedPhoneNumber = parsePhoneNumber(text.includes('+') ? text : `+1${text}`);
+
 	return (
 		<Popover
 			open={open}
@@ -78,8 +82,47 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 				avoidCollisions
 			>
 				<Command>
-					<CommandInput placeholder='Filter directory...' />
-					<CommandEmpty>Nothing found.</CommandEmpty>
+					<CommandInput
+						value={text}
+						onValueChange={(e) => setText(e.trim())}
+						placeholder='Filter directory or type in number...'
+					/>
+					<CommandEmpty className='flex flex-col items-center gap-3 w-full p-3 text-center'>
+						<Search className='w-6 h-6' />
+
+						<h4 className='font-medium text-sm'>No contacts found.</h4>
+
+						<p className='text-xs text-muted-foreground'>
+							"{text}" did not match any contacts.
+							{parsedPhoneNumber.isValid && (
+								<>
+									<br />
+									Would you like to call this number?
+								</>
+							)}
+						</p>
+
+						<div className='flex items-center gap-3'>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={() => setText('')}
+							>
+								Clear
+							</Button>
+
+							{parsedPhoneNumber.isValid && (
+								<Button
+									size='sm'
+									onClick={() => {
+										actionFn && actionFn(false, parsedPhoneNumber?.formattedNumber ?? '');
+									}}
+								>
+									<Phone className='mr-1.5' /> {parsedPhoneNumber.formattedNumber}
+								</Button>
+							)}
+						</div>
+					</CommandEmpty>
 					<CommandList>
 						<CommandGroup heading='Workers'>
 							{isWorkersLoading ? (

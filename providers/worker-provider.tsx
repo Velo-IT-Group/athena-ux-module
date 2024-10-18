@@ -38,6 +38,11 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 		const worker = new Supervisor(authToken);
 		setWorker(worker);
 
+		worker.on('activityUpdated', (w) => {
+			console.log(w);
+			setActivity(w.activity);
+		});
+
 		return () => {
 			worker?.disconnect();
 		};
@@ -45,12 +50,7 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 
 	useEffect(() => {
 		if (!worker || !worker.activity) return;
-		console.log(worker.activity);
 		setActivity(worker.activity);
-
-		worker.on('activityUpdated', (w) => {
-			setActivity(w.activity);
-		});
 	}, [worker, worker?.activity]);
 
 	return <Provider value={{ worker, activity }}>{children}</Provider>;

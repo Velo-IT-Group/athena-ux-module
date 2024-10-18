@@ -11,22 +11,16 @@ const ActiveCallParticipants = () => {
 	const entries = useMemo(() => Object.entries(conferenceParticipants ?? {}), [conferenceParticipants]);
 	const { items } = useSyncMap(`Conference-${task?.sid}`);
 
-	console.log(items);
-
 	return (
 		<CardContent className='p-1.5 flex flex-col justify-start'>
-			{entries.map(([key, value]) => {
-				const data = items.find((i) => i.data.AccountSid === value)?.data as ParticipantInstance;
-				console.log(data);
-				return (
-					<ParticipantListItem
-						key={key}
-						participantType={key as Participant}
-						sid={value}
-						showRemoval={entries.length > 2}
-					/>
-				);
-			})}
+			{entries.map(([key, value]) => (
+				<ParticipantListItem
+					key={key}
+					participantType={key as Participant}
+					sid={value}
+					showRemoval={entries.length > 2}
+				/>
+			))}
 			{/* {items.map((item) => {
 				const data = item.data as ParticipantInstance;
 

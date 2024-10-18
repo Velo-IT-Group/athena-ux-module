@@ -86,7 +86,7 @@ const Layout = async ({ children }: Props) => {
 				process.env.TWILIO_API_KEY_SID as string,
 				process.env.TWILIO_API_KEY_SECRET as string,
 				process.env.TWILIO_WORKSPACE_SID as string,
-				user?.user_metadata.workerSid ?? '',
+				profile?.worker_sid ?? '',
 				user?.email ?? ''
 			),
 	});

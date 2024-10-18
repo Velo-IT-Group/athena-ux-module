@@ -12,8 +12,6 @@ import OutboundTask from './outbound-task';
 import { MessageSquareText, Phone, Voicemail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import VoicemailTask from './voicemail-task';
-import useSyncMap from '@/hooks/useSyncMap';
-
 type Props = {
 	reservation: Reservation;
 	task: Task;
@@ -22,11 +20,9 @@ type Props = {
 
 const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	'use no memo'; // opts out this component from being compiled by React Compiler
-	const { currentCallControl } = useDevice();
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
-	// const { getSyncItem } = useSyncMap('active-conferences');
 
 	const isVoicemail = task.attributes.taskType === 'voicemail';
 	const taskChannelUniqueName = task.taskChannelUniqueName;

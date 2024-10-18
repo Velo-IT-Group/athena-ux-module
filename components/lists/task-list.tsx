@@ -35,8 +35,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		if (r.task.attributes.direction === 'outbound') {
 			await r.conference({
 				beep: false,
-				conferenceStatusCallback: 'https://b940-170-55-184-242.ngrok-free.app/hello-world',
-				conferenceStatusCallbackEvent: 'start,end,join,leave,mute,hold,speaker',
 			});
 		} else if (isVoicemail) {
 			createNotification(`New Voicemail From ${r.task.attributes.name}`);
@@ -138,7 +136,7 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		};
 	}, [worker]);
 
-	const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
+	// const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
 
 	return (
 		<Fragment>
@@ -148,9 +146,9 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 				{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
 				<>
-					{incompleteTasks.length > 0 ? (
+					{reservations.length > 0 ? (
 						<>
-							{incompleteTasks.map((reservation) => (
+							{reservations.map((reservation) => (
 								<TaskNotification
 									key={reservation.sid}
 									reservation={reservation}

@@ -1,3 +1,4 @@
+'use server'
 import { type Conditions, generateParams, baseHeaders } from '@/utils/manage/params';
 import type {
 	AuditTrailEntry,
@@ -289,6 +290,8 @@ export const getTasks = async (
 export const getTickets = async (
 	conditions?: Conditions<ServiceTicket>
 ): Promise<{ data: ServiceTicket[]; count: number }> => {
+		console.log(process.env.CONNECT_WISE_URL)
+
 	const generatedConditions = generateParams(conditions);
 	const [
 		ticketResponse,

@@ -29,6 +29,7 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 	// const { getSyncItem } = useSyncMap('active-conferences');
 
 	const isVoicemail = task.attributes.taskType === 'voicemail';
+	const taskChannelUniqueName = task.taskChannelUniqueName;
 
 	return (
 		<Popover
@@ -41,18 +42,15 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 					size={isCollapsed ? 'icon' : 'default'}
 					className={cn('animate-pulse', isCollapsed ? 'h-9 w-9' : 'w-full justify-start')}
 				>
-					{reservation.task.taskChannelUniqueName === 'default' && (
+					{taskChannelUniqueName === 'default' && isVoicemail && <Voicemail className={cn(!isCollapsed && 'mr-1.5')} />}
+					{taskChannelUniqueName === 'default' && !isVoicemail && (
 						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
 					)}
-					{reservation.task.taskChannelUniqueName === 'voice' &&
-						reservation.task.attributes.taskType === 'voicemail' && (
-							<Voicemail className={cn(!isCollapsed && 'mr-1.5')} />
-						)}
-					{reservation.task.taskChannelUniqueName === 'voice' &&
-						reservation.task.attributes.taskType !== 'voicemail' && (
-							<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
-						)}
-					{reservation.task.taskChannelUniqueName === 'chat' && (
+					{taskChannelUniqueName === 'voice' && isVoicemail && <Voicemail className={cn(!isCollapsed && 'mr-1.5')} />}
+					{taskChannelUniqueName === 'voice' && !isVoicemail && (
+						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+					)}
+					{taskChannelUniqueName === 'chat' && (
 						<MessageSquareText className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
 					)}
 
@@ -83,13 +81,11 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 						/>
 					)}
 
-					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && !isVoicemail && (
+					{reservation.status === 'accepted' && taskChannelUniqueName === 'voice' && !isVoicemail && (
 						<ActiveCall task={task} />
 					)}
 
-					{reservation.status === 'accepted' && task.taskChannelUniqueName === 'voice' && isVoicemail && (
-						<VoicemailTask task={task} />
-					)}
+					{reservation.status === 'accepted' && isVoicemail && <VoicemailTask task={task} />}
 
 					{reservation.status === 'wrapping' && (
 						<TaskWrapup

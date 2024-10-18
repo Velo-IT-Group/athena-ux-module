@@ -53,10 +53,10 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 					<Circle
 						className={cn(
 							'stroke-none',
-							row?.original?.priority?.id === 6 && 'fill-red-500',
+							row?.original?.priority?.id === 6 && 'fill-[#DC3221]',
 							// row?.original?.priority?.id === 8 && 'fill-yellow-500',
-							row?.original?.priority?.id === 8 && 'fill-[#FFFE0D]',
-							row?.original?.priority?.id === 7 && 'fill-blue-500'
+							row?.original?.priority?.id === 7 && 'fill-[#029E73]',
+							row?.original?.priority?.id === 8 && 'fill-[#56B4E9]'
 						)}
 					/>
 					<span className='max-w-[40ch] truncate font-medium'>{row.getValue('summary')}</span>
@@ -108,7 +108,6 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 
 			return (
 				<div className='flex w-[100px] items-center'>
-					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{status?.name}</span>
 				</div>
 			);
@@ -164,13 +163,8 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		cell: ({ row }) => {
 			const reference = row.getValue('company') as ReferenceType;
 
-			// if (!status) {
-			// 	return null;
-			// }
-
 			return (
 				<div className='flex items-center'>
-					{/* {status.icon && <status.icon className='mr-2 h-3.5 w-3.5 text-muted-foreground' />} */}
 					<span>{reference?.name}</span>
 				</div>
 			);

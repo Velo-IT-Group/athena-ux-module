@@ -41,8 +41,20 @@ const WorkerListItem = ({ member, actionFn, onOpenChange }: Props) => {
 
 	return (
 		<CommandItem
-			value={`${member.officePhone ?? member.mobilePhone ?? member.officePhone}-${member.firstName} ${
+			value={`${member.officePhone ?? member.mobilePhone ?? member.homePhone}-${member.firstName} ${
 				member.lastName ?? ''
+			} ${
+				parsePhoneNumber(member.officePhone ?? '').isValid
+					? parsePhoneNumber(member.officePhone ?? '')?.formattedNumber
+					: ''
+			} ${
+				parsePhoneNumber(member.mobilePhone ?? '').isValid
+					? parsePhoneNumber(member.mobilePhone ?? '')?.formattedNumber
+					: ''
+			} ${
+				parsePhoneNumber(member.homePhone ?? '').isValid
+					? parsePhoneNumber(member.homePhone ?? '')?.formattedNumber
+					: ''
 			}`}
 			onSelect={(currentValue) => {
 				if (!hasMultipleNumbers()) {

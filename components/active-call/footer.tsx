@@ -3,12 +3,12 @@ import React from 'react';
 import { CardFooter } from '../ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
-import { ArrowRightFromLine, Grip, Mic, Pause, Phone, PhoneForwarded, UserPlus2 } from 'lucide-react';
+import { ArrowRightFromLine, Grip, Mic, Phone, UserPlus2 } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
 import { useDevice } from '@/providers/device-provider';
 import WorkerSelector from '@/app/(user)/worker-selector';
 import { parsePhoneNumber } from '@/lib/utils';
-import OutboundDialerContent, { outboundPhoneSchema } from '../outbound-dialer-content';
+import { outboundPhoneSchema } from '../outbound-dialer-content';
 import { useTaskContext } from './context';
 import { toast } from 'sonner';
 import { removeConferenceParticipant } from '@/lib/twilio/conference/helpers';
@@ -28,24 +28,6 @@ const ActiveCallFooter = () => {
 		updateParticipants,
 	} = useTaskContext();
 	const { muted, setMuted, activeCall } = useDevice();
-
-	async function onSubmit(values: z.infer<typeof outboundPhoneSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		try {
-			const parsedNumber = parsePhoneNumber(values.To, 'US', 'E.164').formattedNumber ?? '';
-			const attributes = {
-				externalContact: parsePhoneNumber(values.To, 'US').formattedNumber,
-			};
-			addExternalParticipant?.mutate({
-				From: task?.attributes.to ?? task?.attributes.from,
-				To: parsedNumber,
-				attributes,
-			});
-		} catch (error) {
-			toast.error(JSON.stringify(error, null, 2));
-		}
-	}
 
 	return (
 		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>

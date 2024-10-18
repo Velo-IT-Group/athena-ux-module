@@ -9,7 +9,7 @@ import { useWorker } from '@/providers/worker-provider';
 type Props = {};
 
 const ActivityDropdownMenuSub = ({}: Props) => {
-	const { worker, activity } = useWorker();
+	const { worker, activity: currentActivity } = useWorker();
 
 	return (
 		<DropdownMenuSub>
@@ -34,7 +34,10 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 										}}
 									>
 										<Check
-											className={cn('mr-2 h-3.5 w-3.5', activity?.sid === activity?.sid ? 'opacity-100' : 'opacity-0')}
+											className={cn(
+												'mr-2 h-3.5 w-3.5',
+												activity?.sid === currentActivity?.sid ? 'opacity-100' : 'opacity-0'
+											)}
 										/>
 
 										{activity.name}
@@ -47,8 +50,8 @@ const ActivityDropdownMenuSub = ({}: Props) => {
 			</DropdownMenuSubContent>
 
 			<DropdownMenuSubTrigger>
-				<Circle className={cn('stroke-none  mr-1.5', activity?.available ? 'fill-green-500' : 'fill-red-500')} />
-				<span>{activity?.name}</span>
+				<Circle className={cn('stroke-none  mr-1.5', currentActivity?.available ? 'fill-green-500' : 'fill-red-500')} />
+				<span>{currentActivity?.name}</span>
 			</DropdownMenuSubTrigger>
 		</DropdownMenuSub>
 	);

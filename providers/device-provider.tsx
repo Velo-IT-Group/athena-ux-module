@@ -90,12 +90,10 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 			call.on('accept', (c: Call) => {
 				setActiveCall(c);
-				currentCallControl?.offHook(true);
 			});
 
 			call.on('disconnect', () => {
 				setActiveCall(undefined);
-				currentCallControl?.offHook(false);
 			});
 		});
 
@@ -113,54 +111,9 @@ export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
 
 	useEffect(() => {
 		setMuted(muted);
-		currentCallControl?.mute(muted);
 		if (!activeCall) return;
 		activeCall.mute(muted);
 	}, [muted]);
-
-	useEffect(() => {
-		initalizeJabra()
-			.then((j) => {
-				const eccFactory = new CallControlFactory(j);
-
-				j.deviceAdded.subscribe(async (d) => {
-					if (!eccFactory.supportsCallControl(d)) {
-						return;
-					}
-					// Convert the ISdkDevice to a ICallControlDevice
-					const ccDevice = await eccFactory.createCallControl(d);
-
-					try {
-						const isLocked = await ccDevice.takeCallLock();
-
-						if (!isLocked) throw new Error('Error getting lock');
-						setCurrentCallControl(ccDevice);
-					} catch (error) {
-						toast.error('Call lock already established.');
-					}
-				});
-			})
-			.catch((e) => {
-				console.error(e);
-				toast.error(e);
-			});
-
-		return () => {
-			if (currentCallControl) {
-				currentCallControl.releaseCallLock();
-			}
-		};
-	}, []);
-
-	useEffect(() => {
-		if (!currentCallControl) return;
-
-		currentCallControl.deviceSignals.subscribe((signal) => {
-			if (signal.type === SignalType.PHONE_MUTE) {
-				setMuted((prev) => !prev);
-			}
-		});
-	}, [currentCallControl]);
 
 	const testDevice = () => {
 		if (!window) return;

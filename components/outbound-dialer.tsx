@@ -23,7 +23,7 @@ export const numbers = {
 const OutboundDialer = (props: Props) => {
 	const [isRinging, setIsRinging] = useState(false);
 	const { worker } = useWorker();
-	const { currentCallControl, testDevice } = useDevice();
+	const { testDevice } = useDevice();
 	const { playing, togglePlayback } = useRinger();
 
 	async function onSubmit(values: z.infer<typeof outboundPhoneSchema>) {
@@ -72,7 +72,6 @@ const OutboundDialer = (props: Props) => {
 					className='shrink-0'
 					onClick={() => {
 						try {
-							console.log(currentCallControl);
 							togglePlayback(!playing);
 							setIsRinging((prev) => !prev);
 						} catch (error) {

@@ -23,7 +23,6 @@ type Props = {
 
 const TaskList = ({ isCollapsed, className }: Props) => {
 	const { worker } = useWorker();
-	const { currentCallControl } = useDevice();
 	const { reservations, addReservation, removeReservation } = useReservations();
 	const { createNotification } = useNotifications();
 	const { togglePlayback } = useRinger();
@@ -47,7 +46,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			console.log('Call accepted');
 			try {
 				togglePlayback(false);
-				currentCallControl?.ring(false);
 			} catch (error) {
 				console.error(error);
 				toast.error(JSON.stringify(error));
@@ -58,7 +56,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				togglePlayback(false);
 				removeReservation(reservation);
-				currentCallControl?.ring(false);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
@@ -69,7 +66,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				togglePlayback(false);
 				removeReservation(reservation);
-				currentCallControl?.ring(false);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
@@ -80,8 +76,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				togglePlayback(false);
 				console.log('Wrapping up');
-				currentCallControl?.ring(false);
-				currentCallControl?.offHook(false);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -91,8 +85,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				togglePlayback(false);
 				removeReservation(reservation);
-				currentCallControl?.ring(false);
-				currentCallControl?.offHook(false);
 			} catch (error) {
 				toast.error(JSON.stringify(error));
 			}
@@ -102,8 +94,6 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			try {
 				togglePlayback(false);
 				removeReservation(reservation);
-				currentCallControl?.ring(false);
-				currentCallControl?.offHook(false);
 			} catch (error) {
 				console.error('No call pending', error);
 				toast.error(JSON.stringify(error));
@@ -136,7 +126,9 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 		};
 	}, [worker]);
 
-	// const incompleteTasks = reservations.filter((r) => r.status !== 'completed');
+	const imcomingCalls = reservations.filter(
+		(r) => r.task.taskChannelUniqueName === 'voice' || r.task.taskChannelUniqueName === 'default'
+	);
 
 	return (
 		<Fragment>
@@ -145,41 +137,37 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			<section className='space-y-1.5 mx-1.5'>
 				{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
 
-				<>
-					{reservations.length > 0 ? (
-						<>
-							{reservations.map((reservation) => (
-								<TaskNotification
-									key={reservation.sid}
-									reservation={reservation}
-									task={reservation.task}
-									isCollapsed={isCollapsed}
-								/>
-							))}
-						</>
-					) : (
-						<Popover>
-							<PopoverTrigger asChild>
-								<Button
-									variant='ghost'
-									size={isCollapsed ? 'icon' : 'sm'}
-									className={cn('w-full', !isCollapsed && 'justify-start')}
-								>
-									<Phone className='fill-current stroke-none' />
-									<span className={cn('ml-1.5', isCollapsed && 'sr-only')}>Outbound Dialer</span>
-								</Button>
-							</PopoverTrigger>
-
-							<PopoverContent
-								align='start'
-								side='right'
-								sideOffset={12}
+				{imcomingCalls.length === 0 && (
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								variant='ghost'
+								size={isCollapsed ? 'icon' : 'sm'}
+								className={cn('w-full', !isCollapsed && 'justify-start')}
 							>
-								<OutboundDialer />
-							</PopoverContent>
-						</Popover>
-					)}
-				</>
+								<Phone className='fill-current stroke-none' />
+								<span className={cn('ml-1.5', isCollapsed && 'sr-only')}>Outbound Dialer</span>
+							</Button>
+						</PopoverTrigger>
+
+						<PopoverContent
+							align='start'
+							side='right'
+							sideOffset={12}
+						>
+							<OutboundDialer />
+						</PopoverContent>
+					</Popover>
+				)}
+
+				{reservations.map((reservation) => (
+					<TaskNotification
+						key={reservation.sid}
+						reservation={reservation}
+						task={reservation.task}
+						isCollapsed={isCollapsed}
+					/>
+				))}
 			</section>
 		</Fragment>
 	);

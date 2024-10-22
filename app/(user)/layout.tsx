@@ -1,20 +1,19 @@
 import { ReactNode } from 'react';
 import UserLayout from './user-layout';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import SideNav from '@/components/side-nav';
 import { Toaster } from 'sonner';
 import { cookies } from 'next/headers';
-import { onLayoutChange } from './layout-actions';
 import { createClient } from '@/utils/supabase/server';
 import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
 import { getContacts, getSystemMembers } from '@/lib/manage/read';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactQueryProvider from '@/providers/react-query';
 import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
+import { AppSidebar } from '@/components/app-sidebar';
 
 type Props = {
 	children: ReactNode;
@@ -94,28 +93,17 @@ const Layout = async ({ children }: Props) => {
 	return (
 		<ReactQueryProvider>
 			<UserLayout token={twilioToken}>
-				<ResizablePanelGroup
-					direction='horizontal'
-					onLayout={onLayoutChange}
-				>
-					<SideNav
-						isDefaultCollapsed={defaultCollapsed ?? true}
-						defaultLayout={defaultLayout ?? [15, 32, 48]}
-						conversations={conversations!}
-						profile={profile!}
-						user={user}
-					/>
+				<SidebarProvider>
+					<AppSidebar />
 
-					<ResizableHandle className='opacity-0' />
-
-					<ResizablePanel className='my-3 mr-3 bg-background rounded-md border shadow'>
+					<SidebarInset>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
 							<Navbar />
 
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>
-					</ResizablePanel>
-				</ResizablePanelGroup>
+					</SidebarInset>
+				</SidebarProvider>
 
 				<Toaster richColors />
 				<Analytics />

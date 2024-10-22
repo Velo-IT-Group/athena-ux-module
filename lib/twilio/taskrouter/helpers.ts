@@ -41,9 +41,10 @@ export const getEvents = async () => {
 	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).events.list({ limit: 20 });
 };
 
-export const getOngoingTasks = async () => {
+export const getOngoingTasks = async (options?: TaskListInstanceOptions) => {
 	const client = await createTwilioClient();
-	return await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks.list({
+	return await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks.list({
+		...options, 
 		assignmentStatus: ['pending', 'assigned', 'reserved'],
 		// evaluateTaskAttributes: "name='" + name + "'",
 	});

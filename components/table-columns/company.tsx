@@ -45,8 +45,8 @@ export const columns: ColumnDef<Company>[] = [
 			/>
 		),
 		cell: ({ row }) => (
-			<Tooltip>
-				<TooltipTrigger asChild>
+			(<Tooltip>
+                <TooltipTrigger asChild>
 					<Link
 						href={`/companies/${row.original.id}`}
 						className='font-medium w-[80px]'
@@ -54,12 +54,11 @@ export const columns: ColumnDef<Company>[] = [
 						{row.getValue('identifier')}
 					</Link>
 				</TooltipTrigger>
-
-				{/* <CompanyTooltipDetail
+                {/* <CompanyTooltipDetail
 					name={row.original.name}
 					phoneNumber={row.original.phoneNumber}
 				/> */}
-			</Tooltip>
+            </Tooltip>)
 			// <Link
 			// 	href={`/tickets/${row.getValue('identifier')}`}
 			// 	className={cn(buttonVariants({ variant: 'link' }), 'w-[80px]')}

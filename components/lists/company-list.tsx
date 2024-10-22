@@ -33,47 +33,45 @@ const CompanyList = async ({
 }: Props) => {
 	const { data: companies, count } = await getCompanies(params);
 
-	return (
-		<>
-			{type === 'table' && (
-				// <DataTable
-				// 	data={companies}
-				// 	columns={columns}
-				// 	meta={{ filterKey: 'name' }}
-				// 	facetedFilters={facetedFilters}
-				// 	count={count}
-				// />
-				<></>
-			)}
-			{type === 'combobox' && (
-				<Combobox
-					id={id}
-					path={path}
-					type='ticket'
-					items={
-						companies?.map(({ id, name }) => {
-							return { label: name, value: `${id}-${name}` };
-						}) ?? []
-					}
-					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={() => {}}
-					placeholder='Filter companies...'
-					side='left'
-					align='start'
-				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<Building className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add company'}</span>
-					</Button>
-				</Combobox>
-			)}
-		</>
-	);
+	return (<>
+        {type === 'table' && (
+            // <DataTable
+            // 	data={companies}
+            // 	columns={columns}
+            // 	meta={{ filterKey: 'name' }}
+            // 	facetedFilters={facetedFilters}
+            // 	count={count}
+            // />
+            (<></>)
+        )}
+        {type === 'combobox' && (
+            <Combobox
+                id={id}
+                path={path}
+                type='ticket'
+                items={
+                    companies?.map(({ id, name }) => {
+                        return { label: name, value: `${id}-${name}` };
+                    }) ?? []
+                }
+                value={`${defaultValue?.id}-${defaultValue?.name}`}
+                // setValue={() => {}}
+                placeholder='Filter companies...'
+                side='left'
+                align='start'
+            >
+                <Button
+                    size='sm'
+                    variant='ghost'
+                    role='combobox'
+                    className='flex'
+                >
+                    <Building className='mr-1.5' />
+                    <span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add company'}</span>
+                </Button>
+            </Combobox>
+        )}
+    </>);
 };
 
 export default CompanyList;

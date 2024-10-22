@@ -93,7 +93,7 @@ const Layout = async ({ children }: Props) => {
 	return (
 		<ReactQueryProvider>
 			<UserLayout token={twilioToken}>
-				<SidebarProvider>
+				<SidebarProvider defaultOpen={false}>
 					<AppSidebar />
 
 					<SidebarInset>

@@ -34,16 +34,23 @@ import { useMutation } from '@tanstack/react-query';
 import { changeOnCallEngineer } from '../utils/twilio/workers';
 import { useTwilio } from '../providers/twilio-provider';
 import { updateOnCallEngineer } from '@/lib/twilio/update';
-import { activityColors } from './activity-item';
+import { SidebarMenuButton } from './ui/sidebar';
+
+const activityColors: Record<string, string> = {
+	Available: 'bg-green-500',
+	Unavailable: 'bg-red-500',
+	Offline: 'bg-gray-500',
+	Break: 'bg-gray-500',
+	'On-Site': 'bg-orange-500',
+};
 
 type Props = {
 	user: User | null;
-	isCollapsed: boolean;
 	align?: 'center' | 'end' | 'start';
 	side?: 'top' | 'right' | 'bottom' | 'left';
 };
 
-const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
+const UserInfo = ({ user, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
 	const { worker, activity } = useWorker();
@@ -64,11 +71,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 		<AlertDialog>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button
-						variant='ghost'
-						size='sm'
-						className='justify-start'
-					>
+					<SidebarMenuButton>
 						<div className='relative'>
 							<UserIcon />
 
@@ -80,8 +83,8 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 							/>
 						</div>
 
-						<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>{user?.user_metadata?.full_name}</span>
-					</Button>
+						<span>{user?.user_metadata?.full_name}</span>
+					</SidebarMenuButton>
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent

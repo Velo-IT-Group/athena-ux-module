@@ -9,20 +9,23 @@ import TaskWrapup from './task/wrapup';
 import useTimer from '@/hooks/useTimer';
 import { TaskContext } from './active-call/context';
 import OutboundTask from './outbound-task';
-import { MessageSquareText, Phone, Voicemail } from 'lucide-react';
+import { MessageSquareText, Phone, PhoneIncoming, PhoneOutgoing, Voicemail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import VoicemailTask from './voicemail-task';
 type Props = {
 	reservation: Reservation;
 	task: Task;
 	isCollapsed?: boolean;
+	side?: 'right' | 'top' | 'bottom' | 'left';
+	align?: 'center' | 'end' | 'start';
 };
 
-const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
+const TaskNotification = ({ reservation, task, isCollapsed, side = 'right', align = 'start' }: Props) => {
 	'use no memo'; // opts out this component from being compiled by React Compiler
 	const [open, setOpen] = useState(reservation.status === 'pending' && task.attributes.direction !== 'outboundDial');
 	const { attributes } = task;
 	const timer = useTimer(task.dateUpdated);
+	const isInbound = task.attributes.direction === 'inbound';
 
 	const isVoicemail = task.attributes.taskType === 'voicemail';
 	const taskChannelUniqueName = task.taskChannelUniqueName;
@@ -32,34 +35,18 @@ const TaskNotification = ({ reservation, task, isCollapsed }: Props) => {
 			open={open}
 			onOpenChange={setOpen}
 		>
-			<PopoverTrigger asChild>
-				<Button
-					variant='secondary'
-					size={isCollapsed ? 'icon' : 'default'}
-					className={cn('animate-pulse', isCollapsed ? 'h-9 w-9' : 'w-full justify-start')}
-				>
-					{taskChannelUniqueName === 'default' && isVoicemail && <Voicemail className={cn(!isCollapsed && 'mr-1.5')} />}
-					{taskChannelUniqueName === 'default' && !isVoicemail && (
-						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
-					)}
-					{taskChannelUniqueName === 'voice' && isVoicemail && <Voicemail className={cn(!isCollapsed && 'mr-1.5')} />}
-					{taskChannelUniqueName === 'voice' && !isVoicemail && (
-						<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
-					)}
-					{taskChannelUniqueName === 'chat' && (
-						<MessageSquareText className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
-					)}
+			<PopoverTrigger className='hover:bg-muted transition-colors'>
+				<div className='flex items-center gap-1.5 px-1.5 text-xs'>
+					{isInbound ? <PhoneIncoming className='w-3 h-3' /> : <PhoneOutgoing className='w-3 h-3' />}
 
-					<span className={isCollapsed ? 'sr-only' : 'text-muted-foreground flex items-center gap-1.5 font-medium'}>
-						{attributes.name ?? attributes.from}
-					</span>
-				</Button>
+					<span className='whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>{task.attributes.name}</span>
+				</div>
 			</PopoverTrigger>
 
 			<TaskContext task={task}>
 				<PopoverContent
-					side='right'
-					align='start'
+					side={side}
+					align={align}
 					sideOffset={12}
 					className='p-0'
 				>

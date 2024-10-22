@@ -11,6 +11,9 @@ import { useNotifications } from '@/providers/notification-provider';
 import useRinger from '@/hooks/useRinger';
 import { toast } from 'sonner';
 import { SidebarTrigger } from './ui/sidebar';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import OutboundDialerContent from './outbound-dialer-content';
+import OutboundDialer from './outbound-dialer';
 
 const Navbar = () => {
 	'use no memo';
@@ -143,16 +146,23 @@ const Navbar = () => {
 					reservation={reservation}
 				/>
 			))}
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button
+						variant='ghost'
+						size='sm'
+						className='p-1.5 h-[26px] text-xs'
+					>
+						<Plus className='mr-1.5 h-3 w-3' />
 
-			<Button
-				variant='ghost'
-				size='sm'
-				className='p-1.5 h-[26px] text-xs'
-			>
-				<Plus className='mr-1.5 h-3 w-3' />
+						<span>Add</span>
+					</Button>
+				</PopoverTrigger>
 
-				<span>Add</span>
-			</Button>
+				<PopoverContent side='bottom'>
+					<OutboundDialer />
+				</PopoverContent>
+			</Popover>
 		</nav>
 	);
 };

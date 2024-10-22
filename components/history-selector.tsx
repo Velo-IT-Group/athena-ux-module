@@ -1,6 +1,5 @@
 'use client';
 import { History } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
@@ -14,17 +13,16 @@ import { groupBy } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
 import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { SidebarMenuButton } from './ui/sidebar';
 
 type Props = {
 	profile: Profile;
 	initalConversations: Conversation[];
 	align?: 'center' | 'end' | 'start';
 	side?: 'top' | 'right' | 'bottom' | 'left';
-	isCollapsed: boolean;
 };
 
-const HistorySelector = ({ profile, initalConversations, align = 'end', side, isCollapsed }: Props) => {
+const HistorySelector = ({ profile, initalConversations, align = 'end', side }: Props) => {
 	const supabase = createClient();
 	const [conversations, setConversations] = useState<Conversation[]>(initalConversations);
 
@@ -68,15 +66,10 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side, is
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button
-					variant='ghost'
-					role='combobox'
-					size={isCollapsed ? 'icon' : 'sm'}
-					className={cn(!isCollapsed && 'justify-start')}
-				>
+				<SidebarMenuButton>
 					<History />
-					<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>History</span>
-				</Button>
+					<span>History</span>
+				</SidebarMenuButton>
 			</PopoverTrigger>
 
 			<PopoverContent

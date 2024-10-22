@@ -22,6 +22,7 @@ import OutboundDialer from './outbound-dialer';
 import HistorySelector from './history-selector';
 import UserInfo from './user-info';
 import getQueryClient from '@/app/getQueryClient';
+import SidebarActivityList from './sidebar-activity-list';
 
 const activityColors: Record<string, string> = {
 	Available: 'bg-green-500',
@@ -137,7 +138,8 @@ export async function AppSidebar() {
 					<SidebarGroupLabel>Activities</SidebarGroupLabel>
 
 					<SidebarGroupContent>
-						<SidebarMenu>
+						<SidebarActivityList isCollapsed />
+						{/* <SidebarMenu>
 							{activites.map((activity) => (
 								<SidebarMenuItem>
 									<SidebarMenuButton>
@@ -151,7 +153,7 @@ export async function AppSidebar() {
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 							))}
-						</SidebarMenu>
+						</SidebarMenu> */}
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>

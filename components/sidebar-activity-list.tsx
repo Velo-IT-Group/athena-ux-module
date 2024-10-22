@@ -6,6 +6,7 @@ import { useWorker } from '@/providers/worker-provider';
 import { Activity } from 'twilio-taskrouter';
 import ActivityItem from './activity-item';
 import { createClient } from '@/utils/supabase/client';
+import { SidebarMenu, SidebarMenuItem, SidebarMenuSkeleton } from './ui/sidebar';
 
 type Props = {
 	isCollapsed: boolean;
@@ -18,6 +19,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	const { worker } = useWorker();
 
 	const [open, setOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 
 	const { data: workers } = useQuery({
@@ -47,6 +49,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 		if (!worker) return;
 		worker.on('ready', () => {
 			setActivities(Array.from(worker.activities.values()));
+			setIsLoading(false);
 		});
 	}, [worker]);
 
@@ -69,8 +72,20 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	const workerArray = Array.from(workers?.values() ?? []);
 
+	if (isLoading) {
+		return (
+			<SidebarMenu>
+				{Array.from({ length: 5 }).map((_, index) => (
+					<SidebarMenuItem key={index}>
+						<SidebarMenuSkeleton showIcon />
+					</SidebarMenuItem>
+				))}
+			</SidebarMenu>
+		);
+	}
+
 	return (
-		<div className='grid gap-1.5 mx-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:mx-1.5 group-[[data-collapsed=true]]:py-1.5'>
+		<SidebarMenu>
 			{activities?.map((activity) => (
 				<ActivityItem
 					key={activity.sid}
@@ -78,10 +93,9 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 					currentActivity={worker?.activity}
 					conversations={conversations}
 					activity={activity}
-					isCollapsed={isCollapsed}
 				/>
 			))}
-		</div>
+		</SidebarMenu>
 	);
 };
 

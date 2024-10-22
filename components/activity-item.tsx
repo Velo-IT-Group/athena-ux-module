@@ -10,13 +10,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Button } from '@/components/ui/button';
 import { Circle, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
 
 type Props = {
 	workers: Worker[];
 	currentActivity?: Activity;
 	conversations: Conversation[];
 	activity: Activity;
-	isCollapsed: boolean;
 };
 
 export const activityColors: Record<string, string> = {
@@ -27,79 +27,79 @@ export const activityColors: Record<string, string> = {
 	'On-Site': 'bg-orange-500',
 };
 
-const ActivityItem = ({ workers, currentActivity, conversations, activity, isCollapsed }: Props) => {
+const ActivityItem = ({ workers, currentActivity, conversations, activity }: Props) => {
+	const { state } = useSidebar();
+	const isCollapsed = state === 'collapsed';
 	return (
-		<Popover>
-			<ContextMenu>
-				<Tooltip>
-					<ContextMenuTrigger asChild>
-						<TooltipTrigger asChild>
-							<PopoverTrigger asChild>
-								<Button
-									variant={currentActivity?.sid === activity.sid ? 'secondary' : 'ghost'}
-									size={isCollapsed ? 'icon' : 'sm'}
-									className={cn(
-										isCollapsed ? 'h-9 w-9' : 'justify-start',
-										currentActivity?.sid === activity.sid && 'bg-secondary'
-									)}
-								>
-									<Circle
-										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
-									/>
+		<SidebarMenuItem>
+			<Popover>
+				<ContextMenu>
+					<Tooltip>
+						<ContextMenuTrigger asChild>
+							<TooltipTrigger asChild>
+								<PopoverTrigger asChild>
+									<>
+										<SidebarMenuButton>
+											<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
 
-									<span className={cn(isCollapsed && 'sr-only')}>{activity.name}</span>
-								</Button>
-							</PopoverTrigger>
-						</TooltipTrigger>
-					</ContextMenuTrigger>
+											<span>{activity.name}</span>
+										</SidebarMenuButton>
+										<SidebarMenuBadge>
+											{workers.filter((worker) => worker.activitySid === activity.sid).length}
+										</SidebarMenuBadge>
+									</>
+								</PopoverTrigger>
+							</TooltipTrigger>
+						</ContextMenuTrigger>
 
-					<ContextMenuContent>
-						<ContextMenuItem
-							onSelect={async () => await activity.setAsCurrent()}
-							disabled={currentActivity?.sid === activity.sid}
-						>
-							Set as current activity
-						</ContextMenuItem>
-					</ContextMenuContent>
+						<ContextMenuContent>
+							<ContextMenuItem
+								onSelect={async () => await activity.setAsCurrent()}
+								disabled={currentActivity?.sid === activity.sid}
+							>
+								Set as current activity
+							</ContextMenuItem>
+						</ContextMenuContent>
 
-					<TooltipContent side='right'>
-						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-					</TooltipContent>
-					<TooltipContent side='right'>
-						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-					</TooltipContent>
-				</Tooltip>
-			</ContextMenu>
+						<TooltipContent side='right'>
+							{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
+						</TooltipContent>
+						<TooltipContent side='right'>
+							{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
+						</TooltipContent>
+					</Tooltip>
+				</ContextMenu>
 
-			<PopoverContent
-				side='right'
-				align='start'
-				sideOffset={12}
-				className='p-0'
-			>
-				<Command>
-					<CommandInput placeholder={'Search users'} />
-					<CommandList>
-						<CommandGroup heading={activity.name}>
-							{workers?.map((worker) => {
-								const workerConversations =
-									conversations?.filter(
-										(conversation) => conversation.agent === worker.sid && !conversation.talk_time
-									) ?? [];
-								return (
-									<ActivityListItem
-										key={worker.sid}
-										worker={worker}
-										conversations={workerConversations}
-									/>
-								);
-							})}
-						</CommandGroup>
-					</CommandList>
-					<CommandEmpty>Nothing users.</CommandEmpty>
-				</Command>
-			</PopoverContent>
-		</Popover>
+				<PopoverContent
+					side='right'
+					align='start'
+					sideOffset={12}
+					className='p-0'
+				>
+					<Command>
+						<CommandInput placeholder={'Search users'} />
+						<CommandList>
+							<CommandGroup heading={activity.name}>
+								{workers?.map((worker) => {
+									const workerConversations =
+										conversations?.filter(
+											(conversation) => conversation.agent === worker.sid && !conversation.talk_time
+										) ?? [];
+									return (
+										<ActivityListItem
+											key={worker.sid}
+											worker={worker}
+											conversations={workerConversations}
+										/>
+									);
+								})}
+							</CommandGroup>
+						</CommandList>
+						<CommandEmpty>Nothing users.</CommandEmpty>
+					</Command>
+				</PopoverContent>
+			</Popover>
+		</SidebarMenuItem>
 	);
 };
 

@@ -127,7 +127,9 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	}, [worker]);
 
 	const imcomingCalls = reservations.filter(
-		(r) => r.task.taskChannelUniqueName === 'voice' || r.task.taskChannelUniqueName === 'default'
+		(r) =>
+			(r.task.taskChannelUniqueName === 'voice' || r.task.taskChannelUniqueName === 'default') &&
+			r.task.attributes.taskType !== 'voicemail'
 	);
 
 	return (

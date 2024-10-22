@@ -15,7 +15,7 @@ type Props = {
 };
 
 const ContactProfileForm = ({ contact }: Props) => {
-	const formRef = useRef<HTMLFormElement>();
+	const formRef = useRef<HTMLFormElement>(undefined);
 	const form = useForm<Contact>({
 		resolver: zodResolver(contactSchema),
 		defaultValues: contact,

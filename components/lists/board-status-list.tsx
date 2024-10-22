@@ -17,33 +17,31 @@ const BoardStatusList = async ({ type, id, defaultValue, params }: Props) => {
 	console.log(id);
 	const statuses = await getStatuses(id, params);
 
-	return (
-		<>
-			{type === 'combobox' && (
-				// @ts-ignore
-				<Combobox
-					items={statuses.map((status) => {
-						return { label: status?.name, value: `${status?.id}-${status?.name}` };
-					})}
-					side='left'
-					align='start'
-					placeholder='Select a status...'
-					value={`${defaultValue?.id}-${defaultValue?.name}`}
-					// setValue={()
-				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<CircleDashed className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add status'}</span>
-					</Button>
-				</Combobox>
-			)}
-		</>
-	);
+	return (<>
+        {type === 'combobox' && (
+            // @ts-ignore
+            (<Combobox
+                items={statuses.map((status) => {
+                    return { label: status?.name, value: `${status?.id}-${status?.name}` };
+                })}
+                side='left'
+                align='start'
+                placeholder='Select a status...'
+                value={`${defaultValue?.id}-${defaultValue?.name}`}
+                // setValue={()
+            >
+                <Button
+                    size='sm'
+                    variant='ghost'
+                    role='combobox'
+                    className='flex'
+                >
+                    <CircleDashed className='mr-1.5' />
+                    <span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add status'}</span>
+                </Button>
+            </Combobox>)
+        )}
+    </>);
 };
 
 export default BoardStatusList;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getCompanies } from '@/lib/manage/read';
+import { getCompanies, getCompanyNotes } from '@/lib/manage/read';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -15,6 +15,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MinimalTiptapEditor } from '@/components/tiptap';
 import { Content } from '@tiptap/core';
+import { createClient } from '@/utils/supabase/client';
 
 const formSchema = z.object({
 	company: z.number(),
@@ -24,9 +25,9 @@ const formSchema = z.object({
 type Props = {};
 
 const Page = (props: Props) => {
-	const [value, setValue] = useState<Content>(
-		'<p class="text-node">IOT devices</p><p class="text-node">-MAAS 360 is used for Mobile Device Management (MDM) of all IOS devices that are used for VIP Mobile apps</p><p class="text-node">-Karen Richard main POC for IOS devices</p><p class="text-node">iPads and iPhones are company assigned and enrolled in MaaS360</p><p class="text-node">DO NOT give out the iTunes account information. Inevitably, this will lead to issues.</p><p class="text-node">Apple IDs for Maas:</p><p class="text-node">Drivers have an Apple ID that is in Manage</p><p class="text-node">Salesmen have their own email accounts</p><p class="text-node">Users authorized to use their own Apple IDs</p><p class="text-node">Tyone Cormier, Theron Pitre, Chris Robicheaux</p><p class="text-node">Drivers:</p><p class="text-node">They NO LONGER share an email accout (<a class="link" href="mailto:drivers@acadianabottling.com">drivers@acadianabottling.com</a>)</p><p class="text-node">Each Driver needs to have their own individual Driver accounts </p><p class="text-node">e.g. <a class="link" href="mailto:Driver1@acadianabottling.com">Driver1@acadianabottling.com</a> , <a class="link" href="mailto:Driver2@acadianabottling.com">Driver2@acadianabottling.com</a></p><p class="text-node">Drivers previously shared a single account (<a class="link" href="mailto:Drivers@acadianabottling.com">Drivers@acadianabottling.com</a>)</p><p class="text-node">DO NOT RESET THIS ACCOUNT. This is shared across all devices, and any change will have a huge impact on their day to day operations. DO NOT RESET THIS ACCOUNT.</p>'
-	);
+	const supabase = createClient();
+	// supabase.from()
+
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -52,6 +53,10 @@ const Page = (props: Props) => {
 				pageSize: 1000,
 			}),
 	});
+	const { data: notes } = useQuery({
+		queryKey: ['companyNotes', form.getValues().company],
+		queryFn: () => getCompanyNotes(form.getValues().company),
+	});
 
 	return (
 		<Form {...form}>
@@ -59,6 +64,22 @@ const Page = (props: Props) => {
 				onSubmit={form.handleSubmit(onSubmit)}
 				className='space-y-8 grid place-items-center max-w-lg w-full p-3'
 			>
+				{notes?.map((note) => {
+					const splitNote = note.text.split('"');
+					return (
+						<div key={note.id}>
+							{splitNote.map((n) => (
+								<pre
+									key={n}
+									className='text-wrap'
+								>
+									{JSON.stringify(n, null, 2)}
+								</pre>
+							))}
+							{note.type.name}
+						</div>
+					);
+				})}
 				<FormField
 					control={form.control}
 					name='company'

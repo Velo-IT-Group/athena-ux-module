@@ -21,7 +21,7 @@ import { Progress } from '@/components/ui/progress';
 import LabeledInput from '@/components/ui/labeled-input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import Tiptap from '@/components/tip-tap';
+import { MinimalTiptapEditor } from '@/components/tiptap';
 
 type Props = {
 	contactId?: number;
@@ -128,7 +128,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 				>
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
-						<Tiptap />
+						<MinimalTiptapEditor editable={false} />
 					</div>
 
 					<div className='space-y-3'>

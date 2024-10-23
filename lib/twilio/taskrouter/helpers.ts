@@ -61,33 +61,6 @@ const buildWorkspacePolicy = (options?: { resources: string[]; method?: string }
 	});
 };
 
-export const createWorkerCapabilityToken = (sid: string) => {
-	const workerCapability = new TaskRouterCapability({
-		accountSid: process.env.TWILIO_ACCOUNT_SID!,
-		authToken: process.env.TWILIO_AUTH_TOKEN!,
-		workspaceSid: process.env.WORKSPACE_SID!,
-		channelId: sid,
-		ttl: 3600,
-	});
-
-	const eventBridgePolicies = jwt.taskrouter.util.defaultEventBridgePolicies(process.env.TWILIO_ACCOUNT_SID!, sid);
-
-	const workspacePolicies = [
-		// Workspace fetch Policy
-		buildWorkspacePolicy(),
-		// Workspace subresources fetch Policy
-		buildWorkspacePolicy({ resources: ['**'] }),
-		// Workspace resources update Policy
-		buildWorkspacePolicy({ resources: ['**'], method: 'POST' }),
-	];
-
-	eventBridgePolicies.concat(workspacePolicies).forEach((policy) => {
-		workerCapability.addPolicy(policy);
-	});
-
-	return workerCapability;
-};
-
 export const getWorkflows = async () => {
 	const client = await createTwilioClient();
 	return client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workflows.list();

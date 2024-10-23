@@ -1,4 +1,4 @@
-import { Circle, LucideIcon, Phone, Voicemail } from 'lucide-react';
+import { Box, Building, Inbox, LucideIcon, Maximize, Tag, User } from 'lucide-react';
 import {
 	Sidebar,
 	SidebarContent,
@@ -10,27 +10,10 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { getOngoingTasks } from '@/lib/twilio/taskrouter/helpers';
-import { createClient } from '@/utils/supabase/server';
-import { cn } from '@/lib/utils';
 import Logo from '@/app/logo';
-import { getActivies } from '@/lib/twilio/taskrouter/worker/helpers';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import OutboundDialer from './outbound-dialer';
-import HistorySelector from './history-selector';
-import UserInfo from './user-info';
 import getQueryClient from '@/app/getQueryClient';
-import SidebarActivityList from './sidebar-activity-list';
-
-const activityColors: Record<string, string> = {
-	Available: 'bg-green-500',
-	Unavailable: 'bg-red-500',
-	Offline: 'bg-gray-500',
-	Break: 'bg-gray-500',
-	'On-Site': 'bg-orange-500',
-};
+import Link from 'next/link';
 
 type MenuItem = {
 	title: string;
@@ -39,45 +22,58 @@ type MenuItem = {
 };
 
 type MenuGroup = {
-	label: string;
+	label?: string;
 	content: MenuItem[];
 };
 
+const sidebarContent: MenuGroup[] = [
+	{
+		content: [
+			{
+				title: 'Inbox',
+				icon: Inbox,
+				url: '/inbox',
+			},
+			{
+				title: 'My Issues',
+				icon: Maximize,
+				url: '/my-issues',
+			},
+		],
+	},
+	{
+		label: 'Organization',
+		content: [
+			{
+				title: 'Tickets',
+				icon: Tag,
+				url: '/tickets/all',
+			},
+			{
+				title: 'Companies',
+				icon: Building,
+				url: '/companies/all',
+			},
+			{
+				title: 'Contacts',
+				icon: User,
+				url: '/contacts/all',
+			},
+			{
+				title: 'Projects',
+				icon: Box,
+				url: '/projects/all',
+			},
+		],
+	},
+];
+
 export async function AppSidebar() {
 	const queryClient = getQueryClient();
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-	const { data: profile } = await queryClient.fetchQuery({
-		queryKey: ['profiles', user?.id],
-		queryFn: async () =>
-			supabase
-				.from('profiles')
-				.select()
-				.eq('id', user?.id ?? '')
-				.single(),
-	});
-	const { data: conversations } = await queryClient.fetchQuery({
-		queryKey: ['conversations', user?.id],
-		queryFn: async () =>
-			await supabase
-				.schema('reporting')
-				.from('conversations')
-				.select()
-				.eq('agent', user?.user_metadata?.worker_sid ?? '')
-				.order('date', { ascending: false })
-				.limit(25),
+	const locations = await queryClient.fetchQuery({
+		queryKey: ['/system/locations'],
 	});
 
-	if (!user) return;
-
-	const { data, error } = await supabase.from('profiles').select().eq('id', user?.id).single();
-
-	if (!data) return;
-
-	const tasks = await getOngoingTasks({ routingTarget: data.worker_sid ?? '' });
-	const activites = await getActivies();
 	return (
 		<Sidebar
 			variant='inset'
@@ -88,90 +84,49 @@ export async function AppSidebar() {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<SidebarSeparator />
+				{sidebarContent.map((group, index) => (
+					<SidebarGroup key={`sidebar-group-${index}`}>
+						{group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
 
-				<SidebarGroup>
-					<SidebarGroupLabel>Tasks</SidebarGroupLabel>
-
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<Popover>
-									<PopoverTrigger asChild>
-										<SidebarMenuButton>
-											<Phone className='fill-current stroke-none' />
-											<span>Outbound Dialer</span>
-										</SidebarMenuButton>
-									</PopoverTrigger>
-
-									<PopoverContent
-										align='start'
-										side='right'
-										sideOffset={12}
-									>
-										<OutboundDialer />
-									</PopoverContent>
-								</Popover>
-							</SidebarMenuItem>
-
-							{tasks.map((task) => {
-								const voiceChannels = ['voice', 'default'];
-								const isCall = voiceChannels.includes(task.taskChannelUniqueName);
-								const attributes = JSON.parse(task.attributes);
-
-								return (
-									<SidebarMenuItem>
-										<SidebarMenuButton>
-											{isCall ? <Phone /> : <Voicemail />}
-											<span>{attributes.name}</span>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								{group.content.map((item) => (
+									<SidebarMenuItem key={`${item.title}-${item.url ?? ''}`}>
+										<SidebarMenuButton asChild={item.url !== undefined}>
+											{item.url ? (
+												<Link href={item.url}>
+													<item.icon />
+													<span>{item.title}</span>
+												</Link>
+											) : (
+												<>
+													<item.icon />
+													<span>{item.title}</span>
+												</>
+											)}
 										</SidebarMenuButton>
 									</SidebarMenuItem>
-								);
-							})}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-
-				<SidebarSeparator />
-
-				<SidebarGroup>
-					<SidebarGroupLabel>Activities</SidebarGroupLabel>
-
-					<SidebarGroupContent>
-						<SidebarActivityList isCollapsed />
-						{/* <SidebarMenu>
-							{activites.map((activity) => (
-								<SidebarMenuItem>
-									<SidebarMenuButton>
-										<Circle
-											className={cn(
-												'stroke-none rounded-full group-data-[collapsible=icon]:mr-1.5',
-												activityColors[activity.friendlyName]
-											)}
-										/>
-										<span>{activity.friendlyName}</span>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu> */}
-					</SidebarGroupContent>
-				</SidebarGroup>
+								))}
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				))}
 			</SidebarContent>
 
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<HistorySelector
+						{/* <HistorySelector
 							profile={profile!}
 							initalConversations={conversations!}
 							side='right'
-						/>
+						/> */}
 					</SidebarMenuItem>
 					<SidebarMenuItem>
-						<UserInfo
+						{/* <UserInfo
 							user={user!}
 							side='right'
-						/>
+						/> */}
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>

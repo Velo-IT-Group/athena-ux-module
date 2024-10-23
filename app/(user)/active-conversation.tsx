@@ -111,9 +111,10 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 	return (
 		<div className={cn('overflow-x-hidden', className)}>
 			<Tabs defaultValue={tabs[2].name}>
-				<TabsList className=''>
+				<TabsList>
 					{tabs.map((tab) => (
 						<TabsTrigger
+							key={tab.name}
 							className='w-full'
 							value={tab.name}
 						>

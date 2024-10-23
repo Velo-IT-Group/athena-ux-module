@@ -1,41 +1,14 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-
-import { Checkbox } from '@/components/ui/checkbox';
 import type { Company, ReferenceType } from '@/types/manage';
 import { DataTableColumnHeader } from '../ui/data-table/column-header';
-import { DataTableRowActions } from '../ui/data-table/row-actions';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { buttonVariants } from '../ui/button';
-import { Tooltip, TooltipTrigger } from '../ui/tooltip';
 import parsePhoneNumber from 'libphonenumber-js';
 
-// 'id', 'identifier', 'name', 'phoneNumber', 'territory'
-
 export const columns: ColumnDef<Company>[] = [
-	{
-		id: 'select',
-		header: ({ table }) => (
-			<Checkbox
-				checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label='Select all'
-				className='translate-y-[2px]'
-			/>
-		),
-		cell: ({ row }) => (
-			<Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label='Select row'
-				className='translate-y-[2px]'
-			/>
-		),
-		enableSorting: false,
-		enableHiding: false,
-	},
 	{
 		accessorKey: 'identifier',
 		header: ({ column }) => (
@@ -45,27 +18,14 @@ export const columns: ColumnDef<Company>[] = [
 			/>
 		),
 		cell: ({ row }) => (
-			(<Tooltip>
-                <TooltipTrigger asChild>
-					<Link
-						href={`/companies/${row.original.id}`}
-						className='font-medium w-[80px]'
-					>
-						{row.getValue('identifier')}
-					</Link>
-				</TooltipTrigger>
-                {/* <CompanyTooltipDetail
-					name={row.original.name}
-					phoneNumber={row.original.phoneNumber}
-				/> */}
-            </Tooltip>)
-			// <Link
-			// 	href={`/tickets/${row.getValue('identifier')}`}
-			// 	className={cn(buttonVariants({ variant: 'link' }), 'w-[80px]')}
-			// >
-			// 	{row.getValue('identifier')}
-			// </Link>
+			<Link
+				href={`/companies/${row.original.id}`}
+				className={cn(buttonVariants({ variant: 'link' }), 'w-[80px] px-0 justify-start')}
+			>
+				{row.getValue('identifier')}
+			</Link>
 		),
+		size: 15,
 		enableSorting: false,
 		enableHiding: false,
 	},

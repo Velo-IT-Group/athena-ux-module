@@ -303,13 +303,6 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       proposal_settings: {
@@ -766,6 +759,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      read_secret: {
+        Args: {
+          secret_name: string
+        }
+        Returns: string
+      }
       slugify: {
         Args: {
           value: string
@@ -875,88 +874,81 @@ export type Database = {
           talk_time?: number | null
           workflow?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_agent_fkey"
-            columns: ["agent"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["worker_sid"]
-          },
-        ]
+        Relationships: []
       }
-      conversations_new: {
+    }
+    Views: {
+      abandoned_conversations_by_day: {
         Row: {
-          abanded: string | null
-          abandon_time: number | null
-          abandoned_phase: string | null
-          agent: string | null
-          communication_channel: string | null
-          company_id: number | null
-          contact_id: number | null
-          conversation: string | null
-          date: string | null
-          direction: string | null
-          external_contact: string | null
-          hold_time: number | null
+          abandoned_count: number | null
+          average_abandon_time: number | null
+          conversation_date: string | null
+        }
+        Relationships: []
+      }
+      handle_time_by_day: {
+        Row: {
+          average_abandon_time: number | null
+          average_handling_time: number | null
+          average_queue_time: number | null
+          conversation_date: string | null
+        }
+        Relationships: []
+      }
+      voicemails_by_day: {
+        Row: {
+          voicemail_count: number | null
+          voicemail_date: string | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      search_number: {
+        Args: {
+          phone_number: string
+        }
+        Returns: {
+          userid: number
+          companyid: number
+          name: string
+          territoryname: string
+        }[]
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  user_experience: {
+    Tables: {
+      custom_view: {
+        Row: {
+          created_at: string
+          creator: string | null
+          filterData: Json
+          filters: Json
           id: string
-          in_business_hours: boolean | null
-          kind: string | null
-          outcome: string | null
-          queue: string | null
-          queue_time: number | null
-          ring_time: number | null
-          talk_time: number | null
-          time: string | null
-          workflow: string | null
+          name: string
         }
         Insert: {
-          abanded?: string | null
-          abandon_time?: number | null
-          abandoned_phase?: string | null
-          agent?: string | null
-          communication_channel?: string | null
-          company_id?: number | null
-          contact_id?: number | null
-          conversation?: string | null
-          date?: string | null
-          direction?: string | null
-          external_contact?: string | null
-          hold_time?: number | null
+          created_at?: string
+          creator?: string | null
+          filterData: Json
+          filters: Json
           id?: string
-          in_business_hours?: boolean | null
-          kind?: string | null
-          outcome?: string | null
-          queue?: string | null
-          queue_time?: number | null
-          ring_time?: number | null
-          talk_time?: number | null
-          time?: string | null
-          workflow?: string | null
+          name: string
         }
         Update: {
-          abanded?: string | null
-          abandon_time?: number | null
-          abandoned_phase?: string | null
-          agent?: string | null
-          communication_channel?: string | null
-          company_id?: number | null
-          contact_id?: number | null
-          conversation?: string | null
-          date?: string | null
-          direction?: string | null
-          external_contact?: string | null
-          hold_time?: number | null
+          created_at?: string
+          creator?: string | null
+          filterData?: Json
+          filters?: Json
           id?: string
-          in_business_hours?: boolean | null
-          kind?: string | null
-          outcome?: string | null
-          queue?: string | null
-          queue_time?: number | null
-          ring_time?: number | null
-          talk_time?: number | null
-          time?: string | null
-          workflow?: string | null
+          name?: string
         }
         Relationships: []
       }
@@ -1056,4 +1048,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

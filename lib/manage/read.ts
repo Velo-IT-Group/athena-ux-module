@@ -36,12 +36,13 @@ export const getCompany = async (id: number, conditions?: Conditions<Company>): 
 };
 
 export const getCompanies = async (conditions?: Conditions<Company>): Promise<{ data: Company[]; count: number }> => {
+	const params = generateParams(conditions)
 	const [response, countResponse] = await Promise.all([
-		fetch(`${process.env.CONNECT_WISE_URL}/company/companies${generateParams(conditions)}`, {
+		fetch(`${process.env.CONNECT_WISE_URL}/company/companies${params}`, {
 			headers: baseHeaders,
 			method: 'GET',
 		}),
-		fetch(`${process.env.CONNECT_WISE_URL}/company/companies/count${generateParams(conditions)}`, {
+		fetch(`${process.env.CONNECT_WISE_URL}/company/companies/count${params}`, {
 			headers: baseHeaders,
 			method: 'GET',
 		}),

@@ -29,6 +29,25 @@ const nextConfig: NextConfig = {
 
 		return config;
 	},
+	redirects: async () => {
+		return [
+			{
+				source: '/my-issues',
+				destination: '/my-issues/assigned',
+				permanent: true
+			},
+			{
+				source: '/projects',
+				destination: '/projects/all',
+				permanent: true
+			},
+			{
+				source: '/tickets',
+				destination: '/tickets/all',
+				permanent: true
+			}
+		]
+	},
 	experimental: {
 		reactCompiler: true,
 	},

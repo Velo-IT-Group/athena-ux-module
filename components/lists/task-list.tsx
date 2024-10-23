@@ -116,6 +116,11 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 
 		worker?.on('reservationCreated', onReservationCreated);
 
+		worker?.on('reservationFailed', (reservation) => {
+			togglePlayback(false);
+			removeReservation(reservation);
+		});
+
 		worker.on('error', (e) => {
 			console.error(e.message);
 		});

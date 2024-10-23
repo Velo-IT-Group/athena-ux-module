@@ -98,8 +98,6 @@ const Layout = async ({ children }: Props) => {
 
 					<SidebarInset>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
-							<Navbar />
-
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>
 					</SidebarInset>

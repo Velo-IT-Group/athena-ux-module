@@ -7,6 +7,7 @@ import { initalizeJabra } from '@/lib/jabra';
 import { CallControlFactory, ICallControl, SignalType } from '@gnaudio/jabra-js';
 import { toast } from 'sonner';
 import { PreflightTestReport } from '@/types/twilio';
+import { useRouter } from 'next/navigation';
 
 interface DeviceProviderProps {
 	device: Device | undefined;
@@ -53,6 +54,7 @@ export type CustomCall = {
 };
 
 export const DeviceProvider = ({ authToken, children }: WithChildProps) => {
+	const router = useRouter();
 	const [device, setDevice] = useState<Device>();
 	const [currentCallControl, setCurrentCallControl] = useState<ICallControl | undefined>();
 	const [activeCalls, setActiveCalls] = useState<Call[]>([]);

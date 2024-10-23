@@ -114,6 +114,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 				<TabsList className=''>
 					{tabs.map((tab) => (
 						<TabsTrigger
+							key={tab.name}
 							className='w-full'
 							value={tab.name}
 						>

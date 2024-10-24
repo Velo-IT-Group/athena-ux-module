@@ -6,6 +6,7 @@ import ConfigurationsList from '@/components/lists/configurations-list';
 import {
 	getBoards,
 	getCompanies,
+	getCompanyNotes,
 	getConfigurationStatuses,
 	getConfigurationTypes,
 	getContacts,
@@ -41,6 +42,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		{ data: calls },
 		{ data: projects },
 		{ data: contacts },
+		{ data: notes },
 	] = await Promise.all([
 		getBoards({
 			conditions: {
@@ -100,7 +102,15 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			fields: ['id', 'firstName', 'lastName'],
 			pageSize: 1000,
 		}),
+		getCompanyNotes(companyId, {
+			conditions: {
+				'type/id': 6,
+			},
+			fields: ['id', 'text'],
+		}),
 	]);
+
+	console.log(notes);
 
 	const tabs = [
 		{ name: 'Company', icon: Building },
@@ -129,7 +139,15 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 				>
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
-						<MinimalTiptapEditor editable={false} />
+						<MinimalTiptapEditor
+							editable={false}
+							content={notes?.[0]?.text}
+							output='html'
+							shouldRerenderOnTransaction
+							placeholder='Type your description here...'
+							editorClassName='focus:outline-none'
+							immediatelyRender
+						/>
 					</div>
 
 					<div className='space-y-3'>

@@ -71,14 +71,28 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 	return await response.json();
 };
 
-export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
-	const response = await fetch(
-		`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
-		{
-			headers: baseHeaders,
-		}
-	);
-	return await response.json();
+export const getCompanyNotes = async (id?: number, conditions?: Conditions<Note>): Promise<{data: Note[], count: number}> => {
+	if (!id) return { data: [], count: 0 };
+	const params = generateParams(conditions)
+	const [dataResponse, countResponse] = await Promise.all([
+		fetch(
+			`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes${params}`,
+			{
+				headers: baseHeaders,
+			}
+		),
+		fetch(
+			`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes/count${params}`,
+			{
+				headers: baseHeaders,
+			}
+		),
+	])
+	
+	return {
+		data: await dataResponse.json(),
+		count: (await countResponse.json()).count
+	}
 };
 
 export const getContact = async (

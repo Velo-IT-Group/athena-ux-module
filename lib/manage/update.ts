@@ -28,3 +28,24 @@ export const updateTicket = async (id: number, operation: PathOperation[]) => {
 
 	return await response.json();
 };
+
+export const updateCompanyNote = async (companyId: number, id: number, operation: PathOperation[]) => {
+	const headers = new Headers(baseHeaders);
+	headers.set('access-control-allow-origin', '*');
+
+	// console.log(headers);
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${companyId}/notes/${id}`, {
+		headers,
+		method: 'patch',
+		body: JSON.stringify(operation),
+	});
+
+	const data = await response.json();
+	console.log(data)
+
+	if (!response.ok) throw new Error(response.statusText, { cause: response.statusText });
+
+	revalidatePath('/');
+
+	return data
+};

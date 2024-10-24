@@ -15,6 +15,19 @@ export const customFieldSchema = z.object({
 	value: z.object({}),
 });
 
+export const companyNoteSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+  type: z.object({ id: z.number(), name: z.string() }),
+  flagged: z.boolean(),
+  enteredBy: z.string(),
+  company: z.object({
+    id: z.number(),
+    identifier: z.string(),
+    name: z.string()
+  })
+})
+
 const auditTypeSchema = z.enum([
 	'Attachment',
 	'Combined Tickets',
@@ -559,6 +572,11 @@ export const configurationTypeSchema = z.object({
 	systemFlag: z.boolean(),
 });
 
+export const createNoteSchema = z.object({
+	text: z.string(),
+	type: z.object({ id: z.number() }),
+});
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type BoardStatus = z.infer<typeof boardStatusSchema>;
@@ -570,6 +588,7 @@ export type CommunicationType = z.infer<typeof communicationTypeSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type ConfigurationStatus = z.infer<typeof configurationStatusSchema>;
 export type ConfigurationType = z.infer<typeof configurationTypeSchema>;
+export type CompanyNote = z.infer<typeof companyNoteSchema>;
 export type Document = z.infer<typeof documentSchema>;
 export type Location = z.infer<typeof locationSchema>;
 export type Project = z.infer<typeof projectSchema>;

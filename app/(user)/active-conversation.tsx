@@ -110,8 +110,6 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		}),
 	]);
 
-	console.log(notes);
-
 	const tabs = [
 		{ name: 'Company', icon: Building },
 		{ name: 'Configurations', icon: Cable },

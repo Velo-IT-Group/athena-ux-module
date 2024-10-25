@@ -559,6 +559,8 @@ export const configurationTypeSchema = z.object({
 	systemFlag: z.boolean(),
 });
 
+
+
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type BoardStatus = z.infer<typeof boardStatusSchema>;

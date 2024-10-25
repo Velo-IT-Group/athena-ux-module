@@ -14,6 +14,7 @@ import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
 import { useEffect, useState } from 'react';
 import { SidebarMenuButton } from './ui/sidebar';
+import { Button } from './ui/button';
 
 type Props = {
 	profile: Profile;
@@ -66,10 +67,14 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side }: 
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<SidebarMenuButton>
+				<Button
+					variant='ghost'
+					size='icon'
+					className='rounded-full'
+				>
 					<History />
-					<span>History</span>
-				</SidebarMenuButton>
+					<span className='sr-only'>History</span>
+				</Button>
 			</PopoverTrigger>
 
 			<PopoverContent

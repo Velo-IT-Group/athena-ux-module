@@ -71,20 +71,25 @@ const UserInfo = ({ user, align = 'end', side }: Props) => {
 		<AlertDialog>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<SidebarMenuButton>
+					<Button
+						variant='ghost'
+						size='icon'
+						className='rounded-full'
+					>
 						<div className='relative'>
 							<UserIcon />
 
 							<div
 								className={cn(
 									'w-2 h-2 rounded-full absolute border border-white -right-0.5 -bottom-0.5',
-									activity && activityColors[activity?.name]
+									// activity && activityColors[activity?.name]
+									'bg-green-500'
 								)}
 							/>
 						</div>
 
-						<span>{user?.user_metadata?.full_name}</span>
-					</SidebarMenuButton>
+						<span className='sr-only'>{user?.user_metadata?.full_name}</span>
+					</Button>
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent

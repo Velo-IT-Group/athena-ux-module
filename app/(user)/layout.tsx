@@ -14,6 +14,7 @@ import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
 import { AppSidebar } from '@/components/app-sidebar';
+import WorkerToolbar from '@/components/worker-toolbar';
 
 type Props = {
 	children: ReactNode;
@@ -101,10 +102,13 @@ const Layout = async ({ children }: Props) => {
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>
 					</SidebarInset>
-				</SidebarProvider>
 
-				<Toaster richColors />
-				<Analytics />
+					<Toaster richColors />
+
+					<Analytics />
+
+					<WorkerToolbar />
+				</SidebarProvider>
 			</UserLayout>
 		</ReactQueryProvider>
 	);

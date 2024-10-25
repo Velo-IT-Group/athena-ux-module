@@ -27,9 +27,9 @@ const OutboundTask = ({ task }: Props) => {
 				<CardDescription className='flex items-center gap-1.5'>
 					<span className='text-nowrap'>Outbound call</span>
 
-					<PopoverClose>
+					{/* <PopoverClose>
 						<X className='h-3.5 w-3.5 inline-block text-gray-400 cursor-pointer' />
-					</PopoverClose>
+					</PopoverClose> */}
 				</CardDescription>
 			</CardHeader>
 

@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Input } from '@/components/ui/input';
+import { Input, InputProps } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -36,8 +36,7 @@ export type PhoneData = {
 	type?: NumberType;
 };
 
-interface PhoneInputProps extends React.ComponentPropsWithoutRef<'input'> {
-	value?: string;
+interface PhoneInputProps extends InputProps {
 	defaultCountry?: CountryCode;
 }
 
@@ -61,21 +60,21 @@ export function getPhoneData(phone: string): PhoneData {
 }
 
 export function PhoneInput({
-	value: valueProp,
+	// value: valueProp,
 	defaultCountry = 'US',
 	className,
 	id,
 	required = true,
-	...rest
+	...props
 }: PhoneInputProps) {
 	const asYouType = new AsYouType();
 
 	const inputRef = React.useRef<HTMLInputElement>(null);
 
-	const [value, handlers, history] = useStateHistory(valueProp);
+	const [value, handlers, history] = useStateHistory(props.value);
 
-	if (value && value.length > 0) {
-		defaultCountry = parsePhoneNumberFromString(value)?.getPossibleCountries()[0] || defaultCountry;
+	if (value && typeof props.value === 'string' && props.value.length > 0) {
+		defaultCountry = parsePhoneNumberFromString(props.value ?? '')?.getPossibleCountries()[0] || defaultCountry;
 	}
 
 	const [openCommand, setOpenCommand] = React.useState(false);
@@ -127,6 +126,7 @@ export function PhoneInput({
 			handlers.back();
 			if (inputRef.current && history.current > 0 && history.history[history.current - 1] !== undefined) {
 				event.preventDefault();
+				// @ts-ignore
 				inputRef.current.value = history.history[history.current - 1] || '';
 			}
 		}
@@ -209,13 +209,13 @@ export function PhoneInput({
 				name='phone'
 				id={id}
 				placeholder='Phone'
-				defaultValue={initializeDefaultValue()}
+				// defaultValue={initializeDefaultValue()}
 				onInput={handleOnInput}
 				onPaste={handleOnPaste}
 				onKeyDown={handleKeyDown}
 				required={required}
 				aria-required={required}
-				{...rest}
+				{...props}
 			/>
 		</div>
 	);

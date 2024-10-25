@@ -1,6 +1,6 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { X } from 'lucide-react';
+import { Compass, Smartphone, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import Timer from '../timer';
 import { Task } from 'twilio-taskrouter';
@@ -20,34 +20,29 @@ const TaskWrapup = ({ timer }: Props) => {
 	const { completeTask } = useTaskContext();
 
 	return (
-		<Card>
-			<CardHeader className='flex-row justify-between items-center p-3 gap-12 border-b'>
-				<CardTitle className='text-lg'>Wrapping</CardTitle>
+		<div className='grid gap-3'>
+			<div className='grid gap-3 rounded-lg border bg-background p-3 w-full'>
+				<div className='flex w-full items-center justify-start gap-x-2'>
+					<div className='h-6 w-6 shrink-0 rounded-full border border-border/15 bg-[#FE9300] '></div>
 
-				<CardDescription>
-					<Timer timer={timer} />
+					<span className='select-none text-sm font-medium'>Jonas</span>
 
-					<PopoverClose asChild>
-						<Button
-							variant='ghost'
-							size='icon'
-							className='p-0 w-9 h-9'
-						>
-							<X className='inline-block text-gray-400 cursor-pointer' />
-						</Button>
-					</PopoverClose>
-				</CardDescription>
-			</CardHeader>
+					<Smartphone />
 
-			<CardContent className='p-3 pt-1.5'>
-				<Button
-					className='w-full'
-					onClick={() => completeTask?.mutate()}
-				>
-					Complete
-				</Button>
-			</CardContent>
-		</Card>
+					<Compass />
+				</div>
+
+				<span className='select-none text-sm text-muted-foreground'>Call Details </span>
+			</div>
+
+			<Button
+				variant='outline'
+				size='sm'
+				className='w-full'
+			>
+				Complete
+			</Button>
+		</div>
 	);
 };
 

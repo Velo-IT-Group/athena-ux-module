@@ -30,7 +30,7 @@ const ActiveCallFooter = () => {
 	const { muted, setMuted, activeCall } = useDevice();
 
 	return (
-		<CardFooter className='p-3 border-t space-x-1.5 justify-between'>
+		<div className='flex items-center justify-between gap-3 w-full rounded-lg border bg-background p-1.5'>
 			<Tooltip>
 				<TooltipTrigger asChild>
 					<Button
@@ -168,7 +168,7 @@ const ActiveCallFooter = () => {
 					</TooltipContent>
 				</Tooltip>
 			</div>
-		</CardFooter>
+		</div>
 	);
 };
 

@@ -31,14 +31,14 @@ const IncomingTask = ({ reservation, task }: Props) => {
 				<CardDescription className='flex items-center gap-1.5'>
 					<span className='text-nowrap text-xs'>{isVoicemail ? 'Incoming Voicemail' : 'Incoming call'}</span>
 
-					<PopoverClose asChild>
+					{/* <PopoverClose asChild>
 						<Button
 							variant='ghost'
 							size='smIcon'
 						>
 							<X className='inline-block text-gray-400 cursor-pointer' />
 						</Button>
-					</PopoverClose>
+					</PopoverClose> */}
 				</CardDescription>
 			</CardHeader>
 

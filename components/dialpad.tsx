@@ -27,7 +27,7 @@ type Props = {
 
 export function Dialpad({ onValueChange }: Props) {
 	return (
-		<div className='w-full grid grid-cols-3 gap-1.5'>
+		<div className='w-full grid grid-cols-3 gap-1.5 place-items-center'>
 			{digitButtons.map((d) => (
 				<Button
 					size='icon'

@@ -23,14 +23,14 @@ const VoicemailTask = ({ task }: Props) => {
 				</CardTitle>
 
 				<CardDescription className='flex items-center gap-1.5'>
-					<PopoverClose asChild>
+					{/* <PopoverClose asChild>
 						<Button
 							variant='ghost'
 							size='smIcon'
 						>
 							<X className='inline-block text-gray-400 cursor-pointer' />
 						</Button>
-					</PopoverClose>
+					</PopoverClose> */}
 				</CardDescription>
 			</CardHeader>
 

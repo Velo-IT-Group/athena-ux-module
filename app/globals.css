@@ -90,7 +90,7 @@
 	}
 
 	svg {
-		@apply w-3.5 h-3.5;
+		@apply w-3.5 h-3.5 inline-block;
 	}
 	h1 {
 		@apply text-2xl font-bold;

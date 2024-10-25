@@ -1,4 +1,17 @@
-import { Axe, Box, Building, Calendar, FileText, Inbox, LucideIcon, Maximize, Tag, Ticket, User } from 'lucide-react';
+import {
+	Axe,
+	Box,
+	Building,
+	Calendar,
+	FileText,
+	Inbox,
+	LogOut,
+	LucideIcon,
+	Maximize,
+	Tag,
+	Ticket,
+	User,
+} from 'lucide-react';
 import {
 	Sidebar,
 	SidebarContent,
@@ -183,6 +196,15 @@ export async function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
+						<SidebarMenuButton
+							content='Logout'
+							asChild
+						>
+							<Link href='/login'>
+								<LogOut />
+								<span>Logout</span>
+							</Link>
+						</SidebarMenuButton>
 						{/* <HistorySelector
 							profile={profile!}
 							initalConversations={conversations!}

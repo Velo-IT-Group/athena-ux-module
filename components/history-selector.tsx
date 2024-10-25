@@ -1,20 +1,9 @@
 'use client';
-import { History } from 'lucide-react';
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandList,
-	CommandSeparator,
-} from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useEffect, useState } from 'react';
 import { groupBy } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
-import { useEffect, useState } from 'react';
-import { SidebarMenuButton } from './ui/sidebar';
-import { Button } from './ui/button';
+import { ScrollArea } from './ui/scroll-area';
 
 type Props = {
 	profile: Profile;
@@ -28,7 +17,6 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side }: 
 	const [conversations, setConversations] = useState<Conversation[]>(initalConversations);
 
 	useEffect(() => {
-		// setConversations(initalConversations);
 		const channel = supabase
 			.channel('reporting_conversations')
 			.on(
@@ -54,62 +42,35 @@ const HistorySelector = ({ profile, initalConversations, align = 'end', side }: 
 		};
 	}, []);
 
-	// .schema('reporting')
-	// .from('conversations')
-	// .select('id, date, direction, phone_number, talk_time, contact_id')
-	// .eq('agent', user?.user_metadata.workerSid ?? '')
-	// .order('date', { ascending: false });
-
 	const groupedCalls = groupBy(conversations, ({ date }) =>
 		Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(date))
 	);
 
 	return (
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button
-					variant='ghost'
-					size='icon'
-					className='rounded-full'
-				>
-					<History />
-					<span className='sr-only'>History</span>
-				</Button>
-			</PopoverTrigger>
-
-			<PopoverContent
-				align={align}
-				side={side}
-				sideOffset={12}
-				className='min-w-80 p-0'
-			>
-				<Command>
-					<CommandInput placeholder='Filter calls...' />
-
-					<CommandEmpty>No call history found.</CommandEmpty>
-
-					<CommandList className='relative'>
-						{Object?.entries(groupedCalls).map(([key, conversations], index) => (
-							<div key={`${key}-separator`}>
-								{index !== 0 && <CommandSeparator key={`${key}-seperator`} />}
-								<CommandGroup
-									key={key}
-									heading={key}
-									className='[&_[cmdk-group-heading]]:sticky [&_[cmdk-group-heading]]:top-0 relative'
-								>
-									{conversations?.map((conversation) => (
-										<HistoryListItem
-											key={conversation.id}
-											conversation={conversation as Conversation}
-										/>
-									))}
-								</CommandGroup>
-							</div>
-						))}
-					</CommandList>
-				</Command>
-			</PopoverContent>
-		</Popover>
+		<ScrollArea className='min-h-12 max-h-96 h-full flex flex-col bg-muted'>
+			<div className='flex w-[285px] flex-col items-center justify-center gap-y-3 rounded-xl border py-3 px-1.5'>
+				{Object?.entries(groupedCalls).map(([key, conversations], index) => (
+					<div
+						key={`${key}-separator`}
+						className='w-full'
+					>
+						{/* {index !== 0 && <CommandSeparator key={`${key}-seperator`} />} */}
+						<div
+							key={key}
+							className='w-full'
+						>
+							<span className='text-xs font-medium text-muted-foreground ml-1'>{key}</span>
+							{conversations?.map((conversation) => (
+								<HistoryListItem
+									key={conversation.id}
+									conversation={conversation as Conversation}
+								/>
+							))}
+						</div>
+					</div>
+				))}
+			</div>
+		</ScrollArea>
 	);
 };
 

@@ -22,6 +22,7 @@ import LabeledInput from '@/components/ui/labeled-input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Tiptap from '@/components/tip-tap';
+import getQueryClient from '../getQueryClient';
 
 type Props = {
 	contactId?: number;
@@ -31,6 +32,7 @@ type Props = {
 
 const ConversationDetails = async ({ contactId, companyId, className }: Props) => {
 	const supabase = await createClient();
+	const client = getQueryClient();
 	const [
 		boards,
 		priorities,
@@ -42,15 +44,20 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		{ data: projects },
 		{ data: contacts },
 	] = await Promise.all([
-		getBoards({
-			conditions: {
-				inactiveFlag: false,
-				projectFlag: false,
-				// 'workRole/id': [9, 5],
-			},
-			orderBy: { key: 'name' },
-			fields: ['id', 'name'],
-			pageSize: 1000,
+		client.fetchQuery({
+			queryKey: [
+				'/service/boards',
+				{
+					conditions: {
+						inactiveFlag: false,
+						projectFlag: false,
+						// 'workRole/id': [9, 5],
+					},
+					orderBy: { key: 'name' },
+					fields: ['id', 'name'],
+					pageSize: 1000,
+				},
+			],
 		}),
 		getPriorities({ fields: ['id', 'name'], orderBy: { key: 'name' }, pageSize: 1000 }),
 		getSystemMembers({

@@ -12,7 +12,7 @@ const ActiveCallParticipants = () => {
 	const { items } = useSyncMap(`Conference-${task?.sid}`);
 
 	return (
-		<CardContent className='p-1.5 flex flex-col justify-start'>
+		<div className='p-1.5 flex flex-col justify-start gap-3 w-full rounded-lg border bg-background'>
 			{entries.map(([key, value]) => (
 				<ParticipantListItem
 					key={key}
@@ -33,7 +33,7 @@ const ActiveCallParticipants = () => {
 					/>
 				);
 			})} */}
-		</CardContent>
+		</div>
 	);
 };
 

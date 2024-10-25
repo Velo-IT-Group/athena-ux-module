@@ -19,7 +19,7 @@ export function ActiveCall({ task }: Props) {
 	}
 
 	return (
-		<Card>
+		<div className='grid gap-3 w-full'>
 			<ActiveCallHeader
 				queueName={task.queueName}
 				searchParams={searchParams}
@@ -28,6 +28,6 @@ export function ActiveCall({ task }: Props) {
 			<ActiveCallParticipants />
 
 			<ActiveCallFooter />
-		</Card>
+		</div>
 	);
 }

@@ -40,14 +40,14 @@ const ActiveCallHeader = ({ queueName, searchParams }: Props) => {
 
 				<Tooltip>
 					<TooltipTrigger asChild>
-						<PopoverClose asChild>
+						{/* <PopoverClose asChild>
 							<Button
 								variant='ghost'
 								size='smIcon'
 							>
 								<X />
 							</Button>
-						</PopoverClose>
+						</PopoverClose> */}
 					</TooltipTrigger>
 
 					<TooltipContent>Dismiss</TooltipContent>

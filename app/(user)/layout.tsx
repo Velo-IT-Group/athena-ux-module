@@ -91,6 +91,8 @@ const Layout = async ({ children }: Props) => {
 			),
 	});
 
+	if (!profile) return null;
+
 	return (
 		<ReactQueryProvider>
 			<UserLayout token={twilioToken}>
@@ -107,7 +109,11 @@ const Layout = async ({ children }: Props) => {
 
 					<Analytics />
 
-					<WorkerToolbar />
+					<WorkerToolbar
+						conversations={conversations ?? []}
+						profile={profile!}
+						user={user}
+					/>
 				</SidebarProvider>
 			</UserLayout>
 		</ReactQueryProvider>

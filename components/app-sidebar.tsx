@@ -4,6 +4,7 @@ import {
 	Building,
 	Calendar,
 	FileText,
+	Home,
 	Inbox,
 	LogOut,
 	LucideIcon,
@@ -48,9 +49,9 @@ const sidebarContent: MenuGroup[] = [
 	{
 		content: [
 			{
-				title: 'Inbox',
-				icon: Inbox,
-				url: '/inbox',
+				title: 'Dashboard',
+				icon: Home,
+				url: '/',
 			},
 			{
 				title: 'My Issues',

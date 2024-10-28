@@ -1,13 +1,12 @@
 'use client';
+import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CommandItem } from '@/components/ui/command';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getContact } from '@/lib/manage/read';
 import { parsePhoneNumber } from '@/lib/utils';
-import { addSeconds, relativeDate } from '@/utils/date';
+import { relativeDate } from '@/utils/date';
 import { useQuery } from '@tanstack/react-query';
-import { Briefcase, Compass, Hash, PhoneIncoming, PhoneOutgoing, Route, Smartphone, Undo2, User } from 'lucide-react';
-import React from 'react';
+import { Briefcase, Compass, Hash, Route, Smartphone, Undo2, User } from 'lucide-react';
 
 type Props = {
 	conversation: Conversation;
@@ -18,6 +17,7 @@ const HistoryListItem = ({ conversation }: Props) => {
 	const { data, isLoading } = useQuery({
 		queryKey: ['contact', conversation.contact_id],
 		queryFn: () => getContact(conversation.contact_id, { fields: ['id', 'firstName', 'lastName', 'company'] }),
+		enabled: !!conversation.contact_id,
 	});
 
 	const name = data
@@ -81,35 +81,6 @@ const HistoryListItem = ({ conversation }: Props) => {
 				</AccordionItem>
 			</Accordion>
 		</div>
-		// <CommandItem value={value}>
-		// {conversation.direction === 'outbound' ? (
-		// 	<PhoneOutgoing className='mr-3 text-red-500' />
-		// ) : (
-		// 	<PhoneIncoming className='mr-3 text-green-500' />
-		// )}
-		// 	<div>
-		// {isLoading ? (
-		// 	<Skeleton className='h-2 w-5' />
-		// ) : (
-		// 	<>
-		// 		{name && name}
-		// 		{name && ' • '}
-		// 	</>
-		// )}
-		// 		{parsePhoneNumber(conversation.phone_number ?? '').formattedNumber}
-		// 	<div>
-		// 		<span className='text-muted-foreground text-xs'>
-		// 			{Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(startTime)}
-		// 			{' - '}
-		// 			{conversation.talk_time
-		// 				? Intl.DateTimeFormat('en-US', { timeStyle: 'short' }).format(
-		// 						addSeconds(startTime, conversation?.talk_time ?? 0)
-		// 				  )
-		// 				: 'Current'}
-		// 		</span>
-		// 	</div>
-		// </div>
-		// </CommandItem>
 	);
 };
 

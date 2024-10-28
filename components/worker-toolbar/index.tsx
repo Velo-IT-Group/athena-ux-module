@@ -15,10 +15,17 @@ import { toast } from 'sonner';
 import TaskNotification from '../task-notification';
 import useTimer from '@/hooks/useTimer';
 import Timer from '../timer';
+import HistorySelector from '../history-selector';
+import UserInfo from '../user-info';
+import { User } from '@supabase/supabase-js';
 
-type Props = {};
+type Props = {
+	profile: Profile;
+	conversations: Conversation[];
+	user: User;
+};
 
-const WorkerToolbar = (props: Props) => {
+const WorkerToolbar = ({ profile, conversations, user }: Props) => {
 	const [selectedTab, setSelectedTab] = useState('');
 	const { worker } = useWorker();
 	const { reservations, addReservation, removeReservation } = useReservations();
@@ -130,30 +137,11 @@ const WorkerToolbar = (props: Props) => {
 		};
 	}, [worker]);
 
-	// const supabase = await createClient();
-
-	// const {
-	// 	data: { user },
-	// } = await supabase.auth.getUser();
-
-	// if (!user) return null;
-
-	// const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-
-	// if (!profile) return null;
-
-	// const { data: initialConversations } = await supabase
-	// 	.schema('reporting')
-	// 	.from('conversations')
-	// 	.select('*')
-	// 	.order('date', { ascending: false })
-	// 	.eq('agent', profile?.worker_sid ?? '');
-
 	return (
 		<Tabs
 			value={selectedTab}
 			onValueChange={setSelectedTab}
-			is-worker-loaded={true}
+			// is-worker-loaded={true}
 			className='flex flex-col items-center justify-end overflow-hidden border bg-background shadow-sm fixed bottom-6 right-6 rounded-2xl p-1'
 		>
 			<div className='w-full rounded-xl overflow-hidden'>
@@ -161,18 +149,18 @@ const WorkerToolbar = (props: Props) => {
 					value='user-info'
 					className='bg-secondary'
 				>
-					{/* <UserInfo user={user} /> */}
+					<UserInfo user={user} />
 				</TabsContent>
 
 				<TabsContent value='call-history'>
-					{/* <HistorySelector
+					<HistorySelector
 						profile={profile}
-						initalConversations={initialConversations ?? []}
-					/> */}
+						initalConversations={conversations ?? []}
+					/>
 				</TabsContent>
 
 				<TabsContent value='team-members'>
-					<TeamMembers members={[]} />
+					<TeamMembers />
 				</TabsContent>
 
 				<TabsContent value='outbound-dialer'>
@@ -214,7 +202,7 @@ const WorkerToolbar = (props: Props) => {
 					value='call-history'
 					className='rounded-full hover:bg-muted data-[state=active]:bg-muted h-9 w-9'
 				>
-					<History />
+					<History className='h-5 w-5' />
 
 					<span className='sr-only'>Call History</span>
 				</TabsTrigger>
@@ -223,7 +211,7 @@ const WorkerToolbar = (props: Props) => {
 					value='team-members'
 					className='rounded-full hover:bg-muted data-[state=active]:bg-muted h-9 w-9'
 				>
-					<Users />
+					<Users className='h-5 w-5' />
 
 					<span className='sr-only'>Team Members</span>
 				</TabsTrigger>
@@ -237,7 +225,7 @@ const WorkerToolbar = (props: Props) => {
 					value='outbound-dialer'
 					className='rounded-full hover:bg-muted data-[state=active]:bg-muted h-9 w-9'
 				>
-					<PhoneOutgoing />
+					<PhoneOutgoing className='h-5 w-5' />
 				</TabsTrigger>
 
 				{reservations.length > 0 && (
@@ -269,7 +257,7 @@ export const ReservationTrigger = ({ reservation }: { reservation: Reservation }
 			value={reservation.sid}
 			className='rounded-full hover:bg-muted data-[state=active]:bg-muted h-9 flex items-center gap-1.5'
 		>
-			{(taskChannel === 'voice' || taskChannel === 'default') && <Phone />}
+			{(taskChannel === 'voice' || taskChannel === 'default') && <Phone className='h-5 w-5' />}
 
 			<div className='flex flex-col justify-start items-start'>
 				<p className='text-xs leading-none'>{task.attributes.name}</p>

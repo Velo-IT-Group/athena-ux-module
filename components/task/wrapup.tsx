@@ -39,6 +39,7 @@ const TaskWrapup = ({ timer }: Props) => {
 				variant='outline'
 				size='sm'
 				className='w-full'
+				onClick={() => completeTask?.mutate()}
 			>
 				Complete
 			</Button>

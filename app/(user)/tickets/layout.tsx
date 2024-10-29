@@ -31,7 +31,7 @@ const Layout = ({ children }: Props) => {
 					{
 						title: 'All tickets',
 						href: '/tickets/all',
-						icon: Ticket,
+						// icon: 'Ticket',
 					},
 				]}
 			>

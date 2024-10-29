@@ -4,6 +4,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { Button } from './ui/button';
 import { type DialogProps } from '@radix-ui/react-dialog';
 import { LucideIcon, Search } from 'lucide-react';
+import { useHotkeys } from '@/hooks/use-hot-keys';
 
 type CommandItemType = {
 	icon: LucideIcon;
@@ -17,16 +18,25 @@ interface Props extends DialogProps {
 export function CommandMenu({ ...props }: Props) {
 	const [open, setOpen] = React.useState(false);
 
-	React.useEffect(() => {
-		const down = (e: KeyboardEvent) => {
-			if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-				e.preventDefault();
+	useHotkeys([
+		[
+			'k',
+			() => {
 				setOpen((open) => !open);
-			}
-		};
-		document.addEventListener('keydown', down);
-		return () => document.removeEventListener('keydown', down);
-	}, []);
+			},
+		],
+	]);
+
+	// React.useEffect(() => {
+	// 	const down = (e: KeyboardEvent) => {
+	// 		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+	// 			e.preventDefault();
+	// 			setOpen((open) => !open);
+	// 		}
+	// 	};
+	// 	document.addEventListener('keydown', down);
+	// 	return () => document.removeEventListener('keydown', down);
+	// }, []);
 
 	return (
 		<>

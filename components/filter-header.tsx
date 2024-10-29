@@ -1,17 +1,12 @@
 'use client';
 import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { Circle, CircleDashed, ListFilter, SlidersHorizontal, Type, User, UserCircle, UserPen } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { SlidersHorizontal } from 'lucide-react';
 import { FilterItem as ComboboxFilterItem, LinearCombobox } from './linear-combobox';
 import FilterItem from './filter-item';
 
 type Props = {
-	filters: {
-		label: string;
-		value: string | number;
-		icon?: React.ComponentType<{ className?: string }>;
-	}[];
+	filters: ComboboxFilterItem[];
 };
 
 const FilterHeader = ({ filters }: Props) => {
@@ -27,17 +22,7 @@ const FilterHeader = ({ filters }: Props) => {
 			))}
 
 			<LinearCombobox
-				filterGroups={[
-					{
-						filters: [
-							{ label: 'Status', icon: CircleDashed },
-							{ label: 'Status type', icon: Circle },
-							{ label: 'Assignee', icon: User },
-							{ label: 'Creator', icon: UserPen },
-							{ label: 'Content', icon: Type },
-						],
-					},
-				]}
+				filterGroups={[{ filters }]}
 				filterValues={selectedFilters}
 				setFilterValues={setSelectedFilters}
 			/>

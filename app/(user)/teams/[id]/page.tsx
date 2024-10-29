@@ -7,7 +7,6 @@ import { Location } from '@/types/manage';
 import React from 'react';
 import { Overview } from './overview';
 import { RecentSales } from './recent-sales';
-import { Building, FileText, Ticket, User } from 'lucide-react';
 
 type QueryParams = Promise<{ id: string }>;
 
@@ -26,22 +25,22 @@ const Page = async ({ params, ...props }: Props) => {
 				items={[
 					{
 						title: 'Tickets',
-						icon: Ticket,
+						// icon: 'Ticket',
 						href: `/teams/${id}/tickets`,
 					},
 					{
 						title: 'Companies',
-						icon: Building,
+						// icon: Building,
 						href: `/teams/${id}/companies`,
 					},
 					{
 						title: 'Contacts',
-						icon: User,
+						// icon: User,
 						href: `/teams/${id}/contacts`,
 					},
 					{
 						title: 'Proposals',
-						icon: FileText,
+						// icon: FileText,
 						href: `/teams/${id}/proposals`,
 					},
 				]}

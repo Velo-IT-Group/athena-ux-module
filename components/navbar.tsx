@@ -1,9 +1,11 @@
+'use client';
 import React, { ReactNode } from 'react';
 import { SidebarTrigger } from './ui/sidebar';
 import { NavItem } from '@/types/nav';
 import Link from 'next/link';
 import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 type Props = {
 	title: string;
@@ -12,7 +14,7 @@ type Props = {
 };
 
 const Navbar = ({ title, items, children }: Props) => {
-	// const pathname = usePathname();
+	const pathname = usePathname();
 	return (
 		<nav className='flex items-center gap-1.5 px-3 py-0.5 h-12 border-b space-y-0'>
 			<SidebarTrigger />

@@ -36,15 +36,21 @@ const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) 
 
 const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, worker: WorkerInstance) => {
 	const email = user?.user_metadata.email
-	
+	const [members, { data: contacts }] = await Promise.all([
+		getSystemMembers({ conditions: { officeEmail: `'${email}'` } }),
+		getContacts({ childConditions: { 'communicationItems/value': `'${email}'` } })
+	]);	
+
 	await supabase.auth.updateUser({
 		data: {
 			...user?.user_metadata,
-			workerSid: worker.sid
+			workerSid: worker?.sid,
+			referenceId: members?.[0]?.id ?? 310,
+			contactId: contacts?.[0]?.id ?? 32569,
 		}
 	})
 
-	await supabase.from('profiles').update({ worker_sid: worker.sid }).eq('id', user?.id ?? '')
+	await supabase.from('profiles').update({ worker_sid: worker.sid, manage_reference_id: members?.[0]?.id }).eq('id', user?.id ?? '')
 
 	const parsedAttributes = JSON.parse(worker.attributes)
 

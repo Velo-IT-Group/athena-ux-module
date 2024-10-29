@@ -4,7 +4,6 @@ import TicketList from '@/components/lists/ticket-list';
 import { cn } from '@/lib/utils';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import {
-	getBoards,
 	getCompanies,
 	getConfigurationStatuses,
 	getConfigurationTypes,
@@ -18,7 +17,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import LabeledInput from '@/components/ui/labeled-input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Tiptap from '@/components/tip-tap';

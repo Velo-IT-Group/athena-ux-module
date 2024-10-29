@@ -14,6 +14,7 @@ export function useHotkeys(
 				handler,
 				options = { preventDefault: true },
 			] of hotkeys) {
+				console.log(hotkey, event.key)
 				if (
 					getHotkeyMatcher(hotkey)(event) &&
 					shouldFireEvent(event, tagsToIgnore, triggerOnContentEditable)

@@ -12,8 +12,10 @@ import { MediumIcon } from './icons/medium';
 import { NoPriorityIcon } from './icons/no-priority';
 import { UrgentIcon } from './icons/urgent';
 import { Kbd } from './kbd';
-import { Ellipsis, ListFilter, type LucideIcon } from 'lucide-react';
+import { Ellipsis, ListFilter } from 'lucide-react';
+import { icons } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Icon from '@/components/Icon';
 
 type FilterGroup = {
 	label?: string;
@@ -22,7 +24,8 @@ type FilterGroup = {
 
 export type FilterItem = {
 	label: string;
-	icon: LucideIcon;
+	icon: string;
+	values?: FilterItem[];
 };
 
 type Priority = {
@@ -63,7 +66,7 @@ export const LinearCombobox = ({
 
 	useHotkeys([
 		[
-			'f',
+			isValueSelector ? '' : 'f',
 			() => {
 				setOpenTooltip(false);
 				setOpenPopover(true);
@@ -95,12 +98,23 @@ export const LinearCombobox = ({
 										<Ellipsis />
 									) : (
 										<>
-											{filterValues.map((filter) => (
-												<React.Fragment key={`filter-value-${filter.label}`}>
-													<filter.icon className='mr-1.5' />
-													<span className='text-xs'>{filter.label}</span>
-												</React.Fragment>
-											))}
+											{filterValues.length === 1 ? (
+												filterValues.map((filter) => {
+													return (
+														<React.Fragment key={`filter-value-${filter.label}`}>
+															<Icon
+																name={filter.icon}
+																className='mr-1.5'
+															/>
+															<span className='text-xs'>{filter.label}</span>
+														</React.Fragment>
+													);
+												})
+											) : (
+												<span className='lowercase'>
+													{filterValues.length} {filterValues[0].label}s
+												</span>
+											)}
 										</>
 									)}
 								</>
@@ -128,7 +142,7 @@ export const LinearCombobox = ({
 			</Tooltip>
 
 			<PopoverContent
-				className='w-[206px] p-0 rounded-lg'
+				className='w-fit p-0 rounded-lg'
 				align='start'
 				onCloseAutoFocus={(e) => e.preventDefault()}
 				sideOffset={6}
@@ -169,18 +183,24 @@ export const LinearCombobox = ({
 											setSearchValue('');
 											setFilterValues((prev) => [...prev, filter]);
 										}}
-										className='group rounded-md flex justify-between items-center w-full text-[0.8125rem] leading-normal text-primary'
+										className='group rounded-md flex justify-between gap-3 items-center w-full text-[0.8125rem] leading-normal text-primary'
 									>
 										<div className='flex items-center'>
-											<filter.icon className='mr-1.5 size-3 group-hover:fill-primary' />
+											{filter.icon && (
+												<Icon
+													name={filter.icon}
+													className='mr-1.5 size-3 group-hover:fill-primary'
+												/>
+											)}
 
 											<span>{filter.label}</span>
 										</div>
+
 										<div className='flex items-center'>
 											{filterValues.some((f) => f.label === filter.label) && (
 												<CheckIcon
 													title='Check'
-													className='mr-3 size-4 group-hover:fill-primary'
+													className='mx-3 size-4 group-hover:fill-primary'
 												/>
 											)}
 

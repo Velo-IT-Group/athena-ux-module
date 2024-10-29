@@ -14,6 +14,7 @@ import {
 } from './ui/alert-dialog';
 import { FilterItem as ComboboxFilterItem, LinearCombobox } from './linear-combobox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import Icon from './Icon';
 
 type Props = {
 	filter: ComboboxFilterItem;
@@ -26,7 +27,10 @@ const FilterItem = ({ filter }: Props) => {
 	return (
 		<div className='flex items-center gap-0.5 rounded-lg overflow-hidden relative h-6 text-ellipsis shrink'>
 			<p className='text-xs px-1.5 py-0.5 bg-muted self-stretch flex items-center gap-1'>
-				<filter.icon className='inline-block size-3' />
+				<Icon
+					name={filter.icon}
+					className='inline-block size-3'
+				/>
 				<span>{filter.label}</span>
 			</p>
 
@@ -42,17 +46,7 @@ const FilterItem = ({ filter }: Props) => {
 			</DropdownMenu>
 
 			<LinearCombobox
-				filterGroups={[
-					{
-						label: filter.label,
-						filters: [
-							{
-								label: 'No assignee',
-								icon: UserCircle,
-							},
-						],
-					},
-				]}
+				filterGroups={[{ filters: filter?.values ?? [] }]}
 				filterValues={filterValues}
 				setFilterValues={setFilterValues}
 				isValueSelector

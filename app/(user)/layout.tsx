@@ -41,22 +41,22 @@ const Layout = async ({ children }: Props) => {
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
-	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
-		const [worker, members, { data: contacts }] = await Promise.all([
-			findWorker(user?.email ?? ''),
-			getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
-			getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
-		]);
+	// if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
+	// 	const [worker, members, { data: contacts }] = await Promise.all([
+	// 		findWorker(user?.email ?? ''),
+	// 		getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
+	// 		getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
+	// 	]);
 
-		await supabase.auth.updateUser({
-			data: {
-				...user?.user_metadata,
-				workerSid: worker.sid,
-				referenceId: members?.[0]?.id,
-				contactId: contacts?.[0]?.id,
-			},
-		});
-	}
+	// 	await supabase.auth.updateUser({
+	// 		data: {
+	// 			...user?.user_metadata,
+	// 			workerSid: worker.sid,
+	// 			referenceId: members?.[0]?.id,
+	// 			contactId: contacts?.[0]?.id,
+	// 		},
+	// 	});
+	// }
 
 	const { data: profile } = await queryClient.fetchQuery({
 		queryKey: ['profiles', user?.id],
@@ -100,8 +100,8 @@ const Layout = async ({ children }: Props) => {
 					<AppSidebar />
 
 					<SidebarInset>
-						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
-							<div className='h-full grow'>{children}</div>
+						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col scroll-pb-3'>
+							<div className='h-full grow scroll-pb-3'>{children}</div>
 						</ScrollArea>
 					</SidebarInset>
 

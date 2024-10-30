@@ -5,20 +5,18 @@ import { useTwilio } from '@/providers/twilio-provider';
 import { useWorker } from '@/providers/worker-provider';
 import { Activity } from 'twilio-taskrouter';
 import ActivityItem from './activity-item';
-import { createClient } from '@/utils/supabase/client';
+import useSyncMap from '@/hooks/useSyncMap';
 
 type Props = {
 	isCollapsed: boolean;
 };
 
 const SidebarActivityList = ({ isCollapsed }: Props) => {
-	const supabase = createClient();
-
+	'use no memo';
 	const { workspace } = useTwilio();
 	const { worker } = useWorker();
 
 	const [open, setOpen] = useState(false);
-	const [conversations, setConversations] = useState<Conversation[]>([]);
 
 	const { data: workers } = useQuery({
 		queryKey: ['workers'],
@@ -26,21 +24,8 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 		refetchInterval: open ? 1000 : 10000,
 	});
 
-	const { data } = useQuery({
-		queryKey: ['conversations'],
-		queryFn: async () =>
-			await supabase.schema('reporting').from('conversations').select().is('talk_time', null).is('abandoned', null),
-	});
-
-	useEffect(() => {
-		if (!data) {
-			setConversations([]);
-			return;
-		}
-
-		setConversations(data?.data as unknown as Conversation[]);
-	}, [data]);
-
+	const { items } = useSyncMap('SyncTaskRouterTasks');
+	// console.log(items);
 	const [activities, setActivities] = useState<Activity[]>([]);
 
 	useEffect(() => {
@@ -49,23 +34,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 			setActivities(Array.from(worker.activities.values()));
 		});
 	}, [worker]);
-
-	useEffect(() => {
-		const channel = supabase
-			.channel('realtime_conversations')
-			.on('postgres_changes', { event: 'INSERT', schema: 'reporting', table: 'conversations' }, (payload) => {
-				const newItem = payload.new as Conversation;
-				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
-			})
-			.on('postgres_changes', { event: 'UPDATE', schema: 'reporting', table: 'conversations' }, (payload) => {
-				const newItem = payload.new as Conversation;
-				setConversations((prev) => [...prev.filter((c) => c.id !== newItem.id), newItem]);
-			})
-			.subscribe();
-		return () => {
-			supabase.removeChannel(channel);
-		};
-	}, []);
 
 	const workerArray = Array.from(workers?.values() ?? []);
 
@@ -76,7 +44,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 					key={activity.sid}
 					workers={workerArray.filter((worker) => worker.activitySid === activity.sid)}
 					currentActivity={worker?.activity}
-					conversations={conversations}
+					conversations={items}
 					activity={activity}
 					isCollapsed={isCollapsed}
 				/>

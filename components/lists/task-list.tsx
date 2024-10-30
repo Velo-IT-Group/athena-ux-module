@@ -52,6 +52,16 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 			}
 		});
 
+		r.on('rescinded', async (reservation) => {
+			try {
+				togglePlayback(false);
+				removeReservation(reservation);
+			} catch (error) {
+				console.error('No call pending', error);
+				toast.error(JSON.stringify(error));
+			}
+		});
+
 		r.on('rejected', async (reservation) => {
 			try {
 				togglePlayback(false);

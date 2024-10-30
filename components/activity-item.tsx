@@ -8,13 +8,19 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } 
 import { Worker } from 'twilio-taskrouter';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Circle, Phone } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Circle, Phone, PhoneIncoming, PhoneOutgoing, Smartphone, Voicemail } from 'lucide-react';
+import { cn, parsePhoneNumber } from '@/lib/utils';
+import { SyncMapItem } from 'twilio-sync';
+import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import { Separator } from './ui/separator';
+import useTimer from '@/hooks/useTimer';
+import Timer from './timer';
+import { relativeDate } from '@/utils/date';
 
 type Props = {
 	workers: Worker[];
 	currentActivity?: Activity;
-	conversations: Conversation[];
+	conversations: SyncMapItem[];
 	activity: Activity;
 	isCollapsed: boolean;
 };
@@ -28,6 +34,8 @@ export const activityColors: Record<string, string> = {
 };
 
 const ActivityItem = ({ workers, currentActivity, conversations, activity, isCollapsed }: Props) => {
+	'use no memo';
+	// console.log(conversations);
 	return (
 		<Popover>
 			<ContextMenu>
@@ -83,9 +91,11 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 						<CommandGroup heading={activity.name}>
 							{workers?.map((worker) => {
 								const workerConversations =
-									conversations?.filter(
-										(conversation) => conversation.agent === worker.sid && !conversation.talk_time
-									) ?? [];
+									conversations?.filter((conversation) => {
+										const data = conversation.data as TaskInstance;
+										const attributes = JSON.parse(data?.attributes ?? '{}');
+										return attributes.worker_sid === worker.sid;
+									}) ?? [];
 								return (
 									<ActivityListItem
 										key={worker.sid}
@@ -105,41 +115,73 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 
 type ActivityListItemProps = {
 	worker: Worker;
-	conversations: Conversation[];
+	conversations: SyncMapItem[];
 };
 
 const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
-	const workerAttributes = worker.attributes;
+	'use no memo';
 
+	const workerAttributes = worker.attributes;
+	// const timer = useTimer(worker.dateActivityChanged);
+
+	// console.log(worker.dateActivityChanged);
 	return (
 		<CommandItem
-			key={worker.sid}
+			// key={worker.sid}
 			value={workerAttributes.full_name}
-			className='flex items-center gap-1.5'
+			className='grid gap-1.5'
 		>
-			<Avatar className='w-3.5 h-3.5'>
-				<AvatarFallback className='w-3.5 h-3.5'>{workerAttributes.full_name.charAt(0)}</AvatarFallback>
-				<AvatarImage
-					className='w-3.5 h-3.5'
-					src={workerAttributes.imageUrl}
-				/>
-			</Avatar>
-
-			<div>
+			<div className='flex items-center gap-1.5'>
 				<p>{workerAttributes.full_name}</p>
-				{/* <p className='text-muted-foreground text-sm'>{worker.sid}</p> */}
+
+				<p className='ml-auto text-xs'>{relativeDate(worker.dateActivityChanged)}</p>
+
+				{/* <Timer
+					timer={timer}
+					className='ml-auto'
+				/> */}
 			</div>
 
-			{conversations?.length > 0 && (
-				<Button
-					variant='default'
-					size='smIcon'
-					className='ml-auto animate-pulse'
-				>
-					<Phone />
-				</Button>
+			{conversations && conversations?.length > 0 && (
+				<>
+					<Separator />
+					<div className='pl-3'>
+						{conversations?.map((conversation) => {
+							const task = conversation.data as TaskInstance;
+							return (
+								<TaskListItem
+									key={`${worker.sid}-${conversation.key}`}
+									task={task}
+								/>
+							);
+						})}
+					</div>
+				</>
 			)}
 		</CommandItem>
+	);
+};
+
+const TaskListItem = ({ task }: { task: TaskInstance }) => {
+	const attributes = JSON.parse(task?.attributes ?? '{}');
+	const timer = useTimer(new Date(task.dateUpdated));
+
+	return (
+		<div className='flex items-center gap-1.5 text-xs text-muted-foreground border-b pb-1.5 last:pb-0 last:border-b-0'>
+			{attributes.taskType === 'voicemail' && <Voicemail />}
+			{attributes.taskType !== 'voicemail' && attributes.direction === 'outbound' ? (
+				<PhoneOutgoing />
+			) : (
+				<PhoneIncoming />
+			)}
+
+			<p>{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}</p>
+
+			<Timer
+				className='ml-auto'
+				timer={timer}
+			/>
+		</div>
 	);
 };
 

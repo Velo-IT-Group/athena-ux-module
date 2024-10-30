@@ -1,4 +1,4 @@
-const formatter = new Intl.RelativeTimeFormat('en', { style: 'long' });
+const formatter = new Intl.RelativeTimeFormat('en', { style: 'short' });
 
 export function relativeDate(date: Date) {
 	const now = new Date();

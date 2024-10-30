@@ -1,5 +1,5 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Building, Cable, Tag } from 'lucide-react';
+import { Box, Building, Cable, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { cn } from '@/lib/utils';
 import ConfigurationsList from '@/components/lists/configurations-list';
@@ -149,6 +149,14 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
+						{projects.length === 0 && (
+							<div className='max-h-60 grid place-items-center h-full text-muted-foreground'>
+								<div className='grid place-items-center gap-1.5'>
+									<Box className='w-9 h-9' />
+									<p className='text-lg text-center font-semibold'>No active projects</p>
+								</div>
+							</div>
+						)}
 						{projects.map((project) => (
 							<Card key={project.id}>
 								<CardHeader>

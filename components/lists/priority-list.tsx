@@ -5,6 +5,7 @@ import React from 'react';
 import { Combobox } from '../ui/combobox';
 import { Button } from '../ui/button';
 import { Circle } from 'lucide-react';
+import { Kbd } from '../linear-combobox/kbd';
 
 type Props = {
 	ticketId: number;
@@ -28,27 +29,32 @@ const PriorityList = async ({ ticketId, type, defaultValue, params = { orderBy: 
 							return { label: name, value: `${id}-${name}` };
 						}) ?? []
 					}
+					hotkey='p'
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
 					// setValue={() => {}}
 					placeholder='Filter statuses...'
 					side='left'
 					align='start'
 				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<Circle
-							className='mr-1.5'
-							// @ts-ignore
-							style={{ color: defaultValue?.color?.toLowerCase() }}
-						/>
-						<span className='text-xs text-muted-foreground'>
-							{defaultValue?.name ? defaultValue.name : 'Assign Priority'}
-						</span>
-					</Button>
+					<div className='flex items-center justify-between'>
+						<Button
+							size='sm'
+							variant='ghost'
+							role='combobox'
+							className='flex'
+						>
+							<Circle
+								className='mr-1.5'
+								// @ts-ignore
+								style={{ color: defaultValue?.color?.toLowerCase() }}
+							/>
+							<span className='text-xs text-muted-foreground'>
+								{defaultValue?.name ? defaultValue.name : 'Assign Priority'}
+							</span>
+						</Button>
+
+						<Kbd letter='p' />
+					</div>
 				</Combobox>
 			)}
 		</>

@@ -5,6 +5,7 @@ import React from 'react';
 import { Combobox } from '../ui/combobox';
 import { Button } from '../ui/button';
 import { CircleUser } from 'lucide-react';
+import { Kbd } from '../linear-combobox/kbd';
 
 type Props = {
 	id: number;
@@ -43,16 +44,21 @@ const MemberList = async ({
 					placeholder='Filter members...'
 					side='left'
 					align='start'
+					hotkey='r'
 				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<CircleUser className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Assign'}</span>
-					</Button>
+					<div className='flex items-center justify-between'>
+						<Button
+							size='sm'
+							variant='ghost'
+							role='combobox'
+							className='flex'
+						>
+							<CircleUser className='mr-1.5' />
+							<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Assign'}</span>
+						</Button>
+
+						<Kbd letter='r' />
+					</div>
 				</Combobox>
 			)}
 		</>

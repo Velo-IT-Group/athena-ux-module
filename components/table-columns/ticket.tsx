@@ -20,7 +20,7 @@ export const columns: ColumnDef<ServiceTicket>[] = [
 		cell: ({ row }) => (
 			<Link
 				href={`/tickets/${row.getValue('id')}`}
-				target='_blank'
+				// target='_blank'
 				className={cn(buttonVariants({ variant: 'link', className: 'w-[80px] px-0' }))}
 			>
 				#{row.getValue('id')}

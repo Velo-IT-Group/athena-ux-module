@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import type { PopoverTriggerProps } from '@radix-ui/react-popover';
 import { updateTicket } from '@/lib/manage/update';
 import { toast } from 'sonner';
+import { useHotkeys } from '@/hooks/use-hot-keys';
 
 export type ComboBoxItem = {
 	label: string | React.ReactNode;
@@ -28,6 +29,7 @@ type Props = {
 	value?: string;
 	popoverTriggerProps?: PopoverTriggerProps;
 	className?: string;
+	hotkey: string;
 };
 
 export function Combobox({
@@ -42,6 +44,7 @@ export function Combobox({
 	value = '',
 	popoverTriggerProps,
 	className,
+	hotkey,
 }: Props) {
 	const [open, setOpen] = useState(false);
 
@@ -59,6 +62,15 @@ export function Combobox({
 			toast.error(`${JSON.stringify(error)}`);
 		}
 	};
+
+	useHotkeys([
+		[
+			hotkey,
+			() => {
+				setOpen((open) => !open);
+			},
+		],
+	]);
 
 	return (
 		<Popover

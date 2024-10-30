@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
-import { Button } from './ui/button';
 import { type DialogProps } from '@radix-ui/react-dialog';
-import { LucideIcon, Search } from 'lucide-react';
-import { useHotkeys } from '@/hooks/use-hot-keys';
+import { Search } from 'lucide-react';
+import Icon from './Icon';
+import { SidebarMenuButton } from './ui/sidebar';
 
 type CommandItemType = {
-	icon: LucideIcon;
+	icon: string;
 	title: string;
 };
 
@@ -18,37 +18,27 @@ interface Props extends DialogProps {
 export function CommandMenu({ ...props }: Props) {
 	const [open, setOpen] = React.useState(false);
 
-	useHotkeys([
-		[
-			'k',
-			() => {
+	React.useEffect(() => {
+		const down = (e: KeyboardEvent) => {
+			if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+				e.preventDefault();
 				setOpen((open) => !open);
-			},
-		],
-	]);
-
-	// React.useEffect(() => {
-	// 	const down = (e: KeyboardEvent) => {
-	// 		if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-	// 			e.preventDefault();
-	// 			setOpen((open) => !open);
-	// 		}
-	// 	};
-	// 	document.addEventListener('keydown', down);
-	// 	return () => document.removeEventListener('keydown', down);
-	// }, []);
+			}
+		};
+		document.addEventListener('keydown', down);
+		return () => document.removeEventListener('keydown', down);
+	}, []);
 
 	return (
 		<>
-			<Button
-				variant='ghost'
-				size='icon'
+			<SidebarMenuButton
 				onClick={() => setOpen(true)}
-				className='h-7 w-7'
+				content='Search'
 				{...props}
 			>
 				<Search />
-			</Button>
+				<span>Command Menu</span>
+			</SidebarMenuButton>
 			<CommandDialog
 				open={open}
 				onOpenChange={setOpen}
@@ -61,7 +51,7 @@ export function CommandMenu({ ...props }: Props) {
 								className='space-x-1.5'
 								key={`${index}-${item.title}`}
 							>
-								{item.icon && <item.icon />}
+								{item.icon && <Icon name={item.icon} />}
 								<span>{item.title}</span>
 							</CommandItem>
 						))}

@@ -9,6 +9,7 @@ import { DataTable } from '../ui/data-table';
 import { columns } from '../table-columns/company';
 import { FacetedFilter } from '../ui/data-table/toolbar';
 import getQueryClient from '@/app/getQueryClient';
+import { Kbd } from '../linear-combobox/kbd';
 
 type Props = {
 	id: number;
@@ -36,6 +37,7 @@ const CompanyList = async ({ id, path, type, defaultValue, params, facetedFilter
 	});
 	console.log(companies);
 	// const { data, count } = data;
+	const hotKey = 'o';
 
 	return (
 		<>
@@ -67,16 +69,21 @@ const CompanyList = async ({ id, path, type, defaultValue, params, facetedFilter
 					placeholder='Filter companies...'
 					side='left'
 					align='start'
+					hotkey={hotKey}
 				>
-					<Button
-						size='sm'
-						variant='ghost'
-						role='combobox'
-						className='flex'
-					>
-						<Building className='mr-1.5' />
-						<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add company'}</span>
-					</Button>
+					<div className='flex items-center justify-between'>
+						<Button
+							size='sm'
+							variant='ghost'
+							role='combobox'
+							className='flex'
+						>
+							<Building className='mr-1.5' />
+							<span className='text-xs text-muted-foreground'>{defaultValue ? defaultValue.name : 'Add company'}</span>
+						</Button>
+
+						<Kbd letter={hotKey} />
+					</div>
 				</Combobox>
 			)}
 		</>

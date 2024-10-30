@@ -27,16 +27,7 @@ const Layout = ({ children }: Props) => {
 						href: '/my-issues/activity',
 					},
 				]}
-			>
-				<CommandMenu
-					items={[
-						{
-							icon: TicketPlus,
-							title: 'Create Ticket',
-						},
-					]}
-				/>
-			</Navbar>
+			/>
 
 			{children}
 		</div>

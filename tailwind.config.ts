@@ -82,18 +82,20 @@ const config = {
     			},
     			'call-show': {
     				from: {
-    					right: '-48px'
+						right: '-24px',
+						bottom: '-74px'
     				},
     				to: {
-    					right: '6px'
+						right: '24px',
+						bottom: '24px'
     				}
     			},
     			'call-hide': {
     				from: {
-    					right: '6px'
+    					right: '-203px'
     				},
     				to: {
-    					right: '-48px'
+    					right: '-74px'
     				}
     			}
     		},

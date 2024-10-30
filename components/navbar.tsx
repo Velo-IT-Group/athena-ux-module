@@ -25,14 +25,11 @@ const Navbar = ({ title, items, children }: Props) => {
 				<Link
 					key={item.title}
 					href={item.href ?? ''}
-					className='block h-[22px]'
+					className='h-[22px] grid place-items-center'
 				>
 					<Badge
 						variant='outline'
-						className={cn(
-							'rounded-sm font-medium space-x-1.5 h-[22px]'
-							// pathname === item.href && 'bg-muted'
-						)}
+						className={cn('rounded-sm font-medium space-x-1.5 h-[22px]', pathname === item.href && 'bg-muted')}
 					>
 						{item.icon && <item.icon />}
 						<span>{item.title}</span>

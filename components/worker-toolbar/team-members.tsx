@@ -35,10 +35,10 @@ const TeamMembers = ({}: Props) => {
 
 	return (
 		<ScrollArea className='min-h-12 max-h-96 h-full flex flex-col bg-muted'>
-			<Input
+			{/* <Input
 				value={value}
 				onChange={(e) => setValue(e.target.value)}
-			/>
+			/> */}
 
 			<div className='flex w-[285px] flex-col items-center justify-center gap-y-3 rounded-xl border py-3 px-1.5'>
 				{Object?.entries(groupedActivities).map(([key, value], index) => (

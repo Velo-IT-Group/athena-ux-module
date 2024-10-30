@@ -11,6 +11,7 @@ import {
 	Maximize,
 	Tag,
 	Ticket,
+	TicketPlus,
 	User,
 } from 'lucide-react';
 import {
@@ -33,6 +34,7 @@ import getQueryClient from '@/app/getQueryClient';
 import Link from 'next/link';
 import { Conditions } from '@/utils/manage/params';
 import { Location } from '@/types/manage';
+import { CommandMenu } from './command-menu';
 
 type MenuItem = {
 	title: string;
@@ -197,6 +199,19 @@ export async function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
+						{/* <SidebarMenuButton
+							content='Search'
+							asChild
+						>
+						</SidebarMenuButton> */}
+						<CommandMenu
+							items={[
+								{
+									icon: 'TicketPlus',
+									title: 'Create Ticket',
+								},
+							]}
+						/>
 						<SidebarMenuButton
 							content='Logout'
 							asChild

@@ -26,6 +26,7 @@ type Props = {
 };
 
 const WorkerToolbar = ({ profile, conversations, user }: Props) => {
+	'use no memo';
 	const [selectedTab, setSelectedTab] = useState('');
 	const { worker } = useWorker();
 	const { reservations, addReservation, removeReservation } = useReservations();
@@ -141,8 +142,8 @@ const WorkerToolbar = ({ profile, conversations, user }: Props) => {
 		<Tabs
 			value={selectedTab}
 			onValueChange={setSelectedTab}
-			// is-worker-loaded={true}
-			className='flex flex-col items-center justify-end overflow-hidden border bg-background shadow-sm fixed bottom-6 right-6 rounded-2xl p-1'
+			data-worker-loaded={worker !== undefined}
+			className='group flex flex-col group-data-[side=right]:rotate-180 data-[worker-loaded=true]:animate-call-show data-[worker-loaded=false]:animate-call-hide items-center justify-end overflow-hidden border bg-background shadow-sm fixed right-[-203px] bottom-0 rounded-2xl p-1'
 		>
 			<div className='w-full rounded-xl overflow-hidden'>
 				<TabsContent

@@ -14,6 +14,7 @@ const useSyncMap = (mapKey: string) => {
 		const getSync = async () => {
 			const map = await syncClient.map(mapKey);
 			const { items } = await map.getItems();
+			console.log(map, mapKey, items);
 			setItems(items);
 
 			map.on('itemUpdated', (item) => {

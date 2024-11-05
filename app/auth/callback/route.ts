@@ -58,6 +58,7 @@ const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, wo
 
 export async function GET(request: NextRequest) {
 	const { searchParams, origin } = request.nextUrl;
+	
 
 	const code = searchParams.get('code');
 	// if "next" is in param, use it as the redirect URL
@@ -73,7 +74,11 @@ export async function GET(request: NextRequest) {
 			
 			const { data: { user } } = await supabase.auth.getUser()
 
-			const email = user?.user_metadata.email;
+			if (!user) return;
+
+			const {data: keys, error} = await supabase.from('profile_keys').select().eq('user', user.id)
+
+			const email = user.user_metadata.email;
 
 			const workers = await getWorkers({ friendlyName: email }) 
 			

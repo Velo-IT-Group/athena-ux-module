@@ -1,10 +1,6 @@
 import { ReactNode } from 'react';
 import UserLayout from './user-layout';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import SideNav from '@/components/side-nav';
 import { Toaster } from 'sonner';
-import { cookies } from 'next/headers';
-import { onLayoutChange } from './layout-actions';
 import { createClient } from '@/utils/supabase/server';
 import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
@@ -16,6 +12,7 @@ import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import AppSidebar from '@/components/app-sidebar';
 
 type Props = {
 	children: ReactNode;
@@ -34,13 +31,6 @@ const Layout = async ({ children }: Props) => {
 	if (!user || !user.user_metadata || !user.email) {
 		redirect('/login');
 	}
-
-	const cookieStore = await cookies();
-	const layout = cookieStore.get('react-resizable-panels:layout');
-	const collapsed = cookieStore.get('react-resizable-panels:collapsed');
-
-	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
-	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, { data: contacts }] = await Promise.all([
@@ -68,6 +58,7 @@ const Layout = async ({ children }: Props) => {
 				.eq('id', user?.id ?? '')
 				.single(),
 	});
+
 	const { data: conversations } = await queryClient.fetchQuery({
 		queryKey: ['conversations', user?.id],
 		queryFn: async () =>
@@ -79,6 +70,7 @@ const Layout = async ({ children }: Props) => {
 				.order('date', { ascending: false })
 				.limit(25),
 	});
+
 	const twilioToken = await queryClient.fetchQuery({
 		queryKey: ['accessToken'],
 		queryFn: async () =>
@@ -93,12 +85,10 @@ const Layout = async ({ children }: Props) => {
 	});
 
 	return (
-		<SidebarProvider>
-			<ReactQueryProvider>
-				<UserLayout token={twilioToken}>
-					<SideNav
-						isDefaultCollapsed={defaultCollapsed ?? true}
-						defaultLayout={defaultLayout ?? [15, 32, 48]}
+		<ReactQueryProvider>
+			<UserLayout token={twilioToken}>
+				<SidebarProvider>
+					<AppSidebar
 						conversations={conversations!}
 						profile={profile!}
 						user={user}
@@ -113,10 +103,11 @@ const Layout = async ({ children }: Props) => {
 					</SidebarInset>
 
 					<Toaster richColors />
+
 					<Analytics />
-				</UserLayout>
-			</ReactQueryProvider>
-		</SidebarProvider>
+				</SidebarProvider>
+			</UserLayout>
+		</ReactQueryProvider>
 	);
 };
 

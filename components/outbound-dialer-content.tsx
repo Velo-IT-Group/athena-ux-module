@@ -20,7 +20,6 @@ export const outboundPhoneSchema = z.object({
 });
 
 const OutboundDialerContent = ({ onSubmit }: Props) => {
-	const { activity } = useWorker();
 	const form = useForm<CreateParticipantParams>({
 		resolver: zodResolver(outboundPhoneSchema),
 	});
@@ -40,7 +39,7 @@ const OutboundDialerContent = ({ onSubmit }: Props) => {
 				<Button
 					type='submit'
 					className='w-full'
-					disabled={!activity?.available || form.formState.disabled || form.formState.isSubmitting}
+					disabled={form.formState.disabled || form.formState.isSubmitting}
 				>
 					Dial
 				</Button>

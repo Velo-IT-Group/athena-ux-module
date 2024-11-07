@@ -35,6 +35,7 @@ import { changeOnCallEngineer } from '../utils/twilio/workers';
 import { useTwilio } from '../providers/twilio-provider';
 import { updateOnCallEngineer } from '@/lib/twilio/update';
 import { activityColors } from './activity-item';
+import { SidebarMenuButton } from './ui/sidebar';
 
 type Props = {
 	user: User | null;
@@ -64,11 +65,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 		<AlertDialog>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button
-						variant='ghost'
-						size='sm'
-						className='justify-start'
-					>
+					<SidebarMenuButton size='sm'>
 						<div className='relative'>
 							<UserIcon />
 
@@ -80,8 +77,8 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 							/>
 						</div>
 
-						<span className={isCollapsed ? 'sr-only' : 'ml-1.5'}>{user?.user_metadata?.full_name}</span>
-					</Button>
+						<span>{user?.user_metadata?.full_name}</span>
+					</SidebarMenuButton>
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent

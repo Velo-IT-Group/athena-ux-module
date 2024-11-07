@@ -9,14 +9,30 @@ type Props = {
 		hours: number;
 	};
 	className?: string;
+	relative?: boolean;
 };
 
-const Timer = ({ timer, className }: Props) => {
+const timeFormat = new Intl.RelativeTimeFormat('en-US', { style: 'short', numeric: 'always' });
+
+const Timer = ({ timer, className, relative }: Props) => {
 	const { seconds, minutes, hours } = timer;
+
+	const formattedSeconds = timeFormat.format(seconds, 'seconds');
+	const formattedMinutes = timeFormat.format(minutes, 'minutes');
+	const formattedHours = timeFormat.format(hours, 'hours');
 
 	return (
 		<span className={cn('text-xs text-muted-foreground tabular-nums', className)}>
-			{String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+			{relative ? (
+				<>
+					{hours > 0 && formattedHours} {minutes > 0 && formattedMinutes} {seconds > 0 && formattedSeconds}
+					{/* {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')} */}
+				</>
+			) : (
+				<>
+					{String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+				</>
+			)}
 		</span>
 	);
 };

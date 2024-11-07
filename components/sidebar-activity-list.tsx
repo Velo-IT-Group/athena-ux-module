@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
 import { useWorker } from '@/providers/worker-provider';
@@ -20,7 +20,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 
 	const { data: workers } = useQuery({
 		queryKey: ['workers'],
-		queryFn: () => workspace?.fetchWorkers(),
+		queryFn: () => workspace?.fetchWorkers({ Ordering: 'DateStatusChanged:desc' }),
 		refetchInterval: open ? 1000 : 10000,
 	});
 
@@ -38,7 +38,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	const workerArray = Array.from(workers?.values() ?? []);
 
 	return (
-		<div className='grid gap-1.5 mx-1.5 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:mx-1.5 group-[[data-collapsed=true]]:py-1.5'>
+		<Fragment>
 			{activities?.map((activity) => (
 				<ActivityItem
 					key={activity.sid}
@@ -49,7 +49,7 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 					isCollapsed={isCollapsed}
 				/>
 			))}
-		</div>
+		</Fragment>
 	);
 };
 

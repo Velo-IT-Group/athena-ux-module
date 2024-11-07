@@ -45,14 +45,14 @@ export const LinkPopoverBlock: React.FC<LinkPopoverBlockProps> = ({ url, onClear
 					tooltip='Open link in a new tab'
 					onClick={handleOpenLink}
 				>
-					<ExternalLinkIcon className='size-4' />
+					<ExternalLinkIcon className='size-3' />
 				</ToolbarButton>
 				<Separator orientation='vertical' />
 				<ToolbarButton
 					tooltip='Clear link'
 					onClick={onClear}
 				>
-					<Unlink className='size-4' />
+					<Unlink className='size-3' />
 				</ToolbarButton>
 				<Separator orientation='vertical' />
 				<ToolbarButton
@@ -64,7 +64,7 @@ export const LinkPopoverBlock: React.FC<LinkPopoverBlockProps> = ({ url, onClear
 						},
 					}}
 				>
-					<CopyIcon className='size-4' />
+					<CopyIcon className='size-3' />
 				</ToolbarButton>
 			</div>
 		</div>

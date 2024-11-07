@@ -28,6 +28,86 @@ export const companyNoteSchema = z.object({
   })
 })
 
+export const timeEntrySchema = z.object({
+  id: z.number(),
+  company: referenceTypeSchema,
+  companyType: z.string(),
+  chargeToId: z.number(),
+  chargeToType: z.string(),
+  member: z.object({
+    id: z.number(),
+    identifier: z.string(),
+    name: z.string(),
+    dailyCapacity: z.number()
+  }),
+  locationId: z.number(),
+  businessUnitId: z.number(),
+  businessGroupDesc: z.string(),
+	workType: z.object({
+    id: z.number(),
+    name: z.string(),
+    utilizationFlag: z.boolean()
+  }),
+  workRole: referenceTypeSchema,
+  agreement: referenceTypeSchema,
+  agreementType: z.string(),
+  activity: referenceTypeSchema,
+  opportunityRecid: z.number(),
+  projectActivity: z.string(),
+  territory: z.string(),
+  timeStart: z.string(),
+  timeEnd: z.string(),
+  hoursDeduct: z.number(),
+  actualHours: z.number(),
+  billableOption: z.string(),
+  notes: z.string(),
+  internalNotes: z.string(),
+  addToDetailDescriptionFlag: z.boolean(),
+  addToInternalAnalysisFlag: z.boolean(),
+  addToResolutionFlag: z.boolean(),
+  emailResourceFlag: z.boolean(),
+	emailContactFlag: z.boolean(),
+  emailCcFlag: z.boolean(),
+  emailCc: z.string(),
+  hoursBilled: z.number(),
+  invoiceHours: z.number(),
+  hourlyCost: z.string(),
+  enteredBy: z.string(),
+  dateEntered: z.string(),
+  invoice: referenceTypeSchema,
+  mobileGuid: z.string(),
+  hourlyRate: z.number(),
+  overageRate: z.number(),
+  agreementHours: z.number(),
+  agreementAmount: z.number(),
+  agreementAdjustment: z.number(),
+  adjustment: z.number(),
+  invoiceReady: z.number(),
+  timeSheet: referenceTypeSchema,
+  status: z.string(),
+  ticket: z.object({ id: z.number(), summary: z.string() }),
+  project:referenceTypeSchema,
+  phase: referenceTypeSchema,
+  ticketBoard: z.string(),
+  ticketStatus: z.string(),
+  ticketType: z.string(),
+  ticketSubType: z.string(),
+  invoiceFlag: z.boolean(),
+  extendedInvoiceAmount: z.number(),
+  locationName: z.string(),
+  taxCode: referenceTypeSchema,
+  customFields: z.array(
+    z.object({
+      id: z.number(),
+      caption: z.string(),
+      type: z.string(),
+      entryMethod: z.string(),
+      numberOfDecimals: z.number(),
+      value: z.object({})
+    })
+  )
+})
+
 const auditTypeSchema = z.enum([
 	'Attachment',
 	'Combined Tickets',
@@ -577,6 +657,30 @@ export const createNoteSchema = z.object({
 	type: z.object({ id: z.number() }),
 });
 
+export const activitySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+  status: referenceTypeSchema,
+  notes: z.string(),
+  dateStart: z.string(),
+  dateEnd: z.string(),
+  assignedBy: referenceTypeSchema,
+  assignTo: referenceTypeSchema,
+  scheduleStatus: referenceTypeSchema,
+	reminder: referenceTypeSchema,
+    contact: referenceTypeSchema,
+  notifyFlag: z.boolean(),
+  mobileGuid: z.string(),
+  _info: z.object({
+    lastUpdated: z.string(),
+    updatedBy: z.string(),
+    dateEntered: z.string(),
+    enteredBy: z.string()
+  })
+})
+
+export type Activity = z.infer<typeof activitySchema>;
 export type AuditType = z.infer<typeof auditTypeSchema>;
 export type AuditTrailEntry = z.infer<typeof auditTrailEntrySchema>;
 export type BoardStatus = z.infer<typeof boardStatusSchema>;
@@ -597,6 +701,7 @@ export type ServiceTicket = z.infer<typeof serviceTicketSchema>;
 export type ServiceTicketTask = z.infer<typeof serviceTicketTaskSchema>;
 export type SystemMember = z.infer<typeof systemMemberSchema>;
 export type TicketNote = z.infer<typeof ticketNoteSchema>;
+export type TimeEntry = z.infer<typeof timeEntrySchema>;
 
 export interface Configuration {
 	id: number;

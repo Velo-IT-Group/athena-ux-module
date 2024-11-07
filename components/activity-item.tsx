@@ -1,21 +1,29 @@
 'use client';
-import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import React, { act } from 'react';
 import { Activity } from 'twilio-taskrouter';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Worker } from 'twilio-taskrouter';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
-import { Circle, Phone, PhoneIncoming, PhoneOutgoing, Smartphone, Voicemail } from 'lucide-react';
+import { ChevronDown, Circle, PhoneIncoming, PhoneOutgoing, Voicemail } from 'lucide-react';
 import { cn, parsePhoneNumber } from '@/lib/utils';
 import { SyncMapItem } from 'twilio-sync';
 import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
-import { Separator } from './ui/separator';
 import useTimer from '@/hooks/useTimer';
 import Timer from './timer';
-import { relativeDate } from '@/utils/date';
+import { formatDate } from '@/utils/date';
+import {
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
+} from './ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Dialog, DialogTrigger } from './ui/dialog';
+import WorkerDialog from './worker-dialog';
 
 type Props = {
 	workers: Worker[];
@@ -33,62 +41,31 @@ export const activityColors: Record<string, string> = {
 	'On-Site': 'bg-orange-500',
 };
 
-const ActivityItem = ({ workers, currentActivity, conversations, activity, isCollapsed }: Props) => {
-	'use no memo';
-	// console.log(conversations);
+const ActivityItem = ({ workers, conversations, activity }: Props) => {
 	return (
-		<Popover>
-			<ContextMenu>
-				<Tooltip>
-					<ContextMenuTrigger asChild>
-						<TooltipTrigger asChild>
-							<PopoverTrigger asChild>
-								<Button
-									variant={currentActivity?.sid === activity.sid ? 'secondary' : 'ghost'}
-									size={isCollapsed ? 'icon' : 'sm'}
-									className={cn(
-										isCollapsed ? 'h-9 w-9' : 'justify-start',
-										currentActivity?.sid === activity.sid && 'bg-secondary'
-									)}
-								>
-									<Circle
-										className={cn('stroke-none rounded-full', activityColors[activity.name], !isCollapsed && 'mr-1.5')}
-									/>
-
-									<span className={cn(isCollapsed && 'sr-only')}>{activity.name}</span>
-								</Button>
-							</PopoverTrigger>
-						</TooltipTrigger>
-					</ContextMenuTrigger>
-
-					<ContextMenuContent>
-						<ContextMenuItem
-							onSelect={async () => await activity.setAsCurrent()}
-							disabled={currentActivity?.sid === activity.sid}
+		<Collapsible
+			className='group/collapsible'
+			title={activity.name}
+		>
+			<SidebarGroup>
+				<SidebarGroupLabel asChild>
+					<CollapsibleTrigger asChild>
+						<SidebarMenuButton
+							size='sm'
+							className='[&>svg]:size-3.5'
 						>
-							Set as current activity
-						</ContextMenuItem>
-					</ContextMenuContent>
+							<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
 
-					<TooltipContent side='right'>
-						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-					</TooltipContent>
-					<TooltipContent side='right'>
-						{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-					</TooltipContent>
-				</Tooltip>
-			</ContextMenu>
+							<span>{activity.name}</span>
 
-			<PopoverContent
-				side='right'
-				align='start'
-				sideOffset={12}
-				className='p-0'
-			>
-				<Command>
-					<CommandInput placeholder={'Search users'} />
-					<CommandList>
-						<CommandGroup heading={activity.name}>
+							<ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+						</SidebarMenuButton>
+					</CollapsibleTrigger>
+				</SidebarGroupLabel>
+
+				<CollapsibleContent>
+					<SidebarGroupContent>
+						<SidebarMenu>
 							{workers?.map((worker) => {
 								const workerConversations =
 									conversations?.filter((conversation) => {
@@ -96,20 +73,20 @@ const ActivityItem = ({ workers, currentActivity, conversations, activity, isCol
 										const attributes = JSON.parse(data?.attributes ?? '{}');
 										return attributes.worker_sid === worker.sid;
 									}) ?? [];
+
 								return (
 									<ActivityListItem
 										key={worker.sid}
-										worker={worker}
 										conversations={workerConversations}
+										worker={worker}
 									/>
 								);
 							})}
-						</CommandGroup>
-					</CommandList>
-					<CommandEmpty>Nothing users.</CommandEmpty>
-				</Command>
-			</PopoverContent>
-		</Popover>
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</CollapsibleContent>
+			</SidebarGroup>
+		</Collapsible>
 	);
 };
 
@@ -119,46 +96,49 @@ type ActivityListItemProps = {
 };
 
 const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
-	'use no memo';
-
 	const workerAttributes = worker.attributes;
-	// const timer = useTimer(worker.dateActivityChanged);
 
-	// console.log(worker.dateActivityChanged);
 	return (
-		<CommandItem
-			// key={worker.sid}
-			value={workerAttributes.full_name}
-			className='grid gap-1.5'
-		>
-			<div className='flex items-center gap-1.5'>
-				<p>{workerAttributes.full_name}</p>
+		<Dialog>
+			<SidebarMenuItem>
+				<DialogTrigger asChild>
+					<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3'>
+						<div className='flex items-center gap-1.5 text-nowrap'>
+							<Avatar className='uppercase w-6 h-6'>
+								<AvatarFallback className='text-[9px] font-medium'>
+									{worker.friendlyName[0]}
+									{worker.friendlyName[1]}
+								</AvatarFallback>
+							</Avatar>
 
-				<p className='ml-auto text-xs'>{relativeDate(worker.dateActivityChanged)}</p>
+							<p>{workerAttributes.full_name}</p>
 
-				{/* <Timer
-					timer={timer}
-					className='ml-auto'
-				/> */}
-			</div>
+							<p className='ml-auto text-xs'>
+								since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
+							</p>
+						</div>
 
-			{conversations && conversations?.length > 0 && (
-				<>
-					<Separator />
-					<div className='pl-3'>
-						{conversations?.map((conversation) => {
-							const task = conversation.data as TaskInstance;
-							return (
-								<TaskListItem
-									key={`${worker.sid}-${conversation.key}`}
-									task={task}
-								/>
-							);
-						})}
-					</div>
-				</>
-			)}
-		</CommandItem>
+						{conversations && conversations?.length > 0 && (
+							<SidebarMenuSub className='pr-0 mr-0'>
+								{conversations?.map((conversation) => {
+									const task = conversation.data as TaskInstance;
+									return (
+										<SidebarMenuSubItem key={`${worker.sid}-${conversation.key}`}>
+											<TaskListItem task={task} />
+										</SidebarMenuSubItem>
+									);
+								})}
+							</SidebarMenuSub>
+						)}
+					</SidebarMenuButton>
+				</DialogTrigger>
+			</SidebarMenuItem>
+
+			<WorkerDialog
+				worker={worker}
+				workerAttributes={workerAttributes}
+			/>
+		</Dialog>
 	);
 };
 
@@ -167,21 +147,23 @@ const TaskListItem = ({ task }: { task: TaskInstance }) => {
 	const timer = useTimer(new Date(task.dateUpdated));
 
 	return (
-		<div className='flex items-center gap-1.5 text-xs text-muted-foreground border-b pb-1.5 last:pb-0 last:border-b-0'>
-			{attributes.taskType === 'voicemail' && <Voicemail />}
+		<SidebarMenuSubButton className='flex items-center gap-1.5 text-xs text-muted-foreground border-b pb-1.5 last:pb-0 last:border-b-0 w-full'>
+			{attributes.taskType === 'voicemail' && <Voicemail className='size-3' />}
 			{attributes.taskType !== 'voicemail' && attributes.direction === 'outbound' ? (
-				<PhoneOutgoing />
+				<PhoneOutgoing className='size-3' />
 			) : (
-				<PhoneIncoming />
+				<PhoneIncoming className='size-3' />
 			)}
 
-			<p>{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}</p>
+			<p className='text-nowrap text-ellipsis'>
+				{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}
+			</p>
 
 			<Timer
 				className='ml-auto'
 				timer={timer}
 			/>
-		</div>
+		</SidebarMenuSubButton>
 	);
 };
 

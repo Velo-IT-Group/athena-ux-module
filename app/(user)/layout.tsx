@@ -15,6 +15,7 @@ import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 type Props = {
 	children: ReactNode;
@@ -92,12 +93,9 @@ const Layout = async ({ children }: Props) => {
 	});
 
 	return (
-		<ReactQueryProvider>
-			<UserLayout token={twilioToken}>
-				<ResizablePanelGroup
-					direction='horizontal'
-					onLayout={onLayoutChange}
-				>
+		<SidebarProvider>
+			<ReactQueryProvider>
+				<UserLayout token={twilioToken}>
 					<SideNav
 						isDefaultCollapsed={defaultCollapsed ?? true}
 						defaultLayout={defaultLayout ?? [15, 32, 48]}
@@ -106,21 +104,19 @@ const Layout = async ({ children }: Props) => {
 						user={user}
 					/>
 
-					<ResizableHandle className='opacity-0' />
-
-					<ResizablePanel className='my-3 mr-3 bg-background rounded-md border shadow'>
+					<SidebarInset className='my-3 mr-3 bg-background rounded-md border shadow'>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
 							<Navbar />
 
 							<div className='h-full grow'>{children}</div>
 						</ScrollArea>
-					</ResizablePanel>
-				</ResizablePanelGroup>
+					</SidebarInset>
 
-				<Toaster richColors />
-				<Analytics />
-			</UserLayout>
-		</ReactQueryProvider>
+					<Toaster richColors />
+					<Analytics />
+				</UserLayout>
+			</ReactQueryProvider>
+		</SidebarProvider>
 	);
 };
 

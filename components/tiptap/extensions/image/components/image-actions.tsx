@@ -74,10 +74,10 @@ const ActionItems: Array<{
 	tooltip: string;
 	isLink?: boolean;
 }> = [
-	{ key: 'onView', icon: <Maximize2 className='size-4' />, tooltip: 'View image' },
-	{ key: 'onDownload', icon: <DownloadIcon className='size-4' />, tooltip: 'Download image' },
-	{ key: 'onCopy', icon: <ClipboardCopyIcon className='size-4' />, tooltip: 'Copy image to clipboard' },
-	{ key: 'onCopyLink', icon: <Link2Icon className='size-4' />, tooltip: 'Copy image link', isLink: true },
+	{ key: 'onView', icon: <Maximize2 className='size-3' />, tooltip: 'View image' },
+	{ key: 'onDownload', icon: <DownloadIcon className='size-3' />, tooltip: 'Download image' },
+	{ key: 'onCopy', icon: <ClipboardCopyIcon className='size-3' />, tooltip: 'Copy image to clipboard' },
+	{ key: 'onCopyLink', icon: <Link2Icon className='size-3' />, tooltip: 'Copy image link', isLink: true },
 ];
 
 export const ImageActions: React.FC<ImageActionsProps> = React.memo(
@@ -101,7 +101,7 @@ export const ImageActions: React.FC<ImageActionsProps> = React.memo(
 					>
 						<DropdownMenuTrigger asChild>
 							<ActionButton
-								icon={<Ellipsis className='size-4' />}
+								icon={<Ellipsis className='size-3' />}
 								tooltip='Open menu'
 								onClick={(e) => e.preventDefault()}
 							/>

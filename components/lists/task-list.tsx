@@ -15,6 +15,14 @@ import { Phone } from 'lucide-react';
 import OutboundDialer from '../outbound-dialer';
 import { useNotifications } from '@/providers/notification-provider';
 import useRinger from '@/hooks/useRinger';
+import {
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from '../ui/sidebar';
 
 type Props = {
 	isCollapsed?: boolean;
@@ -143,45 +151,41 @@ const TaskList = ({ isCollapsed, className }: Props) => {
 	);
 
 	return (
-		<Fragment>
-			<Separator />
+		<SidebarGroup className={className}>
+			<SidebarGroupContent>
+				<SidebarMenu>
+					{imcomingCalls.length === 0 && (
+						<Popover>
+							<PopoverTrigger asChild>
+								<SidebarMenuItem>
+									<SidebarMenuButton size='sm'>
+										<Phone className='fill-current stroke-none' />
+										<span>Outbound Dialer</span>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							</PopoverTrigger>
 
-			<section className='space-y-1.5 mx-1.5'>
-				{!isCollapsed && <h2 className='text-xs text-muted-foreground px-3 font-medium'>Tasks</h2>}
-
-				{imcomingCalls.length === 0 && (
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button
-								variant='ghost'
-								size={isCollapsed ? 'icon' : 'sm'}
-								className={cn('w-full', !isCollapsed && 'justify-start')}
+							<PopoverContent
+								align='start'
+								side='right'
+								sideOffset={12}
 							>
-								<Phone className='fill-current stroke-none' />
-								<span className={cn('ml-1.5', isCollapsed && 'sr-only')}>Outbound Dialer</span>
-							</Button>
-						</PopoverTrigger>
+								<OutboundDialer />
+							</PopoverContent>
+						</Popover>
+					)}
 
-						<PopoverContent
-							align='start'
-							side='right'
-							sideOffset={12}
-						>
-							<OutboundDialer />
-						</PopoverContent>
-					</Popover>
-				)}
-
-				{reservations.map((reservation) => (
-					<TaskNotification
-						key={reservation.sid}
-						reservation={reservation}
-						task={reservation.task}
-						isCollapsed={isCollapsed}
-					/>
-				))}
-			</section>
-		</Fragment>
+					{reservations.map((reservation) => (
+						<TaskNotification
+							key={reservation.sid}
+							reservation={reservation}
+							task={reservation.task}
+							isCollapsed={isCollapsed}
+						/>
+					))}
+				</SidebarMenu>
+			</SidebarGroupContent>
+		</SidebarGroup>
 	);
 };
 

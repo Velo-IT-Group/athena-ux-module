@@ -252,7 +252,7 @@ export const ImageViewBlock: React.FC<NodeViewProps> = ({ editor, node, selected
 					{imageState.error && (
 						<ActionWrapper>
 							<ActionButton
-								icon={<TrashIcon className='size-4' />}
+								icon={<TrashIcon className='size-3' />}
 								tooltip='Remove image'
 								onClick={onRemoveImg}
 							/>

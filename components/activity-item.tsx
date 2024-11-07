@@ -1,5 +1,5 @@
 'use client';
-import React, { act } from 'react';
+import React from 'react';
 import { Activity } from 'twilio-taskrouter';
 import { Worker } from 'twilio-taskrouter';
 import { ChevronDown, Circle, PhoneIncoming, PhoneOutgoing, Voicemail } from 'lucide-react';
@@ -43,28 +43,20 @@ export const activityColors: Record<string, string> = {
 
 const ActivityItem = ({ workers, conversations, activity }: Props) => {
 	return (
-		<Collapsible
-			className='group/collapsible'
-			title={activity.name}
-		>
+		<Collapsible className='group/collapsible'>
 			<SidebarGroup>
-				<SidebarGroupLabel asChild>
+				<SidebarGroupContent>
 					<CollapsibleTrigger asChild>
-						<SidebarMenuButton
-							size='sm'
-							className='[&>svg]:size-3.5'
-						>
+						<SidebarMenuButton className='[&>svg]:size-3.5'>
 							<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
 
-							<span>{activity.name}</span>
+							<span className='group-data-[collapsible=icon]:hidden'>{activity.name}</span>
 
-							<ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+							<ChevronDown className='group-data-[collapsible=icon]:hidden ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
 						</SidebarMenuButton>
 					</CollapsibleTrigger>
-				</SidebarGroupLabel>
 
-				<CollapsibleContent>
-					<SidebarGroupContent>
+					<CollapsibleContent>
 						<SidebarMenu>
 							{workers?.map((worker) => {
 								const workerConversations =
@@ -83,8 +75,8 @@ const ActivityItem = ({ workers, conversations, activity }: Props) => {
 								);
 							})}
 						</SidebarMenu>
-					</SidebarGroupContent>
-				</CollapsibleContent>
+					</CollapsibleContent>
+				</SidebarGroupContent>
 			</SidebarGroup>
 		</Collapsible>
 	);
@@ -99,46 +91,38 @@ const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
 	const workerAttributes = worker.attributes;
 
 	return (
-		<Dialog>
-			<SidebarMenuItem>
-				<DialogTrigger asChild>
-					<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3'>
-						<div className='flex items-center gap-1.5 text-nowrap'>
-							<Avatar className='uppercase w-6 h-6'>
-								<AvatarFallback className='text-[9px] font-medium'>
-									{worker.friendlyName[0]}
-									{worker.friendlyName[1]}
-								</AvatarFallback>
-							</Avatar>
+		<SidebarMenuItem>
+			<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3'>
+				<div className='flex items-center gap-1.5 text-nowrap'>
+					<Avatar className='uppercase w-6 h-6'>
+						<AvatarFallback className='text-[9px] font-medium'>
+							{worker.friendlyName[0]}
+							{worker.friendlyName[1]}
+						</AvatarFallback>
+					</Avatar>
 
-							<p>{workerAttributes.full_name}</p>
+					<p>{workerAttributes.full_name}</p>
 
-							<p className='ml-auto text-xs'>
-								since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
-							</p>
-						</div>
+					<p className='ml-auto text-xs'>
+						since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
+					</p>
+				</div>
 
-						{conversations && conversations?.length > 0 && (
-							<SidebarMenuSub className='pr-0 mr-0'>
-								{conversations?.map((conversation) => {
-									const task = conversation.data as TaskInstance;
-									return (
-										<SidebarMenuSubItem key={`${worker.sid}-${conversation.key}`}>
-											<TaskListItem task={task} />
-										</SidebarMenuSubItem>
-									);
-								})}
-							</SidebarMenuSub>
-						)}
-					</SidebarMenuButton>
-				</DialogTrigger>
-			</SidebarMenuItem>
-
-			<WorkerDialog
-				worker={worker}
-				workerAttributes={workerAttributes}
-			/>
-		</Dialog>
+				{conversations && conversations?.length > 0 && (
+					<SidebarMenuSub className='px-0 mr-0'>
+						{conversations?.map((conversation) => {
+							const task = conversation.data as TaskInstance;
+							return (
+								<TaskListItem
+									key={`${worker.sid}-${conversation.key}`}
+									task={task}
+								/>
+							);
+						})}
+					</SidebarMenuSub>
+				)}
+			</SidebarMenuButton>
+		</SidebarMenuItem>
 	);
 };
 

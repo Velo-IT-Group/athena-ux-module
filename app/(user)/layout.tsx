@@ -104,7 +104,7 @@ const Layout = async ({ children }: Props) => {
 						user={user}
 					/>
 
-					<SidebarInset className='my-3 mr-3 bg-background rounded-md border shadow'>
+					<SidebarInset className='bg-background rounded-md border shadow'>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
 							<Navbar />
 

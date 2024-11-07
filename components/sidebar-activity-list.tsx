@@ -12,7 +12,6 @@ type Props = {
 };
 
 const SidebarActivityList = ({ isCollapsed }: Props) => {
-	'use no memo';
 	const { workspace } = useTwilio();
 	const { worker } = useWorker();
 
@@ -25,7 +24,6 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	});
 
 	const { items } = useSyncMap('SyncTaskRouterTasks');
-	// console.log(items);
 	const [activities, setActivities] = useState<Activity[]>([]);
 
 	useEffect(() => {

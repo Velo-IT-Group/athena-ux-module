@@ -4,14 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useTwilio } from '@/providers/twilio-provider';
 import { useWorker } from '@/providers/worker-provider';
 import { Activity } from 'twilio-taskrouter';
-import ActivityItem from './activity-item';
+import ActivityItem from '../activity-item';
 import useSyncMap from '@/hooks/useSyncMap';
 
 type Props = {
 	isCollapsed: boolean;
 };
 
-const SidebarActivityList = ({ isCollapsed }: Props) => {
+const ActivityList = ({ isCollapsed }: Props) => {
 	const { workspace } = useTwilio();
 	const { worker } = useWorker();
 
@@ -51,4 +51,4 @@ const SidebarActivityList = ({ isCollapsed }: Props) => {
 	);
 };
 
-export default SidebarActivityList;
+export default ActivityList;

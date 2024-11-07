@@ -1,6 +1,5 @@
 'use client';
 import { History } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
 	Command,
 	CommandEmpty,
@@ -14,8 +13,7 @@ import { groupBy } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import HistoryListItem from '@/app/(user)/history-list-item';
 import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { SidebarMenuButton } from './ui/sidebar';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
 
 type Props = {
 	profile: Profile;

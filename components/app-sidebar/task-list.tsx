@@ -1,28 +1,23 @@
 'use client';
+import { useEffect } from 'react';
 
-import { useEffect, useState, Fragment } from 'react';
 import { useWorker } from '@/providers/worker-provider';
 import type { Reservation, Worker } from 'twilio-taskrouter';
-import { useDevice } from '@/providers/device-provider';
-import { Separator } from '../ui/separator';
 import useReservations from '@/hooks/useReservations';
-import TaskNotification from '../task-notification';
+import TaskNotification from '@/components/task-notification';
 import { toast } from 'sonner';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Button } from '../ui/button';
-import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Phone } from 'lucide-react';
-import OutboundDialer from '../outbound-dialer';
+import OutboundDialer from '@/components/outbound-dialer';
 import { useNotifications } from '@/providers/notification-provider';
 import useRinger from '@/hooks/useRinger';
 import {
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from '../ui/sidebar';
+} from '@/components/ui/sidebar';
 
 type Props = {
 	isCollapsed?: boolean;

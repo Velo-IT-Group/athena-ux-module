@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,17 +9,15 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Button } from './ui/button';
+} from '@/components/ui/dropdown-menu';
 import { Bell, BellOff, LogOut, UserIcon } from 'lucide-react';
-import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
-import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
+import DeviceDropdownMenuSub from '@/components/device-dropdown-menu-sub';
+import ActivityDropdownMenuSub from '@/components/activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
-import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
+import ThemeDropdownSelectorSub from '@/components/theme-dropdown-selector-sub';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -28,14 +27,14 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { useWorker } from '../providers/worker-provider';
+} from '@/components/ui/alert-dialog';
+import { useWorker } from '@/providers/worker-provider';
 import { useMutation } from '@tanstack/react-query';
-import { changeOnCallEngineer } from '../utils/twilio/workers';
-import { useTwilio } from '../providers/twilio-provider';
+import { changeOnCallEngineer } from '@/utils/twilio/workers';
+import { useTwilio } from '@/providers/twilio-provider';
 import { updateOnCallEngineer } from '@/lib/twilio/update';
-import { activityColors } from './activity-item';
-import { SidebarMenuButton } from './ui/sidebar';
+import { activityColors } from '@/components/activity-item';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
 
 type Props = {
 	user: User | null;

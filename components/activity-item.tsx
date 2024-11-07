@@ -12,18 +12,14 @@ import { formatDate } from '@/utils/date';
 import {
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarMenuSub,
 	SidebarMenuSubButton,
-	SidebarMenuSubItem,
 } from './ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { Dialog, DialogTrigger } from './ui/dialog';
-import WorkerDialog from './worker-dialog';
 
 type Props = {
 	workers: Worker[];
@@ -131,22 +127,24 @@ const TaskListItem = ({ task }: { task: TaskInstance }) => {
 	const timer = useTimer(new Date(task.dateUpdated));
 
 	return (
-		<SidebarMenuSubButton className='flex items-center gap-1.5 text-xs text-muted-foreground border-b pb-1.5 last:pb-0 last:border-b-0 w-full'>
-			{attributes.taskType === 'voicemail' && <Voicemail className='size-3' />}
+		<SidebarMenuSubButton className='flex items-center gap-3 text-xs border-b pb-1.5 [&>svg]:size-4 last:pb-0 last:border-b-0 w-full'>
+			{attributes.taskType === 'voicemail' && <Voicemail />}
 			{attributes.taskType !== 'voicemail' && attributes.direction === 'outbound' ? (
-				<PhoneOutgoing className='size-3' />
+				<PhoneOutgoing />
 			) : (
-				<PhoneIncoming className='size-3' />
+				<PhoneIncoming />
 			)}
 
-			<p className='text-nowrap text-ellipsis'>
-				{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}
-			</p>
+			<div>
+				<p className='text-nowrap text-ellipsis font-medium'>
+					{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}
+				</p>
 
-			<Timer
-				className='ml-auto'
-				timer={timer}
-			/>
+				<Timer
+					className='ml-auto text-muted-foreground '
+					timer={timer}
+				/>
+			</div>
 		</SidebarMenuSubButton>
 	);
 };

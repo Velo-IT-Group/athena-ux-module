@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,17 +9,15 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Button } from './ui/button';
+} from '@/components/ui/dropdown-menu';
 import { Bell, BellOff, LogOut, UserIcon } from 'lucide-react';
-import DeviceDropdownMenuSub from './device-dropdown-menu-sub';
-import ActivityDropdownMenuSub from './activity-dropdown-menu-sub';
+import DeviceDropdownMenuSub from '@/components/device-dropdown-menu-sub';
+import ActivityDropdownMenuSub from '@/components/activity-dropdown-menu-sub';
 import { cn } from '@/lib/utils';
-import ThemeDropdownSelectorSub from './theme-dropdown-selector-sub';
+import ThemeDropdownSelectorSub from '@/components/theme-dropdown-selector-sub';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -28,32 +27,26 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { useWorker } from '../providers/worker-provider';
+} from '@/components/ui/alert-dialog';
+import { useWorker } from '@/providers/worker-provider';
 import { useMutation } from '@tanstack/react-query';
-import { changeOnCallEngineer } from '../utils/twilio/workers';
-import { useTwilio } from '../providers/twilio-provider';
+import { changeOnCallEngineer } from '@/utils/twilio/workers';
+import { useTwilio } from '@/providers/twilio-provider';
 import { updateOnCallEngineer } from '@/lib/twilio/update';
-import { SidebarMenuButton } from './ui/sidebar';
-
-const activityColors: Record<string, string> = {
-	Available: 'bg-green-500',
-	Unavailable: 'bg-red-500',
-	Offline: 'bg-gray-500',
-	Break: 'bg-gray-500',
-	'On-Site': 'bg-orange-500',
-};
+import { activityColors } from '@/components/activity-item';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
 
 type Props = {
 	user: User | null;
+	isCollapsed: boolean;
 	align?: 'center' | 'end' | 'start';
 	side?: 'top' | 'right' | 'bottom' | 'left';
 };
 
-const UserInfo = ({ user, align = 'end', side }: Props) => {
+const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
-	const { worker, activity } = useWorker();
+	const { worker } = useWorker();
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const { token } = useTwilio();
 
@@ -71,25 +64,20 @@ const UserInfo = ({ user, align = 'end', side }: Props) => {
 		<AlertDialog>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='rounded-full'
-					>
+					<SidebarMenuButton size='sm'>
 						<div className='relative'>
 							<UserIcon />
 
 							<div
 								className={cn(
 									'w-2 h-2 rounded-full absolute border border-white -right-0.5 -bottom-0.5',
-									// activity && activityColors[activity?.name]
-									'bg-green-500'
+									worker?.activity && activityColors[worker?.activity?.name]
 								)}
 							/>
 						</div>
 
-						<span className='sr-only'>{user?.user_metadata?.full_name}</span>
-					</Button>
+						<span>{user?.user_metadata?.full_name}</span>
+					</SidebarMenuButton>
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent

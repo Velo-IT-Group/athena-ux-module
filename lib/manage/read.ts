@@ -1,6 +1,7 @@
 'use server'
 import { type Conditions, generateParams, baseHeaders } from '@/utils/manage/params';
 import type {
+	Activity,
 	AuditTrailEntry,
 	Board,
 	BoardStatus,
@@ -9,6 +10,7 @@ import type {
 	CommunicationItem,
 	CommunicationType,
 	Company,
+	CompanyNote,
 	Configuration,
 	ConfigurationStatus,
 	ConfigurationType,
@@ -26,6 +28,7 @@ import type {
 	Site,
 	SystemMember,
 	TicketNote,
+	TimeEntry,
 } from '@/types/manage';
 
 export const getCompany = async (id: number, conditions?: Conditions<Company>): Promise<Company> => {
@@ -72,14 +75,28 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 	return await response.json();
 };
 
-export const getCompanyNotes = async (id: number, conditions?: Conditions<Note>): Promise<Note[]> => {
-	const response = await fetch(
-		`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes${generateParams(conditions)}`,
-		{
-			headers: baseHeaders,
-		}
-	);
-	return await response.json();
+export const getCompanyNotes = async (id?: number, conditions?: Conditions<CompanyNote>): Promise<{data: CompanyNote[], count: number}> => {
+	if (!id) return { data: [], count: 0 };
+	const params = generateParams(conditions)
+	const [dataResponse, countResponse] = await Promise.all([
+		fetch(
+			`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes${params}`,
+			{
+				headers: baseHeaders,
+			}
+		),
+		fetch(
+			`${process.env.CONNECT_WISE_URL}/company/companies/${id}/notes/count${params}`,
+			{
+				headers: baseHeaders,
+			}
+		),
+	])
+	
+	return {
+		data: await dataResponse.json(),
+		count: (await countResponse.json()).count
+	}
 };
 
 export const getContact = async (
@@ -593,6 +610,20 @@ export const getHoliday = async (
 
 export const getLocations = async (conditions?: Conditions<Location>): Promise<Location[]> => {
 	const response = await fetch(`${process.env.CONNECT_WISE_URL}/system/locations${generateParams(conditions)}`, {
+		headers: baseHeaders,
+	});
+	return await response.json();
+};
+
+export const getTimeEntries = async (conditions?: Conditions<TimeEntry>): Promise<TimeEntry[]> => {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/time/entries${generateParams(conditions)}`, {
+		headers: baseHeaders,
+	});
+	return await response.json();
+};
+
+export const getActivities = async (conditions?: Conditions<Activity>): Promise<Activity[]> => {
+	const response = await fetch(`${process.env.CONNECT_WISE_URL}/sales/activities${generateParams(conditions)}`, {
 		headers: baseHeaders,
 	});
 	return await response.json();

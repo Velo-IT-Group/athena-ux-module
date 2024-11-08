@@ -1,4 +1,5 @@
-const formatter = new Intl.RelativeTimeFormat('en', { style: 'long' });
+const formatter = new Intl.RelativeTimeFormat('en', { style: 'short' });
+
 
 export function relativeDate(date: Date) {
 	const now = new Date();
@@ -31,4 +32,8 @@ export function relativeDate(date: Date) {
 export function addSeconds(date: Date, seconds: number) {
   date.setSeconds(date.getSeconds() + seconds);
   return date;
+}
+
+export const formatDate = (options?: Intl.DateTimeFormatOptions) => {
+	return  new Intl.DateTimeFormat('en', options);
 }

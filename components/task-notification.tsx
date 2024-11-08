@@ -8,6 +8,7 @@ import useTimer from '@/hooks/useTimer';
 import { TaskContext } from './active-call/context';
 import OutboundTask from './outbound-task';
 import VoicemailTask from './voicemail-task';
+import { SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
 type Props = {
 	reservation: Reservation;
 	task: Task;
@@ -27,14 +28,52 @@ const TaskNotification = ({ reservation, task, isCollapsed, side = 'right', alig
 	const taskChannelUniqueName = task.taskChannelUniqueName;
 
 	return (
-		<TaskContext task={task}>
-			<div className='min-h-12 max-h-96 h-full flex flex-col bg-muted p-3'>
-				{reservation.status === 'pending' && task.attributes.direction === 'outbound' && (
-					<OutboundTask
-						reservation={reservation}
-						task={task}
-					/>
-				)}
+		<Popover
+			open={open}
+			onOpenChange={setOpen}
+		>
+			<PopoverTrigger asChild>
+				<SidebarMenuItem>
+					<SidebarMenuButton
+						// variant='secondary'
+						// size={isCollapsed ? 'icon' : 'default'}
+						size='sm'
+						className={cn('animate-pulse')}
+					>
+						{taskChannelUniqueName === 'default' && isVoicemail && (
+							<Voicemail className={cn(!isCollapsed && 'mr-1.5')} />
+						)}
+						{taskChannelUniqueName === 'default' && !isVoicemail && (
+							<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+						)}
+						{taskChannelUniqueName === 'voice' && isVoicemail && <Voicemail className={cn(!isCollapsed && 'mr-1.5')} />}
+						{taskChannelUniqueName === 'voice' && !isVoicemail && (
+							<Phone className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+						)}
+						{taskChannelUniqueName === 'chat' && (
+							<MessageSquareText className={cn('fill-current stroke-none', !isCollapsed && 'mr-1.5')} />
+						)}
+
+						<span className={isCollapsed ? 'sr-only' : 'text-muted-foreground flex items-center gap-1.5 font-medium'}>
+							{attributes.name ?? attributes.from}
+						</span>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
+			</PopoverTrigger>
+
+			<TaskContext task={task}>
+				<PopoverContent
+					side='right'
+					align='start'
+					sideOffset={12}
+					className='p-0'
+				>
+					{reservation.status === 'pending' && task.attributes.direction === 'outbound' && (
+						<OutboundTask
+							reservation={reservation}
+							task={task}
+						/>
+					)}
 
 				{reservation.status === 'pending' && task.attributes.direction !== 'outbound' && (
 					<IncomingTask

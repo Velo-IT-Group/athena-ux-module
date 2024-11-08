@@ -30,6 +30,7 @@ export const createAccessToken = async (
 
 	const accessToken = new AccessToken(accountSid, signingKeySid, signingKeySecret, {
 		identity,
+		ttl: 36000
 	});
 
 	accessToken.addGrant(taskRouterGrant);

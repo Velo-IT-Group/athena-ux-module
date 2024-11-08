@@ -1,10 +1,11 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Building, Cable, Tag } from 'lucide-react';
+import { Box, Building, Cable, Tag } from 'lucide-react';
 import TicketList from '@/components/lists/ticket-list';
 import { cn } from '@/lib/utils';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import {
 	getCompanies,
+	getCompanyNotes,
 	getConfigurationStatuses,
 	getConfigurationTypes,
 	getContacts,
@@ -19,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import Tiptap from '@/components/tip-tap';
+import SOPExceptions from './sop-exceptions';
 import getQueryClient from '../getQueryClient';
 
 type Props = {
@@ -38,9 +39,9 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		{ data: companies },
 		{ data: configurationStatuses },
 		configurationTypes,
-		{ data: calls },
 		{ data: projects },
 		{ data: contacts },
+		{ data: notes },
 	] = await Promise.all([
 		client.fetchQuery({
 			queryKey: [
@@ -82,12 +83,6 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			fields: ['id', 'name'],
 			pageSize: 1000,
 		}),
-		supabase
-			.schema('reporting')
-			.from('conversations')
-			.select()
-			.eq('contact_id', contactId ? contactId : '')
-			.eq('company_id', companyId ? companyId : ''),
 		getProjects({
 			conditions: {
 				closedFlag: false,
@@ -104,6 +99,12 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			},
 			fields: ['id', 'firstName', 'lastName'],
 			pageSize: 1000,
+		}),
+		getCompanyNotes(companyId, {
+			conditions: {
+				'type/id': 6,
+			},
+			fields: ['id', 'text', '_info'],
 		}),
 	]);
 
@@ -134,11 +135,22 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 				>
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
-						<Tiptap />
+						<SOPExceptions
+							note={notes?.[0]}
+							companyId={companyId!}
+						/>
 					</div>
 
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
+						{projects.length === 0 && (
+							<div className='max-h-60 grid place-items-center h-full text-muted-foreground'>
+								<div className='grid place-items-center gap-1.5'>
+									<Box className='w-9 h-9' />
+									<p className='text-lg text-center font-semibold'>No active projects</p>
+								</div>
+							</div>
+						)}
 						{projects.map((project) => (
 							<Card key={project.id}>
 								<CardHeader>

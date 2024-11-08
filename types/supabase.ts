@@ -261,6 +261,29 @@ export type Database = {
           },
         ]
       }
+      profile_keys: {
+        Row: {
+          key: string
+          user_id: string
+        }
+        Insert: {
+          key: string
+          user_id: string
+        }
+        Update: {
+          key?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_keys_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -915,49 +938,6 @@ export type Database = {
           territoryname: string
         }[]
       }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  user_experience: {
-    Tables: {
-      custom_view: {
-        Row: {
-          created_at: string
-          creator: string | null
-          filterData: Json
-          filters: Json
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          creator?: string | null
-          filterData: Json
-          filters: Json
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          creator?: string | null
-          filterData?: Json
-          filters?: Json
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

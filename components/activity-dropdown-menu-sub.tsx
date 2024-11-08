@@ -5,11 +5,16 @@ import { Check, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useWorker } from '@/providers/worker-provider';
+import { useEffect, useState } from 'react';
+import { Activity } from 'twilio-taskrouter';
 
 type Props = {};
 
 const ActivityDropdownMenuSub = ({}: Props) => {
-	const { worker, activity: currentActivity } = useWorker();
+	'use no memo';
+	const { worker } = useWorker();
+
+	const currentActivity = worker?.activity;
 
 	return (
 		<DropdownMenuSub>

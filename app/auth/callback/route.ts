@@ -7,6 +7,7 @@ import { getContacts, getSystemMembers } from '@/lib/manage/read';
 import { updateWorker } from '@/lib/twilio/update';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
+import { cookies } from 'next/headers';
 
 const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) => {
 	const email = user?.user_metadata.email
@@ -64,6 +65,8 @@ const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, wo
 
 export async function GET(request: NextRequest) {
 	const { searchParams, origin } = request.nextUrl;
+	const cookieStore = await cookies()
+	
 
 	const code = searchParams.get('code');
 	// if "next" is in param, use it as the redirect URL
@@ -72,6 +75,8 @@ export async function GET(request: NextRequest) {
 	if (code) {
 		const supabase = await createClient();
 		const { error } = await supabase.auth.exchangeCodeForSession(code);
+		const { data } = await supabase.from('profile_keys').select().single();
+		cookieStore.set('connect_wise:auth', JSON.stringify(data?.key))
 
 		if (!error) {
 			const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
@@ -79,7 +84,9 @@ export async function GET(request: NextRequest) {
 			
 			const { data: { user } } = await supabase.auth.getUser()
 
-			const email = user?.user_metadata.email;
+			if (!user) return;
+
+			const email = user.user_metadata.email;
 
 			const workers = await getWorkers({ friendlyName: email }) 
 			
@@ -94,8 +101,6 @@ export async function GET(request: NextRequest) {
 				return NextResponse.redirect(`${origin}${next}`);
 			} else if (forwardedHost) {
 				return NextResponse.redirect(`${origin}${next}`);
-
-				// return NextResponse.redirect(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
 			}

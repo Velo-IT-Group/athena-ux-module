@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import UserLayout from './user-layout';
 import { Toaster } from 'sonner';
-import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import { createAccessToken } from '@/lib/twilio';
 import { findWorker } from '@/lib/twilio/taskrouter/helpers';
@@ -13,8 +12,11 @@ import { redirect } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
+import { userHeaders } from '@/lib/utils';
+import { decryptToken } from '@/utils/crypto';
 import { AppSidebar } from '@/components/app-sidebar';
 import WorkerToolbar from '@/components/worker-toolbar';
+import { cookies } from 'next/headers';
 
 type Props = {
 	children: ReactNode;
@@ -41,12 +43,12 @@ const Layout = async ({ children }: Props) => {
 	const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
 	const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
 
-	// if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
-	// 	const [worker, members, { data: contacts }] = await Promise.all([
-	// 		findWorker(user?.email ?? ''),
-	// 		getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
-	// 		getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
-	// 	]);
+	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
+		const [worker, members, { data: contacts }] = await Promise.all([
+			findWorker(user?.email ?? ''),
+			getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
+			getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
+		]);
 
 	// 	await supabase.auth.updateUser({
 	// 		data: {
@@ -67,6 +69,7 @@ const Layout = async ({ children }: Props) => {
 				.eq('id', user?.id ?? '')
 				.single(),
 	});
+
 	const { data: conversations } = await queryClient.fetchQuery({
 		queryKey: ['conversations', user?.id],
 		queryFn: async () =>
@@ -78,6 +81,7 @@ const Layout = async ({ children }: Props) => {
 				.order('date', { ascending: false })
 				.limit(25),
 	});
+
 	const twilioToken = await queryClient.fetchQuery({
 		queryKey: ['accessToken'],
 		queryFn: async () =>
@@ -90,6 +94,19 @@ const Layout = async ({ children }: Props) => {
 				user?.email ?? ''
 			),
 	});
+
+	const cookieStore = await cookies();
+	const authCookie = cookieStore.get('connect_wise:auth');
+
+	if (authCookie) {
+		const auth = JSON.parse(authCookie?.value ?? '{}');
+		const token = decryptToken(auth, user.id);
+
+		userHeaders.set(
+			'Authorization',
+			'Basic ' + btoa('velo+' + token.connect_wise.public_key + ':' + token.connect_wise.secret_key)
+		);
+	}
 
 	if (!profile) return null;
 
@@ -111,6 +128,10 @@ const Layout = async ({ children }: Props) => {
 
 					<WorkerToolbar
 						conversations={conversations ?? []}
+					/>
+		
+					<AppSidebar
+						conversations={conversations!}
 						profile={profile!}
 						user={user}
 					/>

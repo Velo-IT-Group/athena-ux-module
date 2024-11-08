@@ -30,13 +30,13 @@ export type CustomCall = {
 };
 
 export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
-	const [worker, setWorker] = useState<Worker>();
+	'use no memo';
+	// const [worker, setWorker] = useState<Worker>();
+	const worker = useMemo(() => new Supervisor(authToken), [authToken]);
 	const [activity, setActivity] = useState<Activity>();
 
 	useEffect(() => {
-		if (!authToken) return;
-		const worker = new Supervisor(authToken);
-		setWorker(worker);
+		if (!worker) return;
 
 		worker.on('activityUpdated', (w) => {
 			console.log(w);
@@ -46,7 +46,7 @@ export const WorkerProvider = ({ authToken, children }: WithChildProps) => {
 		return () => {
 			worker?.disconnect();
 		};
-	}, [authToken]);
+	}, [worker]);
 
 	useEffect(() => {
 		if (!worker || !worker.activity) return;

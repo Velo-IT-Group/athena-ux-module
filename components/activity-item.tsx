@@ -1,21 +1,31 @@
 'use client';
 import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Activity } from 'twilio-taskrouter';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Worker } from 'twilio-taskrouter';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
-import { Circle, Phone } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ChevronDown, Circle, PhoneIncoming, PhoneOutgoing, Voicemail } from 'lucide-react';
+import { cn, parsePhoneNumber } from '@/lib/utils';
+import { SyncMapItem } from 'twilio-sync';
+import { TaskInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/task';
+import useTimer from '@/hooks/useTimer';
+import Timer from './timer';
+import { formatDate } from '@/utils/date';
+import {
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+} from './ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { Avatar, AvatarFallback } from './ui/avatar';
 import { SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
 
 type Props = {
 	workers: Worker[];
 	currentActivity?: Activity;
-	conversations: Conversation[];
+	conversations: SyncMapItem[];
 	activity: Activity;
 };
 
@@ -27,119 +37,115 @@ export const activityColors: Record<string, string> = {
 	'On-Site': 'bg-orange-500',
 };
 
-const ActivityItem = ({ workers, currentActivity, conversations, activity }: Props) => {
-	const { state } = useSidebar();
-	const isCollapsed = state === 'collapsed';
+const ActivityItem = ({ workers, conversations, activity }: Props) => {
 	return (
-		<SidebarMenuItem>
-			<Popover>
-				<ContextMenu>
-					<Tooltip>
-						<ContextMenuTrigger asChild>
-							<TooltipTrigger asChild>
-								<PopoverTrigger asChild>
-									<>
-										<SidebarMenuButton>
-											<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
+		<Collapsible className='group/collapsible'>
+			<SidebarGroup>
+				<SidebarGroupContent>
+					<CollapsibleTrigger asChild>
+						<SidebarMenuButton className='[&>svg]:size-3.5'>
+							<Circle className={cn('stroke-none rounded-full', activityColors[activity.name])} />
 
-											<span>{activity.name}</span>
-										</SidebarMenuButton>
-										<SidebarMenuBadge>
-											{workers.filter((worker) => worker.activitySid === activity.sid).length}
-										</SidebarMenuBadge>
-									</>
-								</PopoverTrigger>
-							</TooltipTrigger>
-						</ContextMenuTrigger>
+							<span className='group-data-[collapsible=icon]:hidden'>{activity.name}</span>
 
-						<ContextMenuContent>
-							<ContextMenuItem
-								onSelect={async () => await activity.setAsCurrent()}
-								disabled={currentActivity?.sid === activity.sid}
-							>
-								Set as current activity
-							</ContextMenuItem>
-						</ContextMenuContent>
+							<ChevronDown className='group-data-[collapsible=icon]:hidden ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+						</SidebarMenuButton>
+					</CollapsibleTrigger>
 
-						<TooltipContent side='right'>
-							{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-						</TooltipContent>
-						<TooltipContent side='right'>
-							{activity.name} ({workers.filter((worker) => worker.activitySid === activity.sid).length})
-						</TooltipContent>
-					</Tooltip>
-				</ContextMenu>
+					<CollapsibleContent>
+						<SidebarMenu>
+							{workers?.map((worker) => {
+								const workerConversations =
+									conversations?.filter((conversation) => {
+										const data = conversation.data as TaskInstance;
+										const attributes = JSON.parse(data?.attributes ?? '{}');
+										return attributes.worker_sid === worker.sid;
+									}) ?? [];
 
-				<PopoverContent
-					side='right'
-					align='start'
-					sideOffset={12}
-					className='p-0'
-				>
-					<Command>
-						<CommandInput placeholder={'Search users'} />
-						<CommandList>
-							<CommandGroup heading={activity.name}>
-								{workers?.map((worker) => {
-									const workerConversations =
-										conversations?.filter(
-											(conversation) => conversation.agent === worker.sid && !conversation.talk_time
-										) ?? [];
-									return (
-										<ActivityListItem
-											key={worker.sid}
-											worker={worker}
-											conversations={workerConversations}
-										/>
-									);
-								})}
-							</CommandGroup>
-						</CommandList>
-						<CommandEmpty>Nothing users.</CommandEmpty>
-					</Command>
-				</PopoverContent>
-			</Popover>
-		</SidebarMenuItem>
+								return (
+									<ActivityListItem
+										key={worker.sid}
+										conversations={workerConversations}
+										worker={worker}
+									/>
+								);
+							})}
+						</SidebarMenu>
+					</CollapsibleContent>
+				</SidebarGroupContent>
+			</SidebarGroup>
+		</Collapsible>
 	);
 };
 
 type ActivityListItemProps = {
 	worker: Worker;
-	conversations: Conversation[];
+	conversations: SyncMapItem[];
 };
 
 const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
 	const workerAttributes = worker.attributes;
 
 	return (
-		<CommandItem
-			key={worker.sid}
-			value={workerAttributes.full_name}
-			className='flex items-center gap-1.5'
-		>
-			<Avatar className='w-3.5 h-3.5'>
-				<AvatarFallback className='w-3.5 h-3.5'>{workerAttributes.full_name.charAt(0)}</AvatarFallback>
-				<AvatarImage
-					className='w-3.5 h-3.5'
-					src={workerAttributes.imageUrl}
-				/>
-			</Avatar>
+		<SidebarMenuItem>
+			<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3'>
+				<div className='flex items-center gap-1.5 text-nowrap'>
+					<Avatar className='uppercase w-6 h-6'>
+						<AvatarFallback className='text-[9px] font-medium'>
+							{worker.friendlyName[0]}
+							{worker.friendlyName[1]}
+						</AvatarFallback>
+					</Avatar>
+
+					<p>{workerAttributes.full_name}</p>
+
+					<p className='ml-auto text-xs'>
+						since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
+					</p>
+				</div>
+
+				{conversations && conversations?.length > 0 && (
+					<SidebarMenuSub className='px-0 mr-0'>
+						{conversations?.map((conversation) => {
+							const task = conversation.data as TaskInstance;
+							return (
+								<TaskListItem
+									key={`${worker.sid}-${conversation.key}`}
+									task={task}
+								/>
+							);
+						})}
+					</SidebarMenuSub>
+				)}
+			</SidebarMenuButton>
+		</SidebarMenuItem>
+	);
+};
+
+const TaskListItem = ({ task }: { task: TaskInstance }) => {
+	const attributes = JSON.parse(task?.attributes ?? '{}');
+	const timer = useTimer(new Date(task.dateUpdated));
+
+	return (
+		<SidebarMenuSubButton className='flex items-center gap-3 text-xs border-b pb-1.5 [&>svg]:size-4 last:pb-0 last:border-b-0 w-full'>
+			{attributes.taskType === 'voicemail' && <Voicemail />}
+			{attributes.taskType !== 'voicemail' && attributes.direction === 'outbound' ? (
+				<PhoneOutgoing />
+			) : (
+				<PhoneIncoming />
+			)}
 
 			<div>
-				<p>{workerAttributes.full_name}</p>
-				{/* <p className='text-muted-foreground text-sm'>{worker.sid}</p> */}
-			</div>
+				<p className='text-nowrap text-ellipsis font-medium'>
+					{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}
+				</p>
 
-			{conversations?.length > 0 && (
-				<Button
-					variant='default'
-					size='smIcon'
-					className='ml-auto animate-pulse'
-				>
-					<Phone />
-				</Button>
-			)}
-		</CommandItem>
+				<Timer
+					className='ml-auto text-muted-foreground '
+					timer={timer}
+				/>
+			</div>
+		</SidebarMenuSubButton>
 	);
 };
 

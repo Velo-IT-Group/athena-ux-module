@@ -1,8 +1,7 @@
+'use client';
 import { useTwilio } from '@/providers/twilio-provider';
-import React, { useEffect, useMemo, useState } from 'react';
-import { SyncClient, SyncMap, SyncMapItem } from 'twilio-sync';
-
-type Props = {};
+import { useEffect, useMemo, useState } from 'react';
+import { SyncClient, SyncMapItem } from 'twilio-sync';
 
 const useSyncMap = (mapKey: string) => {
 	const { token } = useTwilio();
@@ -17,40 +16,26 @@ const useSyncMap = (mapKey: string) => {
 			setItems(items);
 
 			map.on('itemUpdated', (item) => {
-				const oldItems = items;
-				const oldItem = oldItems.findIndex((i) => i.key === item.key);
-				oldItems[oldItem] = item;
-				setItems(oldItems);
-
-				console.log(item);
+				console.log('itemUpdated', item.item.key);
+				setItems((prev) => [...prev.filter((i) => i.key !== item.item.key), item.item]);
 			});
 
 			map.on('itemAdded', (item) => {
-				setItems((prev) => [...prev, item]);
+				console.log('itemAdded', item.item.key);
+				let newItems = [...items.filter((i) => i.key !== item.item.key), item.item];
+				setItems(newItems);
 			});
 
 			map.on('itemRemoved', (item) => {
-				setItems((prev) => [...prev.filter((i) => i.key !== item.key)]);
+				console.log('itemRemoved', item.key);
+				let newItems = [...items.filter((i) => i.key !== item.key)];
+				console.log(newItems);
+				setItems(newItems);
 			});
 		};
 
 		getSync();
 	}, [syncClient, mapKey]);
-
-	// const getSyncItem = async (key: string) => {
-	// 	const map = await syncClient.map(mapKey);
-	// 	map.on('itemAdded', () => {});
-	// 	const item = await map.get(key);
-	// 	// item.get
-	// 	return item;
-	// };
-
-	// const updateSyncItem = async (key: string, data: Object) => {
-	// 	const map = await syncClient.map(mapKey);
-	// 	const item = await map.get(key);
-	// 	// item.update()
-	// 	return item;
-	// };
 
 	return {
 		items,

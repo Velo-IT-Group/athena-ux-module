@@ -151,7 +151,7 @@ export function PhoneInput({
 						) : (
 							'Select country'
 						)}
-						<ChevronsUpDown className='ml-2 size-4 shrink-0 opacity-50' />
+						<ChevronsUpDown className='ml-2 size-3 shrink-0 opacity-50' />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent
@@ -180,7 +180,7 @@ export function PhoneInput({
 												}}
 											>
 												<Check
-													className={cn('mr-2 size-4', countryCode === country.iso2 ? 'opacity-100' : 'opacity-0')}
+													className={cn('mr-2 size-3', countryCode === country.iso2 ? 'opacity-100' : 'opacity-0')}
 												/>
 												<Image
 													src={`/flags/${country.iso2.toLowerCase()}.svg`}

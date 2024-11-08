@@ -18,7 +18,7 @@ const Page = async () => {
 						<CardDescription>Enter your email below to login to your account.</CardDescription>
 					</CardHeader>
 
-					<CardContent className='grid gap-4'>
+					<CardContent className='grid gap-3'>
 						<LabeledInput
 							label='Email'
 							name='email'

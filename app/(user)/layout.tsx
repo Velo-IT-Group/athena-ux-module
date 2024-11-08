@@ -13,6 +13,9 @@ import { Analytics } from '@vercel/analytics/react';
 import getQueryClient from '../getQueryClient';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar';
+import { cookies } from 'next/headers';
+import { userHeaders } from '@/lib/utils';
+import { decryptToken } from '@/utils/crypto';
 
 type Props = {
 	children: ReactNode;
@@ -83,6 +86,19 @@ const Layout = async ({ children }: Props) => {
 				user?.email ?? ''
 			),
 	});
+
+	const cookieStore = await cookies();
+	const authCookie = cookieStore.get('connect_wise:auth');
+
+	if (authCookie) {
+		const auth = JSON.parse(authCookie?.value ?? '{}');
+		const token = decryptToken(auth, user.id);
+
+		userHeaders.set(
+			'Authorization',
+			'Basic ' + btoa('velo+' + token.connect_wise.public_key + ':' + token.connect_wise.secret_key)
+		);
+	}
 
 	return (
 		<SidebarProvider>

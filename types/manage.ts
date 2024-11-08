@@ -25,6 +25,10 @@ export const companyNoteSchema = z.object({
     id: z.number(),
     identifier: z.string(),
     name: z.string()
+  }),
+	_info: z.object({
+		lastUpdated: z.string(),
+		updatedBy: z.string()
   })
 })
 

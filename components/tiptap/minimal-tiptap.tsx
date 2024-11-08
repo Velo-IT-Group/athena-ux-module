@@ -97,7 +97,7 @@ export const MinimalTiptapEditor = React.forwardRef<HTMLDivElement, MinimalTipta
 					className
 				)}
 			>
-				{props.editable && <Toolbar editor={editor} />}
+				<Toolbar editor={editor} />
 				<EditorContent
 					editor={editor}
 					className={cn('minimal-tiptap-editor p-6', editorContentClassName)}

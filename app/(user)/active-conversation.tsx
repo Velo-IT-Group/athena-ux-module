@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { MinimalTiptapEditor } from '@/components/tiptap';
+import SOPExceptions from './sop-exceptions';
 
 type Props = {
 	contactId?: number;
@@ -38,7 +38,6 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		{ data: companies },
 		{ data: configurationStatuses },
 		configurationTypes,
-		{ data: calls },
 		{ data: projects },
 		{ data: contacts },
 		{ data: notes },
@@ -78,12 +77,6 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			fields: ['id', 'name'],
 			pageSize: 1000,
 		}),
-		supabase
-			.schema('reporting')
-			.from('conversations')
-			.select()
-			.eq('contact_id', contactId ? contactId : '')
-			.eq('company_id', companyId ? companyId : ''),
 		getProjects({
 			conditions: {
 				closedFlag: false,
@@ -105,7 +98,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			conditions: {
 				'type/id': 6,
 			},
-			fields: ['id', 'text'],
+			fields: ['id', 'text', '_info'],
 		}),
 	]);
 
@@ -136,14 +129,9 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 				>
 					<div className='space-y-3'>
 						<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
-						<MinimalTiptapEditor
-							editable={false}
-							content={notes?.[0]?.text}
-							output='html'
-							shouldRerenderOnTransaction
-							placeholder='Type your description here...'
-							editorClassName='focus:outline-none text-sm'
-							immediatelyRender
+						<SOPExceptions
+							note={notes?.[0]}
+							companyId={companyId!}
 						/>
 					</div>
 

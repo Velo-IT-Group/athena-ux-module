@@ -10,6 +10,7 @@ import type {
 	CommunicationItem,
 	CommunicationType,
 	Company,
+	CompanyNote,
 	Configuration,
 	ConfigurationStatus,
 	ConfigurationType,
@@ -73,7 +74,7 @@ export const getCompanySites = async (id: number, conditions?: Conditions<Site>)
 	return await response.json();
 };
 
-export const getCompanyNotes = async (id?: number, conditions?: Conditions<Note>): Promise<{data: Note[], count: number}> => {
+export const getCompanyNotes = async (id?: number, conditions?: Conditions<CompanyNote>): Promise<{data: CompanyNote[], count: number}> => {
 	if (!id) return { data: [], count: 0 };
 	const params = generateParams(conditions)
 	const [dataResponse, countResponse] = await Promise.all([

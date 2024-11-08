@@ -46,7 +46,7 @@ type Props = {
 const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 	const { push } = useRouter();
 	const supabase = createClient();
-	const { worker, activity } = useWorker();
+	const { worker } = useWorker();
 	const [attributes, setAttributes] = useState<Record<string, any>>();
 	const { token } = useTwilio();
 
@@ -71,7 +71,7 @@ const UserInfo = ({ user, isCollapsed, align = 'end', side }: Props) => {
 							<div
 								className={cn(
 									'w-2 h-2 rounded-full absolute border border-white -right-0.5 -bottom-0.5',
-									activity && activityColors[activity?.name]
+									worker?.activity && activityColors[worker?.activity?.name]
 								)}
 							/>
 						</div>

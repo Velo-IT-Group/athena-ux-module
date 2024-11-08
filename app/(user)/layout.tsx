@@ -85,9 +85,9 @@ const Layout = async ({ children }: Props) => {
 	});
 
 	return (
-		<ReactQueryProvider>
-			<UserLayout token={twilioToken}>
-				<SidebarProvider>
+		<SidebarProvider>
+			<ReactQueryProvider>
+				<UserLayout token={twilioToken}>
 					<AppSidebar
 						conversations={conversations!}
 						profile={profile!}
@@ -105,9 +105,9 @@ const Layout = async ({ children }: Props) => {
 					<Toaster richColors />
 
 					<Analytics />
-				</SidebarProvider>
-			</UserLayout>
-		</ReactQueryProvider>
+				</UserLayout>
+			</ReactQueryProvider>
+		</SidebarProvider>
 	);
 };
 

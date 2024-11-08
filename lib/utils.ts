@@ -13,6 +13,10 @@ baseHeaders.set(
 );
 baseHeaders.set('Content-Type', 'application/json');
 
+export const userHeaders = new Headers();
+userHeaders.set('clientId', process.env.CONNECT_WISE_CLIENT_ID!);
+userHeaders.set('Content-Type', 'application/json');
+
 import parser, { CountryCode, NumberFormat, FormatNumberOptions } from 'libphonenumber-js';
 
 export const parsePhoneNumber = (

@@ -80,8 +80,6 @@ export async function GET(request: NextRequest) {
 
 			if (!user) return;
 
-			const {data: keys, error} = await supabase.from('profile_keys').select().eq('user', user.id)
-
 			const email = user.user_metadata.email;
 
 			const workers = await getWorkers({ friendlyName: email }) 
@@ -97,8 +95,6 @@ export async function GET(request: NextRequest) {
 				return NextResponse.redirect(`${origin}${next}`);
 			} else if (forwardedHost) {
 				return NextResponse.redirect(`${origin}${next}`);
-
-				// return NextResponse.redirect(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
 			}

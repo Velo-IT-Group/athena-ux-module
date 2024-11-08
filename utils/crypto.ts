@@ -1,4 +1,6 @@
+import { WebToken } from '@/app/auth/encrypt/route';
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto'
+import { verify } from 'jsonwebtoken';
 
 export const decryptSymmetric = (key: string, ciphertext: string, iv: string, tag: string) => {
   const decipher = createDecipheriv(
@@ -14,6 +16,8 @@ export const decryptSymmetric = (key: string, ciphertext: string, iv: string, ta
 
   return plaintext;
 }
+
+export const decryptToken = (token: string, user_id: string) => verify(token, process.env.SECRET_KEY! + user_id) as WebToken;
 
 export const encryptSymmetric = (key: string, plaintext: string) => {
   const iv = randomBytes(12).toString('base64');

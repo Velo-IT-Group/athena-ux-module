@@ -1,14 +1,20 @@
-import { decryptSymmetric } from '@/utils/crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { WebToken } from '../encrypt/route';
+import { verify } from 'jsonwebtoken';
+
+type EncryptedValue = {
+	user_id: string
+	key: string;
+}
 
 export async function POST(request: NextRequest) {
-	const body = await request.json()
-	const { text } = body;
-	const { searchParams, origin } = request.nextUrl;
-	const key = process.env.SECRET_KEY!
+	const response = await request.json()
+  	const data = response as EncryptedValue;
 
-	
-	return NextResponse.json({
-		status: 200
-	})
+	 const value = verify(data.key, process.env.SECRET_KEY! + data.user_id, {})  
+
+	return NextResponse.json(
+		value,
+		{ status: 200 }
+	)
 }

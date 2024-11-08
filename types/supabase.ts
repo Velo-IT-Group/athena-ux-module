@@ -263,31 +263,22 @@ export type Database = {
       }
       profile_keys: {
         Row: {
-          is_secret: boolean
-          iv: string
           key: string
-          tag: Json | null
           user_id: string
         }
         Insert: {
-          is_secret: boolean
-          iv: string
           key: string
-          tag?: Json | null
-          user_id?: string
+          user_id: string
         }
         Update: {
-          is_secret?: boolean
-          iv?: string
           key?: string
-          tag?: Json | null
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "profile_keys_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

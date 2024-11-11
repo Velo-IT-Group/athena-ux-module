@@ -6,6 +6,7 @@ import { useWorker } from '@/providers/worker-provider';
 import { Activity } from 'twilio-taskrouter';
 import ActivityItem from '../activity-item';
 import useSyncMap from '@/hooks/useSyncMap';
+import { updateWorker } from '@/lib/twilio/update';
 
 type Props = {
 	isCollapsed: boolean;
@@ -19,7 +20,7 @@ const ActivityList = ({ isCollapsed }: Props) => {
 
 	const { data: workers } = useQuery({
 		queryKey: ['workers'],
-		queryFn: () => workspace?.fetchWorkers({ Ordering: 'DateStatusChanged:desc' }),
+		queryFn: () => workspace?.fetchWorkers({ Ordering: 'DateStatusChanged:desc', TargetWorkersExpression: 'active == true' }),
 		refetchInterval: open ? 1000 : 10000,
 	});
 

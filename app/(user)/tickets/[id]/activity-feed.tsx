@@ -1,24 +1,19 @@
 import React from 'react';
-import ActivityItem from './activity-item';
 import { getAuditTrail, getTicketNotes } from '@/lib/manage/read';
-import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { ArrowUp, Ellipsis, Paperclip, Reply, SmilePlus, User } from 'lucide-react';
-import { createTicketNote } from '@/lib/manage/create';
-import { toast } from 'sonner';
+import { User } from 'lucide-react';
 import ActivityList from '@/components/lists/activity-list';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { relativeDate } from '@/utils/date';
 import NoteItem from '@/components/note-item';
 
 export default async function ActivityFeed({ id }: { id: number }) {
 	const [entries, notes] = await Promise.all([
-		getAuditTrail('Ticket', id, { orderBy: { key: 'enteredDate', order: 'desc' } }),
+		getAuditTrail('Ticket', id, {
+			orderBy: {
+				key: 'enteredDate',
+				order: 'desc',
+			},
+		}),
 		getTicketNotes(id),
 	]);
 

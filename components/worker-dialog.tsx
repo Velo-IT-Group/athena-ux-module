@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { getActivities, getTimeEntries } from '@/lib/manage/read';
 import { ScrollArea } from './ui/scroll-area';
 import { formatDate } from '@/utils/date';
@@ -26,26 +26,44 @@ type Log = {
 };
 
 const WorkerDialog = ({ worker, workerAttributes }: Props) => {
-	const { data } = useQuery({
-		queryKey: ['timeEntries'],
-		queryFn: () =>
-			getTimeEntries({
-				conditions: { 'member/id': 310 },
-				orderBy: { key: 'dateEntered', order: 'desc' },
-			}),
-	});
-
-	const { data: activities } = useQuery({
-		queryKey: ['activities'],
-		queryFn: () =>
-			getActivities({
-				conditions: {
-					'assignTo/id': 310,
-					'type/id': 27,
-				},
-				// @ts-ignore
-				orderBy: { key: 'dateEntered', order: 'desc' },
-			}),
+	const [{ data }, { data: activities }] = useQueries({
+		queries: [
+			{
+				queryKey: [
+					'timeEntries',
+					{
+						conditions: { 'member/id': 310 },
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					},
+				],
+				queryFn: () =>
+					getTimeEntries({
+						conditions: { 'member/id': 310 },
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					}),
+			},
+			{
+				queryKey: [
+					'activities',
+					{
+						conditions: {
+							'assignTo/id': 310,
+							'type/id': 27,
+						},
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					},
+				],
+				queryFn: () =>
+					getActivities({
+						conditions: {
+							'assignTo/id': 310,
+							'type/id': 27,
+						},
+						// @ts-ignore
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					}),
+			},
+		],
 	});
 
 	let logs: Log[] = [

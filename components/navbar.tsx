@@ -12,14 +12,11 @@ type Props = {
 	items?: NavItem[];
 	children?: ReactNode;
 };
-import { SidebarTrigger } from './ui/sidebar';
 
 const Navbar = ({ title, items, children }: Props) => {
 	const pathname = usePathname();
 	return (
 		<nav className='flex items-center gap-1.5 px-3 py-0.5 h-12 border-b space-y-0'>
-			<SidebarTrigger />
-
 			<SidebarTrigger />
 			<h2 className='text-sm font-medium tracking-tight'>{title}</h2>
 

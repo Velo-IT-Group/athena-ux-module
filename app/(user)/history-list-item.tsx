@@ -15,7 +15,7 @@ type Props = {
 const HistoryListItem = ({ conversation }: Props) => {
 	const startTime = new Date(conversation.date);
 	const { data, isLoading } = useQuery({
-		queryKey: ['contact', conversation.contact_id],
+		queryKey: ['contact', conversation.contact_id, { fields: ['id', 'firstName', 'lastName', 'company'] }],
 		queryFn: () => getContact(conversation.contact_id, { fields: ['id', 'firstName', 'lastName', 'company'] }),
 		enabled: !!conversation.contact_id,
 	});

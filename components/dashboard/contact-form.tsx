@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getCommunicationTypes, getCompanies, getContact } from '@/lib/manage/read';
+import { getCompanies, getContact } from '@/lib/manage/read';
 import { Building, ChevronsUpDown } from 'lucide-react';
 import React, { Suspense } from 'react';
 import { groupBy } from 'lodash';
@@ -14,13 +14,12 @@ import TableSkeleton from '@/components/ui/data-table/skeleton';
 import { parsePhoneNumber } from '@/lib/utils';
 
 type Props = {
-	contactId?: number;
+	contactId: number;
 };
 
-const ConversationContactDetail = async ({ contactId }: Props) => {
-	const [contact, types, { data: companies }] = await Promise.all([
+const DashboardContactForm = async ({ contactId }: Props) => {
+	const [contact, { data: companies }] = await Promise.all([
 		getContact(contactId),
-		getCommunicationTypes(),
 		getCompanies({
 			childConditions: { 'types/id': 1 },
 			orderBy: { key: 'name', order: 'asc' },
@@ -159,4 +158,4 @@ const ConversationContactDetail = async ({ contactId }: Props) => {
 	);
 };
 
-export default ConversationContactDetail;
+export default DashboardContactForm;

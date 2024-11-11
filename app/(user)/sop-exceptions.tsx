@@ -17,47 +17,39 @@ type Props = {
 const SOPExceptions = ({ note, companyId }: Props) => {
 	const [value, setValue] = useState<Content>(note?.text ?? '');
 
-	const updateNote = useMutation({
-		mutationKey: ['notes', companyId, note],
-		mutationFn: (operation: PathOperation[]) => updateCompanyNote(companyId, note?.id ?? -1, operation),
-		onError(error, variables, context) {
-			toast.error(error.message);
-		},
-	});
-
-	const createNote = useMutation({
-		mutationKey: ['notes', companyId, note],
-		mutationFn: (note: CompanyNote) => createCompanyNote(companyId, note),
-		onError(error, variables, context) {
-			toast.error(error.message);
-		},
-	});
-
-	console.log(updateNote.error);
-	useEffect(() => {
-		if (!note) return;
-
-		setValue(note.text);
-	}, [note]);
-
 	return (
 		<div className='space-y-1.5'>
 			<MinimalTiptapEditor
-				editable={!updateNote.isPending}
+				editable={!updateCompanyNote.isPending}
 				content={note?.text}
 				onBlur={(e) => {
 					if (e !== note?.text && !note) {
-						// @ts-ignore
-						createNote.mutate({ text: e?.toString() ?? '', type: { id: 6 } });
+						createCompanyNote.mutate({
+							companyId,
+							body: {
+								text: e?.toString() ?? '',
+								type: { id: 6 },
+							},
+						});
 					} else if (e !== note?.text && note) {
-						updateNote.mutate([{ op: 'replace', path: '/text', value: e?.toString() ?? '' }]);
+						updateCompanyNote.mutate({
+							companyId,
+							id: note.id,
+							operation: [
+								{
+									op: 'replace',
+									path: '/text',
+									value: e?.toString() ?? '',
+								},
+							],
+						});
 					}
 				}}
 				output='html'
-				shouldRerenderOnTransaction
+				// shouldRerenderOnTransaction
 				placeholder='Type your description here...'
 				editorClassName='focus:outline-none text-sm'
-				immediatelyRender
+				// immediatelyRender
 			/>
 			{note && (
 				<p className='text-xs text-muted-foreground'>

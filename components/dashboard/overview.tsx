@@ -4,34 +4,25 @@ import TicketList from '@/components/lists/ticket-list';
 import { cn } from '@/lib/utils';
 import ConfigurationsList from '@/components/lists/configurations-list';
 import {
+	getBoards,
 	getCompanies,
 	getCompanyNotes,
 	getConfigurationStatuses,
 	getConfigurationTypes,
 	getContacts,
 	getPriorities,
-	getProjects,
 	getSystemMembers,
 } from '@/lib/manage/read';
-import { createClient } from '@/utils/supabase/server';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import SOPExceptions from './sop-exceptions';
-import getQueryClient from '../getQueryClient';
+import SOPExceptions from '../../app/(user)/sop-exceptions';
+import CompanyOverviewTab from './company-overview-tab';
 
 type Props = {
-	contactId?: number;
-	companyId?: number;
+	contactId: number;
+	companyId: number;
 	className?: string;
 };
 
-const ConversationDetails = async ({ contactId, companyId, className }: Props) => {
-	const supabase = await createClient();
-	const client = getQueryClient();
+const DashboardOverview = async ({ contactId, companyId, className }: Props) => {
 	const [
 		boards,
 		priorities,
@@ -39,24 +30,18 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 		{ data: companies },
 		{ data: configurationStatuses },
 		configurationTypes,
-		{ data: projects },
+		// { data: projects },
 		{ data: contacts },
 		{ data: notes },
 	] = await Promise.all([
-		client.fetchQuery({
-			queryKey: [
-				'/service/boards',
-				{
-					conditions: {
-						inactiveFlag: false,
-						projectFlag: false,
-						// 'workRole/id': [9, 5],
-					},
-					orderBy: { key: 'name' },
-					fields: ['id', 'name'],
-					pageSize: 1000,
-				},
-			],
+		getBoards({
+			conditions: {
+				inactiveFlag: false,
+				projectFlag: false,
+			},
+			orderBy: { key: 'name' },
+			fields: ['id', 'name'],
+			pageSize: 1000,
 		}),
 		getPriorities({ fields: ['id', 'name'], orderBy: { key: 'name' }, pageSize: 1000 }),
 		getSystemMembers({
@@ -83,12 +68,12 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 			fields: ['id', 'name'],
 			pageSize: 1000,
 		}),
-		getProjects({
-			conditions: {
-				closedFlag: false,
-				'company/id': companyId,
-			},
-		}),
+		// getProjects({
+		// 	conditions: {
+		// 		closedFlag: false,
+		// 		'company/id': companyId,
+		// 	},
+		// }),
 		getContacts({
 			conditions: {
 				'company/id': companyId ? [companyId] : undefined,
@@ -129,7 +114,9 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 					))}
 				</TabsList>
 
-				<TabsContent
+				<CompanyOverviewTab companyId={companyId} />
+
+				{/* <TabsContent
 					value={tabs[0].name}
 					className='grid grid-cols-[3fr_2fr] gap-3'
 				>
@@ -191,7 +178,7 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 							</Card>
 						))}
 					</div>
-				</TabsContent>
+				</TabsContent> */}
 
 				<TabsContent value={tabs[1].name}>
 					<ConfigurationsList
@@ -274,4 +261,4 @@ const ConversationDetails = async ({ contactId, companyId, className }: Props) =
 	);
 };
 
-export default ConversationDetails;
+export default DashboardOverview;

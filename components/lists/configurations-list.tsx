@@ -1,4 +1,4 @@
-import { getAllConfigurations, getConfigurations } from '@/lib/manage/read';
+import { getConfigurations } from '@/lib/manage/read';
 import { Configuration, ReferenceType } from '@/types/manage';
 import { Conditions } from '@/utils/manage/params';
 import React from 'react';

@@ -1,6 +1,7 @@
-'use server';
-import { revalidatePath } from 'next/cache';
+// 'use server';
 import { userHeaders } from '../utils';
+import getQueryClient from '@/app/getQueryClient';
+import { useMutation } from '@tanstack/react-query';
 
 export type PathOperation = {
 	op: 'replace' | 'add' | 'remove' | 'copy' | 'move' | 'test';
@@ -8,39 +9,27 @@ export type PathOperation = {
 	value: any;
 };
 
-export const updateTicket = async (id: number, operation: PathOperation[]) => {
-	// console.log(id, operation, `${process.env.CONNECT_WISE_URL}/service/tickets/${id}`);
-	// const headers = new Headers(baseHeaders);
-	// headers.set('access-control-allow-origin', '*');
-	// console.log(headers);
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}`, {
+const client = getQueryClient()
+
+
+export const updateTicket = useMutation({
+	mutationFn: async ({ id, operation }: { id: number, operation: PathOperation[] }) => await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}`, {
 		headers: userHeaders,
 		method: 'patch',
 		body: JSON.stringify(operation),
-	});
+	}),
+	onSuccess: () => {
+		client.invalidateQueries({ queryKey: ['tickets'] })
+	},
+})
 
-	console.log(response);
-
-	if (!response.ok) throw new Error(response.statusText, { cause: response.statusText });
-
-	revalidatePath('/');
-
-	return await response.json();
-};
-
-export const updateCompanyNote = async (companyId: number, id: number, operation: PathOperation[]) => {	
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${companyId}/notes/${id}`, {
+export const updateCompanyNote = useMutation({
+	mutationFn: async ({ companyId, id, operation }: { companyId: number, id: number, operation: PathOperation[] }) => await fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${companyId}/notes/${id}`, {
 		headers: userHeaders,
 		method: 'patch',
 		body: JSON.stringify(operation),
-	});
-
-	const data = await response.json();
-	console.log(data)
-
-	if (!response.ok) throw new Error(response.statusText, { cause: response.statusText });
-
-	revalidatePath('/');
-
-	return data
-};
+	}),
+	onSuccess: () => {
+		client.invalidateQueries({ queryKey: ['companyNotes'] })
+	},
+})

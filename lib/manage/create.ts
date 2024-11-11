@@ -1,8 +1,8 @@
-'use server';
 import { CommunicationItem, createNoteSchema, TicketNote } from '@/types/manage';
-import { baseHeaders } from '@/utils/manage/params';
-import { revalidatePath } from 'next/cache';
+import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
+import { userHeaders } from '../utils';
+import getQueryClient from '@/app/getQueryClient';
 
 export type PathOperation = {
 	op: 'replace' | 'add' | 'remove' | 'copy' | 'move' | 'test';
@@ -10,61 +10,37 @@ export type PathOperation = {
 	value: any;
 };
 
-export const createTicketNote = async (id: number, body: TicketNote) => {
-	const headers = new Headers(baseHeaders);
-	headers.set('access-control-allow-origin', '*');
+const client = getQueryClient()
 
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/notes`, {
-		headers,
+export const createTicketNote = useMutation({
+	mutationFn: ({ id, body }: { id: number, body: TicketNote }) => fetch(`${process.env.CONNECT_WISE_URL}/service/tickets/${id}/notes`, {
+		headers: userHeaders,
 		method: 'post',
 		body: JSON.stringify(body),
-	});
+	}),
+	onSuccess: () => {
+		client.invalidateQueries({ queryKey: ['ticketNotes'] })
+	},
+})
 
-	console.log(response.status);
-
-	if (response.status !== 201) throw Error(response.statusText);
-
-	revalidatePath('/');
-
-	return await response.json();
-};
-
-export const createContactCommunication = async (id: number, body: CommunicationItem) => {
-	const headers = new Headers(baseHeaders);
-	headers.set('access-control-allow-origin', '*');
-
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications`, {
-		headers,
+export const createContactCommunication = useMutation({
+	mutationFn: ({ id, body }: { id: number, body: CommunicationItem }) => fetch(`${process.env.CONNECT_WISE_URL}/company/contacts/${id}/communications`, {
+		headers: userHeaders,
 		method: 'post',
 		body: JSON.stringify(body),
-	});
+	}),
+	onSuccess: () => {
+		client.invalidateQueries({ queryKey: ['contactCommunications'] })
+	},
+})
 
-	console.log(response.status);
-
-	if (response.status !== 201) throw Error(response.statusText);
-
-	revalidatePath('/');
-
-	return await response.json();
-};
-
-export const createCompanyNote = async (companyId: number, operation: z.infer<typeof createNoteSchema>) => {
-	const headers = new Headers(baseHeaders);
-	headers.set('access-control-allow-origin', '*');
-
-	// console.log(headers);
-	const response = await fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${companyId}/notes`, {
-		headers,
+export const createCompanyNote = useMutation({
+	mutationFn: ({ companyId, body }: { companyId: number, body: z.infer<typeof createNoteSchema> }) => fetch(`${process.env.CONNECT_WISE_URL}/company/companies/${companyId}/notes`, {
+		headers: userHeaders,
 		method: 'post',
-		body: JSON.stringify(operation),
-	});
-
-	const data = await response.json()
-	console.log(data);
-
-	if (!response.ok) throw new Error(response.statusText, { cause: response.statusText });
-
-	revalidatePath('/');
-
-	return data;
-};
+		body: JSON.stringify(body),
+	}),
+	onSuccess: () => {
+		client.invalidateQueries({ queryKey: ['companyNotes'] })
+	},
+})

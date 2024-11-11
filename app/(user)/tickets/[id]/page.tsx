@@ -17,11 +17,12 @@ import {
 import ChildTickets from './child-tickets';
 
 type Props = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 export default async function Page({ params }: Props) {
-	const [ticket, notes] = await Promise.all([getTicket(Number(params.id)), getTicketNotes(Number(params.id))]);
+	const { id } = await params;
+	const [ticket, notes] = await Promise.all([getTicket(Number(id)), getTicketNotes(Number(id))]);
 
 	const initalNote = notes.find((note) => note.detailDescriptionFlag);
 
@@ -74,7 +75,7 @@ export default async function Page({ params }: Props) {
 						<Separator />
 					)}
 
-					<ActivityFeed id={Number(params.id)} />
+					<ActivityFeed id={Number(id)} />
 				</div>
 			</ScrollArea>
 

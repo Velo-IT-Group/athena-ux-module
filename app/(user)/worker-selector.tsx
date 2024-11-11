@@ -31,17 +31,26 @@ const WorkerSelector = ({ actionFn, children }: Props) => {
 	const { workspace } = useTwilio();
 	const { worker: currentWorker } = useWorker();
 	const { data, isLoading: isWorkersLoading } = useQuery({
-		queryKey: ['workers'],
+		queryKey: ['workers', { ActivityName: 'Available' }],
 		queryFn: () => workspace?.fetchWorkers({ ActivityName: 'Available' }),
 		refetchInterval: 1000,
 	});
 	const { data: members, isLoading: isMembersLoading } = useQuery({
-		queryKey: ['members'],
+		queryKey: [
+			'members',
+			{
+				conditions: {
+					inactiveFlag: false,
+				},
+				fields: ['id', 'firstName', 'lastName', 'homePhone', 'mobilePhone', 'officePhone', 'defaultPhone'],
+				orderBy: { key: 'firstName' },
+				pageSize: 1000,
+			},
+		],
 		queryFn: () =>
 			getSystemMembers({
 				conditions: {
 					inactiveFlag: false,
-					// officePhone: `not '${null}'`
 				},
 				fields: ['id', 'firstName', 'lastName', 'homePhone', 'mobilePhone', 'officePhone', 'defaultPhone'],
 				orderBy: { key: 'firstName' },

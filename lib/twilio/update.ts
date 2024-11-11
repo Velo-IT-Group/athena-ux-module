@@ -8,7 +8,7 @@ import { getWorker, getWorkers } from './read';
 export const updateWorker = async (workerSid: string, options: WorkerContextUpdateOptions) => {
 	const client = await createClient();
 	try {
-		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).workers(workerSid).update(options);
+		const worker = await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).workers(workerSid).update(options);
 
 		console.log(worker);
 	} catch (error) {
@@ -19,7 +19,7 @@ export const updateWorker = async (workerSid: string, options: WorkerContextUpda
 export const updateTask = async (taskSid: string, options: TaskContextUpdateOptions) => {
 	const client = await createClient();
 	try {
-		const worker = await client.taskrouter.v1.workspaces(process.env.WORKSPACE_SID!).tasks(taskSid).update(options);
+		const worker = await client.taskrouter.v1.workspaces(process.env.TWILIO_WORKSPACE_SID!).tasks(taskSid).update(options);
 
 		console.log(worker);
 	} catch (error) {
@@ -36,7 +36,7 @@ export const resToConference = async (
 ) => {
 	const client = await createClient();
 	const reservation = await client.taskrouter.v1
-		.workspaces(process.env.WORKSPACE_SID!)
+		.workspaces(process.env.TWILIO_WORKSPACE_SID!)
 		.tasks(taskSid)
 		.reservations(reservationSid)
 		.update(params);

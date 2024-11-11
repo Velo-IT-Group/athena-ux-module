@@ -10,7 +10,7 @@ import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 import { cookies } from 'next/headers';
 
 const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) => {
-	const email = user?.user_metadata.email
+	const email = user?.email ?? ''
 	const [members, { data: contacts }] = await Promise.all([
 		getSystemMembers({ conditions: { officeEmail: `'${email}'` } }),
 		getContacts({ childConditions: { 'communicationItems/value': `'${email}'` } }),
@@ -20,7 +20,8 @@ const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) 
 		contact_uri: `client:${email}`,
 		on_call: false,
 		...user?.user_metadata,
-		
+		contact_id: contacts?.[0]?.id,
+		member_id: members?.[0]?.id
 	})
 
 	await supabase.auth.updateUser({
@@ -36,7 +37,11 @@ const updateUnknownWorker = async (supabase: SupabaseClient, user: User | null) 
 }
 
 const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, worker: WorkerInstance) => {
-	const email = user?.user_metadata.email
+	const email = user?.email ?? ''
+	const [members, { data: contacts }] = await Promise.all([
+		getSystemMembers({ conditions: { officeEmail: `'${email}'` } }),
+		getContacts({ childConditions: { 'communicationItems/value': `'${email}'` } }),
+	]);
 	
 	await supabase.auth.updateUser({
 		data: {
@@ -52,7 +57,9 @@ const updateKnownWorker = async (supabase: SupabaseClient, user: User | null, wo
 	await updateWorker(worker.sid, {
 		attributes: {
 			...parsedAttributes,
-			contact_uri: `client:${email}`
+			contact_uri: `client:${email}`,
+			contact_id: contacts?.[0]?.id,
+			member_id: members?.[0]?.id
 		}
 	})
 }

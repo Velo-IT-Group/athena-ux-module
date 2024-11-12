@@ -20,6 +20,9 @@ import {
 } from './ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { Avatar, AvatarFallback } from './ui/avatar';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import WorkerDialog from './worker-dialog';
+import { Dialog, DialogTrigger } from './ui/dialog';
 
 type Props = {
 	workers: Worker[];
@@ -87,38 +90,44 @@ const ActivityListItem = ({ worker, conversations }: ActivityListItemProps) => {
 	const workerAttributes = worker.attributes;
 
 	return (
-		<SidebarMenuItem>
-			<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3'>
-				<div className='flex items-center gap-1.5 text-nowrap'>
-					<Avatar className='uppercase w-6 h-6'>
-						<AvatarFallback className='text-[9px] font-medium'>
-							{worker.friendlyName[0]}
-							{worker.friendlyName[1]}
-						</AvatarFallback>
-					</Avatar>
+		<Dialog>
+			<SidebarMenuItem>
+				<DialogTrigger asChild>
+					<SidebarMenuButton className='grid gap-1.5 h-auto p-1.5 pr-3 hover:cursor-pointer'>
+						<div className='flex items-center gap-1.5 text-nowrap'>
+							<Avatar className='uppercase w-6 h-6'>
+								<AvatarFallback className='text-[9px] font-medium'>
+									{worker.friendlyName[0]}
+									{worker.friendlyName[1]}
+								</AvatarFallback>
+							</Avatar>
 
-					<p>{workerAttributes.full_name}</p>
+							<p>{workerAttributes.full_name}</p>
 
-					<p className='ml-auto text-xs'>
-						since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
-					</p>
-				</div>
+							<p className='ml-auto text-xs'>
+								since {formatDate({ timeStyle: 'short' }).format(worker.dateActivityChanged)}
+							</p>
+						</div>
 
-				{conversations && conversations?.length > 0 && (
-					<SidebarMenuSub className='px-0 mr-0'>
-						{conversations?.map((conversation) => {
-							const task = conversation.data as TaskInstance;
-							return (
-								<TaskListItem
-									key={`${worker.sid}-${conversation.key}`}
-									task={task}
-								/>
-							);
-						})}
-					</SidebarMenuSub>
-				)}
-			</SidebarMenuButton>
-		</SidebarMenuItem>
+						{conversations && conversations?.length > 0 && (
+							<SidebarMenuSub className='px-0 mr-0'>
+								{conversations?.map((conversation) => {
+									const task = conversation.data as TaskInstance;
+									return (
+										<TaskListItem
+											key={`${worker.sid}-${conversation.key}`}
+											task={task}
+										/>
+									);
+								})}
+							</SidebarMenuSub>
+						)}
+					</SidebarMenuButton>
+				</DialogTrigger>
+			</SidebarMenuItem>
+
+			<WorkerDialog worker={worker} workerAttributes={workerAttributes} items={conversations}  />
+		</Dialog>
 	);
 };
 
@@ -127,7 +136,7 @@ const TaskListItem = ({ task }: { task: TaskInstance }) => {
 	const timer = useTimer(new Date(task.dateUpdated));
 
 	return (
-		<SidebarMenuSubButton className='flex items-center gap-3 text-xs border-b pb-1.5 [&>svg]:size-4 last:pb-0 last:border-b-0 w-full'>
+		<SidebarMenuSubButton className='flex items-center gap-3 text-xs border-b pb-1.5 [&>svg]:size-4 last:pb-0 last:border-b-0 w-full h-auto'>
 			{attributes.taskType === 'voicemail' && <Voicemail />}
 			{attributes.taskType !== 'voicemail' && attributes.direction === 'outbound' ? (
 				<PhoneOutgoing />
@@ -140,10 +149,13 @@ const TaskListItem = ({ task }: { task: TaskInstance }) => {
 					{attributes.name ?? parsePhoneNumber(attributes.outbound_to).formattedNumber}
 				</p>
 
-				<Timer
-					className='ml-auto text-muted-foreground '
-					timer={timer}
-				/>
+				<div className='flex items-center gap-1.5 text-muted-foreground '>
+					{task.assignmentStatus === 'wrapping' && <p className='capitalize'>{task.assignmentStatus} | </p>}
+
+					<Timer
+						timer={timer}
+					/>
+				</div>
 			</div>
 		</SidebarMenuSubButton>
 	);

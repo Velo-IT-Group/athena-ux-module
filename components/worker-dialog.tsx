@@ -1,161 +1,175 @@
 'use client';
 import React, { Fragment } from 'react';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { useQuery } from '@tanstack/react-query';
-import { getActivities, getTimeEntries } from '@/lib/manage/read';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { useQueries } from '@tanstack/react-query';
+import { getTimeEntries } from '@/lib/manage/read';
 import { ScrollArea } from './ui/scroll-area';
-import { formatDate } from '@/utils/date';
+import { formatDate, relativeDate, relativeDay } from '@/utils/date';
 import { Separator } from './ui/separator';
 import { groupBy } from 'lodash';
-import { Card, CardHeader, CardTitle } from './ui/card';
 import { Worker } from 'twilio-taskrouter';
+import { createClient } from '@/utils/supabase/client';
+import { parsePhoneNumber } from '@/lib/utils';
+import { Clock, LucideIcon, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
+import { SyncMapItem } from 'twilio-sync';
+import { useWorker } from '@/providers/worker-provider';
 
 type Props = {
 	worker: Worker;
 	workerAttributes: Record<string, any>;
+	items: SyncMapItem[];
 };
 
 type Log = {
-	id: number;
+	id: number | string;
 	text: string;
 	currentUser: string;
 	contact: string;
 	startDate: Date;
 	endDate: Date;
+	icon: LucideIcon;
 };
 
-const WorkerDialog = ({ worker, workerAttributes }: Props) => {
-	const { data } = useQuery({
-		queryKey: ['timeEntries'],
-		queryFn: () =>
-			getTimeEntries({
-				conditions: { 'member/id': 310 },
-				orderBy: { key: 'dateEntered', order: 'desc' },
-			}),
-	});
+const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
+	const {worker: currentWorker} = useWorker()
+	const supabase = createClient()
+	console.log(worker)
 
-	const { data: activities } = useQuery({
-		queryKey: ['activities'],
-		queryFn: () =>
-			getActivities({
-				conditions: {
-					'assignTo/id': 310,
-					'type/id': 27,
-				},
-				// @ts-ignore
-				orderBy: { key: 'dateEntered', order: 'desc' },
-			}),
-	});
+	const [{ data }, { data: conversationsData }] = useQueries({
+		queries: [
+			{
+				queryKey: [
+					'timeEntries',
+					{
+						conditions: { 
+							'member/id': workerAttributes.member_id
+						},
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					}
+				],
+				queryFn: () =>
+					getTimeEntries(
+						{
+						conditions: { 'member/id': workerAttributes.member_id },
+						orderBy: { key: 'dateEntered', order: 'desc' },
+					}
+				),
+			},
+			{
+				queryKey: ['conversations', worker.sid],
+				queryFn: async () =>
+					await supabase
+						.schema('reporting')
+						.from('conversations')
+						.select()
+						.eq('agent', worker.sid)
+						.order('date', { ascending: false })
+						.limit(25),
+			}
+		]
+	})
 
+	const conversations = conversationsData?.data;
+	
 	let logs: Log[] = [
-		...(activities?.map(({ id, assignedBy, dateStart, dateEnd, contact }) => ({
-			id,
-			currentUser: assignedBy.name,
-			contact: contact?.name ?? '',
-			endDate: new Date(dateEnd),
-			startDate: new Date(dateStart),
-			text: `talked to`,
-		})) ?? []),
-		...(data?.map(({ id, member, timeStart, timeEnd, ticket }) => ({
+		...(data?.filter(a => a.ticket !== undefined)?.map(({ id, member, timeStart, timeEnd, ticket }) => ({
 			id,
 			currentUser: member.name,
-			contact: ticket?.summary ?? '',
+			contact: `#${ticket?.id ?? ''} - ${ticket?.summary ?? ''}`,
 			startDate: new Date(timeStart),
 			endDate: new Date(timeEnd),
 			text: 'saved a time entry to',
+			icon: Clock
 		})) ?? []),
+		...(conversations?.map(({id, date, phone_number, direction, talk_time}) => {
+			const startDate = new Date(date);
+			const endDate = new Date(startDate.getTime() + (talk_time ?? 0) * 1000); // Add duration in milliseconds
+			const isInbound = direction === 'inbound'
+			return {
+				id,
+				currentUser: worker.attributes.full_name,
+				contact: parsePhoneNumber(phone_number ?? '')?.formattedNumber ?? '',
+				startDate,
+				endDate,
+				text: isInbound ? 'talked to' : 'called',
+				icon: isInbound ? PhoneIncoming : PhoneOutgoing
+			}
+		}
+		)) ?? []
 	];
 
 	const groupedLogs = groupBy(
 		logs.sort((a, b) => b.endDate.getTime() - a.endDate.getTime()),
-		({ startDate }) => Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(startDate))
+		({ startDate }) => {
+			let newDate = new Date(startDate)
+			return relativeDay(newDate)}
 	);
 
 	return (
 		<DialogContent className='sm:max-w-5xl'>
 			<DialogHeader className='flex flex-row items-center justify-start gap-3 space-y-0'>
-				<Avatar className='h-12 w-12'>
+				<Avatar className='h-12 w-12 font-semibold'>
 					<AvatarFallback className='uppercase'>
 						{worker.friendlyName[0]}
 						{worker.friendlyName[1]}
 					</AvatarFallback>
-					{/* <AvatarImage src='https://cdn.prod.website-files.com/61d87d426829a9bac65eeb9e/654d2b113b66e71152acc84c_Nick_Headshot_Fall2023-p-500.jpg' /> */}
 				</Avatar>
-
+				
 				<div className='space-y-1.5'>
-					<DialogTitle>{workerAttributes.full_name}</DialogTitle>
-					<DialogDescription>{workerAttributes.full_name}</DialogDescription>
+					<DialogTitle className='shrink-0'>{workerAttributes.full_name}</DialogTitle>
+					{/* <div className='flex items-center gap-1.5'>
+					</div> */}
+					<DialogDescription>{workerAttributes.email}</DialogDescription>
 				</div>
 			</DialogHeader>
 
-			<ScrollArea className='h-96'>
-				<div className='grid grid-cols-4 gap-3'>
-					<Card>
-						<CardHeader>
-							<CardTitle className='text-lg'>Outbound Conversations</CardTitle>
-						</CardHeader>
-					</Card>
+			<ScrollArea className='h-[480px]'>
+				<div className='space-y-3 px-3'>
+					{/* <p className='text-muted-foreground text-sm'>Activity Logs</p> */}
 
-					<Card>
-						<CardHeader>
-							<CardTitle className='text-lg'>Inbound Conversations</CardTitle>
-						</CardHeader>
-					</Card>
+					<div>
+						{Object?.entries(groupedLogs).map(([key, logGroup], index) => (
+							<Fragment key={key}>
+								<h2 className='font-medium mb-3 capitalize'>{key}</h2>
 
-					<Card>
-						<CardHeader>
-							<CardTitle className='text-lg'>Inbound Missed</CardTitle>
-						</CardHeader>
-					</Card>
+								{logGroup.map((log) => (
+									<div
+										key={`log-${log.id}`}
+										className='group px-1.5 flex items-start gap-3'
+									>
+										<div className='flex flex-col justify-center items-center'>
+											<Avatar className='h-9 w-9'>
+												<AvatarFallback className='uppercase'>
+													{/* <Icon  /> */}
+													<log.icon />
+												</AvatarFallback>
+											</Avatar>
 
-					<Card>
-						<CardHeader>
-							<CardTitle className='text-lg'>Total Time On Phone</CardTitle>
-						</CardHeader>
-					</Card>
-				</div>
+											<Separator
+												orientation='vertical'
+												className='min-h-9 w-[2px] group-last::opacity-0'
+											/>
+										</div>
 
-				{Object?.entries(groupedLogs).map(([key, logGroup], index) => (
-					<Fragment key={key}>
-						<h2 className='text-lg font-medium mb-3'>{key}</h2>
+										<div className='space-y-1.5'>
+											<p>
+												<span className='font-medium'>{log.currentUser}</span>
+												<span className='text-muted-foreground text-sm'> {log.text} </span>
+												<span className='font-medium'>{log.contact}</span>
+											</p>
 
-						{logGroup.map((log) => (
-							<div
-								key={`log-${log.id}`}
-								className='px-1.5 flex items-start gap-3'
-							>
-								<div className='flex flex-col justify-center items-center'>
-									<Avatar className='h-9 w-9'>
-										<AvatarFallback>NB</AvatarFallback>
-										<AvatarImage src='https://cdn.prod.website-files.com/61d87d426829a9bac65eeb9e/654d2b113b66e71152acc84c_Nick_Headshot_Fall2023-p-500.jpg' />
-									</Avatar>
-
-									<Separator
-										orientation='vertical'
-										className='min-h-9 w-[2px]'
-									/>
-								</div>
-
-								<div className='space-y-1.5'>
-									<p>
-										<span className='font-medium'>{log.currentUser}</span>
-										<span className='text-muted-foreground text-sm'> {log.text} </span>
-										<span className='font-medium'>{log.contact}</span>
-									</p>
-
-									<p className='text-xs text-muted-foreground'>
-										{formatDate({ timeStyle: 'short' }).formatRange(log.startDate, log.endDate)}
-									</p>
-								</div>
-							</div>
+											<p className='text-xs text-muted-foreground'>
+												{formatDate({ timeStyle: 'short' }).formatRange(log.startDate, log.endDate)}
+											</p>
+										</div>
+									</div>
+								))}
+							</Fragment>
 						))}
-					</Fragment>
-					// {
-					// 	logGroup.map(log => (
-					// 	<span></span>
-					// ))}
-				))}
+					</div>
+
+				</div>
 			</ScrollArea>
 		</DialogContent>
 	);

@@ -160,7 +160,7 @@ const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
 											</p>
 
 											<p className='text-xs text-muted-foreground'>
-												{formatDate({ timeStyle: 'short' }).formatRange(log.startDate, log.endDate)}
+												{log.startDate && log.endDate && formatDate({ timeStyle: 'short' }).formatRange(log.startDate, log.endDate)}
 											</p>
 										</div>
 									</div>

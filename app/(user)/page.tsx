@@ -59,7 +59,7 @@ export default async function Page(props: { searchParams: Promise<{ [key: string
 
 	const companyId: number = searchParams.companyId
 		? parseInt(searchParams.companyId as string)
-		: (user!.user_metadata!.contactId as number);
+		: 250;
 	const contactId = searchParams.contactId
 		? parseInt(searchParams.contactId as string)
 		: (user!.user_metadata!.contactId as number);

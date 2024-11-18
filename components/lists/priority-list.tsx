@@ -14,7 +14,12 @@ type Props = {
 	params?: Conditions<Priority>;
 };
 
-const PriorityList = async ({ ticketId, type, defaultValue, params = { orderBy: { key: 'sortOrder' } } }: Props) => {
+const PriorityList = async ({
+	ticketId,
+	type,
+	defaultValue,
+	params = { orderBy: { key: 'sortOrder' } },
+}: Props) => {
 	const priorities = await getPriorities(params);
 
 	return (
@@ -22,38 +27,40 @@ const PriorityList = async ({ ticketId, type, defaultValue, params = { orderBy: 
 			{type === 'combobox' && (
 				<Combobox
 					id={ticketId}
-					path='priority/id'
-					type='ticket'
+					path="priority/id"
+					type="ticket"
 					items={
 						priorities?.map(({ id, name }) => {
 							return { label: name, value: `${id}-${name}` };
 						}) ?? []
 					}
-					hotkey='p'
+					hotkey="p"
 					value={`${defaultValue?.id}-${defaultValue?.name}`}
 					// setValue={() => {}}
-					placeholder='Filter statuses...'
-					side='left'
-					align='start'
-				>
-					<div className='flex items-center justify-between'>
+					placeholder="Filter statuses..."
+					side="left"
+					align="start">
+					<div className="flex items-center justify-between">
 						<Button
-							size='sm'
-							variant='ghost'
-							role='combobox'
-							className='flex'
-						>
+							size="sm"
+							variant="ghost"
+							role="combobox"
+							className="flex">
 							<Circle
-								className='mr-1.5'
-								// @ts-ignore
-								style={{ color: defaultValue?.color?.toLowerCase() }}
+								className="mr-1.5"
+								style={{
+									// @ts-ignore
+									color: defaultValue?.color?.toLowerCase(),
+								}}
 							/>
-							<span className='text-xs text-muted-foreground'>
-								{defaultValue?.name ? defaultValue.name : 'Assign Priority'}
+							<span className="text-xs text-muted-foreground">
+								{defaultValue?.name
+									? defaultValue.name
+									: 'Assign Priority'}
 							</span>
 						</Button>
 
-						<Kbd letter='p' />
+						<Kbd letter="p" />
 					</div>
 				</Combobox>
 			)}

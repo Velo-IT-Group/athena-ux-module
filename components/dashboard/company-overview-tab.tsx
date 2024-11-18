@@ -1,7 +1,6 @@
 import React from 'react';
 import { TabsContent } from '../ui/tabs';
 import SOPExceptions from '@/app/(user)/sop-exceptions';
-import { useQueries, useQuery } from '@tanstack/react-query';
 import { getCompanyNotes } from '@/lib/manage/read';
 
 type Props = {
@@ -9,43 +8,31 @@ type Props = {
 };
 
 const CompanyOverviewTab = async ({ companyId }: Props) => {
-	const { data } = useQuery({
-		queryKey: [
-			'companyNotes',
-			companyId,
-			{
-				conditions: {
-					'type/id': 6,
-				},
-				fields: ['id', 'text', '_info'],
-			},
-		],
-		queryFn: () =>
-			getCompanyNotes(companyId, {
-				conditions: {
-					'type/id': 6,
-				},
-				fields: ['id', 'text', '_info'],
-			}),
+	const { data: notes } = await getCompanyNotes(companyId, {
+		conditions: {
+			'type/id': 6,
+		},
+		fields: ['id', 'text', '_info'],
 	});
-
-	const notes = data?.data;
 
 	return (
 		<TabsContent
-			value='Company'
-			className='grid grid-cols-[3fr_2fr] gap-3'
-		>
-			<div className='space-y-3'>
-				<h2 className='text-xl font-bold tracking-tight'>SOP Exceptions</h2>
-				{/* <SOPExceptions
+			value="Company"
+			className="grid grid-cols-[3fr_2fr] gap-3">
+			<div className="space-y-3">
+				<h2 className="text-xl font-bold tracking-tight">
+					SOP Exceptions
+				</h2>
+				<SOPExceptions
 					note={notes?.[0]}
 					companyId={companyId!}
-				/> */}
+				/>
 			</div>
 
-			<div className='space-y-3'>
-				<h2 className='text-xl font-bold tracking-tight'>Active Projects</h2>
+			<div className="space-y-3">
+				<h2 className="text-xl font-bold tracking-tight">
+					Active Projects
+				</h2>
 				{/* {projects.length === 0 && (
 							<div className='max-h-60 grid place-items-center h-full text-muted-foreground'>
 								<div className='grid place-items-center gap-1.5'>

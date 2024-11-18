@@ -5,8 +5,18 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+	Command,
+	CommandEmpty,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
 import type { PopoverTriggerProps } from '@radix-ui/react-popover';
 import { updateTicket } from '@/lib/manage/update';
 import { toast } from 'sonner';
@@ -54,7 +64,13 @@ export function Combobox({
 		try {
 			switch (type) {
 				case 'ticket':
-					await updateTicket(id, [{ op: value ? 'replace' : newValue ? 'add' : 'remove', path, value: newValue }]);
+					await updateTicket(id, [
+						{
+							op: value ? 'replace' : newValue ? 'add' : 'remove',
+							path,
+							value: newValue,
+						},
+					]);
 					break;
 				default:
 					break;
@@ -76,21 +92,20 @@ export function Combobox({
 	return (
 		<Popover
 			open={open}
-			onOpenChange={setOpen}
-		>
+			onOpenChange={setOpen}>
 			<PopoverTrigger
 				asChild={children !== undefined}
-				{...popoverTriggerProps}
-			>
+				{...popoverTriggerProps}>
 				{children === undefined ? (
 					<Button
-						variant='outline'
-						role='combobox'
+						variant="outline"
+						role="combobox"
 						aria-expanded={open}
-						className='justify-between'
-					>
-						{value ? items.find((item) => item.value === value)?.label : placeholder}
-						<ChevronsUpDown className='ml-2 h-3.5 w-3.5 shrink-0 opacity-50' />
+						className="justify-between">
+						{value
+							? items.find((item) => item.value === value)?.label
+							: placeholder}
+						<ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
 					</Button>
 				) : (
 					children
@@ -100,8 +115,7 @@ export function Combobox({
 				align={align}
 				className={cn('min-w-52 p-0', className)}
 				side={side}
-				avoidCollisions
-			>
+				avoidCollisions>
 				<Command>
 					<CommandInput placeholder={placeholder} />
 					<CommandEmpty>Nothing found.</CommandEmpty>
@@ -116,9 +130,15 @@ export function Combobox({
 									console.log(id);
 									handleSelect(Number(id));
 									setOpen(false);
-								}}
-							>
-								<Check className={cn('mr-2 h-3.5 w-3.5', value === item.value ? 'opacity-100' : 'opacity-0')} />
+								}}>
+								<Check
+									className={cn(
+										'mr-2 h-3.5 w-3.5',
+										value === item.value
+											? 'opacity-100'
+											: 'opacity-0'
+									)}
+								/>
 								{item.label}
 							</CommandItem>
 						))}

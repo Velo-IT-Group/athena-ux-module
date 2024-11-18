@@ -78,7 +78,7 @@ const Layout = async ({ children }: Props) => {
 
 					<SidebarInset>
 						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col scroll-pb-3'>
-							<div>{children}</div>
+							{children}
 						</ScrollArea>
 					</SidebarInset>
 

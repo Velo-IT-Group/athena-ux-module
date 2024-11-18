@@ -1,3 +1,4 @@
+'use server'
 import { type Conditions, generateParams, baseHeaders } from '@/utils/manage/params';
 import type {
 	Activity,
@@ -36,7 +37,6 @@ const client = getQueryClient();
 /*
 	COMPANY INFORMATION
 */
-
 export const getCompany = async (id: number, conditions?: Conditions<Company>): Promise<Company> => await client.fetchQuery<Company>({
 			queryKey: [
 				`/company/companies/${id}`,
@@ -88,8 +88,6 @@ export const getCompanyNotes = async (id: number, conditions?: Conditions<Compan
 			],
 		})
 	])
-
-	console.log(data, count)
 	
 	return {
 		data,

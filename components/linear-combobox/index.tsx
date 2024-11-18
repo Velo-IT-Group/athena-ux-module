@@ -1,8 +1,22 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+	Command,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useHotkeys } from '@/hooks/use-hot-keys';
 import * as React from 'react';
 import { CheckIcon } from './icons/check';
@@ -25,6 +39,7 @@ type FilterGroup = {
 export type FilterItem = {
 	label: string;
 	icon: string;
+	value?: string;
 	values?: FilterItem[];
 };
 
@@ -77,21 +92,25 @@ export const LinearCombobox = ({
 	return (
 		<Popover
 			open={openPopover}
-			onOpenChange={setOpenPopover}
-		>
+			onOpenChange={setOpenPopover}>
 			<Tooltip
 				delayDuration={500}
 				open={openTooltip}
-				onOpenChange={setOpenTooltip}
-			>
+				onOpenChange={setOpenTooltip}>
 				<TooltipTrigger asChild>
 					<PopoverTrigger asChild>
 						<Button
-							aria-label='Filter'
-							variant='ghost'
-							size={!isValueSelector && filterValues.length > 0 ? 'icon' : 'sm'}
-							className={cn('w-fit px-1.5 h-8 text-sm leading-normal font-medium text-primary', className)}
-						>
+							aria-label="Filter"
+							variant="ghost"
+							size={
+								!isValueSelector && filterValues.length > 0
+									? 'icon'
+									: 'sm'
+							}
+							className={cn(
+								'w-fit px-1.5 h-8 text-sm leading-normal font-medium text-primary',
+								className
+							)}>
 							{isValueSelector ? (
 								<>
 									{filterValues.length === 0 ? (
@@ -101,18 +120,24 @@ export const LinearCombobox = ({
 											{filterValues.length === 1 ? (
 												filterValues.map((filter) => {
 													return (
-														<React.Fragment key={`filter-value-${filter.label}`}>
+														<React.Fragment
+															key={`filter-value-${filter.label}`}>
 															<Icon
-																name={filter.icon}
-																className='mr-1.5'
+																name={
+																	filter.icon
+																}
+																className="mr-1.5"
 															/>
-															<span className='text-xs'>{filter.label}</span>
+															<span className="text-xs">
+																{filter.label}
+															</span>
 														</React.Fragment>
 													);
 												})
 											) : (
-												<span className='lowercase'>
-													{filterValues.length} {filterValues[0].label}s
+												<span className="lowercase">
+													{filterValues.length}{' '}
+													{filterValues[0].label}s
 												</span>
 											)}
 										</>
@@ -120,8 +145,19 @@ export const LinearCombobox = ({
 								</>
 							) : (
 								<>
-									<ListFilter className={cn(filterValues.length === 0 && 'mr-1.5')} />
-									<span className={cn('text-xs', filterValues.length > 0 && 'sr-only')}>Filter</span>
+									<ListFilter
+										className={cn(
+											filterValues.length === 0 &&
+												'mr-1.5'
+										)}
+									/>
+									<span
+										className={cn(
+											'text-xs',
+											filterValues.length > 0 && 'sr-only'
+										)}>
+										Filter
+									</span>
 								</>
 							)}
 						</Button>
@@ -130,29 +166,31 @@ export const LinearCombobox = ({
 
 				<TooltipContent
 					hideWhenDetached
-					side='bottom'
-					align='start'
+					side="bottom"
+					align="start"
 					sideOffset={6}
-					className='flex items-center gap-1.5 bg-background border text-xs px-1.5 h-8'
-				>
-					<span className='text-primary'>Change priority</span>
+					className="flex items-center gap-1.5 bg-background border text-xs px-1.5 h-8">
+					<span className="text-primary">Change priority</span>
 
-					<Kbd letter='p' />
+					<Kbd letter="p" />
 				</TooltipContent>
 			</Tooltip>
 
 			<PopoverContent
-				className='w-fit p-0 rounded-lg'
-				align='start'
+				className="w-fit p-0 rounded-lg"
+				align="start"
 				onCloseAutoFocus={(e) => e.preventDefault()}
-				sideOffset={6}
-			>
-				<Command className='rounded-lg'>
+				sideOffset={6}>
+				<Command className="rounded-lg">
 					<CommandInput
 						value={searchValue}
 						onValueChange={(searchValue) => {
 							// If the user types a number, select the priority like useHotkeys
-							if ([0, 1, 2, 3, 4].includes(Number.parseInt(searchValue))) {
+							if (
+								[0, 1, 2, 3, 4].includes(
+									Number.parseInt(searchValue)
+								)
+							) {
 								setOpenTooltip(false);
 								setOpenPopover(false);
 								setSearchValue('');
@@ -160,18 +198,16 @@ export const LinearCombobox = ({
 							}
 							setSearchValue(searchValue);
 						}}
-						className='text-sm leading-normal'
-						placeholder='Filter...'
-					>
-						{!isSearching && <Kbd letter='f' />}
+						className="text-sm leading-normal"
+						placeholder="Filter...">
+						{!isSearching && <Kbd letter="f" />}
 					</CommandInput>
 
 					<CommandList>
 						{filterGroups.map(({ label, filters }, index) => (
 							<CommandGroup
 								key={`filter-group-${index}`}
-								heading={label}
-							>
+								heading={label}>
 								{filters.map((filter) => (
 									<CommandItem
 										key={filter.label}
@@ -181,30 +217,38 @@ export const LinearCombobox = ({
 											setOpenTooltip(false);
 											setOpenPopover(false);
 											setSearchValue('');
-											setFilterValues((prev) => [...prev, filter]);
+											setFilterValues((prev) => [
+												...prev,
+												filter,
+											]);
 										}}
-										className='group rounded-md flex justify-between gap-3 items-center w-full text-[0.8125rem] leading-normal text-primary'
-									>
-										<div className='flex items-center'>
+										className="group rounded-md flex justify-between gap-3 items-center w-full text-[0.8125rem] leading-normal text-primary">
+										<div className="flex items-center">
 											{filter.icon && (
 												<Icon
 													name={filter.icon}
-													className='mr-1.5 size-3 group-hover:fill-primary'
+													className="mr-1.5 size-3"
 												/>
 											)}
 
 											<span>{filter.label}</span>
 										</div>
 
-										<div className='flex items-center'>
-											{filterValues.some((f) => f.label === filter.label) && (
+										<div className="flex items-center">
+											{filterValues.some(
+												(f) => f.label === filter.label
+											) && (
 												<CheckIcon
-													title='Check'
-													className='mx-3 size-4 group-hover:fill-primary'
+													title="Check"
+													className="mx-3 size-4 group-hover:fill-primary"
 												/>
 											)}
 
-											{!isSearching && <span className='text-xs'>{index}</span>}
+											{!isSearching && (
+												<span className="text-xs">
+													{index}
+												</span>
+											)}
 										</div>
 									</CommandItem>
 								))}

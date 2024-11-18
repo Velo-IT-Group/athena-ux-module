@@ -7,12 +7,14 @@ import {
 	LinearCombobox,
 } from './linear-combobox';
 import FilterItem from './filter-item';
+import { cn } from '@/lib/utils';
 
 type Props = {
 	filters: ComboboxFilterItem[];
+	hideDisplay?: boolean;
 };
 
-const FilterHeader = ({ filters }: Props) => {
+const FilterHeader = ({ filters, hideDisplay = false }: Props) => {
 	const [selectedFilters, setSelectedFilters] = useState<
 		ComboboxFilterItem[]
 	>([]);
@@ -35,7 +37,10 @@ const FilterHeader = ({ filters }: Props) => {
 			<Button
 				size="sm"
 				variant="outline"
-				className="space-x-1.5 h-6 ml-auto">
+				className={cn(
+					'space-x-1.5 h-6 ml-auto',
+					hideDisplay && 'hidden'
+				)}>
 				<SlidersHorizontal />
 				<span className="text-xs">Display</span>
 			</Button>

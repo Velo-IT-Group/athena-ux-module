@@ -14,10 +14,10 @@ const Page = async ({ params }: Props) => {
 		<>
 			<FilterHeader filters={[]} />
 
-			<section className='p-3 overflow-x-scroll'>
+			<section className="p-3 overflow-x-scroll">
 				<ContactList
 					definition={{ page: 'teams-contacts' }}
-					type='table'
+					type="table"
 					params={{
 						conditions: {
 							'companyLocation/id': id,
@@ -26,7 +26,13 @@ const Page = async ({ params }: Props) => {
 						orderBy: {
 							key: 'firstName',
 						},
-						fields: ['id', 'firstName', 'lastName', 'defaultPhoneNbr', 'company'],
+						fields: [
+							'id',
+							'firstName',
+							'lastName',
+							'defaultPhoneNbr',
+							'company',
+						],
 					}}
 				/>
 			</section>

@@ -16,20 +16,22 @@ const useSyncMap = (mapKey: string) => {
 			setItems(items);
 
 			map.on('itemUpdated', (item) => {
-				console.log('itemUpdated', item.item.key);
-				setItems((prev) => [...prev.filter((i) => i.key !== item.item.key), item.item]);
+				setItems((prev) => [
+					...prev.filter((i) => i.key !== item.item.key),
+					item.item,
+				]);
 			});
 
 			map.on('itemAdded', (item) => {
-				console.log('itemAdded', item.item.key);
-				let newItems = [...items.filter((i) => i.key !== item.item.key), item.item];
+				let newItems = [
+					...items.filter((i) => i.key !== item.item.key),
+					item.item,
+				];
 				setItems(newItems);
 			});
 
 			map.on('itemRemoved', (item) => {
-				console.log('itemRemoved', item.key);
 				let newItems = [...items.filter((i) => i.key !== item.key)];
-				console.log(newItems);
 				setItems(newItems);
 			});
 		};

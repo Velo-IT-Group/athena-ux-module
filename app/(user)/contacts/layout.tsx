@@ -1,3 +1,4 @@
+import Navbar from '@/components/navbar';
 import React from 'react';
 
 type Props = {
@@ -6,8 +7,9 @@ type Props = {
 
 const Layout = ({ children }: Props) => {
 	return (
-		<main className="flex">
-			<>{children}</>
+		<main>
+			<Navbar title="Contacts" />
+			{children}
 		</main>
 	);
 };

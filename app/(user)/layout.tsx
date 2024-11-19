@@ -64,7 +64,13 @@ const Layout = async ({ children }: Props) => {
 
 		userHeaders.set(
 			'Authorization',
-			'Basic ' + btoa('velo+' + token.connect_wise.public_key + ':' + token.connect_wise.secret_key)
+			'Basic ' +
+				btoa(
+					'velo+' +
+						token.connect_wise.public_key +
+						':' +
+						token.connect_wise.secret_key
+				)
 		);
 	}
 
@@ -77,7 +83,7 @@ const Layout = async ({ children }: Props) => {
 					<AppSidebar />
 
 					<SidebarInset>
-						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col scroll-pb-3'>
+						<ScrollArea className="h-[calc(100vh-24px)] flex flex-col scroll-pb-3">
 							{children}
 						</ScrollArea>
 					</SidebarInset>

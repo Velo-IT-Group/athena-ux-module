@@ -46,70 +46,8 @@ const Page = async ({ searchParams }: Props) => {
 	]);
 	return (
 		<>
-			{/* <FilterHeader filters={[]} /> */}
-			<Sidebar
-				collapsible="none"
-				className="hidden flex-1 md:flex">
-				<SidebarHeader className="gap-3.5 border-b p-4">
-					<div className="flex w-full items-center justify-between">
-						<div className="text-base font-medium text-foreground">
-							Contacts
-						</div>
+			<FilterHeader filters={[]} />
 
-						<FilterHeader
-							filters={[
-								{
-									icon: 'Building',
-									label: 'Company',
-									values: companies.map((c) => ({
-										icon: 'Building',
-										label: c.name,
-										value: String(c.id),
-									})),
-								},
-							]}
-							hideDisplay
-						/>
-					</div>
-					<SidebarInput placeholder="Type to search..." />
-				</SidebarHeader>
-				<SidebarContent>
-					<SidebarGroup className="px-0">
-						<SidebarGroupContent>
-							{contacts.map((contact) => (
-								<a
-									href="#"
-									key={contact.id}
-									className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-									<div className="flex w-full items-center gap-2">
-										<span>
-											{contact.firstName}{' '}
-											{contact.lastName}
-										</span>
-										<span className="ml-auto text-xs">
-											{contact?.types?.some(
-												(type) => type.name === 'VIP'
-											) && (
-												<Badge
-													variant="caution"
-													className="rounded">
-													VIP
-												</Badge>
-											)}
-										</span>
-									</div>
-									<span className="font-medium">
-										{contact.company?.name}
-									</span>
-									<span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
-										{contact.company?.name}
-									</span>
-								</a>
-							))}
-						</SidebarGroupContent>
-					</SidebarGroup>
-				</SidebarContent>
-			</Sidebar>
 			<section className="p-3">
 				<ContactList
 					params={{}}

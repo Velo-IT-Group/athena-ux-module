@@ -9,6 +9,10 @@ const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
+export type PopoverContentProps = React.ComponentPropsWithoutRef<
+	typeof PopoverPrimitive.Content
+>;
+
 const PopoverContent = React.forwardRef<
 	React.ElementRef<typeof PopoverPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>

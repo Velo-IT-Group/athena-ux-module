@@ -60,7 +60,6 @@ export function Combobox({
 	const [open, setOpen] = useState(false);
 
 	const handleSelect = async (newValue: any) => {
-		console.log(type, id, path, value, newValue);
 		try {
 			switch (type) {
 				case 'ticket':

@@ -38,8 +38,14 @@ const Layout = async ({ children }: Props) => {
 	if (!user?.user_metadata || !user?.user_metadata?.workerSid) {
 		const [worker, members, { data: contacts }] = await Promise.all([
 			findWorker(user?.email ?? ''),
-			getSystemMembers({ conditions: { officeEmail: `'${user?.email}'` } }),
-			getContacts({ childConditions: { 'communicationItems/value': `'${user?.email}'` } }),
+			getSystemMembers({
+				conditions: { officeEmail: `'${user?.email}'` },
+			}),
+			getContacts({
+				childConditions: {
+					'communicationItems/value': `'${user?.email}'`,
+				},
+			}),
 		]);
 
 		await supabase.auth.updateUser({
@@ -96,7 +102,13 @@ const Layout = async ({ children }: Props) => {
 
 		userHeaders.set(
 			'Authorization',
-			'Basic ' + btoa('velo+' + token.connect_wise.public_key + ':' + token.connect_wise.secret_key)
+			'Basic ' +
+				btoa(
+					'velo+' +
+						token.connect_wise.public_key +
+						':' +
+						token.connect_wise.secret_key
+				)
 		);
 	}
 
@@ -111,10 +123,8 @@ const Layout = async ({ children }: Props) => {
 					/>
 
 					<SidebarInset>
-						<ScrollArea className='h-[calc(100vh-24px)] flex flex-col'>
-							<Navbar />
-
-							<div className='h-full grow'>{children}</div>
+						<ScrollArea className="h-[calc(100vh-24px)] flex flex-col">
+							<div className="h-full grow">{children}</div>
 						</ScrollArea>
 					</SidebarInset>
 

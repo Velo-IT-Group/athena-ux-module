@@ -39,7 +39,7 @@ type Log = {
 	currentUser: string;
 	contact: string;
 	startDate: Date;
-	endDate: Date;
+	endDate?: Date;
 	icon: LucideIcon;
 };
 
@@ -124,8 +124,8 @@ const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
 				id,
 				currentUser: member.name,
 				contact: `#${ticket?.id ?? ''} - ${ticket?.summary ?? ''}`,
-				startDate: new Date(timeStart),
-				endDate: new Date(timeEnd),
+				startDate: timeStart ? new Date(timeStart) : new Date(),
+				endDate: timeEnd ? new Date(timeEnd) : undefined,
 				text: 'saved a time entry to',
 				icon: Clock,
 			})) ?? []),
@@ -152,7 +152,11 @@ const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
 	];
 
 	const groupedLogs = groupBy(
-		logs.sort((a, b) => b.endDate.getTime() - a.endDate.getTime()),
+		logs.sort(
+			(a, b) =>
+				(b?.endDate?.getTime() ?? new Date().getTime()) -
+				(a?.endDate?.getTime() ?? new Date().getTime())
+		),
 		({ startDate }) => {
 			let newDate = new Date(startDate);
 			return relativeDay(newDate);
@@ -160,17 +164,17 @@ const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
 	);
 
 	return (
-		<DialogContent className="sm:max-w-5xl">
-			<DialogHeader className="flex flex-row items-center justify-start gap-3 space-y-0">
-				<Avatar className="h-12 w-12 font-semibold">
-					<AvatarFallback className="uppercase">
+		<DialogContent className='sm:max-w-5xl'>
+			<DialogHeader className='flex flex-row items-center justify-start gap-3 space-y-0'>
+				<Avatar className='h-12 w-12 font-semibold'>
+					<AvatarFallback className='uppercase'>
 						{worker.friendlyName[0]}
 						{worker.friendlyName[1]}
 					</AvatarFallback>
 				</Avatar>
 
-				<div className="space-y-1.5">
-					<DialogTitle className="shrink-0">
+				<div className='space-y-1.5'>
+					<DialogTitle className='shrink-0'>
 						{workerAttributes.full_name}
 					</DialogTitle>
 					{/* <div className='flex items-center gap-1.5'>
@@ -181,127 +185,141 @@ const WorkerDialog = ({ worker, workerAttributes, items }: Props) => {
 				</div>
 			</DialogHeader>
 
-			<ScrollArea className="h-[480px]">
-				<div className="space-y-3">
-					<div className="grid grid-cols-4 gap-3">
+			<ScrollArea className='h-[480px]'>
+				<div className='space-y-3'>
+					<div className='grid grid-cols-4 gap-3'>
 						<Card>
-							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
-								<CardTitle className="text-sm font-medium">
+							<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 p-3'>
+								<CardTitle className='text-sm font-medium'>
 									Total Calls
 								</CardTitle>
 
-								<Phone className="text-muted-foreground" />
+								<Phone className='text-muted-foreground' />
 							</CardHeader>
 
-							<CardContent className="pb-3 px-3">
-								<div className="text-2xl font-bold">
+							<CardContent className='pb-3 px-3'>
+								<div className='text-2xl font-bold'>
 									{todayConversations?.length ?? 0}
 								</div>
 							</CardContent>
 						</Card>
 
 						<Card>
-							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
-								<CardTitle className="text-sm font-medium">
+							<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 p-3'>
+								<CardTitle className='text-sm font-medium'>
 									Inbound Calls
 								</CardTitle>
 
-								<PhoneIncoming className="text-muted-foreground" />
+								<PhoneIncoming className='text-muted-foreground' />
 							</CardHeader>
 
-							<CardContent className="pb-3 px-3">
-								<div className="text-2xl font-bold">
+							<CardContent className='pb-3 px-3'>
+								<div className='text-2xl font-bold'>
 									{inboundConversations?.length ?? 0}
 								</div>
 							</CardContent>
 						</Card>
 
 						<Card>
-							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
-								<CardTitle className="text-sm font-medium">
+							<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 p-3'>
+								<CardTitle className='text-sm font-medium'>
 									Outbound Calls
 								</CardTitle>
 
-								<PhoneOutgoing className="text-muted-foreground" />
+								<PhoneOutgoing className='text-muted-foreground' />
 							</CardHeader>
 
-							<CardContent className="pb-3 px-3">
-								<div className="text-2xl font-bold">
+							<CardContent className='pb-3 px-3'>
+								<div className='text-2xl font-bold'>
 									{outboundConversations?.length ?? 0}
 								</div>
 							</CardContent>
 						</Card>
 
 						<Card>
-							<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
-								<CardTitle className="text-sm font-medium">
+							<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 p-3'>
+								<CardTitle className='text-sm font-medium'>
 									Talk Time
 								</CardTitle>
 
-								<Clock className="text-muted-foreground" />
+								<Clock className='text-muted-foreground' />
 							</CardHeader>
 
-							<CardContent className="pb-3 px-3">
-								<div className="text-2xl font-bold">
+							<CardContent className='pb-3 px-3'>
+								<div className='text-2xl font-bold'>
 									{hours}h {minutes}m
 								</div>
 							</CardContent>
 						</Card>
 					</div>
 
-					<div className="space-y-6 px-3">
+					<div className='space-y-6 px-3'>
 						{/* <p className='text-muted-foreground text-sm'>Activity Logs</p> */}
 
-						<div className="space-y-3">
+						<div className='space-y-3'>
 							{Object?.entries(groupedLogs).map(
 								([key, logGroup], index) => (
 									<div key={key}>
-										<h2 className="font-medium mb-3 capitalize">
+										<h2 className='font-medium mb-3 capitalize'>
 											{key}
 										</h2>
 
 										{logGroup.map((log) => (
 											<div
 												key={`log-${log.id}`}
-												className="group px-1.5 flex items-start gap-3">
-												<div className="flex flex-col justify-center items-center">
-													<Avatar className="h-9 w-9">
-														<AvatarFallback className="uppercase">
+												className='group px-1.5 flex items-start gap-3'>
+												<div className='flex flex-col justify-center items-center'>
+													<Avatar className='h-9 w-9'>
+														<AvatarFallback className='uppercase'>
 															{/* <Icon  /> */}
 															<log.icon />
 														</AvatarFallback>
 													</Avatar>
 
 													<Separator
-														orientation="vertical"
-														className="min-h-9 w-[2px] group-last:hidden"
+														orientation='vertical'
+														className='min-h-9 w-[2px] group-last:hidden'
 													/>
 												</div>
 
-												<div className="space-y-1.5">
+												<div className='space-y-1.5'>
 													<p>
-														<span className="font-medium">
+														<span className='font-medium'>
 															{log.currentUser}
 														</span>
-														<span className="text-muted-foreground text-sm">
+														<span className='text-muted-foreground text-sm'>
 															{' '}
 															{log.text}{' '}
 														</span>
-														<span className="font-medium">
+														<span className='font-medium'>
 															{log.contact}
 														</span>
 													</p>
 
-													<p className="text-xs text-muted-foreground">
-														{log.startDate &&
-															log.endDate &&
+													<p className='text-xs text-muted-foreground'>
+														{log.endDate &&
+														log.startDate ? (
 															formatDate({
 																timeStyle:
 																	'short',
 															}).formatRange(
 																log.startDate,
 																log.endDate
-															)}
+															)
+														) : (
+															<>
+																{Intl.DateTimeFormat(
+																	'en-US',
+																	{
+																		timeStyle:
+																			'short',
+																	}
+																).format(
+																	log.startDate
+																)}{' '}
+																- Current
+															</>
+														)}
 													</p>
 												</div>
 											</div>

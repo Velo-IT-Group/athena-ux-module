@@ -278,7 +278,7 @@ export type Database = {
           {
             foreignKeyName: "profile_keys_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -909,6 +909,56 @@ export type Database = {
         }
         Relationships: []
       }
+      calls_by_agent: {
+        Row: {
+          agent: string | null
+          inbound_calls: number | null
+          outbound_calls: number | null
+        }
+        Relationships: []
+      }
+      calls_by_agent_by_day: {
+        Row: {
+          agent: string | null
+          date: string | null
+          inbound_calls: number | null
+          outbound_calls: number | null
+          total_conversations: number | null
+          total_talk_time: number | null
+        }
+        Relationships: []
+      }
+      calls_summary_by_day: {
+        Row: {
+          call_date: string | null
+          inbound_conversations: number | null
+          outbound_conversations: number | null
+          total_calls: number | null
+          total_talk_time: number | null
+        }
+        Relationships: []
+      }
+      conversations_by_agent_by_day: {
+        Row: {
+          agent: string | null
+          conversation_date: string | null
+          inbound_conversations: number | null
+          outbound_conversations: number | null
+          total_conversations: number | null
+          total_talk_time: number | null
+        }
+        Relationships: []
+      }
+      conversations_summary_by_day: {
+        Row: {
+          conversation_date: string | null
+          inbound_conversations: number | null
+          outbound_conversations: number | null
+          total_conversations: number | null
+          voicemail_count: number | null
+        }
+        Relationships: []
+      }
       handle_time_by_day: {
         Row: {
           average_abandon_time: number | null
@@ -922,6 +972,13 @@ export type Database = {
         Row: {
           voicemail_count: number | null
           voicemail_date: string | null
+        }
+        Relationships: []
+      }
+      voicemails_by_month: {
+        Row: {
+          voicemail_count: number | null
+          voicemail_month: string | null
         }
         Relationships: []
       }
